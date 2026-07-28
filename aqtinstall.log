@@ -1,3 +1,20 @@
 2026-07-28 23:35:05,548 - aqt.main - INFO - installer 32140 aqtinstall(aqt) v3.3.0 on Python 3.10.11 [CPython MSC v.1929 64 bit (AMD64)]
 2026-07-28 23:35:05,550 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_683/qt6_683/Updates.xml.sha256
 2026-07-28 23:35:29,661 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_683/qt6_683/Updates.xml.sha256
+2026-07-28 23:35:53,728 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_683/qt6_683/Updates.xml.sha256
+2026-07-28 23:36:17,809 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_683/qt6_683/Updates.xml.sha256
+2026-07-28 23:36:41,896 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/desktop/qt6_683/qt6_683/Updates.xml.sha256
+2026-07-28 23:37:05,994 - aqt.archives - WARNING - archives 32140 Failed to download checksum for the file 'online/qtsdkrepository/windows_x86/desktop/qt6_683/qt6_683/Updates.xml'. This may happen on unofficial mirrors.
+2026-07-28 23:37:06,708 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtwebengine/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:37:30,789 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtwebengine/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:37:54,846 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtwebengine/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:38:18,981 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtwebengine/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:38:43,048 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtwebengine/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:39:07,137 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtpdf/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:39:31,203 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtpdf/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:39:55,283 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtpdf/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:40:19,371 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtpdf/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:40:43,471 - aqt.helper - DEBUG - helper 32140 Attempt to download checksum at https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtpdf/683/msvc2022_64/Updates.xml.sha256
+2026-07-28 23:41:07,595 - aqt.main - ERROR - installer 32140 The packages ['qtdeclarative', 'qtsvg', 'qttools'] were not found while parsing XML of package information!
+==============================Suggested follow-up:==============================
+* Please use 'aqt list-qt windows desktop --modules 6.8.3 <arch>' to show modules available.

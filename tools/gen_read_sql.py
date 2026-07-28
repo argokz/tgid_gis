@@ -81,6 +81,15 @@ SPECIAL_LINE = {
 }
 
 
+def write_sql(path, sql):
+    """Файлы sql3/*.sql приложение читает функцией readQ (mystd.cpp:189),
+    которая прогоняет содержимое через cp2utf, то есть ЖДЁТ CP1251.
+    Записанный в UTF-8 файл был бы прочитан неверно — кириллица
+    в запросе превратилась бы в мусор."""
+    with open(path, 'w', encoding='cp1251', newline='\r\n') as f:
+        f.write(sql)
+
+
 def net_columns(cur, table):
     cur.execute("""SELECT column_name FROM information_schema.columns
                    WHERE table_schema = 'net' AND table_name = %s""", (table,))
@@ -234,8 +243,7 @@ WHERE n.removed = 0
 
     os.makedirs(args.outdir, exist_ok=True)
     path = os.path.join(args.outdir, 'us_net.sql')
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write(sql)
+    write_sql(path, sql)
     print('-> %s (%d колонок, %d ветвей union)'
           % (path, len(us_cols), len(NODE_TYPE_CODE)))
 
@@ -320,8 +328,7 @@ WHERE n1.removed = 0
 """.format(cols=',\n    '.join(outer), union=union)
 
     path = os.path.join(outdir, 'ut_net.sql')
-    with open(path, 'w', encoding='utf-8') as f:
-        f.write(sql)
+    write_sql(path, sql)
     print('-> %s (%d колонок, %d ветвей union)'
           % (path, len(ut_cols), len(targets)))
 
