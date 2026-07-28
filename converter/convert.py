@@ -202,14 +202,21 @@ class Converter:
             cols.append(q(c))
             vals.append('s.%s' % q(c))
 
-        head = ['fragment_id', 'geom', 'removed_at', 'src_id']
-        body = ['f.id',
+        # id СОХРАНЯЕТСЯ из public. На объекты ссылаются 139 колонок
+        # в схеме public (nodeid, lineid, nodeid1, nodeid2), и перенумерация
+        # порвала бы все эти связи. Реестры узлов и линий раздельные,
+        # поэтому совпадение id узла и id линии допустимо.
+        head = ['id', 'fragment_id', 'geom', 'removed_at', 'src_id']
+        body = ['%s.id' % alias,
+                'f.id',
                 geom,
                 'CASE WHEN %s.removed <> 0 THEN now() END' % alias,
                 '%s.id' % alias]
         if is_line:
-            head[1:1] = ['node_from', 'node_to', 'node_from_src', 'node_to_src']
-            body[1:1] = ['nr1.id', 'nr2.id', 'l.nodeid1', 'l.nodeid2']
+            head[1:1] = ['node_from', 'node_to', 'node_from_src',
+                         'node_to_src', 'fileid_src']
+            body[1:1] = ['nr1.id', 'nr2.id', 'l.nodeid1', 'l.nodeid2',
+                         'l.fileid']
 
         src_tbl = 'linesobj' if is_line else 'nodes'
         if plain:
@@ -303,6 +310,21 @@ class Converter:
                 WHERE s.{link} IS NULL OR r.src_id IS NULL
             """.format(src=e['source'], link=link))
 
+    def bump_sequence(self, cur):
+        """Сдвигаем последовательность выше всех перенесённых id, иначе
+        новые объекты столкнутся с сохранёнными идентификаторами."""
+        cur.execute("SELECT tablename FROM pg_tables WHERE schemaname = 'net'")
+        tables = [t for (t,) in cur.fetchall()
+                  if t not in ('fragment', 'node_reg', 'line_reg',
+                               'line_orphan', 'conversion_reject',
+                               'node_src_map')]
+        parts = ['SELECT max(id) AS m FROM net.%s' % q(t) for t in tables]
+        cur.execute('SELECT coalesce(max(m), 0) + 1 FROM (%s) s'
+                    % ' UNION ALL '.join(parts))
+        nxt = cur.fetchone()[0]
+        cur.execute('SELECT setval(%s, %s, false)', ('net.obj_id_seq', nxt))
+        self.log('  следующий id для новых объектов: %d' % nxt)
+
     def analyze(self, cur):
         """Без свежей статистики планировщик не берёт частичные индексы
         и уходит в Seq Scan — замер показал разницу в 3 раза."""
@@ -374,6 +396,7 @@ def main():
         c.layers(cur)
         c.children(cur)
         c.orphans(cur)
+        c.bump_sequence(cur)
         c.analyze(cur)
 
         if args.apply:

@@ -1064,6 +1064,7 @@ CREATE TABLE IF NOT EXISTS net.air_heater (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1106,6 +1107,7 @@ CREATE TABLE IF NOT EXISTS net.damper (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1152,6 +1154,7 @@ CREATE TABLE IF NOT EXISTS net.diaphragm (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1191,6 +1194,7 @@ CREATE TABLE IF NOT EXISTS net.elevator (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1236,6 +1240,7 @@ CREATE TABLE IF NOT EXISTS net.heat_exchanger (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1273,6 +1278,7 @@ CREATE TABLE IF NOT EXISTS net.pipe_section (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1455,6 +1461,7 @@ CREATE TABLE IF NOT EXISTS net.local_resistance (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1493,6 +1500,7 @@ CREATE TABLE IF NOT EXISTS net.regulator_press (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1537,6 +1545,7 @@ CREATE TABLE IF NOT EXISTS net.pump (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1608,6 +1617,7 @@ CREATE TABLE IF NOT EXISTS net.radiator (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1647,6 +1657,7 @@ CREATE TABLE IF NOT EXISTS net.line_plain (
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_from_src int
   , node_to_src   int
+  , fileid_src    int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int

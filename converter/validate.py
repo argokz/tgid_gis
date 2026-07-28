@@ -134,6 +134,39 @@ def main():
           lambda moved, orph, alive: moved + orph >= alive * 0.99,
           'допускается расхождение до 1 % на записи с removed<>0')
 
+    print('\n=== СОХРАННОСТЬ ИДЕНТИФИКАТОРОВ ===')
+
+    # На объекты ссылаются 139 колонок схемы public (nodeid, lineid,
+    # nodeid1, nodeid2). Если id изменится, порвутся все эти связи.
+    check('узлы: id совпадает с прежним public.nodes.id',
+          'SELECT count(*), count(*) FILTER (WHERE id = src_id) FROM (%s) u'
+          % ' UNION ALL '.join('SELECT id, src_id FROM net.%s' % t
+                               for t in node_tables),
+          lambda tot, ok: tot == ok and tot > 0)
+
+    check('линии: id совпадает с прежним public.linesobj.id',
+          'SELECT count(*), count(*) FILTER (WHERE id = src_id) FROM (%s) u'
+          % ' UNION ALL '.join('SELECT id, src_id FROM net.%s' % t
+                               for t in line_tables),
+          lambda tot, ok: tot == ok and tot > 0)
+
+    check('линии: концы ссылаются на прежние id узлов',
+          """SELECT count(*), count(*) FILTER (
+                 WHERE node_from = node_from_src AND node_to = node_to_src)
+             FROM (%s) u"""
+          % ' UNION ALL '.join(
+              'SELECT node_from, node_to, node_from_src, node_to_src '
+              'FROM net.%s' % t for t in line_tables),
+          lambda tot, ok: tot == ok and tot > 0)
+
+    check('последовательность сдвинута выше занятых id',
+          """SELECT (SELECT last_value FROM net.obj_id_seq),
+                    (SELECT max(id) FROM (%s) u)"""
+          % ' UNION ALL '.join('SELECT id FROM net.%s' % t
+                               for t in node_tables + line_tables),
+          lambda seq, mx: seq > mx,
+          'иначе новый объект столкнётся с сохранённым id')
+
     print('\n=== ПРИВЯЗКА К ФРАГМЕНТАМ ===')
 
     # Приложение фильтрует объекты именно по фрагменту, поэтому потеря
