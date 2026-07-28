@@ -1,0 +1,682 @@
+# Классификация таблиц БД almatygid
+
+Всего таблиц: 648, колонок: 7934, внешних ключей: 0
+
+
+## base (2)
+
+- linesobj                                      rows=126460   cols=26   LINESTRING srid=9998
+- nodes                                         rows=91532    cols=44   POINT srid=9998
+
+## node_subtype (21)
+
+- generalizedconsumers                          rows=29051    cols=154   
+- realconsumers                                 rows=26202    cols=160   
+- ugol_povorota_truboprovoda                    rows=25214    cols=22   POINT srid=9998
+- lyuki                                         rows=18392    cols=20   GEOMETRY srid=9998
+- setpressnodes                                 rows=5740     cols=9     
+- vvod_v_zdanie                                 rows=5463     cols=17   GEOMETRY srid=9998
+- opora                                         rows=3611     cols=22   POINT srid=9998
+- wdodevices                                    rows=3385     cols=5     
+- deployeddirections                            rows=2210     cols=3     
+- connectnodes                                  rows=1527     cols=3     
+- pressregulators                               rows=509      cols=13    
+- pumpstations                                  rows=227      cols=11    
+- heatsources                                   rows=164      cols=210   
+- heatchambers                                  rows=91       cols=13    
+- threewayvalves                                rows=14       cols=18    
+- pressdropregulators                           rows=13       cols=13    
+- consumptregulators                            rows=7        cols=13    
+- kapremont_uchastki_remonta                    rows=5        cols=9    GEOMETRY srid=9998
+- perehod_diametra                              rows=4        cols=17   POINT srid=9998
+- opressovka_defekt                             rows=1        cols=10   GEOMETRY srid=9998
+- refillnodes                                   rows=1        cols=16    
+
+## line_subtype (10)
+
+- heatpipesections                              rows=98019    cols=151   
+- diaphragms                                    rows=16718    cols=7     
+- dampers                                       rows=14868    cols=14    
+- vvody_v_zdanie                                rows=5463     cols=7    POINT srid=9998
+- elevators                                     rows=2754     cols=13    
+- systemradiators                               rows=622      cols=7     
+- pumps                                         rows=286      cols=39    
+- heatexchangers                                rows=232      cols=6     
+- airheaters                                    rows=91       cols=11    
+- localhydroresistances2                        rows=2        cols=6     
+
+## geo_other (4)
+
+- zdaniya_2                                     rows=187203   cols=23   GEOMETRY srid=9998
+- zdaniya_potrebiteley                          rows=12466    cols=8    GEOMETRY srid=9998
+- zdaniya_tu                                    rows=5197     cols=11   GEOMETRY srid=9998
+- truby_rekonstruiruemye                        rows=44       cols=24   GEOMETRY srid=9998
+
+## reference (359)
+
+- funktsionalnoe_naznachenie_zdaniy_i_sooruzheniy rows=284      cols=6     
+- directions                                    rows=226      cols=4     
+- standardairheaters                            rows=215      cols=11    
+- standardpressdropregulators                   rows=212      cols=20    
+- shurf_elementy                                rows=190      cols=13    
+- prisoedinennaya_nagruzka_istochnikov3         rows=166      cols=11    
+- hsourceworkmonthgraphs                        rows=152      cols=147   
+- overlaptypes                                  rows=135      cols=3     
+- standardmanometers                            rows=129      cols=15    
+- cities                                        rows=109      cols=2     
+- defekt_truby                                  rows=102      cols=9     
+- mikrorayony                                   rows=100      cols=2     
+- istochniki_tepla                              rows=99       cols=7     
+- heatlosessourcemonths                         rows=84       cols=26    
+- standardtubes                                 rows=83       cols=13    
+- kotelnye                                      rows=80       cols=11    
+- standardpumps                                 rows=80       cols=59    
+- varcoefficients                               rows=79       cols=18    
+- spisok_zhilyh_massivov                        rows=74       cols=2     
+- standardems                                   rows=74       cols=13    
+- calctemperatures                              rows=73       cols=57    
+- table                                         rows=73       cols=7     
+- specexpends                                   rows=71       cols=19    
+- standardcompensators                          rows=69       cols=10    
+- constructiontypes                             rows=60       cols=3     
+- uchastok_ms                                   rows=60       cols=29    
+- standardpressregulators                       rows=51       cols=9     
+- vyd                                           rows=51       cols=4     
+- isolmaterials                                 rows=49       cols=4     
+- vidy_elementov                                rows=46       cols=3     
+- organizatsii_proektnye                        rows=45       cols=7     
+- proektnaya_organizatsiya                      rows=45       cols=7     
+- airgroundmonthtemperatures                    rows=44       cols=49    
+- pasport_uchastka_ms                           rows=42       cols=5     
+- localhydroresistances                         rows=41       cols=4     
+- uchastki_ekspluatatsii                        rows=41       cols=6     
+- material_pokrovnogo_sloya                     rows=40       cols=8     
+- tip_armatury_setey_teplosnabzheniya           rows=38       cols=4     
+- losesbyfilling                                rows=36       cols=14    
+- nachalniki_uchastkov                          rows=36       cols=7     
+- material_obektov_setey_teplosnabzheniya       rows=34       cols=4     
+- passwords                                     rows=34       cols=4     
+- uchastok_rs                                   rows=34       cols=29    
+- pasport_uchastka_rs                           rows=33       cols=5     
+- raspredseti                                   rows=33       cols=10    
+- standardelevators                             rows=32       cols=16    
+- standardtubheatexchangers                     rows=32       cols=17    
+- shurf_truby                                   rows=30       cols=9     
+- remonttubetypes                               rows=29       cols=4     
+- standardreversevalves                         rows=27       cols=9     
+- perspektivnye_truby                           rows=26       cols=18    
+- designtypes                                   rows=22       cols=3     
+- namechennye_meropriyatiya_po_elementam        rows=20       cols=3     
+- remontdocumenttypes                           rows=20       cols=4     
+- vidy_elementov_shurf                          rows=18       cols=3     
+- marki_kabeley_es                              rows=16       cols=3     
+- remontcapitaltubetypes                        rows=16       cols=4     
+- remontinvesttubetypes                         rows=16       cols=4     
+- documenttypes                                 rows=15       cols=2     
+- months                                        rows=15       cols=2     
+- remontcapitalchanneltypes                     rows=15       cols=4     
+- remontinvestchanneltypes                      rows=15       cols=4     
+- subdivisions                                  rows=15       cols=4     
+- familii_masterov_ao__astana_teplotranzit      rows=14       cols=11    
+- fragments                                     rows=14       cols=156   
+- magistrali                                    rows=14       cols=13    
+- magistrals                                    rows=14       cols=13    
+- opressovka_povrezhdeniya                      rows=14       cols=3     
+- heating_seasons                               rows=13       cols=3     
+- defectopistype                                rows=12       cols=4     
+- heatloses                                     rows=12       cols=8     
+- kapremont_truboprovod_oborudovanie_izolyatsiya rows=12       cols=3     
+- listptstables                                 rows=12       cols=3     
+- material_teploizolyatsionnyy                  rows=12       cols=7     
+- objecttypes                                   rows=12       cols=4     
+- transftypes                                   rows=12       cols=4     
+- connectiontypes                               rows=11       cols=4     
+- defectmeroprtype                              rows=11       cols=4     
+- opressovka_meropriyatiya_po_ustraneniyu_povrezhdeniy rows=11       cols=3     
+- povrezhdennyielement                          rows=11       cols=3     
+- tip_kanala_setey_teplosnabzheniya             rows=11       cols=4     
+- armaturetypes                                 rows=10       cols=3     
+- kapremont_planiruemye_meropriyatiya_kolodtsy_opory rows=10       cols=3     
+- normtemperaturesgraphs                        rows=10       cols=37    
+- object_types                                  rows=10       cols=2     
+- rayon_ekspluatatsii                           rows=10       cols=3     
+- remonttruboprovodaspisok                      rows=10       cols=3     
+- standardthermometers                          rows=10       cols=17    
+- standardthreewayvalves                        rows=10       cols=17    
+- administrativnyy_rayon                        rows=9        cols=2     
+- docremonttypes                                rows=9        cols=4     
+- externalmaterials                             rows=9        cols=2     
+- kapremont_uchastok_teploprovoda_ishodnyy      rows=9        cols=140   
+- kapremont_uchastok_teploprovoda_posle_remonta rows=9        cols=140   
+- nodetypes                                     rows=9        cols=4     
+- plity_perekrytiya_teplovyh_kamer              rows=9        cols=10    
+- channeltype                                   rows=8        cols=3     
+- dolzhnosti                                    rows=8        cols=2     
+- materialtypes                                 rows=8        cols=3     
+- nalichie_korrozii_shurf                       rows=8        cols=3     
+- prichiny_korrozii                             rows=8        cols=3     
+- remontchanneltypes                            rows=8        cols=4     
+- standardconsregulators                        rows=8        cols=13    
+- statustypes                                   rows=8        cols=3     
+- compensatortypes                              rows=7        cols=4     
+- defecttypes                                   rows=7        cols=4     
+- mestopovrezhdenija                            rows=7        cols=3     
+- prichinypovrezhdenia                          rows=7        cols=3     
+- radialcompensatorforms                        rows=7        cols=4     
+- remontcat                                     rows=7        cols=4     
+- tip_kompensatora_setey_teplosnabzheniya       rows=7        cols=4     
+- tip_opory                                     rows=7        cols=3     
+- baza_dannyh_po_adresnym_spravkam              rows=6        cols=4     
+- buildingconstructions                         rows=6        cols=4     
+- constructionoverlaptypes                      rows=6        cols=3     
+- heatlosessource                               rows=6        cols=83    
+- oporatypes                                    rows=6        cols=4     
+- prichiny_narusheniya_organizacionnye          rows=6        cols=4     
+- purposetypes                                  rows=6        cols=3     
+- remont_izolyatsionnoy_konstruktsii            rows=6        cols=3     
+- shema_gvs                                     rows=6        cols=3     
+- soputstvuiushchieprichiny                     rows=6        cols=3     
+- sost_oborud                                   rows=6        cols=4     
+- spisokelementov                               rows=6        cols=4     
+- standarddampers                               rows=6        cols=18    
+- throtstagesigns                               rows=6        cols=4     
+- tip_massiva                                   rows=6        cols=4     
+- tipy_priemnikov_elektricheskih_setey          rows=6        cols=4     
+- tolschinometr                                 rows=6        cols=8     
+- vid_korrozii                                  rows=6        cols=3     
+- vidy_trub                                     rows=6        cols=3     
+- buildingconstrstates                          rows=5        cols=4     
+- corrosionprocessmarks                         rows=5        cols=4     
+- externalsignline                              rows=5        cols=4     
+- faktiznos_3_sost_obor                         rows=5        cols=6     
+- faktriska_10_stroykonstr                      rows=5        cols=6     
+- faktriska_4_elekt                             rows=5        cols=6     
+- faktriska_5_transport                         rows=5        cols=6     
+- grupurpose                                    rows=5        cols=2     
+- harakter_grunta                               rows=5        cols=3     
+- harakter_grunta_shurf                         rows=5        cols=3     
+- hydromodesigns                                rows=5        cols=4     
+- konstruktsiya_pokrovnogo_sloya_izolyatsii     rows=5        cols=3     
+- lookup2                                       rows=5        cols=4     
+- lookup6                                       rows=5        cols=4     
+- nalichie_vblizi_kommunikacij                  rows=5        cols=3     
+- namechennye_meropriyatiya_po_izolyatsionnoy_konstruktsii rows=5        cols=3     
+- namechennye_meropriyatiya_po_teploprovodu     rows=5        cols=3     
+- otsenka_korroziynogo_protsessa                rows=5        cols=3     
+- poverhnost_nad_trassoj                        rows=5        cols=3     
+- prtable                                       rows=5        cols=4     
+- roadsurfacetypes                              rows=5        cols=4     
+- shurf_korroziynaya_aktivnost                  rows=5        cols=49    
+- shurf_potentsialy_truba_zemlya                rows=5        cols=80    
+- shurf_vlazhnost_grunta                        rows=5        cols=34    
+- shurf_vodnaya_vytyazhka                       rows=5        cols=47    
+- sost_konstr                                   rows=5        cols=4     
+- sostkonstruktsiikamery                        rows=5        cols=3     
+- sostkonstruktsiikanala                        rows=5        cols=3     
+- sposob_ispolneniya_obektov_setey_teplosnabzheniya rows=5        cols=4     
+- tippovrezhdenia                               rows=5        cols=3     
+- tubetypes                                     rows=5        cols=4     
+- tubingtypes                                   rows=5        cols=4     
+- vosstanovitelnye_raboty_shurf                 rows=5        cols=3     
+- agressivnost_setevoy_vody                     rows=4        cols=3     
+- characteristictypes                           rows=4        cols=3     
+- edvpurpos                                     rows=4        cols=2     
+- faktiznos_2_kat_narush                        rows=4        cols=6     
+- faktriska_16_avto                             rows=4        cols=6     
+- faktriska_18_uscherb_nas                      rows=4        cols=6     
+- graphtypes                                    rows=4        cols=4     
+- groundwatercauses                             rows=4        cols=4     
+- infrastrdamages                               rows=4        cols=4     
+- int_kor                                       rows=4        cols=4     
+- locationtypes                                 rows=4        cols=3     
+- lookup3                                       rows=4        cols=4     
+- material_kamery_opuska_i_pavilonov_setey_teplosnabzh rows=4        cols=4     
+- naznachenie_zapornoy_armatury_setey_teplosnabzheniya rows=4        cols=4     
+- netwateraggressivenesses                      rows=4        cols=4     
+- operators                                     rows=4        cols=2     
+- opres_types                                   rows=4        cols=3     
+- opressovka_meropriyatiya                      rows=4        cols=5     
+- organizationtypes                             rows=4        cols=2     
+- populdamages                                  rows=4        cols=4     
+- prichiny_razryva_stenki_truby                 rows=4        cols=3     
+- prichiny_razryva_svarnogo_shva                rows=4        cols=3     
+- prichiny_svischa                              rows=4        cols=3     
+- remontkanalkameraspisok                       rows=4        cols=3     
+- sost_lookup                                   rows=4        cols=4     
+- sostoyanie_metalla_truboprovoda               rows=4        cols=3     
+- stateindicator                                rows=4        cols=4     
+- statetu                                       rows=4        cols=4     
+- tip_opory_setey_teplosnabzheniya              rows=4        cols=4     
+- tippoverhnosti                                rows=4        cols=3     
+- tipy_istochnikov_elektricheskih_setey         rows=4        cols=4     
+- tubingways                                    rows=4        cols=4     
+- typeofwork                                    rows=4        cols=4     
+- vid_rabot                                     rows=4        cols=4     
+- vidy_dokumentov_shurfa                        rows=4        cols=3     
+- automdegs                                     rows=3        cols=4     
+- axialcompensatortypes                         rows=3        cols=4     
+- breakcomplexities                             rows=3        cols=4     
+- breakconsumvols                               rows=3        cols=4     
+- buildingtypes                                 rows=3        cols=4     
+- controlconditions                             rows=3        cols=4     
+- corrosiondegreesin                            rows=3        cols=4     
+- corrosiondegreesout                           rows=3        cols=4     
+- da_net_informacii                             rows=3        cols=3     
+- damperarmaturestates                          rows=3        cols=4     
+- defectstates                                  rows=3        cols=4     
+- dreniruemyj_truboprovod                       rows=3        cols=4     
+- electroprotectdevices                         rows=3        cols=4     
+- erwdifficulties                               rows=3        cols=4     
+- externalsigns                                 rows=3        cols=4     
+- faktriska_11_vodootvedenie                    rows=3        cols=6     
+- faktriska_12_slozhnost_otkl                   rows=3        cols=6     
+- faktriska_13_otkl_potrebiteli                 rows=3        cols=6     
+- faktriska_14_avar_vosst_raboty                rows=3        cols=6     
+- faktriska_15_peshehod                         rows=3        cols=6     
+- faktriska_17_skoplenie_zhit                   rows=3        cols=6     
+- faktriska_19_uscherb_infrastr                 rows=3        cols=6     
+- faktriska_6_potencial                         rows=3        cols=6     
+- faktriska_7_vneshkorroz                       rows=3        cols=6     
+- faktriska_8_vnutkorroz                        rows=3        cols=6     
+- floodintensitiesbw                            rows=3        cols=4     
+- floodintensitiesfw                            rows=3        cols=4     
+- floodintensitiesgw                            rows=3        cols=4     
+- floodintensitiestw                            rows=3        cols=4     
+- gidroizolyacionnaya_konstrukciya              rows=3        cols=3     
+- groundhumidities                              rows=3        cols=4     
+- gvsparallschemes                              rows=3        cols=4     
+- heatlosesmain                                 rows=3        cols=19    
+- heatpointtypes                                rows=3        cols=3     
+- heatsourcetypes                               rows=3        cols=4     
+- indicatorstates                               rows=3        cols=4     
+- kapitalnyy_remont                             rows=3        cols=47    
+- lookup4                                       rows=3        cols=4     
+- lookup5                                       rows=3        cols=4     
+- materialy_i_mekhanizmy                        rows=3        cols=3     
+- namechennye_meropriyatiya_po_kanalu           rows=3        cols=3     
+- naznachenie_vskr                              rows=3        cols=4     
+- obj_type_faktory_riska                        rows=3        cols=4     
+- objekt_opressovochnogo_nasosa                 rows=3        cols=3     
+- opressovki_uchastok_ocheredi                  rows=3        cols=27    
+- piperemonttypes                               rows=3        cols=4     
+- potentialdifflevels                           rows=3        cols=4     
+- prinadlezhnost                                rows=3        cols=4     
+- regulatorstates                               rows=3        cols=4     
+- remont_kamery                                 rows=3        cols=4     
+- remont_kanala                                 rows=3        cols=4     
+- remont_po_vosstanovleniyu_kanala              rows=3        cols=3     
+- remontizolkonstruktsii                        rows=3        cols=3     
+- remonttypes                                   rows=3        cols=4     
+- schemeconnections                             rows=3        cols=4     
+- sectwaterdumps                                rows=3        cols=4     
+- shema_nagr                                    rows=3        cols=3     
+- shurfstates                                   rows=3        cols=4     
+- shutdowntypes                                 rows=3        cols=4     
+- sostnaruzhnoipoverkhnosti                     rows=3        cols=3     
+- sostoyanie_izolyatsionnogo_materiala          rows=3        cols=3     
+- sostoyanie_konstruktsii_kanala                rows=3        cols=3     
+- sostoyanie_naruzhnogo_pokrytiya               rows=3        cols=3     
+- sostoyanie_opres                              rows=3        cols=3     
+- sostoyanie_pokrovnogo_sloya_izolyatsii        rows=3        cols=3     
+- sostoyanie_protivokorrozionnogo_pokrytiya     rows=3        cols=3     
+- sostoyanie_protivokorrozionnogo_pokrytiya_shurf rows=3        cols=3     
+- sostoyanie_shurfa                             rows=3        cols=3     
+- sostoyanie_stroitelnyh_konstrukcij_kanala     rows=3        cols=3     
+- sostoyanie_teploizolyatsionnoy_konstruktsii   rows=3        cols=3     
+- sostoyanie_teplovoj_izolyacii                 rows=3        cols=3     
+- sostteploizol                                 rows=3        cols=3     
+- sostvnutrenneipoverkhnosti                    rows=3        cols=3     
+- sposob_vvoda_v_zdanie                         rows=3        cols=2     
+- sredstvodiag                                  rows=3        cols=4     
+- standardplateheatexchangers                   rows=3        cols=20    
+- standards                                     rows=3        cols=4     
+- statedefect                                   rows=3        cols=4     
+- stateremont2                                  rows=3        cols=4     
+- tip_kladbischa                                rows=3        cols=4     
+- tip_soedineniya_truboprovoda_setey_teplosnabzheniya rows=3        cols=4     
+- tip_truboprovoda                              rows=3        cols=3     
+- tip_vertikalnogo_povorota_setey_teplosnabzheniya rows=3        cols=4     
+- tubecharacteristics                           rows=3        cols=4     
+- tubingpedestrians                             rows=3        cols=4     
+- typeedv                                       rows=3        cols=2     
+- ustrojstva_vodootvedeniya                     rows=3        cols=3     
+- vid_narusheniya                               rows=3        cols=4     
+- workattributes                                rows=3        cols=4     
+- yesorno123                                    rows=3        cols=4     
+- zanos_kanala_gruntom                          rows=3        cols=3     
+- ballvalvetypes                                rows=2        cols=4     
+- calcferdiametersigns                          rows=2        cols=4     
+- calcheatlosessigns                            rows=2        cols=4     
+- capacity_types                                rows=2        cols=4     
+- channelstates                                 rows=2        cols=4     
+- closesyscalcsigns                             rows=2        cols=4     
+- connectionschemes                             rows=2        cols=4     
+- consumerstates                                rows=2        cols=4     
+- controlorganizations                          rows=2        cols=2     
+- controlservices                               rows=2        cols=4     
+- controlstages                                 rows=2        cols=4     
+- coolanttypes                                  rows=2        cols=4     
+- dgupurpose                                    rows=2        cols=2     
+- drenageperformances                           rows=2        cols=4     
+- drivetypes                                    rows=2        cols=4     
+- faktiznos_1_vneshnii_vid                      rows=2        cols=6     
+- faktriska_9_podtoplenie                       rows=2        cols=6     
+- floodingbeforetubes                           rows=2        cols=4     
+- heatcarriers                                  rows=2        cols=4     
+- holes                                         rows=2        cols=4     
+- isolationtypes                                rows=2        cols=4     
+- izolyatsiya_truby                             rows=2        cols=4     
+- konstruktsiya_drenazhnogo_ustroystva          rows=2        cols=3     
+- konstruktsiya_perekrytiya_kanala              rows=2        cols=3     
+- locations                                     rows=2        cols=4     
+- lookup1                                       rows=2        cols=4     
+- marki_transformatorov_es                      rows=2        cols=3     
+- objecttypes2                                  rows=2        cols=4     
+- ochered_opressovok                            rows=2        cols=25    
+- osmotr_sostoyanie                             rows=2        cols=3     
+- ownerorganizationtypes                        rows=2        cols=4     
+- pdvalveinstalllocs                            rows=2        cols=4     
+- pipelinesigns                                 rows=2        cols=4     
+- pipesectionsstates                            rows=2        cols=4     
+- pr_ots_lookup                                 rows=2        cols=4     
+- rabotniki                                     rows=2        cols=4     
+- rotordiametertypes                            rows=2        cols=4     
+- seasons                                       rows=2        cols=4     
+- setloadclosesyscalcsigns                      rows=2        cols=4     
+- signnumworks                                  rows=2        cols=4     
+- sootv_lookup                                  rows=2        cols=4     
+- standardtempregulators                        rows=2        cols=21    
+- stateinds                                     rows=2        cols=2     
+- states                                        rows=2        cols=4     
+- stopvalvetypes                                rows=2        cols=4     
+- temperaturechartsigns                         rows=2        cols=4     
+- tip_izolyatsii                                rows=2        cols=3     
+- tipy_lep                                      rows=2        cols=4     
+- transfpurpos                                  rows=2        cols=4     
+- tubeisolations                                rows=2        cols=4     
+- valvepurpose                                  rows=2        cols=4     
+- vnutrennee_sostoyanie_kanala                  rows=2        cols=3     
+- wemeteringdevices                             rows=2        cols=4     
+- yesorno                                       rows=2        cols=4     
+- yesorno12                                     rows=2        cols=4     
+- anticorrmaterials                             rows=1        cols=4     
+- energosistemy                                 rows=1        cols=3     
+- factorymanufacturers                          rows=1        cols=8     
+- heatlosesmainfact                             rows=1        cols=19    
+- heatsystem                                    rows=1        cols=162   
+- konstrukciya_drenazhnogo_ustrojstva           rows=1        cols=3     
+- organizatsii_obsluzhivayuschie                rows=1        cols=4     
+- organizatsii_podryadchiki                     rows=1        cols=7     
+- serviceorganizations                          rows=1        cols=4     
+- standardflowmeters                            rows=1        cols=15    
+- stroitelnye_konstrukcii_kanala                rows=1        cols=3     
+- tab                                           rows=1        cols=4     
+- vidy_dokumentov_osmotra                       rows=1        cols=3     
+- zavod_izgotovitel                             rows=1        cols=8     
+
+## other (19)
+
+- addresses                                     rows=90399    cols=7     
+- geodz                                         rows=85503    cols=2     
+- obekty                                        rows=38247    cols=4     
+- tablitsa1                                     rows=38247    cols=4     
+- nagruzki                                      rows=30511    cols=20    
+- organizatsii                                  rows=30285    cols=37    
+- klapany__ventili__zapornye                    rows=17731    cols=9     
+- organizations                                 rows=16579    cols=10    
+- organizatsii_vladeltsy                        rows=16579    cols=7     
+- zhile                                         rows=7962     cols=25    
+- zhile1                                        rows=7962     cols=10    
+- deployedtempgraphs                            rows=5250     cols=10    
+- tehnicheskie_usloviya                         rows=4775     cols=162   
+- spisok_ulits                                  rows=903      cols=2     
+- prisoedinennaya_nagruzka_istochnikov          rows=773      cols=16    
+- externalcodes                                 rows=698      cols=46    
+- ulitsy                                        rows=680      cols=3     
+- spisok_ulits_staryy                           rows=669      cols=2     
+- defekt_elementy                               rows=646      cols=13    
+
+## audit (4)
+
+- changed_object                                rows=156835   cols=7     
+- audit_log                                     rows=35083    cols=12    
+- audit_group_comments                          rows=568      cols=4     
+- oshibki_vstavki                               rows=315      cols=129   
+
+## empty (226)
+
+- act                                           rows=0        cols=18   GEOMETRY srid=9998
+- administrativedistricts                       rows=0        cols=2     
+- any2_out                                      rows=0        cols=9     
+- any_out                                       rows=0        cols=7     
+- bp_out                                        rows=0        cols=19    
+- bridge_crossing                               rows=0        cols=5    GEOMETRY srid=9998
+- brigades                                      rows=0        cols=5     
+- buildingentries                               rows=0        cols=3     
+- bypass                                        rows=0        cols=16    
+- calcschemes                                   rows=0        cols=43    
+- calculatedloads                               rows=0        cols=7     
+- calculatedloadsfact                           rows=0        cols=7     
+- calculation                                   rows=0        cols=8     
+- calculation_iznos                             rows=0        cols=4     
+- calculations                                  rows=0        cols=2     
+- capital2                                      rows=0        cols=19   GEOMETRY srid=9998
+- capital2_dokumenty                            rows=0        cols=5     
+- capital2_meropriyatiya                        rows=0        cols=5     
+- channelcoverconstructions                     rows=0        cols=2     
+- channels                                      rows=0        cols=19   GEOMETRY srid=9998
+- channeltypes                                  rows=0        cols=2     
+- corrosionindicators                           rows=0        cols=23   GEOMETRY srid=9998
+- defect                                        rows=0        cols=85   GEOMETRY srid=9998
+- defectchannel                                 rows=0        cols=3     
+- defectdocuments                               rows=0        cols=5     
+- defectkamera                                  rows=0        cols=3     
+- defectmeropr                                  rows=0        cols=3     
+- defectopis                                    rows=0        cols=3     
+- defectsforshurfy                              rows=0        cols=3     
+- defecttube                                    rows=0        cols=4     
+- defekt                                        rows=0        cols=144  GEOMETRY srid=9998
+- defekt2                                       rows=0        cols=19   GEOMETRY srid=9998
+- defekt2_dokumenty                             rows=0        cols=5     
+- defekt2_meropriyatiya                         rows=0        cols=5     
+- deployedtempgraphsfact                        rows=0        cols=10    
+- dgu                                           rows=0        cols=6     
+- dgudocuments                                  rows=0        cols=5     
+- diag                                          rows=0        cols=46   GEOMETRY srid=9998
+- districts                                     rows=0        cols=3     
+- docdiagosv                                    rows=0        cols=5     
+- docdiagvskr                                   rows=0        cols=5     
+- docdiagvyr                                    rows=0        cols=5     
+- dolzhnosti_es                                 rows=0        cols=2     
+- dolzhnosti_korrozia                           rows=0        cols=2     
+- dr_out                                        rows=0        cols=75    
+- drenazhnyy_kran                               rows=0        cols=33   POINT srid=9998
+- drenazhnyy_truboprovod                        rows=0        cols=26   GEOMETRY srid=9998
+- dro_out                                       rows=0        cols=14    
+- duker                                         rows=0        cols=5    GEOMETRY srid=9998
+- edv                                           rows=0        cols=12    
+- edvdocuments                                  rows=0        cols=5     
+- electrodocuments                              rows=0        cols=5     
+- electrodocumentsist                           rows=0        cols=5     
+- electrodocumentspr                            rows=0        cols=5     
+- faktory_riska_truboprovoda                    rows=0        cols=85    
+- gilza_es                                      rows=0        cols=12   GEOMETRY srid=9998
+- gilza_esdocuments                             rows=0        cols=5     
+- granitsy_vertikalnyh_kompensatorov            rows=0        cols=7    POINT srid=9998
+- gruzob                                        rows=0        cols=6     
+- gruzobdocuments                               rows=0        cols=5     
+- gvsloadgraphs                                 rows=0        cols=51    
+- heatlosesfact                                 rows=0        cols=9     
+- heatlosessourcefact                           rows=0        cols=83    
+- heatlosessourcelist                           rows=0        cols=1     
+- heatlosessourcemonthsfact                     rows=0        cols=26    
+- heatpipesectionsharness                       rows=0        cols=6     
+- heatpipesectionsharnessfact                   rows=0        cols=6     
+- heatpoint                                     rows=0        cols=17   GEOMETRY srid=9998
+- heatsysobjmaterials                           rows=0        cols=2     
+- help_old                                      rows=0        cols=10    
+- indikator_korrozii                            rows=0        cols=47   GEOMETRY srid=9998
+- indikator_korrozii_po_godam                   rows=0        cols=23    
+- internalnodes                                 rows=0        cols=2     
+- ispravl                                       rows=0        cols=2     
+- ist_out                                       rows=0        cols=8     
+- istochnik_elektrosnabzheniya                  rows=0        cols=13   GEOMETRY srid=9998
+- istochniki_teplosnabzheniya                   rows=0        cols=6    GEOMETRY srid=9998
+- itog2_out                                     rows=0        cols=27    
+- itog_out                                      rows=0        cols=24    
+- iznos                                         rows=0        cols=16    
+- kabelnyy_kanal_es                             rows=0        cols=13   GEOMETRY srid=9998
+- kabelnyy_kanal_esdocuments                    rows=0        cols=5     
+- kamera_opuska_ili_podema                      rows=0        cols=14   POINT srid=9998
+- kanal                                         rows=0        cols=33   GEOMETRY srid=9998
+- kapremont_elementy                            rows=0        cols=13    
+- kapremont_kolodtsy_opory_nadzemnyy            rows=0        cols=6     
+- kapremont_kolodtsy_opory_nadzemnyy2           rows=0        cols=3     
+- kapremont_kolodtsy_opory_podzemnyy            rows=0        cols=6     
+- kapremont_kolodtsy_opory_podzemnyy2           rows=0        cols=3     
+- kapremont_meropriyatiya                       rows=0        cols=6     
+- kapremont_planiruemye_meropriyatiya_trubopr_izolyatsiya_oborudo rows=0        cols=4     
+- kapremont_trubopr_izol                        rows=0        cols=6     
+- kolodtsy                                      rows=0        cols=18   POINT srid=9998
+- kompensator                                   rows=0        cols=23   POINT srid=9998
+- kontrol_tehnicheskogo_sostoyaniya             rows=0        cols=24   POINT srid=9998
+- kontrol_tehnicheskogo_sostoyaniya_dokumenty   rows=0        cols=5     
+- liniya_elektroperedach                        rows=0        cols=20   GEOMETRY srid=9998
+- link_elist_diz                                rows=0        cols=3     
+- link_elist_grpod                              rows=0        cols=3     
+- link_elist_trans                              rows=0        cols=3     
+- list_opres_node1                              rows=0        cols=2     
+- list_opres_node2                              rows=0        cols=2     
+- losesbyfillingfact                            rows=0        cols=14    
+- main_out                                      rows=0        cols=4     
+- materialcharacteristics                       rows=0        cols=17    
+- materialcharacteristicsfact                   rows=0        cols=17    
+- mufta                                         rows=0        cols=14   GEOMETRY srid=9998
+- muftadocuments                                rows=0        cols=5     
+- nagruzki_po_elevatoram                        rows=0        cols=9     
+- nalichie_vblizi_kommunikacij_for_shurfy       rows=0        cols=3     
+- nasosnye_stantsii                             rows=0        cols=10   GEOMETRY srid=9998
+- ns_out                                        rows=0        cols=19    
+- nst_out                                       rows=0        cols=8     
+- ok_out                                        rows=0        cols=7     
+- opora_es                                      rows=0        cols=12   POINT srid=9998
+- opora_esdocuments                             rows=0        cols=5     
+- opora_skolzyaschaya                           rows=0        cols=6    POINT srid=9998
+- opres                                         rows=0        cols=63    
+- opresacts                                     rows=0        cols=5     
+- opresdeployed                                 rows=0        cols=3     
+- opresdocuments                                rows=0        cols=5     
+- opresmeropr                                   rows=0        cols=3     
+- opressovka_otvetstvennye                      rows=0        cols=7     
+- opressovka_sektsioniruyuschaya_zadvizhka      rows=0        cols=6    POINT srid=9998
+- opressovka_uchastki_remonta                   rows=0        cols=9    GEOMETRY srid=9998
+- osmotr                                        rows=0        cols=20    
+- osmotrdeployed                                rows=0        cols=3     
+- osmotrdocuments                               rows=0        cols=5     
+- overgroundnodes                               rows=0        cols=4     
+- owners                                        rows=0        cols=2     
+- passports                                     rows=0        cols=10   GEOMETRY srid=9998
+- passportsdocs                                 rows=0        cols=5     
+- password                                      rows=0        cols=4     
+- pavilion                                      rows=0        cols=43   GEOMETRY srid=9998
+- pavilions                                     rows=0        cols=3     
+- perehlesty_setey                              rows=0        cols=5    GEOMETRY srid=9998
+- peremychki                                    rows=0        cols=15   GEOMETRY srid=9998
+- pipesections                                  rows=0        cols=106   
+- plan_remont                                   rows=0        cols=28    
+- podpis                                        rows=0        cols=5    GEOMETRY srid=9998
+- povrezhdennyielementfordefect                 rows=0        cols=3     
+- pribor                                        rows=0        cols=3     
+- prichiny_narusheniya_organizacionnye_for_defect rows=0        cols=3     
+- prichinypovrezhdeniafordefect                 rows=0        cols=3     
+- priemnik_elektrosnabzheniya                   rows=0        cols=25   GEOMETRY srid=9998
+- pt_out                                        rows=0        cols=85    
+- qualityregtempgraphs                          rows=0        cols=26    
+- raspar_out                                    rows=0        cols=61    
+- realconsumerdocuments1                        rows=0        cols=5     
+- realconsumerdocuments2                        rows=0        cols=5     
+- realconsumerdocuments3                        rows=0        cols=5     
+- regularmatures                                rows=0        cols=20    
+- regulatortypes                                rows=0        cols=2     
+- remont                                        rows=0        cols=23   GEOMETRY srid=9998
+- remont2                                       rows=0        cols=48    
+- remont2deployed                               rows=0        cols=3     
+- remontcapitalchannel                          rows=0        cols=3     
+- remontcapitalkamera                           rows=0        cols=3     
+- remontcapitaltube                             rows=0        cols=3     
+- remontchannel                                 rows=0        cols=3     
+- remontdocuments                               rows=0        cols=5     
+- remontinvestchannel                           rows=0        cols=3     
+- remontinvestkamera                            rows=0        cols=3     
+- remontinvesttube                              rows=0        cols=3     
+- remontkamera                                  rows=0        cols=3     
+- remonttube                                    rows=0        cols=3     
+- responsibles                                  rows=0        cols=3     
+- responsibles_es                               rows=0        cols=3     
+- responsibles_korrozia                         rows=0        cols=3     
+- reversevalves                                 rows=0        cols=15    
+- rpp_out                                       rows=0        cols=6     
+- rs_out                                        rows=0        cols=21    
+- shield                                        rows=0        cols=5    GEOMETRY srid=9998
+- shurf                                         rows=0        cols=144  GEOMETRY srid=9998
+- shurf2                                        rows=0        cols=18   GEOMETRY srid=9998
+- shurf2_dokumenty                              rows=0        cols=5     
+- shurf2_meropriyatiya                          rows=0        cols=5     
+- shurfdocuments                                rows=0        cols=5     
+- shurfy                                        rows=0        cols=65   GEOMETRY srid=9998
+- soputstvuiushchieprichinyfordefect            rows=0        cols=3     
+- sortlinesforuchastok                          rows=0        cols=10    
+- sortnodesforuchastok                          rows=0        cols=5     
+- sostkonstruktsiikameryfordefect               rows=0        cols=3     
+- sostkonstruktsiikanalafordefect               rows=0        cols=3     
+- spisok_kamer_drenazh                          rows=0        cols=3     
+- standartequipment                             rows=0        cols=2     
+- streets                                       rows=0        cols=3     
+- sysdiagrams                                   rows=0        cols=5     
+- tankbatteries                                 rows=0        cols=7    GEOMETRY srid=9998
+- tekpar_out                                    rows=0        cols=41    
+- temp_line                                     rows=0        cols=1     
+- temp_node                                     rows=0        cols=1     
+- teplo                                         rows=0        cols=3     
+- teplo_out                                     rows=0        cols=12    
+- teplo_t_out                                   rows=0        cols=16    
+- texts                                         rows=0        cols=9     
+- tip_kamery                                    rows=0        cols=3     
+- tip_otklyucheniya_zapornoy_armatury           rows=0        cols=4     
+- tip_perekrytiya_kamery                        rows=0        cols=3     
+- tkamera                                       rows=0        cols=44   GEOMETRY srid=9998
+- tkameradocuments                              rows=0        cols=5     
+- towns                                         rows=0        cols=3     
+- transf                                        rows=0        cols=13    
+- transfdocuments                               rows=0        cols=5     
+- trps                                          rows=0        cols=3     
+- tstrp                                         rows=0        cols=4    GEOMETRY srid=9998
+- tubes                                         rows=0        cols=3     
+- ulitsy_almaty                                 rows=0        cols=3     
+- undergroundnodes                              rows=0        cols=4     
+- uninstallednodes                              rows=0        cols=3     
+- us2_out                                       rows=0        cols=8     
+- us_out                                        rows=0        cols=8     
+- ut_ktp_out                                    rows=0        cols=4     
+- ut_out                                        rows=0        cols=42    
+- ut_teplo_out                                  rows=0        cols=30    
+- uzel_kanala                                   rows=0        cols=7    POINT srid=9998
+- vertikalnyy_podem_opusk_truprovoda            rows=0        cols=6    POINT srid=9998
+- vid_ispytani                                  rows=0        cols=4     
+- vidy_elementov_for_shurfy                     rows=0        cols=3     
+- visualmetriccontrol                           rows=0        cols=33   GEOMETRY srid=9998
+- vladeltsy_es                                  rows=0        cols=3     
+- vneshny_vid                                   rows=0        cols=4     
+- vozdushnik                                    rows=0        cols=33   POINT srid=9998
+- zapornaya_armatura                            rows=0        cols=41   POINT srid=9998
+- zd2_out                                       rows=0        cols=15    
+- zd_out                                        rows=0        cols=15    
+
+## postgis (1)
+
+- spatial_ref_sys                               rows=8503     cols=5     
+
+## view_or_other (2)
+
+- geography_columns                             rows=?        cols=7     
+- geometry_columns                              rows=?        cols=7     

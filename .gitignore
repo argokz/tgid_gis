@@ -1,0 +1,22 @@
+# Секреты подключения — никогда не коммитим
+.env
+*.pgpass
+config.local.*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Дампы и выгрузки
+*.dump
+*.backup
+docs/schema/*.raw.sql
+
+# Редакторы / ОС
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
