@@ -2343,78 +2343,6 @@
    }
   },
   {
-   "source": "pressregulators",
-   "target": "regulator_press",
-   "category": "class_node",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 509,
-   "columns": [
-    "valvehydroresopen",
-    "valvehydroresclose",
-    "regvalverelcap",
-    "relleakage",
-    "consdrip",
-    "workattrid",
-    "deltah",
-    "regulatorstateid",
-    "h",
-    "pipelinesignid"
-   ],
-   "column_types": {
-    "valvehydroresopen": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "valvehydroresclose": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regvalverelcap": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "relleakage": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "consdrip": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "workattrid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "deltah": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regulatorstateid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "h": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "pipelinesignid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": false
-    }
-   }
-  },
-  {
    "source": "pumpstations",
    "target": "pump_station",
    "category": "class_node",
@@ -4891,6 +4819,78 @@
      "data_type": "double precision",
      "max_length": null,
      "nullable": true
+    }
+   }
+  },
+  {
+   "source": "pressregulators",
+   "target": "regulator_press",
+   "category": "class_line",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 509,
+   "columns": [
+    "valvehydroresopen",
+    "valvehydroresclose",
+    "regvalverelcap",
+    "relleakage",
+    "consdrip",
+    "workattrid",
+    "deltah",
+    "regulatorstateid",
+    "h",
+    "pipelinesignid"
+   ],
+   "column_types": {
+    "valvehydroresopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "valvehydroresclose": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regvalverelcap": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "relleakage": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "consdrip": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "workattrid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "deltah": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regulatorstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "h": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipelinesignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": false
     }
    }
   },

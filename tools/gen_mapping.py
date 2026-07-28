@@ -28,12 +28,17 @@ CLASS_NODE = {
     'heatchambers': 'heat_chamber',
     'threewayvalves': 'valve_3way',
     'connectnodes': 'connect_node',
-    'pressregulators': 'regulator_press',
     'refillnodes': 'refill_node',
 }
 
 # A. Классы линейных объектов (связь lineid заполнена)
+#
+# pressregulators имеет ОБЕ ссылки — nodeid (463) и lineid (509).
+# Решающий признак — как объект читает само приложение: ut.sql джойнит
+# его по lineID и присваивает код типа 'RD', а us.sql не джойнит вовсе.
+# Значит это линейный класс, регулятор стоит НА участке.
 CLASS_LINE = {
+    'pressregulators': 'regulator_press',
     'heatpipesections': 'pipe_section',
     'diaphragms': 'diaphragm',
     'dampers': 'damper',

@@ -50,6 +50,26 @@ BEGIN
     RETURN res;
 END $$;
 
+-- Обратное преобразование: геометрия -> текстовое поле coords в том виде,
+-- в каком его ожидает приложение (CCoordList::loadStr).
+--
+-- Возвращаются ТОЛЬКО промежуточные вершины: первая и последняя точки линии —
+-- это узлы, и приложение подставляет их само. Единицы — сантиметры,
+-- ось Y инвертирована обратно.
+CREATE OR REPLACE FUNCTION net.geom_to_coords(g geometry, scale float8 DEFAULT 100.0)
+RETURNS text
+LANGUAGE sql IMMUTABLE AS $$
+    -- trim_scale убирает хвостовые нули, но НЕ округляет до целых:
+    -- в исходных coords встречаются доли сантиметра, и округление
+    -- сделало бы преобразование туда-обратно неточным.
+    SELECT coalesce(string_agg(
+               trim_scale(round((ST_X(p.geom) * scale)::numeric, 4))::text || ' ' ||
+               trim_scale(round((-ST_Y(p.geom) * scale)::numeric, 4))::text || ',',
+               '' ORDER BY p.path[1]), '')
+    FROM ST_DumpPoints(g) p
+    WHERE p.path[1] > 1 AND p.path[1] < ST_NPoints(g);
+$$;
+
 -- Соответствие «старый public.nodes.id -> новый net.*.id».
 -- Нужно, чтобы линии и дочерние таблицы нашли свои узлы после переноса.
 CREATE TABLE IF NOT EXISTS net.node_src_map (

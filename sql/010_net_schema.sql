@@ -628,62 +628,6 @@ DROP TRIGGER IF EXISTS heat_source_reg ON net.heat_source;
 CREATE TRIGGER heat_source_reg AFTER INSERT OR DELETE ON net.heat_source
     FOR EACH ROW EXECUTE FUNCTION net.reg_node_sync('heat_source');
 
--- regulator_press  <-  public.pressregulators  (509 строк, class_node)
-CREATE TABLE IF NOT EXISTS net.regulator_press (
-    id           bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , fragment_id  int REFERENCES net.fragment(id)
-  , geom         geometry(Point, 9998) NOT NULL
-  , removed_at   timestamptz
-  , src_id       int
-  , internalnodeid                   int
-  , externalcodeid                   int
-  , externalnodename                 text
-  , externalsignid                   int
-  , addressid                        int
-  , geomarktoptube                   double precision
-  , geomarknodearea                  double precision
-  , calcpressflow                    double precision
-  , calcpressret                     double precision
-  , picdate                          date
-  , lastrepairdate                   date
-  , displaysign                      int
-  , archivechangedate                timestamp
-  , operatorid                       int
-  , nodename                         text
-  , scheme                           text
-  , memo                             text
-  , gpscoords                        text
-  , belonghn                         text
-  , passport                         text
-  , inventnumber                     text
-  , pipelinesign                     text
-  , nodetypeid                       int
-  , isbusy                           int
-  , isloaded                         int
-  , belongmagistralsite              int
-  , belongdistsite                   int
-  , organizationid                   int
-  , magistralsite                    int
-  , distsite                         int
-  , registnumber                     text
-  , valvehydroresopen                double precision
-  , valvehydroresclose               double precision
-  , regvalverelcap                   int
-  , relleakage                       double precision
-  , consdrip                         double precision
-  , workattrid                       int
-  , deltah                           double precision
-  , regulatorstateid                 int
-  , h                                double precision
-  , pipelinesignid                   int
-);
-CREATE INDEX IF NOT EXISTS regulator_press_geom_idx ON net.regulator_press USING gist (geom);
-CREATE INDEX IF NOT EXISTS regulator_press_frag_idx ON net.regulator_press (fragment_id) WHERE removed_at IS NULL;
-CREATE UNIQUE INDEX IF NOT EXISTS regulator_press_src_uidx ON net.regulator_press (src_id);
-DROP TRIGGER IF EXISTS regulator_press_reg ON net.regulator_press;
-CREATE TRIGGER regulator_press_reg AFTER INSERT OR DELETE ON net.regulator_press
-    FOR EACH ROW EXECUTE FUNCTION net.reg_node_sync('regulator_press');
-
 -- pump_station  <-  public.pumpstations  (227 строк, class_node)
 CREATE TABLE IF NOT EXISTS net.pump_station (
     id           bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
@@ -1118,6 +1062,8 @@ CREATE TABLE IF NOT EXISTS net.air_heater (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1141,6 +1087,7 @@ CREATE TABLE IF NOT EXISTS net.air_heater (
   , airheatertype                    text
   , contamincoeff                    double precision
   , presscoeff                       double precision
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS air_heater_geom_idx ON net.air_heater USING gist (geom);
 CREATE INDEX IF NOT EXISTS air_heater_frag_idx ON net.air_heater (fragment_id) WHERE removed_at IS NULL;
@@ -1157,6 +1104,8 @@ CREATE TABLE IF NOT EXISTS net.damper (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1184,6 +1133,7 @@ CREATE TABLE IF NOT EXISTS net.damper (
   , relatleakage                     double precision
   , opc                              text
   , damperarmaturestateid            int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS damper_geom_idx ON net.damper USING gist (geom);
 CREATE INDEX IF NOT EXISTS damper_frag_idx ON net.damper (fragment_id) WHERE removed_at IS NULL;
@@ -1200,6 +1150,8 @@ CREATE TABLE IF NOT EXISTS net.diaphragm (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1220,6 +1172,7 @@ CREATE TABLE IF NOT EXISTS net.diaphragm (
   , consinstdiaphcount               int
   , entrymark                        text
   , stateid                          int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS diaphragm_geom_idx ON net.diaphragm USING gist (geom);
 CREATE INDEX IF NOT EXISTS diaphragm_frag_idx ON net.diaphragm (fragment_id) WHERE removed_at IS NULL;
@@ -1236,6 +1189,8 @@ CREATE TABLE IF NOT EXISTS net.elevator (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1262,6 +1217,7 @@ CREATE TABLE IF NOT EXISTS net.elevator (
   , diametersuctionpipe              double precision
   , material                         text
   , stateid                          int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS elevator_geom_idx ON net.elevator USING gist (geom);
 CREATE INDEX IF NOT EXISTS elevator_frag_idx ON net.elevator (fragment_id) WHERE removed_at IS NULL;
@@ -1278,6 +1234,8 @@ CREATE TABLE IF NOT EXISTS net.heat_exchanger (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1296,6 +1254,7 @@ CREATE TABLE IF NOT EXISTS net.heat_exchanger (
   , heatexchtype                     text
   , heatexchcode                     int
   , stateid                          int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS heat_exchanger_geom_idx ON net.heat_exchanger USING gist (geom);
 CREATE INDEX IF NOT EXISTS heat_exchanger_frag_idx ON net.heat_exchanger (fragment_id) WHERE removed_at IS NULL;
@@ -1312,6 +1271,8 @@ CREATE TABLE IF NOT EXISTS net.pipe_section (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1475,6 +1436,7 @@ CREATE TABLE IF NOT EXISTS net.pipe_section (
   , sostkonstrukz                    int
   , kategorii                        int
   , mestn                            text
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS pipe_section_geom_idx ON net.pipe_section USING gist (geom);
 CREATE INDEX IF NOT EXISTS pipe_section_frag_idx ON net.pipe_section (fragment_id) WHERE removed_at IS NULL;
@@ -1491,6 +1453,8 @@ CREATE TABLE IF NOT EXISTS net.local_resistance (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1510,6 +1474,7 @@ CREATE TABLE IF NOT EXISTS net.local_resistance (
   , s_mest                           double precision
   , k_mest                           int
   , sum_mest                         double precision
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS local_resistance_geom_idx ON net.local_resistance USING gist (geom);
 CREATE INDEX IF NOT EXISTS local_resistance_frag_idx ON net.local_resistance (fragment_id) WHERE removed_at IS NULL;
@@ -1520,12 +1485,58 @@ DROP TRIGGER IF EXISTS local_resistance_reg ON net.local_resistance;
 CREATE TRIGGER local_resistance_reg AFTER INSERT OR DELETE ON net.local_resistance
     FOR EACH ROW EXECUTE FUNCTION net.reg_line_sync('local_resistance');
 
+-- regulator_press  <-  public.pressregulators  (509 строк, class_line)
+CREATE TABLE IF NOT EXISTS net.regulator_press (
+    id           bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , fragment_id  int REFERENCES net.fragment(id)
+  , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
+  , geom         geometry(LineString, 9998) NOT NULL
+  , removed_at   timestamptz
+  , src_id       int
+  , externalsignlineid               int
+  , location                         text
+  , hydrores                         double precision
+  , organizationid                   int
+  , registnum                        text
+  , firstpicdate                     date
+  , lastmaintdate                    date
+  , displaysign                      int
+  , archivechangedate                timestamp
+  , operatorid                       int
+  , typ                              text
+  , internalnodeid                   int
+  , valvehydroresopen                double precision
+  , valvehydroresclose               double precision
+  , regvalverelcap                   int
+  , relleakage                       double precision
+  , consdrip                         double precision
+  , workattrid                       int
+  , deltah                           double precision
+  , regulatorstateid                 int
+  , h                                double precision
+  , pipelinesignid                   int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
+);
+CREATE INDEX IF NOT EXISTS regulator_press_geom_idx ON net.regulator_press USING gist (geom);
+CREATE INDEX IF NOT EXISTS regulator_press_frag_idx ON net.regulator_press (fragment_id) WHERE removed_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS regulator_press_src_uidx ON net.regulator_press (src_id);
+CREATE INDEX IF NOT EXISTS regulator_press_from_idx ON net.regulator_press (node_from);
+CREATE INDEX IF NOT EXISTS regulator_press_to_idx ON net.regulator_press (node_to);
+DROP TRIGGER IF EXISTS regulator_press_reg ON net.regulator_press;
+CREATE TRIGGER regulator_press_reg AFTER INSERT OR DELETE ON net.regulator_press
+    FOR EACH ROW EXECUTE FUNCTION net.reg_line_sync('regulator_press');
+
 -- pump  <-  public.pumps  (286 строк, class_line)
 CREATE TABLE IF NOT EXISTS net.pump (
     id           bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1578,6 +1589,7 @@ CREATE TABLE IF NOT EXISTS net.pump (
   , repaircountem                    int
   , opc                              text
   , stateid                          int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS pump_geom_idx ON net.pump USING gist (geom);
 CREATE INDEX IF NOT EXISTS pump_frag_idx ON net.pump (fragment_id) WHERE removed_at IS NULL;
@@ -1594,6 +1606,8 @@ CREATE TABLE IF NOT EXISTS net.radiator (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1614,6 +1628,7 @@ CREATE TABLE IF NOT EXISTS net.radiator (
   , count                            text
   , totalequivsurface                text
   , stateid                          int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS radiator_geom_idx ON net.radiator USING gist (geom);
 CREATE INDEX IF NOT EXISTS radiator_frag_idx ON net.radiator (fragment_id) WHERE removed_at IS NULL;
@@ -1630,6 +1645,8 @@ CREATE TABLE IF NOT EXISTS net.line_plain (
   , fragment_id  int REFERENCES net.fragment(id)
   , node_from    bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
   , node_to      bigint NOT NULL REFERENCES net.node_reg(id) ON DELETE RESTRICT
+  , node_from_src int
+  , node_to_src   int
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
@@ -1645,6 +1662,7 @@ CREATE TABLE IF NOT EXISTS net.line_plain (
   , operatorid                       int
   , typ                              text
   , internalnodeid                   int
+  , coords_legacy text GENERATED ALWAYS AS (net.geom_to_coords(geom, 100.0)) STORED
 );
 CREATE INDEX IF NOT EXISTS line_plain_geom_idx ON net.line_plain USING gist (geom);
 CREATE INDEX IF NOT EXISTS line_plain_frag_idx ON net.line_plain (fragment_id) WHERE removed_at IS NULL;

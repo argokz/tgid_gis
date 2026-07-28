@@ -208,8 +208,8 @@ class Converter:
                 'CASE WHEN %s.removed <> 0 THEN now() END' % alias,
                 '%s.id' % alias]
         if is_line:
-            head[1:1] = ['node_from', 'node_to']
-            body[1:1] = ['nr1.id', 'nr2.id']
+            head[1:1] = ['node_from', 'node_to', 'node_from_src', 'node_to_src']
+            body[1:1] = ['nr1.id', 'nr2.id', 'l.nodeid1', 'l.nodeid2']
 
         src_tbl = 'linesobj' if is_line else 'nodes'
         if plain:

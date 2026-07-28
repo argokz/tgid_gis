@@ -125,7 +125,11 @@ def emit_class(e, base_cols, base_types, is_line):
         L += ['  , node_from    bigint NOT NULL REFERENCES net.node_reg(id) '
               'ON DELETE RESTRICT',
               '  , node_to      bigint NOT NULL REFERENCES net.node_reg(id) '
-              'ON DELETE RESTRICT']
+              'ON DELETE RESTRICT',
+              # Прежние public.id концов. Нужны слою совместимости, чтобы
+              # не джойнить карту соответствия на каждом чтении.
+              '  , node_from_src int',
+              '  , node_to_src   int']
     L += ['  , geom         geometry(%s, 9998) NOT NULL' % e['geometry'],
           '  , removed_at   timestamptz',
           # NULL у объектов, созданных уже после миграции.
@@ -143,6 +147,14 @@ def emit_class(e, base_cols, base_types, is_line):
             continue
         seen.add(c)
         L.append('  , %-32s %s' % (ident(c), coltype(e['column_types'][c])))
+    if is_line:
+        # Текстовый coords нужен приложению, но вычислять его на каждом
+        # чтении дорого — замер показал 330 мс из 380 на 6.8 тыс. строк.
+        # GENERATED STORED считает его при записи. В отличие от прежнего
+        # public.linesobj.coords эта копия не может разойтись с геометрией:
+        # PostgreSQL пересчитывает её при любом изменении geom.
+        L.append('  , coords_legacy text GENERATED ALWAYS AS '
+                 '(net.geom_to_coords(geom, 100.0)) STORED')
     L.append(');')
 
     L += [idx(t, 'geom', 'USING gist (geom)'),

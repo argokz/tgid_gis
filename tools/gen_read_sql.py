@@ -53,6 +53,34 @@ CALC_COLS = {
 }
 
 
+# Коды типов линейных объектов, как их формировал прежний ut.sql
+LINE_TYPE_CODE = {
+    'pipe_section': 'UT',
+    'pump': 'HC',
+    'regulator_press': 'RD',
+    'damper': 'ZD',
+    'diaphragm': 'DR',
+    'elevator': 'EL',
+    'radiator': 'RO',
+    'heat_exchanger': 'TO',
+    'air_heater': 'KU',
+    # localhydroresistances2 в прежнем ut.sql не джойнился вовсе,
+    # поэтому type_txt у него был NULL — сохраняем поведение.
+    'local_resistance': None,
+    'line_plain': None,
+}
+
+SPECIAL_LINE = {
+    'id': '{t}.src_id',
+    'fileid': '{t}.fragment_id',
+    'nodeid1': '{t}.node_from_src',
+    'nodeid2': '{t}.node_to_src',
+    'id2': '{t}.id',
+    'coords': '{t}.coords_legacy',
+    'type_txt': "{code}",
+}
+
+
 def net_columns(cur, table):
     cur.execute("""SELECT column_name FROM information_schema.columns
                    WHERE table_schema = 'net' AND table_name = %s""", (table,))
@@ -211,7 +239,91 @@ WHERE n.removed = 0
     print('-> %s (%d колонок, %d ветвей union)'
           % (path, len(us_cols), len(NODE_TYPE_CODE)))
 
+    build_lines(cur, args.outdir)
     conn.close()
+
+
+def build_lines(cur, outdir):
+    ut_cols = ('id,fileid,nodeid1,nodeid2,externalsignlineid,displaysign,'
+               'organizationid,dru_home,magistral,distsite,magistralsite,'
+               'tubingtypeid,diameterinternal,diameterexternal,diametercondit,'
+               'pipesectlength,wallthickness,crimpingquesite,pipesectionid,'
+               'pipesectstateidflow,pipesectstateidret,id2,type_txt,nomgp,'
+               'nomgo,pod_poter,pod_w,pod_time1,pod_a14,pod_a15,pod_a16,'
+               'pod_a17,pod_tzam,pod_tpot,obr_poter,obr_w,obr_time1,obr_a14,'
+               'obr_a15,obr_a16,obr_a17,obr_tzam,obr_tpot,pod_b101,pod_b102,'
+               'pod_b103,pod_b104,pod_b105,pod_b106,obr_b101,obr_b102,'
+               'obr_b103,obr_b104,pod_q,obr_q,coords').split(',')
+
+    # Колонки, приходящие из таблиц результатов расчёта
+    calc_line = {c for c in ut_cols
+                 if c.startswith(('pod_', 'obr_', 'nomg'))}
+
+    targets = list(LINE_TYPE_CODE)
+    types = column_types(cur, targets)
+    branches = []
+    for t in targets:
+        have = net_columns(cur, t)
+        code = LINE_TYPE_CODE[t]
+        code_sql = "'%s'::text" % code if code else 'NULL::text'
+        parts = []
+        for c in ut_cols:
+            if c in calc_line:
+                continue
+            if c in SPECIAL_LINE:
+                parts.append('%s AS %s'
+                             % (SPECIAL_LINE[c].format(t=t, code=code_sql), c))
+            elif c in have:
+                parts.append('%s.%s' % (t, c))
+            else:
+                parts.append('NULL::%s AS %s' % (types.get(c, 'text'), c))
+        parts.append('0 AS removed')
+        branches.append(
+            'SELECT\n    %s\nFROM net.%s %s\nWHERE %s.removed_at IS NULL'
+            % (',\n    '.join(parts), t, t, t))
+
+    union = '\nUNION ALL\n'.join(branches)
+
+    outer = []
+    for c in ut_cols:
+        if c in calc_line:
+            side = 'utp' if c.startswith('pod_') else 'uto'
+            if c in ('nomgp', 'nomgo'):
+                outer.append('%s.id AS %s'
+                             % ('utp' if c == 'nomgp' else 'uto', c))
+            else:
+                # В ut_out поля называются a10..a17: имена pod_*/obr_*
+                # — это псевдонимы прежнего ut.sql, сохраняем соответствие.
+                suffix = c.split('_', 1)[1]
+                real = {'q': 'a13', 'poter': 'a14',
+                        'w': 'a10', 'time1': 'a11'}.get(suffix, suffix)
+                outer.append('%s.%s AS %s' % (side, real, c))
+        else:
+            outer.append('n1.%s' % c)
+
+    sql = HEAD.format(old='ut.sql', alias='n1') + """
+SELECT
+    {cols}
+FROM (
+{union}
+) n1
+LEFT JOIN (
+    SELECT c.fileid, max(c.id) AS cid FROM public.calculation c GROUP BY c.fileid
+) calc ON calc.fileid = n1.fileid
+LEFT JOIN public.ut_out utp ON utp.lineid = n1.id
+                           AND utp.externalsignlineid IN (2, 4)
+                           AND utp.calculationid = calc.cid
+LEFT JOIN public.ut_out uto ON uto.lineid = n1.id
+                           AND uto.externalsignlineid IN (3, 5)
+                           AND uto.calculationid = calc.cid
+WHERE n1.removed = 0
+""".format(cols=',\n    '.join(outer), union=union)
+
+    path = os.path.join(outdir, 'ut_net.sql')
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(sql)
+    print('-> %s (%d колонок, %d ветвей union)'
+          % (path, len(ut_cols), len(targets)))
 
 
 if __name__ == '__main__':
