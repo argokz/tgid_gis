@@ -134,6 +134,28 @@ def main():
           lambda moved, orph, alive: moved + orph >= alive * 0.99,
           'допускается расхождение до 1 % на записи с removed<>0')
 
+    print('\n=== ПРИВЯЗКА К ФРАГМЕНТАМ ===')
+
+    # Приложение фильтрует объекты именно по фрагменту, поэтому потеря
+    # fragment_id означает, что объект пропадёт из выдачи целиком.
+    check('узлы: fragment_id заполнен везде, где был fileid',
+          """SELECT count(*), count(*) FILTER (WHERE u.fragment_id IS NOT NULL)
+             FROM (%s) u JOIN public.nodes n ON n.id = u.src_id
+             WHERE n.fileid IS NOT NULL"""
+          % ' UNION ALL '.join('SELECT src_id, fragment_id FROM net.%s' % t
+                               for t in node_tables),
+          lambda tot, ok: tot == ok and tot > 0,
+          'NULL здесь = объект не найдётся по AND n.fileID IN (...)')
+
+    check('узлы: набор фрагментов совпадает с исходным',
+          """SELECT (SELECT count(DISTINCT fileid) FROM public.nodes
+                     WHERE removed = 0 AND fileid IS NOT NULL),
+                    (SELECT count(DISTINCT fragment_id) FROM (%s) u
+                     WHERE fragment_id IS NOT NULL)"""
+          % ' UNION ALL '.join('SELECT fragment_id FROM net.%s' % t
+                               for t in node_tables),
+          lambda src, got: src == got)
+
     print('\n=== ЦЕЛОСТНОСТЬ NET ===')
 
     check('реестр узлов совпадает с суммой объектных таблиц',

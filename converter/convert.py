@@ -81,6 +81,24 @@ class Converter:
             ON CONFLICT (id) DO NOTHING
         """, 'fragment')
 
+        # В public.fragments всего 14 строк, а nodes.fileid принимает 25
+        # различных значений: 73 % узлов ссылаются на несуществующий фрагмент.
+        # Без этого шага внешний ключ обнулил бы им привязку, и приложение
+        # перестало бы находить объекты по " AND n.fileID IN (...)".
+        self.run(cur, """
+            INSERT INTO net.fragment (id, name)
+            SELECT DISTINCT f.fileid,
+                   'фрагмент ' || f.fileid || ' (восстановлен конвертером)'
+            FROM (
+                SELECT fileid FROM public.nodes WHERE fileid IS NOT NULL
+                UNION
+                SELECT fileid FROM public.linesobj WHERE fileid IS NOT NULL
+            ) f
+            LEFT JOIN net.fragment nf ON nf.id = f.fileid
+            WHERE nf.id IS NULL
+            ON CONFLICT (id) DO NOTHING
+        """, 'fragment (восстановленные)')
+
     # ---------- отнесение объектов к классам ----------
 
     def assign(self, cur, kind):
@@ -285,6 +303,14 @@ class Converter:
                 WHERE s.{link} IS NULL OR r.src_id IS NULL
             """.format(src=e['source'], link=link))
 
+    def analyze(self, cur):
+        """Без свежей статистики планировщик не берёт частичные индексы
+        и уходит в Seq Scan — замер показал разницу в 3 раза."""
+        self.log('Сбор статистики')
+        cur.execute("SELECT tablename FROM pg_tables WHERE schemaname = 'net'")
+        for (t,) in cur.fetchall():
+            cur.execute('ANALYZE net.%s' % q(t))
+
     def orphans(self, cur):
         self.log('Линии без разрешимых концов')
         self.run(cur, """
@@ -348,6 +374,7 @@ def main():
         c.layers(cur)
         c.children(cur)
         c.orphans(cur)
+        c.analyze(cur)
 
         if args.apply:
             conn.commit()
