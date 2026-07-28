@@ -1,0 +1,6509 @@
+{
+ "srid": 9998,
+ "coord_scale": 100.0,
+ "flip_y": true,
+ "base": {
+  "nodes": {
+   "columns": [
+    "id",
+    "internalnodeid",
+    "externalcodeid",
+    "externalnodename",
+    "externalsignid",
+    "addressid",
+    "geomarktoptube",
+    "geomarknodearea",
+    "calcpressflow",
+    "calcpressret",
+    "picdate",
+    "lastrepairdate",
+    "displaysign",
+    "archivechangedate",
+    "operatorid",
+    "nodename",
+    "scheme",
+    "memo",
+    "gpscoords",
+    "belonghn",
+    "passport",
+    "inventnumber",
+    "pipelinesign",
+    "nodetypeid",
+    "isbusy",
+    "isloaded",
+    "belongmagistralsite",
+    "belongdistsite",
+    "organizationid",
+    "magistralsite",
+    "distsite",
+    "registnumber",
+    "fileid"
+   ]
+  },
+  "linesobj": {
+   "columns": [
+    "id",
+    "nodeid1",
+    "nodeid2",
+    "externalsignlineid",
+    "location",
+    "hydrores",
+    "organizationid",
+    "registnum",
+    "firstpicdate",
+    "lastmaintdate",
+    "displaysign",
+    "archivechangedate",
+    "operatorid",
+    "typ",
+    "fileid",
+    "internalnodeid"
+   ]
+  }
+ },
+ "node_types": [
+  {
+   "source": "connectnodes",
+   "target": "connect_node",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 1527,
+   "columns": [
+    "connectid"
+   ],
+   "column_types": {
+    "connectid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "consumptregulators",
+   "target": "regulator_flow",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 7,
+   "columns": [
+    "regconsmean",
+    "workattrid",
+    "hydroresopen",
+    "hydroresclose",
+    "regvalvecap",
+    "relatleakage",
+    "plumsconsumption",
+    "opc",
+    "deltah",
+    "regulatorstateid"
+   ],
+   "column_types": {
+    "regconsmean": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "workattrid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroresopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroresclose": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regvalvecap": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "relatleakage": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "plumsconsumption": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "opc": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "deltah": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regulatorstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "deployeddirections",
+   "target": "direction_deployed",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 2210,
+   "columns": [
+    "directionid"
+   ],
+   "column_types": {
+    "directionid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "generalizedconsumers",
+   "target": "consumer_general",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 29051,
+   "columns": [
+    "quarter",
+    "maxbuildingheight",
+    "accumcoeff",
+    "hydromodesignid",
+    "specexpendid",
+    "calctemperatureid",
+    "gvsloadgraphid",
+    "varcoeffid",
+    "normhlosflow",
+    "normhlosret",
+    "calchldep",
+    "calcinternhddep",
+    "adjcalchldep",
+    "adjcalchddep",
+    "perspcalchldep",
+    "perspcalcinternhddep",
+    "calctempdep",
+    "connectionschemeid",
+    "mixfactcoeffdep",
+    "calchlindep",
+    "calcinternhdindep",
+    "adjcalchlindep",
+    "adjcalcinternhdindep",
+    "perspcalchlindep",
+    "perspcalcinternhdindep",
+    "calctempindep",
+    "mixfactcoeffindep",
+    "calchlventil",
+    "adjcalchlventil",
+    "perspcalchlventil",
+    "calchlcond",
+    "adjcalchlcond",
+    "perspcalchlcond",
+    "calchlclosesys",
+    "calchlopensysflow",
+    "calchlopensysret",
+    "adjcalchlclosesys",
+    "adjcalchlopensysflow",
+    "adjcalchlopensysret",
+    "perspcalchlclosesys",
+    "perspcalchlopensysflow",
+    "perspcalchlopensysret",
+    "expendhwpart",
+    "calctempha",
+    "calchlparall",
+    "internhdparall",
+    "adjcalchlparall",
+    "adjinternhdparall",
+    "perspcalchlparall",
+    "perspinternhdparall",
+    "schemeparallid",
+    "calchlgvsparall",
+    "adjcalchlgvsparall",
+    "perspcalchlgvsparall",
+    "hourirregcoeffparall",
+    "avghlcompparall",
+    "temprecircpipeparall",
+    "calctemphrparall",
+    "calctemphwdoparall",
+    "amrdepparall",
+    "calchlmix",
+    "internhdmix",
+    "adjcalchlmix",
+    "adjinternhdmix",
+    "perspcalchlmix",
+    "perspinternhdmix",
+    "schememixid",
+    "calchlgvsmix",
+    "adjcalchlgvsmix",
+    "perspcalchlgvsmix",
+    "hourirregcoeffmix",
+    "avghlcompmix",
+    "temprecircpipemix",
+    "calctemphrmix",
+    "calctemphwdomix",
+    "amrdepmix",
+    "calchlconseq",
+    "internhdconseq",
+    "adjcalchlconseq",
+    "adjinternhdconseq",
+    "perspcalchlconseq",
+    "perspinternhdconseq",
+    "schemeconseqid",
+    "calchlgvsconseq",
+    "adjcalchlgvsconseq",
+    "perspcalchlgvsconseq",
+    "hourirregcoeffconseq",
+    "avghlcompconseq",
+    "temprecircpipeconseq",
+    "calctemphrconseq",
+    "calctemphwdoconseq",
+    "amrdepconseq",
+    "calchlpreon",
+    "internhdpreon",
+    "adjcalchlpreon",
+    "adjinternhdpreon",
+    "perspcalchlpreon",
+    "perspinternhdpreon",
+    "schemepreonid",
+    "calchlgvspreon",
+    "adjcalchlgvspreon",
+    "perspcalchlgvspreon",
+    "hourirregcoeffpreon",
+    "avghlcomppreon",
+    "temprecircpipepreon",
+    "calctemphrpreon",
+    "calctemphwdopreon",
+    "amrdeppreon",
+    "avghlgvsopensysflow",
+    "avghlgvsopensysret",
+    "adjavghlgvsopensysflow",
+    "adjavghlgvsopensysret",
+    "perspavghlgvsopensysflow",
+    "perspavghlgvsopensysret",
+    "hourirregcoeffopen",
+    "avghlcompopen",
+    "temprecircpipeopen",
+    "calctemphwdoopen",
+    "pdvalveinstalllocid",
+    "setpdonregulator",
+    "setleakageflow",
+    "setleakageret",
+    "wemeteringdeviceid",
+    "volwaterhs",
+    "volwatervs",
+    "minthrustds",
+    "hydroresclosesys",
+    "hydroresclosesyssummer",
+    "closesyscalcsignid",
+    "hydroreswdoflow",
+    "calcsignopensysflowid",
+    "hydroreswdoret",
+    "calcsignreswdoretid",
+    "calcsignsetloadclosesys",
+    "calcsignsetloadopensysflow",
+    "calcsignsetloadopensysret",
+    "hydrothrustin",
+    "hydrothrustout",
+    "calcexpenddep",
+    "calcexpendindep",
+    "calcexpendventil",
+    "calcexpendcond",
+    "calcexpendhwflow",
+    "calcexpendhwret",
+    "calcexpendrecircopen",
+    "calcexpendhwparall",
+    "calcexpendhwmix",
+    "calcexpendhwconseq",
+    "calcexpendhwpreon",
+    "calcthrustinwsd",
+    "consumerstateid",
+    "name"
+   ],
+   "column_types": {
+    "quarter": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "maxbuildingheight": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "accumcoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydromodesignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "specexpendid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemperatureid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gvsloadgraphid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "varcoeffid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "normhlosflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "normhlosret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchldep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcinternhddep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchldep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchddep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchldep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalcinternhddep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctempdep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "connectionschemeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "mixfactcoeffdep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcinternhdindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalcinternhdindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalcinternhdindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctempindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "mixfactcoeffindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expendhwpart": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctempha": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "internhdparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjinternhdparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspinternhdparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "schemeparallid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlgvsparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlgvsparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlgvsparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hourirregcoeffparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlcompparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temprecircpipeparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphrparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphwdoparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "amrdepparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "internhdmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjinternhdmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspinternhdmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "schememixid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlgvsmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlgvsmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlgvsmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hourirregcoeffmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlcompmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temprecircpipemix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphrmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphwdomix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "amrdepmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "internhdconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjinternhdconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspinternhdconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "schemeconseqid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlgvsconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlgvsconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlgvsconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hourirregcoeffconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlcompconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temprecircpipeconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphrconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphwdoconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "amrdepconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "internhdpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjinternhdpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspinternhdpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "schemepreonid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlgvspreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjcalchlgvspreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlgvspreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hourirregcoeffpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlcomppreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temprecircpipepreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphrpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphwdopreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "amrdeppreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvsopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvsopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjavghlgvsopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "adjavghlgvsopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvsopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvsopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hourirregcoeffopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlcompopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temprecircpipeopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphwdoopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pdvalveinstalllocid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "setpdonregulator": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "setleakageflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "setleakageret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "wemeteringdeviceid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "volwaterhs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "volwatervs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "minthrustds": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroresclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroresclosesyssummer": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "closesyscalcsignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroreswdoflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignopensysflowid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroreswdoret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignreswdoretid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignsetloadclosesys": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignsetloadopensysflow": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignsetloadopensysret": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydrothrustin": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydrothrustout": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpenddep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendrecircopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustinwsd": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "consumerstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "name": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "heatchambers",
+   "target": "heat_chamber",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 91,
+   "columns": [
+    "name",
+    "slotscount",
+    "slotsweight",
+    "internalheight",
+    "internalwidth",
+    "internallength",
+    "wallmaterial",
+    "stairscount",
+    "stoparmaturecount",
+    "ballvalvescount",
+    "airventscount"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "slotscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "slotsweight": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "internalheight": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "internalwidth": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "internallength": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "wallmaterial": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "stairscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "stoparmaturecount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ballvalvescount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "airventscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "heatsources",
+   "target": "heat_source",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 164,
+   "columns": [
+    "sourcename",
+    "name",
+    "stateid",
+    "hsourcetypeid",
+    "hsourceid",
+    "hsourcepower",
+    "hsourcepowerinst",
+    "hseasonbegindate",
+    "hseasonenddate",
+    "hsourcecode",
+    "temperdwflowsummer",
+    "temperdwretsummer",
+    "specvolhs",
+    "specvolvent",
+    "expenddwnorm1",
+    "expenddwnorm2",
+    "expenddwnorm3",
+    "expenddwnorm4",
+    "expenddwnorm5",
+    "managerphone",
+    "controllerphone",
+    "powerset",
+    "poweravailable",
+    "heighttubemark",
+    "heightareamark",
+    "repairworks",
+    "t1_summer",
+    "t2_summer",
+    "name_tg",
+    "heatloscalcyear",
+    "graphtypeid",
+    "tn_1",
+    "tn_5",
+    "tvn_r",
+    "t1_r",
+    "t2_r",
+    "t3_r",
+    "q_r",
+    "t1_2r",
+    "t1_4r",
+    "tvb_tr",
+    "uf",
+    "t2_2r",
+    "q_gv",
+    "tg_r",
+    "tx_r",
+    "t2_gv",
+    "pr",
+    "g1",
+    "g2",
+    "t_gv1",
+    "deployedtempgraphid",
+    "v",
+    "date_on",
+    "name_exe",
+    "name_manager",
+    "dt2_co",
+    "t2pod_parl",
+    "dt2v_sm_noavm",
+    "dt2v_sm_avm",
+    "t1pod_sm",
+    "t1pod_posll",
+    "dt2v_posl",
+    "length_1",
+    "length_2",
+    "length_3",
+    "length_4",
+    "length_5",
+    "length_6",
+    "length_7",
+    "length_8",
+    "length_9",
+    "length_10",
+    "length_11",
+    "length_12",
+    "t_1",
+    "t_2",
+    "t_3",
+    "t_4",
+    "t_5",
+    "t_6",
+    "t_7",
+    "t_8",
+    "t_9",
+    "t_10",
+    "t_11",
+    "t_12",
+    "t1_1",
+    "t1_2",
+    "t1_3",
+    "t1_4",
+    "t1_5",
+    "t1_6",
+    "t1_7",
+    "t1_8",
+    "t1_9",
+    "t1_10",
+    "t1_11",
+    "t1_12",
+    "t2_1",
+    "t2_2",
+    "t2_3",
+    "t2_4",
+    "t2_5",
+    "t2_6",
+    "t2_7",
+    "t2_8",
+    "t2_9",
+    "t2_10",
+    "t2_11",
+    "t2_12",
+    "length_1_fakt",
+    "length_2_fakt",
+    "length_3_fakt",
+    "length_4_fakt",
+    "length_5_fakt",
+    "length_6_fakt",
+    "length_7_fakt",
+    "length_8_fakt",
+    "length_9_fakt",
+    "length_10_fakt",
+    "length_11_fakt",
+    "length_12_fakt",
+    "t_1_fakt",
+    "t_2_fakt",
+    "t_3_fakt",
+    "t_4_fakt",
+    "t_5_fakt",
+    "t_6_fakt",
+    "t_7_fakt",
+    "t_8_fakt",
+    "t_9_fakt",
+    "t_10_fakt",
+    "t_11_fakt",
+    "t_12_fakt",
+    "t1_1_fakt",
+    "t1_2_fakt",
+    "t1_3_fakt",
+    "t1_4_fakt",
+    "t1_5_fakt",
+    "t1_6_fakt",
+    "t1_7_fakt",
+    "t1_8_fakt",
+    "t1_9_fakt",
+    "t1_10_fakt",
+    "t1_11_fakt",
+    "t1_12_fakt",
+    "t2_1_fakt",
+    "t2_2_fakt",
+    "t2_3_fakt",
+    "t2_4_fakt",
+    "t2_5_fakt",
+    "t2_6_fakt",
+    "t2_7_fakt",
+    "t2_8_fakt",
+    "t2_9_fakt",
+    "t2_10_fakt",
+    "t2_11_fakt",
+    "t2_12_fakt",
+    "gpod_1_fakt",
+    "gpod_2_fakt",
+    "gpod_3_fakt",
+    "gpod_4_fakt",
+    "gpod_5_fakt",
+    "gpod_6_fakt",
+    "gpod_7_fakt",
+    "gpod_8_fakt",
+    "gpod_9_fakt",
+    "gpod_10_fakt",
+    "gpod_11_fakt",
+    "gpod_12_fakt",
+    "ggvs_pribor_1_fakt",
+    "ggvs_pribor_2_fakt",
+    "ggvs_pribor_3_fakt",
+    "ggvs_pribor_4_fakt",
+    "ggvs_pribor_5_fakt",
+    "ggvs_pribor_6_fakt",
+    "ggvs_pribor_7_fakt",
+    "ggvs_pribor_8_fakt",
+    "ggvs_pribor_9_fakt",
+    "ggvs_pribor_10_fakt",
+    "ggvs_pribor_11_fakt",
+    "ggvs_pribor_12_fakt",
+    "gakt_tex_1_fakt",
+    "gakt_tex_2_fakt",
+    "gakt_tex_3_fakt",
+    "gakt_tex_4_fakt",
+    "gakt_tex_5_fakt",
+    "gakt_tex_6_fakt",
+    "gakt_tex_7_fakt",
+    "gakt_tex_8_fakt",
+    "gakt_tex_9_fakt",
+    "gakt_tex_10_fakt",
+    "gakt_tex_11_fakt",
+    "gakt_tex_12_fakt",
+    "gakt_avarija_1_fakt",
+    "gakt_avarija_2_fakt",
+    "gakt_avarija_3_fakt",
+    "gakt_avarija_4_fakt",
+    "gakt_avarija_5_fakt",
+    "gakt_avarija_6_fakt",
+    "gakt_avarija_7_fakt",
+    "gakt_avarija_8_fakt",
+    "gakt_avarija_9_fakt",
+    "gakt_avarija_10_fakt",
+    "gakt_avarija_11_fakt",
+    "gakt_avarija_12_fakt",
+    "id_old"
+   ],
+   "column_types": {
+    "sourcename": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hsourcetypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hsourceid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hsourcepower": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hsourcepowerinst": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hseasonbegindate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "hseasonenddate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "hsourcecode": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "temperdwflowsummer": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperdwretsummer": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "specvolhs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "specvolvent": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwnorm1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwnorm2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwnorm3": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwnorm4": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwnorm5": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "managerphone": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "controllerphone": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "powerset": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "poweravailable": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "heighttubemark": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "heightareamark": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "repairworks": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_summer": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_summer": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "name_tg": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "heatloscalcyear": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "graphtypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": false
+    },
+    "tn_1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "tn_5": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "tvn_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t1_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t2_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t3_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "q_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t1_2r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t1_4r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "tvb_tr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "uf": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t2_2r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "q_gv": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "tg_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "tx_r": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t2_gv": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "pr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": false
+    },
+    "g1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "g2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t_gv1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "deployedtempgraphid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "v": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "date_on": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "name_exe": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "name_manager": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "dt2_co": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t2pod_parl": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "dt2v_sm_noavm": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "dt2v_sm_avm": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t1pod_sm": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "t1pod_posll": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "dt2v_posl": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": false
+    },
+    "length_1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_2": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_3": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_4": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_5": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_6": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_7": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_8": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_9": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_10": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_11": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_12": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_3": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_4": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_5": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_6": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_7": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_8": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_9": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_10": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_11": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_12": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_3": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_4": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_5": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_6": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_7": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_8": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_9": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_10": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_11": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_12": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_3": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_4": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_5": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_6": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_7": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_8": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_9": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_10": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_11": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_12": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_1_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_2_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_3_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_4_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_5_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_6_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_7_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_8_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_9_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_10_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_11_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "length_12_fakt": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t1_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "t2_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gpod_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ggvs_pribor_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_tex_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_1_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_2_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_3_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_4_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_5_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_6_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_7_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_8_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_9_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_10_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_11_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gakt_avarija_12_fakt": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "id_old": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "kapremont_uchastki_remonta",
+   "target": "repair_section",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 5,
+   "columns": [
+    "id_remont",
+    "idp1",
+    "ido1",
+    "idp2",
+    "ido2",
+    "shape"
+   ],
+   "column_types": {
+    "id_remont": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "idp1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ido1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "idp2": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ido2": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "lyuki",
+   "target": "manhole",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 18392,
+   "columns": [
+    "name",
+    "elevation_ktp",
+    "elevation_tr",
+    "elevation_tr_2",
+    "elevation_tr_3",
+    "ground_control",
+    "territoryid",
+    "god_sdachi_expl",
+    "srok_expl",
+    "date_autor",
+    "podtip",
+    "nomer",
+    "type",
+    "owner",
+    "year_overhaul",
+    "note",
+    "shape"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "elevation_ktp": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr_2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr_3": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ground_control": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "territoryid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "god_sdachi_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "srok_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "date_autor": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "podtip": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "nomer": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "type": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "owner": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "year_overhaul": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "note": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "opora",
+   "target": "support",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 3611,
+   "columns": [
+    "mestoraspolozhenie",
+    "priznak_truboprovoda",
+    "vysotnaya_otmetka",
+    "stroitelnaya_konstruktsiya",
+    "nomer_opory",
+    "prinadlezhnost",
+    "vid_opory",
+    "shema",
+    "primechanie",
+    "vysota_stroitelnaya_konstruktsi",
+    "shape",
+    "geodezicheskaya_otmetka",
+    "naimenovanie_nachalnogo_uzla_truby",
+    "naimenovanie_konechnogo_uzla_truby",
+    "naimenovanie_uzla_kamery_pavilona",
+    "nomer_shvellera",
+    "kolichestvo_uporov",
+    "constructiontypesid",
+    "angle"
+   ],
+   "column_types": {
+    "mestoraspolozhenie": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "priznak_truboprovoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "stroitelnaya_konstruktsiya": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "nomer_opory": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "prinadlezhnost": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "vid_opory": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "shema": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysota_stroitelnaya_konstruktsi": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    },
+    "geodezicheskaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "naimenovanie_nachalnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_konechnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_uzla_kamery_pavilona": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "nomer_shvellera": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "kolichestvo_uporov": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "constructiontypesid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "opressovka_defekt",
+   "target": "pressure_test_defect",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 1,
+   "columns": [
+    "opressovki_uchastok_ocheredi",
+    "data_provedeniya",
+    "kod_rs_nachalnoy_kamery",
+    "nachalnaya_kamera",
+    "kod_rs_konechnoy_kamery",
+    "konechnaya_kamera",
+    "shape"
+   ],
+   "column_types": {
+    "opressovki_uchastok_ocheredi": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "data_provedeniya": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "kod_rs_nachalnoy_kamery": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "nachalnaya_kamera": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "kod_rs_konechnoy_kamery": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "konechnaya_kamera": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "perehod_diametra",
+   "target": "diameter_change",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 4,
+   "columns": [
+    "priznak_truboprovoda",
+    "vysotnaya_otmetka",
+    "nachalnyy_diametr",
+    "konechnyy_diametr",
+    "mesto_raspolozheniya",
+    "primechanie",
+    "kod",
+    "uzel",
+    "id_geopoint",
+    "prinadlezhnost",
+    "shape",
+    "geodezicheskaya_otmetka",
+    "naimenovanie_nachalnogo_uzla_truby",
+    "angle"
+   ],
+   "column_types": {
+    "priznak_truboprovoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "nachalnyy_diametr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "konechnyy_diametr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "mesto_raspolozheniya": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "kod": {
+     "data_type": "character varying",
+     "max_length": 5,
+     "nullable": true
+    },
+    "uzel": {
+     "data_type": "character varying",
+     "max_length": 25,
+     "nullable": true
+    },
+    "id_geopoint": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "prinadlezhnost": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    },
+    "geodezicheskaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "naimenovanie_nachalnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "pressdropregulators",
+   "target": "regulator_pressdrop",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 13,
+   "columns": [
+    "pressdropmean",
+    "regvalvehydrores",
+    "consthroughregvalve",
+    "thrustdropmean",
+    "regvalverelcap",
+    "maxleakageclosevalve",
+    "consdrip",
+    "workattrid",
+    "deltah",
+    "regulatorstateid"
+   ],
+   "column_types": {
+    "pressdropmean": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regvalvehydrores": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "consthroughregvalve": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "thrustdropmean": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regvalverelcap": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "maxleakageclosevalve": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "consdrip": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "workattrid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "deltah": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regulatorstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "pressregulators",
+   "target": "regulator_press",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 509,
+   "columns": [
+    "valvehydroresopen",
+    "valvehydroresclose",
+    "regvalverelcap",
+    "relleakage",
+    "consdrip",
+    "workattrid",
+    "deltah",
+    "regulatorstateid",
+    "h",
+    "pipelinesignid"
+   ],
+   "column_types": {
+    "valvehydroresopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "valvehydroresclose": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regvalverelcap": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "relleakage": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "consdrip": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "workattrid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "deltah": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regulatorstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "h": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipelinesignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": false
+    }
+   }
+  },
+  {
+   "source": "pumpstations",
+   "target": "pump_station",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 227,
+   "columns": [
+    "name",
+    "purpose",
+    "capacity",
+    "pumpcountflow",
+    "pumpcountret",
+    "state",
+    "stateid",
+    "heighttubemark",
+    "heightareamark"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "purpose": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "capacity": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pumpcountflow": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "pumpcountret": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "state": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "heighttubemark": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "heightareamark": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "realconsumers",
+   "target": "consumer_real",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 26202,
+   "columns": [
+    "name",
+    "consumerstateid",
+    "automdegid",
+    "sectconsumercode",
+    "schemenum",
+    "buildheight",
+    "accumcoeff",
+    "specexpendid",
+    "calctemperatureid",
+    "gvsloadgraphid",
+    "varcoeffid",
+    "calchldep",
+    "calchlindep",
+    "relloadfacade",
+    "calcinternhd",
+    "contcalchldep",
+    "contcalchlindep",
+    "contrelloadfacade",
+    "continternhd",
+    "perspcalchldep",
+    "perspcalchlindep",
+    "persprelloadfacade",
+    "perspinternhd",
+    "calchlventil",
+    "expendhwpart",
+    "contcalchlventil",
+    "perspcalchlventil",
+    "avghlcond",
+    "contavghlcond",
+    "perspavghlcond",
+    "avghlclosesys",
+    "avghlopensysflow",
+    "avghlopensysret",
+    "contavghlclosesys",
+    "contavghlopensysflow",
+    "contavghlopensysret",
+    "perspavghlclose",
+    "perspavghlopenflow",
+    "contavghlopenret",
+    "avghlgvsopenflow",
+    "avghlgvsopenret",
+    "avghlgvscloseparall",
+    "avghlgvsclosemix",
+    "avghlgvscloseconseq",
+    "avghlgvsclosepreon",
+    "contavghlgvsopenflow",
+    "contavghlgvsopenret",
+    "contavghlgvscloseparall",
+    "contavghlgvsclosemix",
+    "contavghlgvscloseconseq",
+    "contavghlgvsclosepreon",
+    "perspavghlgvsopenflow",
+    "perspavghlgvsopenret",
+    "perspavghlgvscloseparall",
+    "perspavghlgvsclosemix",
+    "perspavghlgvscloseconseq",
+    "perspavghlgvsclosepreon",
+    "hydromodesignid",
+    "mixfactcoeff",
+    "hourirregcoeff",
+    "circhlosopen",
+    "temprecircpipe",
+    "setleakageflow",
+    "setleakageret",
+    "wemeteringdeviceid",
+    "volwaterhs",
+    "volwatervs",
+    "hydroresclosesys",
+    "hydroresclosesyssummer",
+    "closesyscalcsignid",
+    "hydroreswdoflow",
+    "calcsignopensysflowid",
+    "hydroreswdoret",
+    "calcsignreswdoretid",
+    "calcsignsetloadclosesys",
+    "calcsignsetloadopensysflow",
+    "calcsignsetloadopensysret",
+    "hydrothrustin",
+    "hydrothrustout",
+    "calcexpenddep",
+    "calcexpendindep",
+    "calcexpendventil",
+    "calcexpendcond",
+    "calcexpendhwflow",
+    "calcexpendhwret",
+    "calcexpendrecircopen",
+    "calcexpendhwparall",
+    "calcexpendhwmix",
+    "calcexpendhwconseq",
+    "calcexpendhwpreon",
+    "throtstagesignid",
+    "diameterthrotdiaph",
+    "diameterelevnozzle",
+    "temperchartsignid",
+    "calcsignres",
+    "calcsignhl",
+    "parallheaterscount1",
+    "parallheaterscount2",
+    "parallheaterscountindep",
+    "calcthrustloshs",
+    "calcthrustlosah",
+    "calcthrustlosac",
+    "calcthrustlosflow",
+    "calcthrustlosflowcirc",
+    "calcthrustinwdo",
+    "calcthrustlosheaters1",
+    "calcthrustlosheaters2",
+    "pdvalveinstalllocid",
+    "setpdonregulator",
+    "calcferdiametersignid",
+    "calctemphr",
+    "calctempvs",
+    "calctemphwdo",
+    "responsibleid",
+    "contractnumber",
+    "stopvalvetypeid",
+    "meterdevworksign",
+    "meterdevsafety",
+    "meterdevstampnum",
+    "isolationtype",
+    "buildingtypeid",
+    "heatsourceptsid",
+    "heatpointid",
+    "countusergv",
+    "countbusinessconsumers",
+    "area",
+    "buildingvolume",
+    "basementvolume",
+    "builtinvolume",
+    "reducebuildingvolume",
+    "countfloors",
+    "builtyear",
+    "streetid",
+    "housenumber",
+    "note_1",
+    "note_2",
+    "note_pts",
+    "note_regime",
+    "b23",
+    "b28",
+    "b32",
+    "b20",
+    "b14",
+    "b38",
+    "b35",
+    "b36",
+    "zd7",
+    "zd8",
+    "zd27",
+    "zd28",
+    "zd36",
+    "zd38",
+    "zd39",
+    "zd48",
+    "zd49",
+    "zd50",
+    "elevatornuminst",
+    "diameternozzle"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "consumerstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "automdegid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "sectconsumercode": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "schemenum": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "buildheight": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "accumcoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "specexpendid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemperatureid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gvsloadgraphid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "varcoeffid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchldep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "relloadfacade": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcinternhd": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contcalchldep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contcalchlindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contrelloadfacade": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "continternhd": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchldep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "persprelloadfacade": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspinternhd": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calchlventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expendhwpart": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contcalchlventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspcalchlventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlopensysflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlopensysret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlclose": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlopenflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlopenret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvsopenflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvsopenret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvscloseparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvsclosemix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvscloseconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "avghlgvsclosepreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlgvsopenflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlgvsopenret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlgvscloseparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlgvsclosemix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlgvscloseconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "contavghlgvsclosepreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvsopenflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvsopenret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvscloseparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvsclosemix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvscloseconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "perspavghlgvsclosepreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydromodesignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "mixfactcoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hourirregcoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "circhlosopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temprecircpipe": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "setleakageflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "setleakageret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "wemeteringdeviceid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "volwaterhs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "volwatervs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroresclosesys": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroresclosesyssummer": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "closesyscalcsignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroreswdoflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignopensysflowid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydroreswdoret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignreswdoretid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignsetloadclosesys": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignsetloadopensysflow": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignsetloadopensysret": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydrothrustin": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydrothrustout": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpenddep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendindep": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendventil": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendcond": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendrecircopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwparall": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwmix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwconseq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendhwpreon": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "throtstagesignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameterthrotdiaph": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameterelevnozzle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperchartsignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignres": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcsignhl": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "parallheaterscount1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "parallheaterscount2": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "parallheaterscountindep": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustloshs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlosah": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlosac": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlosflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlosflowcirc": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustinwdo": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlosheaters1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlosheaters2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pdvalveinstalllocid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "setpdonregulator": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcferdiametersignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctempvs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calctemphwdo": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "responsibleid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "contractnumber": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stopvalvetypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "meterdevworksign": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "meterdevsafety": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "meterdevstampnum": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "isolationtype": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "buildingtypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "heatsourceptsid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "heatpointid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "countusergv": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "countbusinessconsumers": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "area": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "buildingvolume": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "basementvolume": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "builtinvolume": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "reducebuildingvolume": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "countfloors": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "builtyear": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "streetid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "housenumber": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "note_1": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "note_2": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "note_pts": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "note_regime": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "b23": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b28": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b32": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b20": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b14": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b38": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b35": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "b36": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd7": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd8": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd27": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd28": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd36": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd38": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd39": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd48": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd49": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zd50": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevatornuminst": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameternozzle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "refillnodes",
+   "target": "refill_node",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 1,
+   "columns": [
+    "externalsignid",
+    "refillexpend",
+    "wdo",
+    "refillloss",
+    "diameterinternal",
+    "watervolup",
+    "watervoldown",
+    "watervolupset",
+    "potscount",
+    "potssumvol",
+    "potworkingsign",
+    "chargeexpend",
+    "dischargeexpend",
+    "setpressret"
+   ],
+   "column_types": {
+    "externalsignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "refillexpend": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "wdo": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "refillloss": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameterinternal": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "watervolup": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "watervoldown": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "watervolupset": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "potscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "potssumvol": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "potworkingsign": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "chargeexpend": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "dischargeexpend": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "setpressret": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "setpressnodes",
+   "target": "press_set_node",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 5740,
+   "columns": [
+    "pressflow",
+    "pressret",
+    "fragment_resultid",
+    "file_result",
+    "kod_m",
+    "uzel_m",
+    "fileid"
+   ],
+   "column_types": {
+    "pressflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pressret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "fragment_resultid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "file_result": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "kod_m": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "uzel_m": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "fileid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "threewayvalves",
+   "target": "valve_3way",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 14,
+   "columns": [
+    "structure",
+    "state",
+    "purpose",
+    "calcmixfactcoeff",
+    "calcthrustlos",
+    "expendcharstraight",
+    "expendcharvert",
+    "authority",
+    "calccapdeviation",
+    "type",
+    "capacity",
+    "regulator",
+    "maxpd",
+    "diameternomin",
+    "calcexpendnodemix",
+    "pumpstationname"
+   ],
+   "column_types": {
+    "structure": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "state": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "purpose": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "calcmixfactcoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcthrustlos": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expendcharstraight": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "expendcharvert": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "authority": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calccapdeviation": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "type": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "capacity": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "regulator": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "maxpd": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameternomin": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcexpendnodemix": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pumpstationname": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "ugol_povorota_truboprovoda",
+   "target": "pipe_turn",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 25214,
+   "columns": [
+    "priznak_truboprovoda",
+    "kod1",
+    "uzel1",
+    "kod2",
+    "uzel2",
+    "diametr_truboprovoda",
+    "ugol_povorota",
+    "primechanie",
+    "vysotnaya_otmetka_ktp",
+    "vysotnaya_otmetka_truby",
+    "geodezicheskaya_organizatsiya",
+    "god_sdachi_v_ekspluatatsiyu",
+    "shape",
+    "geodezicheskaya_otmetka",
+    "naimenovanie_nachalnogo_uzla_truby",
+    "naimenovanie_konechnogo_uzla_truby",
+    "vysotnaya_otmetka",
+    "id_geopoint",
+    "angle"
+   ],
+   "column_types": {
+    "priznak_truboprovoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "kod1": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "uzel1": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "kod2": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "uzel2": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "diametr_truboprovoda": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "ugol_povorota": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka_ktp": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka_truby": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "geodezicheskaya_organizatsiya": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "god_sdachi_v_ekspluatatsiyu": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    },
+    "geodezicheskaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "naimenovanie_nachalnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_konechnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "id_geopoint": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "vvod_v_zdanie",
+   "target": "building_inlet",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 5463,
+   "columns": [
+    "name",
+    "elevation_ktp",
+    "elevation_tr",
+    "ground_control",
+    "territoryid",
+    "god_sdachi_expl",
+    "srok_expl",
+    "date_autor",
+    "podtip",
+    "note",
+    "heat",
+    "gvs",
+    "vent",
+    "shape"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "elevation_ktp": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ground_control": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "territoryid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "god_sdachi_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "srok_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "date_autor": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "podtip": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "note": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "heat": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gvs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "vent": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "wdodevices",
+   "target": "metering_device",
+   "geometry": "Point",
+   "link_column": "nodeid",
+   "rows": 3385,
+   "columns": [
+    "externalsignid",
+    "wdo",
+    "hydrores"
+   ],
+   "column_types": {
+    "externalsignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "wdo": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydrores": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  }
+ ],
+ "line_types": [
+  {
+   "source": "airheaters",
+   "target": "air_heater",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 91,
+   "columns": [
+    "faninstall",
+    "scheme",
+    "airheaterscount",
+    "rowscount",
+    "storescount",
+    "airheatertype",
+    "contamincoeff",
+    "presscoeff",
+    "location"
+   ],
+   "column_types": {
+    "faninstall": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "scheme": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "airheaterscount": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "rowscount": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "storescount": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "airheatertype": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "contamincoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "presscoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "location": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "dampers",
+   "target": "damper",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 14868,
+   "columns": [
+    "dispatcherswitch",
+    "diametercondit",
+    "partdempopen",
+    "name",
+    "standarddamplink",
+    "turncount",
+    "gatecontrol",
+    "clue",
+    "thrustcollar",
+    "relatleakage",
+    "opc",
+    "damperarmaturestateid"
+   ],
+   "column_types": {
+    "dispatcherswitch": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "diametercondit": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "partdempopen": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "standarddamplink": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "turncount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gatecontrol": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "clue": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "thrustcollar": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "relatleakage": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "opc": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "damperarmaturestateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "diaphragms",
+   "target": "diaphragm",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 16718,
+   "columns": [
+    "throtdiaphloc",
+    "diameterinternal",
+    "consinstdiaphcount",
+    "entrymark",
+    "stateid"
+   ],
+   "column_types": {
+    "throtdiaphloc": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "diameterinternal": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "consinstdiaphcount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "entrymark": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "elevators",
+   "target": "elevator",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 2754,
+   "columns": [
+    "elevatortype",
+    "elevatornuminst",
+    "diameternozzle",
+    "entrymark",
+    "diameterchamber",
+    "length",
+    "diameterinletflange",
+    "diameteroutletflange",
+    "diametersuctionpipe",
+    "material",
+    "stateid"
+   ],
+   "column_types": {
+    "elevatortype": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevatornuminst": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameternozzle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "entrymark": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "diameterchamber": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "length": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameterinletflange": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameteroutletflange": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diametersuctionpipe": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "material": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "heatexchangers",
+   "target": "heat_exchanger",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 232,
+   "columns": [
+    "heatexchtype",
+    "heatexchcode",
+    "location",
+    "stateid"
+   ],
+   "column_types": {
+    "heatexchtype": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "heatexchcode": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "location": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "heatpipesections",
+   "target": "pipe_section",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 98019,
+   "columns": [
+    "pipesectionid",
+    "pipesectstateidflow",
+    "pipesectstateidret",
+    "standardid",
+    "standardtubelink",
+    "tubescount",
+    "diameterinternal",
+    "diametercondit",
+    "diameterexternal",
+    "wallthickness",
+    "pipesectlength",
+    "tuberoughness",
+    "locallosesshare",
+    "localressum",
+    "varcoeffidflow",
+    "varcoeffidret",
+    "calcheatlossignid",
+    "tubingtypeid",
+    "piperemonttypeid",
+    "channelid",
+    "constrchanwidth",
+    "constrchanheight",
+    "heattestscoeff",
+    "signnumwork",
+    "isolmaterialid",
+    "isolthickness",
+    "isolmaterialhccoeff",
+    "pipelinelayingdepth",
+    "isolhtcoeffabove",
+    "isolhtcoeffunder",
+    "airgroundhtcoeffunder",
+    "groundhccoeff",
+    "pipelineaxesdist",
+    "damagenum",
+    "lasttransdate",
+    "lastisoldate",
+    "repairdatecapital",
+    "picdatecapital",
+    "repairdatemaint",
+    "picdatemaint",
+    "repairdateplantp",
+    "firstpicdatehp",
+    "lastmaintdatehp",
+    "sectexploitperiod",
+    "buildingconstrstateid",
+    "specdamagecoeff",
+    "specdamagecoeff2",
+    "powcabinstcount10",
+    "powcabinstcount5",
+    "powcabinstcount3",
+    "powcabinstcount1",
+    "powcabinstcount0",
+    "powcabinterscount",
+    "gasecpcount10",
+    "gasecpcount5",
+    "gasecpcount3",
+    "gasecpcount1",
+    "gasecpcount0",
+    "gasecpinterscount",
+    "eltranspcount10",
+    "eltranspcount5",
+    "eltranspcount3",
+    "eltranspcount1",
+    "eltranspcount0",
+    "eltranspinterscount",
+    "potentialdifflevelid",
+    "corrosiondegoutid",
+    "corrosiondeginid",
+    "floodintensitygwid",
+    "floodintensityfwid",
+    "floodintensitytwid",
+    "floodintensitybwid",
+    "jointstightnessinfr",
+    "chanconstrfract",
+    "projsoldeviation",
+    "constrbearreduce",
+    "fixedsuppdestr",
+    "sectwaterdumpid",
+    "breakcomplexityid",
+    "breakconsumvolid",
+    "erwdifficultyid",
+    "tubingpedestrianid",
+    "tubingwayid",
+    "populdamageid",
+    "infrastrdamageid",
+    "hydratestsdate",
+    "sectexpend",
+    "sectthrustloses",
+    "heattestsdate",
+    "temperoutair",
+    "temperground",
+    "expenddwflow",
+    "expenddwret",
+    "tempercoolflow",
+    "tempercoolret",
+    "temperdwflow",
+    "temperdwret",
+    "opc",
+    "tubecharactid",
+    "tubetypeid",
+    "tubematerial",
+    "tempermax",
+    "factorymanufid",
+    "externmaterialid",
+    "isolationtypeid",
+    "externcoverthick",
+    "anticorrmaterialid",
+    "magistralsite",
+    "distsite",
+    "exploitreg",
+    "net",
+    "magistral",
+    "exploitsite",
+    "nettype",
+    "crimpingquesite",
+    "h",
+    "deltah",
+    "deltaq",
+    "q",
+    "primechanie",
+    "name",
+    "inventnumber",
+    "objecttypeid",
+    "sreda",
+    "press",
+    "temperature",
+    "spoksluzhbirash",
+    "ressurs",
+    "pusk",
+    "organizationid",
+    "elektrich",
+    "transportelekricht",
+    "ponezial",
+    "vodootved",
+    "slozhokluzh",
+    "otkluzhgkal",
+    "avariivipoln",
+    "pesehod",
+    "zhddorogi",
+    "ludiproklad",
+    "uzherbludi",
+    "uzherbsity",
+    "vnesniivid",
+    "sostoborudovania",
+    "vnesnkorrozia",
+    "vnunrenkorrozia",
+    "sostkonstrukz",
+    "kategorii",
+    "mestn"
+   ],
+   "column_types": {
+    "pipesectionid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipesectstateidflow": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipesectstateidret": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "standardid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "standardtubelink": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "tubescount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameterinternal": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diametercondit": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diameterexternal": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "wallthickness": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipesectlength": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "tuberoughness": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "locallosesshare": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "localressum": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "varcoeffidflow": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "varcoeffidret": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "calcheatlossignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "tubingtypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "piperemonttypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "channelid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "constrchanwidth": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "constrchanheight": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "heattestscoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "signnumwork": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "isolmaterialid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "isolthickness": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "isolmaterialhccoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipelinelayingdepth": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "isolhtcoeffabove": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "isolhtcoeffunder": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "airgroundhtcoeffunder": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "groundhccoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "pipelineaxesdist": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "damagenum": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "lasttransdate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "lastisoldate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "repairdatecapital": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "picdatecapital": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "repairdatemaint": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "picdatemaint": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "repairdateplantp": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "firstpicdatehp": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "lastmaintdatehp": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "sectexploitperiod": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "buildingconstrstateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "specdamagecoeff": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "specdamagecoeff2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "powcabinstcount10": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "powcabinstcount5": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "powcabinstcount3": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "powcabinstcount1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "powcabinstcount0": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "powcabinterscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gasecpcount10": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gasecpcount5": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gasecpcount3": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gasecpcount1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gasecpcount0": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gasecpinterscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "eltranspcount10": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "eltranspcount5": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "eltranspcount3": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "eltranspcount1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "eltranspcount0": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "eltranspinterscount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "potentialdifflevelid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "corrosiondegoutid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "corrosiondeginid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "floodintensitygwid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "floodintensityfwid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "floodintensitytwid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "floodintensitybwid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "jointstightnessinfr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "chanconstrfract": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "projsoldeviation": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "constrbearreduce": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "fixedsuppdestr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "sectwaterdumpid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "breakcomplexityid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "breakconsumvolid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "erwdifficultyid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "tubingpedestrianid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "tubingwayid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "populdamageid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "infrastrdamageid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydratestsdate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "sectexpend": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "sectthrustloses": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "heattestsdate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperoutair": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperground": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "expenddwret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "tempercoolflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "tempercoolret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperdwflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperdwret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "opc": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "tubecharactid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "tubetypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "tubematerial": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "tempermax": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "factorymanufid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "externmaterialid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "isolationtypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "externcoverthick": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "anticorrmaterialid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "magistralsite": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "distsite": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "exploitreg": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "net": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "magistral": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "exploitsite": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "nettype": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "crimpingquesite": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "h": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "deltah": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "deltaq": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "q": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "inventnumber": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "objecttypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "sreda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "press": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "temperature": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "spoksluzhbirash": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ressurs": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "pusk": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "organizationid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "elektrich": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "transportelekricht": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ponezial": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vodootved": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "slozhokluzh": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "otkluzhgkal": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "avariivipoln": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "pesehod": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "zhddorogi": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ludiproklad": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "uzherbludi": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "uzherbsity": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vnesniivid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "sostoborudovania": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vnesnkorrozia": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vnunrenkorrozia": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "sostkonstrukz": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "kategorii": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "mestn": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "localhydroresistances2",
+   "target": "local_resistance",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 2,
+   "columns": [
+    "name_mest",
+    "s_mest",
+    "k_mest",
+    "sum_mest"
+   ],
+   "column_types": {
+    "name_mest": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "s_mest": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k_mest": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "sum_mest": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "pumps",
+   "target": "pump",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 286,
+   "columns": [
+    "offreason",
+    "pumpstationid",
+    "number",
+    "thrust",
+    "standardpumpid",
+    "parallagregcount",
+    "drivetypeid",
+    "rotordiametertypeid",
+    "standardemid",
+    "r0",
+    "r1",
+    "r2",
+    "e0",
+    "e1",
+    "e2",
+    "k0",
+    "k1",
+    "k2",
+    "r0_z",
+    "r1_z",
+    "r2_z",
+    "e0_z",
+    "e1_z",
+    "e2_z",
+    "k0_z",
+    "k1_z",
+    "k2_z",
+    "rotorrotspeedset",
+    "rotordiameterset",
+    "lastpumpreplacedate",
+    "lastemreplacedate",
+    "lastagregreplacedate",
+    "repaircountpump",
+    "replacecountagreg",
+    "repaircountem",
+    "opc",
+    "stateid"
+   ],
+   "column_types": {
+    "offreason": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "pumpstationid": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "number": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "thrust": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "standardpumpid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "parallagregcount": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "drivetypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "rotordiametertypeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "standardemid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "r0": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "r1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "r2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "e0": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "e1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "e2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k0": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k1": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "r0_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "r1_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "r2_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "e0_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "e1_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "e2_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k0_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k1_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "k2_z": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "rotorrotspeedset": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "rotordiameterset": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "lastpumpreplacedate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "lastemreplacedate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "lastagregreplacedate": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "repaircountpump": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "replacecountagreg": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "repaircountem": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "opc": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "systemradiators",
+   "target": "radiator",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 622,
+   "columns": [
+    "name",
+    "type",
+    "count",
+    "totalequivsurface",
+    "stateid"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "type": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "count": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "totalequivsurface": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "stateid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "vvody_v_zdanie",
+   "target": "building_inlet_line",
+   "geometry": "LineString",
+   "link_column": "lineid",
+   "rows": 5463,
+   "columns": [
+    "vysotnaya_otmetka",
+    "primechanie",
+    "sposob_vvoda",
+    "shape",
+    "angle"
+   ],
+   "column_types": {
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "sposob_vvoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  }
+ ],
+ "polygon_types": [
+  {
+   "source": "truby_rekonstruiruemye",
+   "target": "pipe_reconstructed",
+   "geometry": "Geometry",
+   "link_column": null,
+   "rows": 44,
+   "columns": [
+    "sostoyanie_stroitelstva",
+    "gorod",
+    "mikrorayon",
+    "ulitsa",
+    "dom",
+    "kommentariy",
+    "nachalnaya_kamera",
+    "konechnaya_kamera",
+    "nomer_tu",
+    "data_vydachi_tu",
+    "sostoyanie_dogovora",
+    "naimenovanie_organizatsii__zaprashivayuschey_tu",
+    "naimenovanie_obekta",
+    "rayon_ekspluatatsii",
+    "istochnik",
+    "dlina",
+    "diametr_uslovnyy",
+    "diametr_vnutrenniy",
+    "tolschina_stenki",
+    "tip_truby",
+    "vid_prokladki",
+    "harakteristika_truby",
+    "shape"
+   ],
+   "column_types": {
+    "sostoyanie_stroitelstva": {
+     "data_type": "character varying",
+     "max_length": 1,
+     "nullable": true
+    },
+    "gorod": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "mikrorayon": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "ulitsa": {
+     "data_type": "character varying",
+     "max_length": 30,
+     "nullable": true
+    },
+    "dom": {
+     "data_type": "character varying",
+     "max_length": 30,
+     "nullable": true
+    },
+    "kommentariy": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "nachalnaya_kamera": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "konechnaya_kamera": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "nomer_tu": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "data_vydachi_tu": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "sostoyanie_dogovora": {
+     "data_type": "character varying",
+     "max_length": 1,
+     "nullable": true
+    },
+    "naimenovanie_organizatsii__zaprashivayuschey_tu": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_obekta": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "rayon_ekspluatatsii": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "istochnik": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "dlina": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diametr_uslovnyy": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "diametr_vnutrenniy": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "tolschina_stenki": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "tip_truby": {
+     "data_type": "character varying",
+     "max_length": 1,
+     "nullable": true
+    },
+    "vid_prokladki": {
+     "data_type": "character varying",
+     "max_length": 1,
+     "nullable": true
+    },
+    "harakteristika_truby": {
+     "data_type": "character varying",
+     "max_length": 1,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "zdaniya_2",
+   "target": "building",
+   "geometry": "Geometry",
+   "link_column": null,
+   "rows": 187203,
+   "columns": [
+    "shape",
+    "objectid",
+    "floor",
+    "number_1",
+    "id_adr_mas",
+    "id_admraio",
+    "year_of_fo",
+    "street_nam",
+    "shape_leng",
+    "shape_area",
+    "otop",
+    "gvs",
+    "vent",
+    "par",
+    "nagr",
+    "txt",
+    "mkr2",
+    "street2",
+    "house2",
+    "otop_cxema",
+    "gvs_cxema",
+    "potrebitel"
+   ],
+   "column_types": {
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    },
+    "objectid": {
+     "data_type": "numeric",
+     "max_length": null,
+     "nullable": true
+    },
+    "floor": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "number_1": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "id_adr_mas": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "id_admraio": {
+     "data_type": "numeric",
+     "max_length": null,
+     "nullable": true
+    },
+    "year_of_fo": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "street_nam": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "shape_leng": {
+     "data_type": "numeric",
+     "max_length": null,
+     "nullable": true
+    },
+    "shape_area": {
+     "data_type": "numeric",
+     "max_length": null,
+     "nullable": true
+    },
+    "otop": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gvs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "vent": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "par": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "nagr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "txt": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "mkr2": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "street2": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "house2": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "otop_cxema": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "gvs_cxema": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "potrebitel": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "zdaniya_potrebiteley",
+   "target": "building_consumer",
+   "geometry": "Geometry",
+   "link_column": null,
+   "rows": 12466,
+   "columns": [
+    "gorod",
+    "mikrorayon",
+    "ulitsa",
+    "dom",
+    "kod_rs_uzla_prisoedineniya",
+    "uzel_prisoedineniya",
+    "shape"
+   ],
+   "column_types": {
+    "gorod": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "mikrorayon": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "ulitsa": {
+     "data_type": "character varying",
+     "max_length": 30,
+     "nullable": true
+    },
+    "dom": {
+     "data_type": "character varying",
+     "max_length": 30,
+     "nullable": true
+    },
+    "kod_rs_uzla_prisoedineniya": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "uzel_prisoedineniya": {
+     "data_type": "character varying",
+     "max_length": 25,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "zdaniya_tu",
+   "target": "building_tu",
+   "geometry": "Geometry",
+   "link_column": null,
+   "rows": 5197,
+   "columns": [
+    "gorod",
+    "mikrorayon",
+    "ulitsa",
+    "dom",
+    "kommentariy",
+    "istochnik",
+    "rayon_ekspluatatsii",
+    "kod_rs_uzla_prisoedineniya",
+    "uzel_prisoedineniya",
+    "shape"
+   ],
+   "column_types": {
+    "gorod": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "mikrorayon": {
+     "data_type": "character varying",
+     "max_length": 20,
+     "nullable": true
+    },
+    "ulitsa": {
+     "data_type": "character varying",
+     "max_length": 30,
+     "nullable": true
+    },
+    "dom": {
+     "data_type": "character varying",
+     "max_length": 30,
+     "nullable": true
+    },
+    "kommentariy": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "istochnik": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "rayon_ekspluatatsii": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "kod_rs_uzla_prisoedineniya": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "uzel_prisoedineniya": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "shape": {
+     "data_type": "USER-DEFINED",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  }
+ ]
+}
