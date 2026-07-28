@@ -61,10 +61,11 @@
    ]
   }
  },
- "node_types": [
+ "class_node": [
   {
    "source": "connectnodes",
    "target": "connect_node",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 1527,
@@ -80,96 +81,9 @@
    }
   },
   {
-   "source": "consumptregulators",
-   "target": "regulator_flow",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 7,
-   "columns": [
-    "regconsmean",
-    "workattrid",
-    "hydroresopen",
-    "hydroresclose",
-    "regvalvecap",
-    "relatleakage",
-    "plumsconsumption",
-    "opc",
-    "deltah",
-    "regulatorstateid"
-   ],
-   "column_types": {
-    "regconsmean": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "workattrid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "hydroresopen": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "hydroresclose": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regvalvecap": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "relatleakage": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "plumsconsumption": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "opc": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "deltah": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regulatorstateid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "deployeddirections",
-   "target": "direction_deployed",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 2210,
-   "columns": [
-    "directionid"
-   ],
-   "column_types": {
-    "directionid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
    "source": "generalizedconsumers",
    "target": "consumer_general",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 29051,
@@ -1093,6 +1007,7 @@
   {
    "source": "heatchambers",
    "target": "heat_chamber",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 91,
@@ -1170,6 +1085,7 @@
   {
    "source": "heatsources",
    "target": "heat_source",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 164,
@@ -2427,512 +2343,9 @@
    }
   },
   {
-   "source": "kapremont_uchastki_remonta",
-   "target": "repair_section",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 5,
-   "columns": [
-    "id_remont",
-    "idp1",
-    "ido1",
-    "idp2",
-    "ido2",
-    "shape"
-   ],
-   "column_types": {
-    "id_remont": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "idp1": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "ido1": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "idp2": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "ido2": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "lyuki",
-   "target": "manhole",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 18392,
-   "columns": [
-    "name",
-    "elevation_ktp",
-    "elevation_tr",
-    "elevation_tr_2",
-    "elevation_tr_3",
-    "ground_control",
-    "territoryid",
-    "god_sdachi_expl",
-    "srok_expl",
-    "date_autor",
-    "podtip",
-    "nomer",
-    "type",
-    "owner",
-    "year_overhaul",
-    "note",
-    "shape"
-   ],
-   "column_types": {
-    "name": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "elevation_ktp": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "elevation_tr": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "elevation_tr_2": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "elevation_tr_3": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "ground_control": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "territoryid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "god_sdachi_expl": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "srok_expl": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "date_autor": {
-     "data_type": "date",
-     "max_length": null,
-     "nullable": true
-    },
-    "podtip": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "nomer": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "type": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "owner": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "year_overhaul": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "note": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "opora",
-   "target": "support",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 3611,
-   "columns": [
-    "mestoraspolozhenie",
-    "priznak_truboprovoda",
-    "vysotnaya_otmetka",
-    "stroitelnaya_konstruktsiya",
-    "nomer_opory",
-    "prinadlezhnost",
-    "vid_opory",
-    "shema",
-    "primechanie",
-    "vysota_stroitelnaya_konstruktsi",
-    "shape",
-    "geodezicheskaya_otmetka",
-    "naimenovanie_nachalnogo_uzla_truby",
-    "naimenovanie_konechnogo_uzla_truby",
-    "naimenovanie_uzla_kamery_pavilona",
-    "nomer_shvellera",
-    "kolichestvo_uporov",
-    "constructiontypesid",
-    "angle"
-   ],
-   "column_types": {
-    "mestoraspolozhenie": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "priznak_truboprovoda": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "vysotnaya_otmetka": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "stroitelnaya_konstruktsiya": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "nomer_opory": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "prinadlezhnost": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "vid_opory": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "shema": {
-     "data_type": "character varying",
-     "max_length": null,
-     "nullable": true
-    },
-    "primechanie": {
-     "data_type": "character varying",
-     "max_length": null,
-     "nullable": true
-    },
-    "vysota_stroitelnaya_konstruktsi": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    },
-    "geodezicheskaya_otmetka": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "naimenovanie_nachalnogo_uzla_truby": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "naimenovanie_konechnogo_uzla_truby": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "naimenovanie_uzla_kamery_pavilona": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "nomer_shvellera": {
-     "data_type": "character varying",
-     "max_length": 10,
-     "nullable": true
-    },
-    "kolichestvo_uporov": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "constructiontypesid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "angle": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "opressovka_defekt",
-   "target": "pressure_test_defect",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 1,
-   "columns": [
-    "opressovki_uchastok_ocheredi",
-    "data_provedeniya",
-    "kod_rs_nachalnoy_kamery",
-    "nachalnaya_kamera",
-    "kod_rs_konechnoy_kamery",
-    "konechnaya_kamera",
-    "shape"
-   ],
-   "column_types": {
-    "opressovki_uchastok_ocheredi": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "data_provedeniya": {
-     "data_type": "date",
-     "max_length": null,
-     "nullable": true
-    },
-    "kod_rs_nachalnoy_kamery": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "nachalnaya_kamera": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "kod_rs_konechnoy_kamery": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "konechnaya_kamera": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "perehod_diametra",
-   "target": "diameter_change",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 4,
-   "columns": [
-    "priznak_truboprovoda",
-    "vysotnaya_otmetka",
-    "nachalnyy_diametr",
-    "konechnyy_diametr",
-    "mesto_raspolozheniya",
-    "primechanie",
-    "kod",
-    "uzel",
-    "id_geopoint",
-    "prinadlezhnost",
-    "shape",
-    "geodezicheskaya_otmetka",
-    "naimenovanie_nachalnogo_uzla_truby",
-    "angle"
-   ],
-   "column_types": {
-    "priznak_truboprovoda": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "vysotnaya_otmetka": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "nachalnyy_diametr": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "konechnyy_diametr": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "mesto_raspolozheniya": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "primechanie": {
-     "data_type": "text",
-     "max_length": null,
-     "nullable": true
-    },
-    "kod": {
-     "data_type": "character varying",
-     "max_length": 5,
-     "nullable": true
-    },
-    "uzel": {
-     "data_type": "character varying",
-     "max_length": 25,
-     "nullable": true
-    },
-    "id_geopoint": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "prinadlezhnost": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    },
-    "geodezicheskaya_otmetka": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "naimenovanie_nachalnogo_uzla_truby": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "angle": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "pressdropregulators",
-   "target": "regulator_pressdrop",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 13,
-   "columns": [
-    "pressdropmean",
-    "regvalvehydrores",
-    "consthroughregvalve",
-    "thrustdropmean",
-    "regvalverelcap",
-    "maxleakageclosevalve",
-    "consdrip",
-    "workattrid",
-    "deltah",
-    "regulatorstateid"
-   ],
-   "column_types": {
-    "pressdropmean": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regvalvehydrores": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "consthroughregvalve": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "thrustdropmean": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regvalverelcap": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "maxleakageclosevalve": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "consdrip": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "workattrid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "deltah": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "regulatorstateid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
    "source": "pressregulators",
    "target": "regulator_press",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 509,
@@ -3004,6 +2417,7 @@
   {
    "source": "pumpstations",
    "target": "pump_station",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 227,
@@ -3069,6 +2483,7 @@
   {
    "source": "realconsumers",
    "target": "consumer_real",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 26202,
@@ -4028,6 +3443,7 @@
   {
    "source": "refillnodes",
    "target": "refill_node",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 1,
@@ -4121,61 +3537,9 @@
    }
   },
   {
-   "source": "setpressnodes",
-   "target": "press_set_node",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 5740,
-   "columns": [
-    "pressflow",
-    "pressret",
-    "fragment_resultid",
-    "file_result",
-    "kod_m",
-    "uzel_m",
-    "fileid"
-   ],
-   "column_types": {
-    "pressflow": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "pressret": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "fragment_resultid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "file_result": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "kod_m": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "uzel_m": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "fileid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
    "source": "threewayvalves",
    "target": "valve_3way",
+   "category": "class_node",
    "geometry": "Point",
    "link_column": "nodeid",
    "rows": 14,
@@ -4279,261 +3643,13 @@
      "nullable": true
     }
    }
-  },
-  {
-   "source": "ugol_povorota_truboprovoda",
-   "target": "pipe_turn",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 25214,
-   "columns": [
-    "priznak_truboprovoda",
-    "kod1",
-    "uzel1",
-    "kod2",
-    "uzel2",
-    "diametr_truboprovoda",
-    "ugol_povorota",
-    "primechanie",
-    "vysotnaya_otmetka_ktp",
-    "vysotnaya_otmetka_truby",
-    "geodezicheskaya_organizatsiya",
-    "god_sdachi_v_ekspluatatsiyu",
-    "shape",
-    "geodezicheskaya_otmetka",
-    "naimenovanie_nachalnogo_uzla_truby",
-    "naimenovanie_konechnogo_uzla_truby",
-    "vysotnaya_otmetka",
-    "id_geopoint",
-    "angle"
-   ],
-   "column_types": {
-    "priznak_truboprovoda": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "kod1": {
-     "data_type": "character varying",
-     "max_length": 10,
-     "nullable": true
-    },
-    "uzel1": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "kod2": {
-     "data_type": "character varying",
-     "max_length": 10,
-     "nullable": true
-    },
-    "uzel2": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "diametr_truboprovoda": {
-     "data_type": "character varying",
-     "max_length": 50,
-     "nullable": true
-    },
-    "ugol_povorota": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "primechanie": {
-     "data_type": "text",
-     "max_length": null,
-     "nullable": true
-    },
-    "vysotnaya_otmetka_ktp": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "vysotnaya_otmetka_truby": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "geodezicheskaya_organizatsiya": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "god_sdachi_v_ekspluatatsiyu": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    },
-    "geodezicheskaya_otmetka": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "naimenovanie_nachalnogo_uzla_truby": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "naimenovanie_konechnogo_uzla_truby": {
-     "data_type": "character varying",
-     "max_length": 255,
-     "nullable": true
-    },
-    "vysotnaya_otmetka": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "id_geopoint": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "angle": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "vvod_v_zdanie",
-   "target": "building_inlet",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 5463,
-   "columns": [
-    "name",
-    "elevation_ktp",
-    "elevation_tr",
-    "ground_control",
-    "territoryid",
-    "god_sdachi_expl",
-    "srok_expl",
-    "date_autor",
-    "podtip",
-    "note",
-    "heat",
-    "gvs",
-    "vent",
-    "shape"
-   ],
-   "column_types": {
-    "name": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "elevation_ktp": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "elevation_tr": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "ground_control": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "territoryid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "god_sdachi_expl": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "srok_expl": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "date_autor": {
-     "data_type": "date",
-     "max_length": null,
-     "nullable": true
-    },
-    "podtip": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "note": {
-     "data_type": "character varying",
-     "max_length": 80,
-     "nullable": true
-    },
-    "heat": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "gvs": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "vent": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    }
-   }
-  },
-  {
-   "source": "wdodevices",
-   "target": "metering_device",
-   "geometry": "Point",
-   "link_column": "nodeid",
-   "rows": 3385,
-   "columns": [
-    "externalsignid",
-    "wdo",
-    "hydrores"
-   ],
-   "column_types": {
-    "externalsignid": {
-     "data_type": "integer",
-     "max_length": null,
-     "nullable": true
-    },
-    "wdo": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    },
-    "hydrores": {
-     "data_type": "double precision",
-     "max_length": null,
-     "nullable": true
-    }
-   }
   }
  ],
- "line_types": [
+ "class_line": [
   {
    "source": "airheaters",
    "target": "air_heater",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 91,
@@ -4599,6 +3715,7 @@
   {
    "source": "dampers",
    "target": "damper",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 14868,
@@ -4682,6 +3799,7 @@
   {
    "source": "diaphragms",
    "target": "diaphragm",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 16718,
@@ -4723,6 +3841,7 @@
   {
    "source": "elevators",
    "target": "elevator",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 2754,
@@ -4800,6 +3919,7 @@
   {
    "source": "heatexchangers",
    "target": "heat_exchanger",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 232,
@@ -4835,6 +3955,7 @@
   {
    "source": "heatpipesections",
    "target": "pipe_section",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 98019,
@@ -5740,6 +4861,7 @@
   {
    "source": "localhydroresistances2",
    "target": "local_resistance",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 2,
@@ -5775,6 +4897,7 @@
   {
    "source": "pumps",
    "target": "pump",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 286,
@@ -6008,6 +5131,7 @@
   {
    "source": "systemradiators",
    "target": "radiator",
+   "category": "class_line",
    "geometry": "LineString",
    "link_column": "lineid",
    "rows": 622,
@@ -6045,23 +5169,224 @@
      "nullable": true
     }
    }
+  }
+ ],
+ "layer": [
+  {
+   "source": "kapremont_uchastki_remonta",
+   "target": "repair_section",
+   "category": "layer",
+   "geometry": "GEOMETRY",
+   "link_column": null,
+   "rows": 5,
+   "columns": [
+    "id_remont",
+    "idp1",
+    "ido1",
+    "idp2",
+    "ido2"
+   ],
+   "column_types": {
+    "id_remont": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "idp1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ido1": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "idp2": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "ido2": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
   },
   {
-   "source": "vvody_v_zdanie",
-   "target": "building_inlet_line",
-   "geometry": "LineString",
-   "link_column": "lineid",
-   "rows": 5463,
+   "source": "lyuki",
+   "target": "manhole",
+   "category": "layer",
+   "geometry": "GEOMETRY",
+   "link_column": null,
+   "rows": 18392,
    "columns": [
+    "name",
+    "elevation_ktp",
+    "elevation_tr",
+    "elevation_tr_2",
+    "elevation_tr_3",
+    "ground_control",
+    "territoryid",
+    "god_sdachi_expl",
+    "srok_expl",
+    "date_autor",
+    "podtip",
+    "nomer",
+    "type",
+    "owner",
+    "year_overhaul",
+    "note"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "elevation_ktp": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr_2": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr_3": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ground_control": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "territoryid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "god_sdachi_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "srok_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "date_autor": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "podtip": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "nomer": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "type": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "owner": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "year_overhaul": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "note": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "opora",
+   "target": "support",
+   "category": "layer",
+   "geometry": "POINT",
+   "link_column": null,
+   "rows": 3611,
+   "columns": [
+    "mestoraspolozhenie",
+    "priznak_truboprovoda",
     "vysotnaya_otmetka",
+    "stroitelnaya_konstruktsiya",
+    "nomer_opory",
+    "prinadlezhnost",
+    "vid_opory",
+    "shema",
     "primechanie",
-    "sposob_vvoda",
-    "shape",
+    "vysota_stroitelnaya_konstruktsi",
+    "geodezicheskaya_otmetka",
+    "naimenovanie_nachalnogo_uzla_truby",
+    "naimenovanie_konechnogo_uzla_truby",
+    "naimenovanie_uzla_kamery_pavilona",
+    "nomer_shvellera",
+    "kolichestvo_uporov",
+    "constructiontypesid",
     "angle"
    ],
    "column_types": {
+    "mestoraspolozhenie": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "priznak_truboprovoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
     "vysotnaya_otmetka": {
      "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "stroitelnaya_konstruktsiya": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "nomer_opory": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "prinadlezhnost": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "vid_opory": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "shema": {
+     "data_type": "character varying",
      "max_length": null,
      "nullable": true
     },
@@ -6070,13 +5395,43 @@
      "max_length": null,
      "nullable": true
     },
-    "sposob_vvoda": {
+    "vysota_stroitelnaya_konstruktsi": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "geodezicheskaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "naimenovanie_nachalnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_konechnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_uzla_kamery_pavilona": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "nomer_shvellera": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "kolichestvo_uporov": {
      "data_type": "integer",
      "max_length": null,
      "nullable": true
     },
-    "shape": {
-     "data_type": "USER-DEFINED",
+    "constructiontypesid": {
+     "data_type": "integer",
      "max_length": null,
      "nullable": true
     },
@@ -6086,13 +5441,150 @@
      "nullable": true
     }
    }
-  }
- ],
- "polygon_types": [
+  },
+  {
+   "source": "opressovka_defekt",
+   "target": "pressure_test_defect",
+   "category": "layer",
+   "geometry": "GEOMETRY",
+   "link_column": null,
+   "rows": 1,
+   "columns": [
+    "opressovki_uchastok_ocheredi",
+    "data_provedeniya",
+    "kod_rs_nachalnoy_kamery",
+    "nachalnaya_kamera",
+    "kod_rs_konechnoy_kamery",
+    "konechnaya_kamera"
+   ],
+   "column_types": {
+    "opressovki_uchastok_ocheredi": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "data_provedeniya": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "kod_rs_nachalnoy_kamery": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "nachalnaya_kamera": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "kod_rs_konechnoy_kamery": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "konechnaya_kamera": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "perehod_diametra",
+   "target": "diameter_change",
+   "category": "layer",
+   "geometry": "POINT",
+   "link_column": null,
+   "rows": 4,
+   "columns": [
+    "priznak_truboprovoda",
+    "vysotnaya_otmetka",
+    "nachalnyy_diametr",
+    "konechnyy_diametr",
+    "mesto_raspolozheniya",
+    "primechanie",
+    "kod",
+    "uzel",
+    "id_geopoint",
+    "prinadlezhnost",
+    "geodezicheskaya_otmetka",
+    "naimenovanie_nachalnogo_uzla_truby",
+    "angle"
+   ],
+   "column_types": {
+    "priznak_truboprovoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "nachalnyy_diametr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "konechnyy_diametr": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "mesto_raspolozheniya": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "kod": {
+     "data_type": "character varying",
+     "max_length": 5,
+     "nullable": true
+    },
+    "uzel": {
+     "data_type": "character varying",
+     "max_length": 25,
+     "nullable": true
+    },
+    "id_geopoint": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "prinadlezhnost": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "geodezicheskaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "naimenovanie_nachalnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
   {
    "source": "truby_rekonstruiruemye",
    "target": "pipe_reconstructed",
-   "geometry": "Geometry",
+   "category": "layer",
+   "geometry": "GEOMETRY",
    "link_column": null,
    "rows": 44,
    "columns": [
@@ -6117,8 +5609,7 @@
     "tolschina_stenki",
     "tip_truby",
     "vid_prokladki",
-    "harakteristika_truby",
-    "shape"
+    "harakteristika_truby"
    ],
    "column_types": {
     "sostoyanie_stroitelstva": {
@@ -6230,9 +5721,250 @@
      "data_type": "character varying",
      "max_length": 1,
      "nullable": true
+    }
+   }
+  },
+  {
+   "source": "ugol_povorota_truboprovoda",
+   "target": "pipe_turn",
+   "category": "layer",
+   "geometry": "POINT",
+   "link_column": null,
+   "rows": 25214,
+   "columns": [
+    "priznak_truboprovoda",
+    "kod1",
+    "uzel1",
+    "kod2",
+    "uzel2",
+    "diametr_truboprovoda",
+    "ugol_povorota",
+    "primechanie",
+    "vysotnaya_otmetka_ktp",
+    "vysotnaya_otmetka_truby",
+    "geodezicheskaya_organizatsiya",
+    "god_sdachi_v_ekspluatatsiyu",
+    "geodezicheskaya_otmetka",
+    "naimenovanie_nachalnogo_uzla_truby",
+    "naimenovanie_konechnogo_uzla_truby",
+    "vysotnaya_otmetka",
+    "id_geopoint",
+    "angle"
+   ],
+   "column_types": {
+    "priznak_truboprovoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
     },
-    "shape": {
-     "data_type": "USER-DEFINED",
+    "kod1": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "uzel1": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "kod2": {
+     "data_type": "character varying",
+     "max_length": 10,
+     "nullable": true
+    },
+    "uzel2": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "diametr_truboprovoda": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "ugol_povorota": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "text",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka_ktp": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "vysotnaya_otmetka_truby": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "geodezicheskaya_organizatsiya": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "god_sdachi_v_ekspluatatsiyu": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "geodezicheskaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "naimenovanie_nachalnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "naimenovanie_konechnogo_uzla_truby": {
+     "data_type": "character varying",
+     "max_length": 255,
+     "nullable": true
+    },
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "id_geopoint": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "vvod_v_zdanie",
+   "target": "building_inlet",
+   "category": "layer",
+   "geometry": "GEOMETRY",
+   "link_column": null,
+   "rows": 5463,
+   "columns": [
+    "name",
+    "elevation_ktp",
+    "elevation_tr",
+    "ground_control",
+    "territoryid",
+    "god_sdachi_expl",
+    "srok_expl",
+    "date_autor",
+    "podtip",
+    "note",
+    "heat",
+    "gvs",
+    "vent"
+   ],
+   "column_types": {
+    "name": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "elevation_ktp": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "elevation_tr": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "ground_control": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "territoryid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "god_sdachi_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "srok_expl": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "date_autor": {
+     "data_type": "date",
+     "max_length": null,
+     "nullable": true
+    },
+    "podtip": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "note": {
+     "data_type": "character varying",
+     "max_length": 80,
+     "nullable": true
+    },
+    "heat": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "gvs": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "vent": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "vvody_v_zdanie",
+   "target": "building_inlet_line",
+   "category": "layer",
+   "geometry": "POINT",
+   "link_column": null,
+   "rows": 5463,
+   "columns": [
+    "vysotnaya_otmetka",
+    "primechanie",
+    "sposob_vvoda",
+    "angle"
+   ],
+   "column_types": {
+    "vysotnaya_otmetka": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "primechanie": {
+     "data_type": "character varying",
+     "max_length": null,
+     "nullable": true
+    },
+    "sposob_vvoda": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "angle": {
+     "data_type": "double precision",
      "max_length": null,
      "nullable": true
     }
@@ -6241,11 +5973,11 @@
   {
    "source": "zdaniya_2",
    "target": "building",
-   "geometry": "Geometry",
+   "category": "layer",
+   "geometry": "GEOMETRY",
    "link_column": null,
    "rows": 187203,
    "columns": [
-    "shape",
     "objectid",
     "floor",
     "number_1",
@@ -6269,11 +6001,6 @@
     "potrebitel"
    ],
    "column_types": {
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
-    },
     "objectid": {
      "data_type": "numeric",
      "max_length": null,
@@ -6384,7 +6111,8 @@
   {
    "source": "zdaniya_potrebiteley",
    "target": "building_consumer",
-   "geometry": "Geometry",
+   "category": "layer",
+   "geometry": "GEOMETRY",
    "link_column": null,
    "rows": 12466,
    "columns": [
@@ -6393,8 +6121,7 @@
     "ulitsa",
     "dom",
     "kod_rs_uzla_prisoedineniya",
-    "uzel_prisoedineniya",
-    "shape"
+    "uzel_prisoedineniya"
    ],
    "column_types": {
     "gorod": {
@@ -6426,18 +6153,14 @@
      "data_type": "character varying",
      "max_length": 25,
      "nullable": true
-    },
-    "shape": {
-     "data_type": "USER-DEFINED",
-     "max_length": null,
-     "nullable": true
     }
    }
   },
   {
    "source": "zdaniya_tu",
    "target": "building_tu",
-   "geometry": "Geometry",
+   "category": "layer",
+   "geometry": "GEOMETRY",
    "link_column": null,
    "rows": 5197,
    "columns": [
@@ -6449,8 +6172,7 @@
     "istochnik",
     "rayon_ekspluatatsii",
     "kod_rs_uzla_prisoedineniya",
-    "uzel_prisoedineniya",
-    "shape"
+    "uzel_prisoedineniya"
    ],
    "column_types": {
     "gorod": {
@@ -6497,13 +6219,126 @@
      "data_type": "character varying",
      "max_length": 255,
      "nullable": true
+    }
+   }
+  }
+ ],
+ "aspect": [
+  {
+   "source": "setpressnodes",
+   "target": "node_press_setting",
+   "category": "aspect",
+   "geometry": null,
+   "link_column": "nodeid",
+   "rows": 5740,
+   "columns": [
+    "pressflow",
+    "pressret",
+    "fragment_resultid",
+    "file_result",
+    "kod_m",
+    "uzel_m",
+    "fileid"
+   ],
+   "column_types": {
+    "pressflow": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
     },
-    "shape": {
-     "data_type": "USER-DEFINED",
+    "pressret": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "fragment_resultid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "file_result": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "kod_m": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "uzel_m": {
+     "data_type": "character varying",
+     "max_length": 50,
+     "nullable": true
+    },
+    "fileid": {
+     "data_type": "integer",
      "max_length": null,
      "nullable": true
     }
    }
+  }
+ ],
+ "child": [
+  {
+   "source": "deployeddirections",
+   "target": "node_direction",
+   "category": "child",
+   "geometry": null,
+   "link_column": "nodeid",
+   "rows": 2210,
+   "columns": [
+    "directionid"
+   ],
+   "column_types": {
+    "directionid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  },
+  {
+   "source": "wdodevices",
+   "target": "node_metering_device",
+   "category": "child",
+   "geometry": null,
+   "link_column": "nodeid",
+   "rows": 3385,
+   "columns": [
+    "externalsignid",
+    "wdo",
+    "hydrores"
+   ],
+   "column_types": {
+    "externalsignid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
+    "wdo": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    },
+    "hydrores": {
+     "data_type": "double precision",
+     "max_length": null,
+     "nullable": true
+    }
+   }
+  }
+ ],
+ "junk": [
+  {
+   "source": "consumptregulators",
+   "rows": 7,
+   "reason": "нет геометрии, nodeid пуст во всех 7 строках"
+  },
+  {
+   "source": "pressdropregulators",
+   "rows": 13,
+   "reason": "нет геометрии, nodeid пуст во всех 13 строках"
   }
  ]
 }

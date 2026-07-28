@@ -65,21 +65,35 @@ END $$;
 -- 6. id выдаётся общей последовательностью — он уникален между таблицами.
 INSERT INTO net.heat_chamber (fragment_id, geom)
 VALUES (999, ST_SetSRID(ST_Point(0, 0), 9998));
-INSERT INTO net.manhole (fragment_id, geom)
+INSERT INTO net.consumer_real (fragment_id, geom)
 VALUES (999, ST_SetSRID(ST_Point(0, 0), 9998));
 
 DO $$
-DECLARE n int;
+DECLARE n int; d int;
 BEGIN
-    SELECT count(*) INTO n FROM (
+    SELECT count(*), count(DISTINCT id) INTO n, d FROM (
         SELECT id FROM net.heat_chamber
-        UNION ALL SELECT id FROM net.manhole
+        UNION ALL SELECT id FROM net.consumer_real
     ) s;
-    IF n <> (SELECT count(DISTINCT id) FROM (
-                SELECT id FROM net.heat_chamber
-                UNION ALL SELECT id FROM net.manhole) s2) THEN
+    IF n <> d THEN
         RAISE EXCEPTION 'ПРОВАЛ: id не уникален между объектными таблицами';
     END IF;
+END $$;
+
+-- 7. Аспект привязан к реестру: узел-потребитель может быть ещё и узлом
+--    задания давления, но ссылка на несуществующий узел недопустима.
+INSERT INTO net.consumer_general (id, fragment_id, geom)
+VALUES (1003, 999, ST_SetSRID(ST_Point(1, 1), 9998));
+INSERT INTO net.node_press_setting (node_id) VALUES (1003);
+
+DO $$
+BEGIN
+    BEGIN
+        INSERT INTO net.node_press_setting (node_id) VALUES (888888);
+        RAISE EXCEPTION 'ПРОВАЛ: аспект принят для несуществующего узла';
+    EXCEPTION WHEN foreign_key_violation THEN
+        NULL;  -- ожидаемо
+    END;
 END $$;
 
 ROLLBACK;
