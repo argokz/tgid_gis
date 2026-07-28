@@ -13,7 +13,8 @@ CREATE SCHEMA IF NOT EXISTS net;
 -- Концы всегда берутся из узлов nodeid1 / nodeid2.
 CREATE OR REPLACE FUNCTION net.parse_coords(txt text, scale float8 DEFAULT 100.0)
 RETURNS geometry[]
-LANGUAGE plpgsql IMMUTABLE AS $$
+LANGUAGE plpgsql IMMUTABLE
+SET search_path = pg_catalog, public AS $$
 DECLARE
     nums float8[];
     res  geometry[] := '{}';
@@ -56,9 +57,13 @@ END $$;
 -- Возвращаются ТОЛЬКО промежуточные вершины: первая и последняя точки линии —
 -- это узлы, и приложение подставляет их само. Единицы — сантиметры,
 -- ось Y инвертирована обратно.
+-- SET search_path обязателен: функция используется в вычисляемой колонке
+-- coords_legacy, а pg_restore выполняет такие выражения с урезанным
+-- search_path и не находит ST_DumpPoints — восстановление БД падает.
 CREATE OR REPLACE FUNCTION net.geom_to_coords(g geometry, scale float8 DEFAULT 100.0)
 RETURNS text
-LANGUAGE sql IMMUTABLE AS $$
+LANGUAGE sql IMMUTABLE
+SET search_path = pg_catalog, public AS $$
     -- trim_scale убирает хвостовые нули, но НЕ округляет до целых:
     -- в исходных coords встречаются доли сантиметра, и округление
     -- сделало бы преобразование туда-обратно неточным.
