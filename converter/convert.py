@@ -272,6 +272,19 @@ class Converter:
                        vals=(', ' + ', '.join(vals)) if vals else ''),
                 e['target'])
 
+            # Ничего не теряем молча: строки с пустой или битой ссылкой
+            # на узел попадают в отчёт с указанием причины.
+            self.run(cur, """
+                INSERT INTO net.conversion_reject (src_table, src_id, reason, detail)
+                SELECT '{src}', s.id,
+                       CASE WHEN s.{link} IS NULL THEN 'ссылка на узел пуста'
+                            ELSE 'узел не найден среди перенесённых' END,
+                       jsonb_build_object('{link}', s.{link})
+                FROM public.{src} s
+                LEFT JOIN net.node_src_map r ON r.src_id = s.{link}
+                WHERE s.{link} IS NULL OR r.src_id IS NULL
+            """.format(src=e['source'], link=link))
+
     def orphans(self, cur):
         self.log('Линии без разрешимых концов')
         self.run(cur, """
