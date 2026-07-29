@@ -271,6 +271,33 @@ class Converter:
         self.insert_class(cur, plain, base, base_alias, link, geom, is_line,
                           plain=True)
 
+    def extra_rows(self, cur, kind):
+        """Строки подтипов, не ставшие объектом, — с настоящими колонками.
+
+        Вызывается ПОСЛЕ переноса классов: раньше объектных таблиц ещё нет.
+        Представления подтипов читают именно отсюда, а не из jsonb —
+        через payload ->> выборка 152 колонок шла 211 секунд.
+        """
+        entries = self.m['class_node' if kind == 'node' else 'class_line']
+        link = 'nodeid' if kind == 'node' else 'lineid'
+        self.log('Лишние строки подтипов (%s)' % kind)
+        for e in entries:
+            cols = [q(c) for c in e['columns']]
+            self.run(cur, """
+                INSERT INTO net.extra_{src} (id, obj_id{extra})
+                SELECT s.id, s.{link}{vals}
+                FROM {src_full} s
+                JOIN _assign_{k} a ON a.obj_id = s.{link}
+                WHERE s.{link} IS NOT NULL
+                  AND (a.target <> '{t}' OR a.src_row <> s.id)
+                ON CONFLICT (id) DO NOTHING
+            """.format(src=e['source'], src_full=self.sub(e['source']),
+                       link=link, k=kind, t=e['target'],
+                       extra=(', ' + ', '.join(cols)) if cols else '',
+                       vals=(', ' + ', '.join('s.%s' % c for c in cols))
+                       if cols else ''),
+                'extra_%s' % e['source'] if e['rows'] else None)
+
     def build_src_map(self, cur):
         """Карта «старый nodes.id -> новый id». Нужна линиям и дочерним таблицам."""
         targets = [e['target'] for e in self.m['class_node']] + ['node_plain']
@@ -521,10 +548,12 @@ def main():
         c.assign(cur, 'node')
         log('Точечные классы')
         c.class_tables(cur, 'node')
+        c.extra_rows(cur, 'node')
         c.build_src_map(cur)
         c.assign(cur, 'line')
         log('Линейные классы')
         c.class_tables(cur, 'line')
+        c.extra_rows(cur, 'line')
         c.layers(cur)
         c.children(cur)
         c.orphans(cur)

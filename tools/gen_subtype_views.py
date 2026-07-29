@@ -38,10 +38,16 @@ UNION ALL
 -- Узел может иметь строки сразу в двух подтипах — старая модель это
 -- допускала, и расчётное ядро читает обе. Без этой части выборка
 -- вернула бы меньше строк, чем на исходной БД.
-SELECT (v.payload ->> 'id')::int AS id,
-       v.obj_id                  AS {link}{vcols}
-FROM net.object_variant v
-WHERE v.src_table = '{src}' AND NOT v.chosen;
+--
+-- Читаем из обычной таблицы, а не из jsonb: через payload ->> выборка
+-- всех колонок шла 211 секунд против 0.4 на исходной БД.
+SELECT x.id, x.obj_id AS {link}{xcols}
+FROM net.extra_{src} x
+-- Порядок обязателен. Расчётное ядро строит граф в порядке поступления
+-- строк, а UNION ALL с параллельным сканированием отдаёт их каждый раз
+-- по-разному — два прогона на одной БД давали разные результаты, тогда
+-- как на исходной таблице порядок физический и потому стабильный.
+ORDER BY 1;
 
 CREATE OR REPLACE FUNCTION net.v_{src}_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -134,11 +140,24 @@ def main():
                     (target,))
         types = dict(cur.fetchall())
 
+        # Тип колонки в объектной таблице и в таблице лишних строк может
+        # разойтись: если имя совпало с колонкой базовой nodes/linesobj,
+        # объектная таблица берёт тип базовой. В UNION это ошибка,
+        # поэтому приводим явно.
+        cur.execute("""SELECT column_name, data_type
+                       FROM information_schema.columns
+                       WHERE table_schema = 'net' AND table_name = %s""",
+                    ('extra_' + src,))
+        xtypes = dict(cur.fetchall())
+
         out.append(VIEW.format(
             src=src, target=target, link=link, kind=kind, plain=plain,
             cols=''.join(',\n       o.%s' % c for c in cols),
-            vcols=''.join(",\n       (v.payload ->> '%s')::%s" %
-                          (c, types.get(c, 'text')) for c in cols),
+            xcols=''.join(
+                ',\n       x.%s%s' % (
+                    c, ('::%s' % types[c])
+                    if types.get(c) and xtypes.get(c) != types.get(c) else '')
+                for c in cols),
             sets_new=''.join(',\n        %s = NEW.%s' % (c, c) for c in cols)))
 
         switch.append('ALTER TABLE public.%s RENAME TO %s_legacy;' % (src, src))
