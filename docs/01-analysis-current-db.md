@@ -143,10 +143,15 @@ q += QString(" AND n1.fileID IN (%1)").arg(par);  // read_lines.cpp:212
    Отдельно: `heatpipesections` содержит 1 981 строку из 98 019, ссылающуюся
    на несуществующий `linesobj.id` — вот это уже настоящие битые ссылки.
 
-3. **Дублирующиеся таблицы** — очевидные копии, обе живые:
-   `obekty` / `tablitsa1` (по 38 247), `zhile` / `zhile1` (по 7 962),
-   `organizations` / `organizatsii_vladeltsy` (по 16 579), `vvod_v_zdanie` / `vvody_v_zdanie` (по 5 463),
-   `spisok_ulits` / `spisok_ulits_staryy`.
+3. **Пары таблиц с одинаковым числом строк**: `obekty` / `tablitsa1` (по 38 247),
+   `zhile` / `zhile1` (по 7 962), `organizations` / `organizatsii_vladeltsy` (по 16 579),
+   `vvod_v_zdanie` / `vvody_v_zdanie` (по 5 463), `spisok_ulits` / `spisok_ulits_staryy`.
+
+   Здесь я сначала написал «очевидные копии» — **это оказалось неверно**.
+   Разбор с проверкой содержимого — [06-duplicate-tables.md](06-duplicate-tables.md):
+   у `obekty` и `tablitsa1` совпадают структура и число строк, но данные различаются
+   полностью; у `zhile` 25 колонок против 10 у `zhile1`. Решающий признак — ссылки
+   из кода: на `tablitsa1` и `zhile1` их ноль.
 
 4. **Механизм GIS-синхронизации заброшен.** Колонки `globalid`, `gistable`, `sync`, `gis`, `sync_tgid`
    есть в `nodes` и `linesobj`, но `gistable` пуст у всех 86 624 записей.
