@@ -20,16 +20,20 @@ import sys
 import psycopg2
 
 OUT_TABLES = [
-    ('us_out', 'nodeid'),
-    ('ut_out', 'lineid'),
-    ('pt_out', 'nodeid'),
-    ('dr_out', 'nodeid'),
-    ('ns_out', 'lineid'),
-    ('rs_out', 'lineid'),
-    ('bp_out', 'lineid'),
-    ('ok_out', 'lineid'),
-    ('is_out', 'nodeid'),
-    ('po_out', 'nodeid'),
+    # Ключ обязан быть УНИКАЛЬНЫМ в пределах расчёта. В ut_out и подобных
+    # на один объект приходится две строки — подача и обратка, — поэтому
+    # ключ составной. С одним lineid строки схлопывались в словаре, и
+    # сравнение выдавало тысячи фантомных расхождений.
+    ('us_out', ('nodeid', 'externalsign')),
+    ('ut_out', ('lineid', 'externalsignlineid')),
+    ('pt_out', ('nodeid',)),
+    ('dr_out', ('nodeid',)),
+    ('ns_out', ('lineid', 'externalsignlineid')),
+    ('rs_out', ('lineid', 'externalsignlineid')),
+    ('bp_out', ('lineid', 'externalsignlineid')),
+    ('ok_out', ('lineid', 'externalsignlineid')),
+    ('is_out', ('nodeid',)),
+    ('po_out', ('nodeid',)),
 ]
 
 
@@ -99,7 +103,7 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
     cols = [c for c, t in numeric_cols(qa, table)
             if t in ('double precision', 'real', 'numeric', 'integer',
                      'bigint', 'smallint')
-            and c not in ('id', 'calculationid')]
+            and c not in ('id', 'calculationid') and c not in key]
     info['numeric_cols'] = len(cols)
 
     diffs = 0
@@ -107,13 +111,11 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
     worst = None
     for c in cols:
         qa.execute(
-            'SELECT %s, %s FROM public.%s WHERE calculationid = %%s '
-            'ORDER BY %s, id' % (key, c, table, key), (ida,))
-        rows_a = {k: v for k, v in qa.fetchall()}
+            'SELECT %s, %s FROM public.%s WHERE calculationid = %%s' % (', '.join(key), c, table), (ida,))
+        rows_a = {r[:-1]: r[-1] for r in qa.fetchall()}
         qb.execute(
-            'SELECT %s, %s FROM public.%s WHERE calculationid = %%s '
-            'ORDER BY %s, id' % (key, c, table, key), (idb,))
-        rows_b = {k: v for k, v in qb.fetchall()}
+            'SELECT %s, %s FROM public.%s WHERE calculationid = %%s' % (', '.join(key), c, table), (idb,))
+        rows_b = {r[:-1]: r[-1] for r in qb.fetchall()}
         keys = set(rows_a) | set(rows_b)
         for k in keys:
             if k not in rows_a or k not in rows_b:

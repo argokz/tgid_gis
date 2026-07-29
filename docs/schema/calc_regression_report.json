@@ -2,47 +2,57 @@
   "db_a": "almatygid_ref",
   "db_b": "tgid_gis",
   "fragment": 2,
-  "calc_a": 2,
-  "calc_b": 5,
+  "calc_a": 4,
+  "calc_b": 14,
   "atol": 1e-06,
   "rtol": 1e-06,
   "tables": [
     {
       "table": "us_out",
-      "key": "nodeid",
+      "key": [
+        "nodeid",
+        "externalsign"
+      ],
       "rows_a": 4908,
       "rows_b": 4908,
       "status": "mismatch",
-      "diff_cells": 200,
-      "max_abs": 18.149999999999977,
+      "diff_cells": 1028,
+      "max_abs": 0.02022974176372827,
       "worst_col": "pih",
-      "numeric_cols": 6
+      "numeric_cols": 4
     },
     {
       "table": "ut_out",
-      "key": "lineid",
+      "key": [
+        "lineid",
+        "externalsignlineid"
+      ],
       "rows_a": 2773,
       "rows_b": 2773,
       "status": "mismatch",
-      "diff_cells": 1762,
-      "max_abs": 496.91535859521093,
-      "worst_col": "a13",
-      "numeric_cols": 39
+      "diff_cells": 32,
+      "max_abs": 0.19451301172694357,
+      "worst_col": "a14",
+      "numeric_cols": 37
     },
     {
       "table": "pt_out",
-      "key": "nodeid",
+      "key": [
+        "nodeid"
+      ],
       "rows_a": 1304,
       "rows_b": 1304,
       "status": "mismatch",
-      "diff_cells": 5,
-      "max_abs": 5.158865112639657,
+      "diff_cells": 11,
+      "max_abs": 0.14473142505819592,
       "worst_col": "a15",
-      "numeric_cols": 82
+      "numeric_cols": 81
     },
     {
       "table": "dr_out",
-      "key": "nodeid",
+      "key": [
+        "nodeid"
+      ],
       "rows_a": 0,
       "rows_b": 0,
       "status": "empty",
@@ -53,29 +63,38 @@
     },
     {
       "table": "ns_out",
-      "key": "lineid",
+      "key": [
+        "lineid",
+        "externalsignlineid"
+      ],
       "rows_a": 2,
       "rows_b": 2,
       "status": "ok",
       "diff_cells": 0,
       "max_abs": 0.0,
       "worst_col": null,
-      "numeric_cols": 14
+      "numeric_cols": 12
     },
     {
       "table": "rs_out",
-      "key": "lineid",
+      "key": [
+        "lineid",
+        "externalsignlineid"
+      ],
       "rows_a": 2,
       "rows_b": 2,
       "status": "ok",
       "diff_cells": 0,
       "max_abs": 0.0,
       "worst_col": null,
-      "numeric_cols": 13
+      "numeric_cols": 11
     },
     {
       "table": "bp_out",
-      "key": "lineid",
+      "key": [
+        "lineid",
+        "externalsignlineid"
+      ],
       "rows_a": 0,
       "rows_b": 0,
       "status": "empty",
@@ -86,7 +105,10 @@
     },
     {
       "table": "ok_out",
-      "key": "lineid",
+      "key": [
+        "lineid",
+        "externalsignlineid"
+      ],
       "rows_a": 0,
       "rows_b": 0,
       "status": "empty",

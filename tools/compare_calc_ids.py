@@ -15,16 +15,20 @@ import sys
 import psycopg2
 
 OUT_TABLES = [
-    ('us_out', 'nodeid'),
-    ('ut_out', 'lineid'),
-    ('pt_out', 'nodeid'),
-    ('dr_out', 'nodeid'),
-    ('ns_out', 'lineid'),
-    ('rs_out', 'lineid'),
-    ('bp_out', 'lineid'),
-    ('ok_out', 'lineid'),
-    ('is_out', 'nodeid'),
-    ('po_out', 'nodeid'),
+    # Ключ обязан быть УНИКАЛЬНЫМ в пределах расчёта. В ut_out и подобных
+    # на один объект приходится две строки — подача и обратка, — поэтому
+    # ключ составной. С одним lineid строки схлопывались в словаре, и
+    # сравнение выдавало тысячи фантомных расхождений.
+    ('us_out', ('nodeid', 'externalsign')),
+    ('ut_out', ('lineid', 'externalsignlineid')),
+    ('pt_out', ('nodeid',)),
+    ('dr_out', ('nodeid',)),
+    ('ns_out', ('lineid', 'externalsignlineid')),
+    ('rs_out', ('lineid', 'externalsignlineid')),
+    ('bp_out', ('lineid', 'externalsignlineid')),
+    ('ok_out', ('lineid', 'externalsignlineid')),
+    ('is_out', ('nodeid',)),
+    ('po_out', ('nodeid',)),
 ]
 
 
@@ -127,12 +131,10 @@ def main():
         maxd = 0.0
         worst = None
         for c in cols:
-            qa.execute('SELECT %s,%s FROM public.%s WHERE calculationid=%%s '
-                       'ORDER BY %s,id' % (key, c, table, key), (args.calc_a,))
-            ra = {k: v for k, v in qa.fetchall()}
-            qb.execute('SELECT %s,%s FROM public.%s WHERE calculationid=%%s '
-                       'ORDER BY %s,id' % (key, c, table, key), (args.calc_b,))
-            rb = {k: v for k, v in qb.fetchall()}
+            qa.execute('SELECT %s,%s FROM public.%s WHERE calculationid=%%s' % (', '.join(key), c, table), (args.calc_a,))
+            ra = {r[:-1]: r[-1] for r in qa.fetchall()}
+            qb.execute('SELECT %s,%s FROM public.%s WHERE calculationid=%%s' % (', '.join(key), c, table), (args.calc_b,))
+            rb = {r[:-1]: r[-1] for r in qb.fetchall()}
             for k in set(ra) | set(rb):
                 if k not in ra or k not in rb:
                     diffs += 1
