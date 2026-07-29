@@ -1,4 +1,4 @@
-# Сборка приложения ТГИД (gid8) под MSVC.
+﻿# Сборка приложения ТГИД (gid8) под MSVC.
 #
 # Окружение на этой машине:
 #   MSVC и cmake уже есть в составе Visual Studio 2022 Build Tools;
@@ -61,8 +61,7 @@ $cfgArgs = @(
     "-DCMAKE_BUILD_TYPE=$Config",
     "-DCMAKE_PREFIX_PATH=$QtDir",
     "-DUSE_HASP=OFF",
-    "-DUSE_ITWIN=OFF",
-    "-DCMAKE_CXX_FLAGS=/I`"$StubDir`" /I`"$BoostDir`""
+    "-DUSE_ITWIN=OFF"
 )
 
 $bat = Join-Path $env:TEMP 'build_gid8_inner.bat'
@@ -70,6 +69,10 @@ $lines = @(
     '@echo off',
     "call `"$vcvars`" >nul",
     "set BOOST_ROOT=$BoostDir",
+    # Каталог с заглушкой proj.h добавляем через INCLUDE, а не через
+    # CMAKE_CXX_FLAGS: путь со слэшем cmake принимает за исходный каталог
+    # и молча игнорирует ("Ignoring extra path from command line").
+    "set INCLUDE=$StubDir;%INCLUDE%",
     "`"$cmake`" $($cfgArgs -join ' ')",
     'if errorlevel 1 exit /b 1'
 )

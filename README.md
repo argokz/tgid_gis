@@ -22,8 +22,35 @@
 | 6 | Новые запросы чтения, замеры | готово — [03-performance.md](docs/03-performance.md) |
 | 7 | Готовность слоёв для QGIS, починка геометрии | готово |
 | 8 | Слой совместимости, переключение и откат | готово — [04-compat-layer.md](docs/04-compat-layer.md) |
-| 9 | Путь записи: `INSTEAD OF` или правка C++ | следующий |
-| 10 | «Тонкое» представление для отрисовки карты | — |
+| 9 | Путь записи через `INSTEAD OF`, смена класса объекта | готово |
+| 10 | Новая БД `tgid_gis` на целевой схеме | готово — [tools/build_new_db.ps1](tools/build_new_db.ps1) |
+| 11 | Развёртывание запросов в приложение | готово — [tools/deploy_sql.ps1](tools/deploy_sql.ps1) |
+| 12 | Правки C++, сборка приложения | в работе |
+| 13 | «Тонкое» представление для отрисовки карты | — |
+
+## Новая БД и запуск приложения на ней
+
+```bash
+$env:PGPASSWORD='...'; .\tools\build_new_db.ps1 -Source almatygid -Target tgid_gis
+psql -d tgid_gis -f sql/040_switch_to_net.sql   # nodes/linesobj -> представления
+psql -d tgid_gis -f sql/050_write_triggers.sql  # запись через представления
+.\tools\deploy_sql.ps1                          # новые us.sql / ut.sql в приложение
+```
+
+Откат на каждом шаге: `sql/041_rollback_to_public.sql` и `.\tools\deploy_sql.ps1 -Rollback`.
+
+## Сборка приложения
+
+Окружение на машине разработчика: MSVC и CMake уже входят в Visual Studio 2022.
+Дополнительно нужны только Qt 6 и заголовки Boost — PROJ не требуется, `proj.h`
+подключается, но ни одна функция PROJ API не вызывается.
+
+```bash
+.\tools\build_gid8.ps1
+```
+
+Если `download.qt.io` недоступен, Qt ставится через зеркало с настройками
+из [tools/aqt_settings.ini](tools/aqt_settings.ini).
 
 ## Достигнуто
 
