@@ -7,82 +7,82 @@
  {
   "step": "fragment (восстановленные)",
   "rows": 11,
-  "seconds": 0.1
+  "seconds": 0.12
  },
  {
   "step": "assign_node",
   "rows": 57007,
-  "seconds": 39.66
+  "seconds": 43.85
  },
  {
   "step": "connect_node",
   "rows": 1494,
-  "seconds": 0.13
+  "seconds": 0.14
  },
  {
   "step": "consumer_general",
   "rows": 28886,
-  "seconds": 3.91
+  "seconds": 3.74
  },
  {
   "step": "heat_chamber",
   "rows": 22,
-  "seconds": 0.01
+  "seconds": 0.02
  },
  {
   "step": "heat_source",
   "rows": 163,
-  "seconds": 0.03
+  "seconds": 0.04
  },
  {
   "step": "pump_station",
   "rows": 222,
-  "seconds": 0.03
+  "seconds": 0.06
  },
  {
   "step": "consumer_real",
   "rows": 26200,
-  "seconds": 3.74
+  "seconds": 3.71
  },
  {
   "step": "refill_node",
   "rows": 1,
-  "seconds": 0.01
+  "seconds": 0.02
  },
  {
   "step": "valve_3way",
   "rows": 13,
-  "seconds": 0.01
+  "seconds": 0.02
  },
  {
   "step": "node_plain",
   "rows": 34489,
-  "seconds": 3.75
+  "seconds": 3.89
  },
  {
   "step": "node_src_map",
   "rows": 91490,
-  "seconds": 0.99
+  "seconds": 1.11
  },
  {
   "step": "assign_line",
-  "rows": 133591,
-  "seconds": 66.4
+  "rows": 134100,
+  "seconds": 72.34
  },
  {
   "step": "air_heater",
   "rows": 0,
-  "seconds": 0.04
+  "seconds": 0.05
  },
  {
   "step": "damper",
   "rows": 599,
-  "seconds": 0.27
+  "seconds": 0.29
  },
  {
   "step": "diaphragm",
   "rows": 0,
-  "seconds": 0.1
+  "seconds": 0.09
  },
  {
   "step": "elevator",
@@ -92,22 +92,22 @@
  {
   "step": "heat_exchanger",
   "rows": 0,
-  "seconds": 0.02
+  "seconds": 0.03
  },
  {
   "step": "pipe_section",
   "rows": 84624,
-  "seconds": 34.93
+  "seconds": 25.49
  },
  {
   "step": "local_resistance",
   "rows": 0,
-  "seconds": 0.02
+  "seconds": 0.03
  },
  {
   "step": "regulator_press",
-  "rows": 0,
-  "seconds": 0.02
+  "rows": 493,
+  "seconds": 0.21
  },
  {
   "step": "pump",
@@ -121,8 +121,8 @@
  },
  {
   "step": "line_plain",
-  "rows": 519,
-  "seconds": 0.22
+  "rows": 26,
+  "seconds": 0.13
  },
  {
   "step": "repair_section",
@@ -132,7 +132,7 @@
  {
   "step": "manhole",
   "rows": 18392,
-  "seconds": 0.34
+  "seconds": 0.44
  },
  {
   "step": "support",
@@ -147,7 +147,7 @@
  {
   "step": "diameter_change",
   "rows": 4,
-  "seconds": 0.0
+  "seconds": 0.01
  },
  {
   "step": "pipe_reconstructed",
@@ -157,32 +157,32 @@
  {
   "step": "pipe_turn",
   "rows": 25214,
-  "seconds": 0.53
+  "seconds": 0.6
  },
  {
   "step": "building_inlet",
   "rows": 5463,
-  "seconds": 0.09
+  "seconds": 0.08
  },
  {
   "step": "building_inlet_line",
   "rows": 5463,
-  "seconds": 0.1
+  "seconds": 0.16
  },
  {
   "step": "building",
   "rows": 187202,
-  "seconds": 5.79
+  "seconds": 5.89
  },
  {
   "step": "building_consumer",
   "rows": 12466,
-  "seconds": 0.26
+  "seconds": 0.38
  },
  {
   "step": "building_tu",
   "rows": 5115,
-  "seconds": 0.14
+  "seconds": 0.12
  },
  {
   "step": "node_press_setting",
@@ -192,7 +192,7 @@
  {
   "step": "node_direction",
   "rows": 1703,
-  "seconds": 0.08
+  "seconds": 0.06
  },
  {
   "step": "node_metering_device",
@@ -202,16 +202,16 @@
  {
   "step": "line_orphan",
   "rows": 40444,
-  "seconds": 2.52
+  "seconds": 2.66
  },
  {
   "step": "node_reg: помечено",
-  "rows": 121,
-  "seconds": 0.13
+  "rows": 124,
+  "seconds": 0.8
  },
  {
   "step": "line_reg: помечено",
   "rows": 0,
-  "seconds": 0.13
+  "seconds": 0.89
  }
 ]

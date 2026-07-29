@@ -1,0 +1,28 @@
+{
+  "db": "tgid_gis",
+  "fragments": "80",
+  "with_geom": false,
+  "runs": 3,
+  "nodes_full": {
+    "rows": 7379,
+    "cols": 67,
+    "min_ms": 140.0
+  },
+  "nodes_thin": {
+    "rows": 7379,
+    "cols": 14,
+    "min_ms": 33.7
+  },
+  "lines_full": {
+    "rows": 6846,
+    "cols": 56,
+    "min_ms": 81.9
+  },
+  "lines_thin": {
+    "rows": 6846,
+    "cols": 14,
+    "min_ms": 38.2
+  },
+  "nodes_speedup": 4.15,
+  "lines_speedup": 2.14
+}

@@ -1,0 +1,44 @@
+start 2026-07-29T20:24:46.6937126+05:00
+venv: H:\venv\sety\Scripts\python.exe
+args: H:\projects\tgid-app-new\gid8\python\sety\sety\ww.py -type_of_net 1 -server localhost -database almatygid -user postgres -port 5440 -fileID 5 -Tn -25 -GWS 1 -GWS2 1 -sopr 0 -roP 0.975 -roO 0.975 -ro_temp -rdbms postgreSQL -out_file C:\Users\Danko\AppData\Local\Temp\calc_almatygid_f5_20260729_202446.txt -user_gid migration-check -password ***
+---
+��: almatygid ��������: ���
+������ ������������ ������ (����������������), ������������ ������
+����������� ��������� ������� -25.0
+������ �������� : migration-check
+������������ ������������ ��������
+�� ����� ��� ��������� ���������� � ����������� [ ]
+
+����� ������ sprav
+����� ������ 30_koeffitsienty_mestnyh_teplovyh_poter
+�������� ������ 30_koeffitsienty_mestnyh_teplovyh_poter
+����� ������ 28_Koeffitsienty_rascheta_balansovoy_nagruzki_GV
+�������� ������ 28_Koeffitsienty_rascheta_balansovoy_nagruzki_GV
+����� ������ 07_Teploizolyatsionnyy_material
+�������� ������ 07_Teploizolyatsionnyy_material
+����� ������ 39_normy_teplovyh_poter
+�������� ������ 39_normy_teplovyh_poter
+�������� ������ sprav
+����� ������ ������������� ������
+�������� ������ ������������� ������
+����� ������ �������� �����2
+�������� ������ �������� �����2
+����� ������ ������� ��������������
+�������� ������ ������� ��������������
+����� ������ standardpumps
+�������� ������ standardpumps
+����� ������ �������� �������
+�������� ������ �������� �������
+����� ������ ��������� �����������
+�������� ������ ��������� �����������
+����� ������ ������������ ��������
+�������� ������ ������������ ��������
+����� ������ externalCodes
+�������� ������ externalCodes
+����� ������ ����
+�������� ������ ����
+����� ������ �������� �����2
+1               2               3               4               �������� ������ �������� �����2
+����� ������ ����������� ��������
+1               
+exit=1 end=2026-07-29T20:24:49.8615171+05:00

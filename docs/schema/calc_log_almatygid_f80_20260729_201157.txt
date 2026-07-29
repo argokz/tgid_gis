@@ -1,0 +1,22 @@
+start 2026-07-29T20:11:57.9649177+05:00
+venv: H:\venv\sety\Scripts\python.exe
+args: H:\projects\tgid-app-new\gid8\python\sety\sety\ww.py -type_of_net 1 -server localhost -database almatygid -user postgres -port 5440 -fileID 80 -Tn -25 -GWS 1 -GWS2 1 -sopr 0 -roP 0.975 -roO 0.975 -ro_temp -rdbms postgreSQL -out_file C:\Users\Danko\AppData\Local\Temp\calc_almatygid_f80_20260729_201157.txt -user_gid migration-check -password ***
+---
+1 ������������� ���� ���� (���-���-���-���) 
+2 ��� 
+3 ��� 
+4 ��� 
+5 ��� 
+41 ���� ��������� 36� 
+42 ���� ��������,6� 
+43 ���� �� ����� 
+72 ��� 
+73 C��� 
+74 ���. ���� ��� ������� �� 
+75 11111 2025_11_10 16:45:35 
+88 ������ 2025_11_11 09:49:33 
+99 mag-tser 2026_01_19 14:56:40 
+�����-�� ������!!!!
+
+
+exit=1 end=2026-07-29T20:12:00.1069590+05:00

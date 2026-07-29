@@ -13,7 +13,17 @@ CREATE VIEW net.v_connectnodes AS
 SELECT o.subtype_src_id AS id,
        o.id             AS nodeid,
        o.connectid
-FROM net.connect_node o;
+FROM net.connect_node o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'connectid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'connectnodes' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_connectnodes_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -218,7 +228,168 @@ SELECT o.subtype_src_id AS id,
        o.calcthrustinwsd,
        o.consumerstateid,
        o.name
-FROM net.consumer_general o;
+FROM net.consumer_general o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'quarter')::integer,
+       (v.payload ->> 'maxbuildingheight')::double precision,
+       (v.payload ->> 'accumcoeff')::double precision,
+       (v.payload ->> 'hydromodesignid')::integer,
+       (v.payload ->> 'specexpendid')::integer,
+       (v.payload ->> 'calctemperatureid')::integer,
+       (v.payload ->> 'gvsloadgraphid')::integer,
+       (v.payload ->> 'varcoeffid')::integer,
+       (v.payload ->> 'normhlosflow')::double precision,
+       (v.payload ->> 'normhlosret')::double precision,
+       (v.payload ->> 'calchldep')::double precision,
+       (v.payload ->> 'calcinternhddep')::double precision,
+       (v.payload ->> 'adjcalchldep')::double precision,
+       (v.payload ->> 'adjcalchddep')::double precision,
+       (v.payload ->> 'perspcalchldep')::double precision,
+       (v.payload ->> 'perspcalcinternhddep')::double precision,
+       (v.payload ->> 'calctempdep')::double precision,
+       (v.payload ->> 'connectionschemeid')::integer,
+       (v.payload ->> 'mixfactcoeffdep')::double precision,
+       (v.payload ->> 'calchlindep')::double precision,
+       (v.payload ->> 'calcinternhdindep')::double precision,
+       (v.payload ->> 'adjcalchlindep')::double precision,
+       (v.payload ->> 'adjcalcinternhdindep')::double precision,
+       (v.payload ->> 'perspcalchlindep')::double precision,
+       (v.payload ->> 'perspcalcinternhdindep')::double precision,
+       (v.payload ->> 'calctempindep')::double precision,
+       (v.payload ->> 'mixfactcoeffindep')::double precision,
+       (v.payload ->> 'calchlventil')::double precision,
+       (v.payload ->> 'adjcalchlventil')::double precision,
+       (v.payload ->> 'perspcalchlventil')::double precision,
+       (v.payload ->> 'calchlcond')::double precision,
+       (v.payload ->> 'adjcalchlcond')::double precision,
+       (v.payload ->> 'perspcalchlcond')::double precision,
+       (v.payload ->> 'calchlclosesys')::double precision,
+       (v.payload ->> 'calchlopensysflow')::double precision,
+       (v.payload ->> 'calchlopensysret')::double precision,
+       (v.payload ->> 'adjcalchlclosesys')::double precision,
+       (v.payload ->> 'adjcalchlopensysflow')::double precision,
+       (v.payload ->> 'adjcalchlopensysret')::double precision,
+       (v.payload ->> 'perspcalchlclosesys')::double precision,
+       (v.payload ->> 'perspcalchlopensysflow')::double precision,
+       (v.payload ->> 'perspcalchlopensysret')::double precision,
+       (v.payload ->> 'expendhwpart')::double precision,
+       (v.payload ->> 'calctempha')::double precision,
+       (v.payload ->> 'calchlparall')::double precision,
+       (v.payload ->> 'internhdparall')::double precision,
+       (v.payload ->> 'adjcalchlparall')::double precision,
+       (v.payload ->> 'adjinternhdparall')::double precision,
+       (v.payload ->> 'perspcalchlparall')::double precision,
+       (v.payload ->> 'perspinternhdparall')::double precision,
+       (v.payload ->> 'schemeparallid')::integer,
+       (v.payload ->> 'calchlgvsparall')::double precision,
+       (v.payload ->> 'adjcalchlgvsparall')::double precision,
+       (v.payload ->> 'perspcalchlgvsparall')::double precision,
+       (v.payload ->> 'hourirregcoeffparall')::double precision,
+       (v.payload ->> 'avghlcompparall')::double precision,
+       (v.payload ->> 'temprecircpipeparall')::double precision,
+       (v.payload ->> 'calctemphrparall')::double precision,
+       (v.payload ->> 'calctemphwdoparall')::double precision,
+       (v.payload ->> 'amrdepparall')::double precision,
+       (v.payload ->> 'calchlmix')::double precision,
+       (v.payload ->> 'internhdmix')::double precision,
+       (v.payload ->> 'adjcalchlmix')::double precision,
+       (v.payload ->> 'adjinternhdmix')::double precision,
+       (v.payload ->> 'perspcalchlmix')::double precision,
+       (v.payload ->> 'perspinternhdmix')::double precision,
+       (v.payload ->> 'schememixid')::integer,
+       (v.payload ->> 'calchlgvsmix')::double precision,
+       (v.payload ->> 'adjcalchlgvsmix')::double precision,
+       (v.payload ->> 'perspcalchlgvsmix')::double precision,
+       (v.payload ->> 'hourirregcoeffmix')::double precision,
+       (v.payload ->> 'avghlcompmix')::double precision,
+       (v.payload ->> 'temprecircpipemix')::double precision,
+       (v.payload ->> 'calctemphrmix')::double precision,
+       (v.payload ->> 'calctemphwdomix')::double precision,
+       (v.payload ->> 'amrdepmix')::double precision,
+       (v.payload ->> 'calchlconseq')::double precision,
+       (v.payload ->> 'internhdconseq')::double precision,
+       (v.payload ->> 'adjcalchlconseq')::double precision,
+       (v.payload ->> 'adjinternhdconseq')::double precision,
+       (v.payload ->> 'perspcalchlconseq')::double precision,
+       (v.payload ->> 'perspinternhdconseq')::double precision,
+       (v.payload ->> 'schemeconseqid')::integer,
+       (v.payload ->> 'calchlgvsconseq')::double precision,
+       (v.payload ->> 'adjcalchlgvsconseq')::double precision,
+       (v.payload ->> 'perspcalchlgvsconseq')::double precision,
+       (v.payload ->> 'hourirregcoeffconseq')::double precision,
+       (v.payload ->> 'avghlcompconseq')::double precision,
+       (v.payload ->> 'temprecircpipeconseq')::double precision,
+       (v.payload ->> 'calctemphrconseq')::double precision,
+       (v.payload ->> 'calctemphwdoconseq')::double precision,
+       (v.payload ->> 'amrdepconseq')::double precision,
+       (v.payload ->> 'calchlpreon')::double precision,
+       (v.payload ->> 'internhdpreon')::double precision,
+       (v.payload ->> 'adjcalchlpreon')::double precision,
+       (v.payload ->> 'adjinternhdpreon')::double precision,
+       (v.payload ->> 'perspcalchlpreon')::double precision,
+       (v.payload ->> 'perspinternhdpreon')::double precision,
+       (v.payload ->> 'schemepreonid')::integer,
+       (v.payload ->> 'calchlgvspreon')::double precision,
+       (v.payload ->> 'adjcalchlgvspreon')::double precision,
+       (v.payload ->> 'perspcalchlgvspreon')::double precision,
+       (v.payload ->> 'hourirregcoeffpreon')::double precision,
+       (v.payload ->> 'avghlcomppreon')::double precision,
+       (v.payload ->> 'temprecircpipepreon')::double precision,
+       (v.payload ->> 'calctemphrpreon')::double precision,
+       (v.payload ->> 'calctemphwdopreon')::double precision,
+       (v.payload ->> 'amrdeppreon')::double precision,
+       (v.payload ->> 'avghlgvsopensysflow')::double precision,
+       (v.payload ->> 'avghlgvsopensysret')::double precision,
+       (v.payload ->> 'adjavghlgvsopensysflow')::double precision,
+       (v.payload ->> 'adjavghlgvsopensysret')::double precision,
+       (v.payload ->> 'perspavghlgvsopensysflow')::double precision,
+       (v.payload ->> 'perspavghlgvsopensysret')::double precision,
+       (v.payload ->> 'hourirregcoeffopen')::double precision,
+       (v.payload ->> 'avghlcompopen')::double precision,
+       (v.payload ->> 'temprecircpipeopen')::double precision,
+       (v.payload ->> 'calctemphwdoopen')::double precision,
+       (v.payload ->> 'pdvalveinstalllocid')::integer,
+       (v.payload ->> 'setpdonregulator')::double precision,
+       (v.payload ->> 'setleakageflow')::double precision,
+       (v.payload ->> 'setleakageret')::double precision,
+       (v.payload ->> 'wemeteringdeviceid')::integer,
+       (v.payload ->> 'volwaterhs')::double precision,
+       (v.payload ->> 'volwatervs')::double precision,
+       (v.payload ->> 'minthrustds')::double precision,
+       (v.payload ->> 'hydroresclosesys')::double precision,
+       (v.payload ->> 'hydroresclosesyssummer')::double precision,
+       (v.payload ->> 'closesyscalcsignid')::integer,
+       (v.payload ->> 'hydroreswdoflow')::double precision,
+       (v.payload ->> 'calcsignopensysflowid')::integer,
+       (v.payload ->> 'hydroreswdoret')::double precision,
+       (v.payload ->> 'calcsignreswdoretid')::integer,
+       (v.payload ->> 'calcsignsetloadclosesys')::integer,
+       (v.payload ->> 'calcsignsetloadopensysflow')::integer,
+       (v.payload ->> 'calcsignsetloadopensysret')::integer,
+       (v.payload ->> 'hydrothrustin')::double precision,
+       (v.payload ->> 'hydrothrustout')::double precision,
+       (v.payload ->> 'calcexpenddep')::double precision,
+       (v.payload ->> 'calcexpendindep')::double precision,
+       (v.payload ->> 'calcexpendventil')::double precision,
+       (v.payload ->> 'calcexpendcond')::double precision,
+       (v.payload ->> 'calcexpendhwflow')::double precision,
+       (v.payload ->> 'calcexpendhwret')::double precision,
+       (v.payload ->> 'calcexpendrecircopen')::double precision,
+       (v.payload ->> 'calcexpendhwparall')::double precision,
+       (v.payload ->> 'calcexpendhwmix')::double precision,
+       (v.payload ->> 'calcexpendhwconseq')::double precision,
+       (v.payload ->> 'calcexpendhwpreon')::double precision,
+       (v.payload ->> 'calcthrustinwsd')::integer,
+       (v.payload ->> 'consumerstateid')::integer,
+       (v.payload ->> 'name')::text
+FROM net.object_variant v
+WHERE v.src_table = 'generalizedconsumers' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_generalizedconsumers_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -584,7 +755,27 @@ SELECT o.subtype_src_id AS id,
        o.stoparmaturecount,
        o.ballvalvescount,
        o.airventscount
-FROM net.heat_chamber o;
+FROM net.heat_chamber o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'slotscount')::integer,
+       (v.payload ->> 'slotsweight')::text,
+       (v.payload ->> 'internalheight')::double precision,
+       (v.payload ->> 'internalwidth')::double precision,
+       (v.payload ->> 'internallength')::double precision,
+       (v.payload ->> 'wallmaterial')::text,
+       (v.payload ->> 'stairscount')::integer,
+       (v.payload ->> 'stoparmaturecount')::integer,
+       (v.payload ->> 'ballvalvescount')::integer,
+       (v.payload ->> 'airventscount')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'heatchambers' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_heatchambers_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -865,7 +1056,224 @@ SELECT o.subtype_src_id AS id,
        o.gakt_avarija_11_fakt,
        o.gakt_avarija_12_fakt,
        o.id_old
-FROM net.heat_source o;
+FROM net.heat_source o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'sourcename')::text,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'stateid')::integer,
+       (v.payload ->> 'hsourcetypeid')::integer,
+       (v.payload ->> 'hsourceid')::integer,
+       (v.payload ->> 'hsourcepower')::double precision,
+       (v.payload ->> 'hsourcepowerinst')::double precision,
+       (v.payload ->> 'hseasonbegindate')::date,
+       (v.payload ->> 'hseasonenddate')::date,
+       (v.payload ->> 'hsourcecode')::text,
+       (v.payload ->> 'temperdwflowsummer')::double precision,
+       (v.payload ->> 'temperdwretsummer')::double precision,
+       (v.payload ->> 'specvolhs')::double precision,
+       (v.payload ->> 'specvolvent')::double precision,
+       (v.payload ->> 'expenddwnorm1')::double precision,
+       (v.payload ->> 'expenddwnorm2')::double precision,
+       (v.payload ->> 'expenddwnorm3')::double precision,
+       (v.payload ->> 'expenddwnorm4')::double precision,
+       (v.payload ->> 'expenddwnorm5')::double precision,
+       (v.payload ->> 'managerphone')::integer,
+       (v.payload ->> 'controllerphone')::integer,
+       (v.payload ->> 'powerset')::double precision,
+       (v.payload ->> 'poweravailable')::double precision,
+       (v.payload ->> 'heighttubemark')::integer,
+       (v.payload ->> 'heightareamark')::integer,
+       (v.payload ->> 'repairworks')::double precision,
+       (v.payload ->> 't1_summer')::double precision,
+       (v.payload ->> 't2_summer')::double precision,
+       (v.payload ->> 'name_tg')::text,
+       (v.payload ->> 'heatloscalcyear')::text,
+       (v.payload ->> 'graphtypeid')::integer,
+       (v.payload ->> 'tn_1')::double precision,
+       (v.payload ->> 'tn_5')::double precision,
+       (v.payload ->> 'tvn_r')::double precision,
+       (v.payload ->> 't1_r')::double precision,
+       (v.payload ->> 't2_r')::double precision,
+       (v.payload ->> 't3_r')::double precision,
+       (v.payload ->> 'q_r')::double precision,
+       (v.payload ->> 't1_2r')::double precision,
+       (v.payload ->> 't1_4r')::double precision,
+       (v.payload ->> 'tvb_tr')::double precision,
+       (v.payload ->> 'uf')::double precision,
+       (v.payload ->> 't2_2r')::double precision,
+       (v.payload ->> 'q_gv')::double precision,
+       (v.payload ->> 'tg_r')::double precision,
+       (v.payload ->> 'tx_r')::double precision,
+       (v.payload ->> 't2_gv')::double precision,
+       (v.payload ->> 'pr')::integer,
+       (v.payload ->> 'g1')::double precision,
+       (v.payload ->> 'g2')::double precision,
+       (v.payload ->> 't_gv1')::double precision,
+       (v.payload ->> 'deployedtempgraphid')::integer,
+       (v.payload ->> 'v')::double precision,
+       (v.payload ->> 'date_on')::double precision,
+       (v.payload ->> 'name_exe')::text,
+       (v.payload ->> 'name_manager')::text,
+       (v.payload ->> 'dt2_co')::double precision,
+       (v.payload ->> 't2pod_parl')::double precision,
+       (v.payload ->> 'dt2v_sm_noavm')::double precision,
+       (v.payload ->> 'dt2v_sm_avm')::double precision,
+       (v.payload ->> 't1pod_sm')::double precision,
+       (v.payload ->> 't1pod_posll')::double precision,
+       (v.payload ->> 'dt2v_posl')::double precision,
+       (v.payload ->> 'length_1')::integer,
+       (v.payload ->> 'length_2')::integer,
+       (v.payload ->> 'length_3')::integer,
+       (v.payload ->> 'length_4')::integer,
+       (v.payload ->> 'length_5')::integer,
+       (v.payload ->> 'length_6')::integer,
+       (v.payload ->> 'length_7')::integer,
+       (v.payload ->> 'length_8')::integer,
+       (v.payload ->> 'length_9')::integer,
+       (v.payload ->> 'length_10')::integer,
+       (v.payload ->> 'length_11')::integer,
+       (v.payload ->> 'length_12')::integer,
+       (v.payload ->> 't_1')::double precision,
+       (v.payload ->> 't_2')::double precision,
+       (v.payload ->> 't_3')::double precision,
+       (v.payload ->> 't_4')::double precision,
+       (v.payload ->> 't_5')::double precision,
+       (v.payload ->> 't_6')::double precision,
+       (v.payload ->> 't_7')::double precision,
+       (v.payload ->> 't_8')::double precision,
+       (v.payload ->> 't_9')::double precision,
+       (v.payload ->> 't_10')::double precision,
+       (v.payload ->> 't_11')::double precision,
+       (v.payload ->> 't_12')::double precision,
+       (v.payload ->> 't1_1')::double precision,
+       (v.payload ->> 't1_2')::double precision,
+       (v.payload ->> 't1_3')::double precision,
+       (v.payload ->> 't1_4')::double precision,
+       (v.payload ->> 't1_5')::double precision,
+       (v.payload ->> 't1_6')::double precision,
+       (v.payload ->> 't1_7')::double precision,
+       (v.payload ->> 't1_8')::double precision,
+       (v.payload ->> 't1_9')::double precision,
+       (v.payload ->> 't1_10')::double precision,
+       (v.payload ->> 't1_11')::double precision,
+       (v.payload ->> 't1_12')::double precision,
+       (v.payload ->> 't2_1')::double precision,
+       (v.payload ->> 't2_2')::double precision,
+       (v.payload ->> 't2_3')::double precision,
+       (v.payload ->> 't2_4')::double precision,
+       (v.payload ->> 't2_5')::double precision,
+       (v.payload ->> 't2_6')::double precision,
+       (v.payload ->> 't2_7')::double precision,
+       (v.payload ->> 't2_8')::double precision,
+       (v.payload ->> 't2_9')::double precision,
+       (v.payload ->> 't2_10')::double precision,
+       (v.payload ->> 't2_11')::double precision,
+       (v.payload ->> 't2_12')::double precision,
+       (v.payload ->> 'length_1_fakt')::integer,
+       (v.payload ->> 'length_2_fakt')::integer,
+       (v.payload ->> 'length_3_fakt')::integer,
+       (v.payload ->> 'length_4_fakt')::integer,
+       (v.payload ->> 'length_5_fakt')::integer,
+       (v.payload ->> 'length_6_fakt')::integer,
+       (v.payload ->> 'length_7_fakt')::integer,
+       (v.payload ->> 'length_8_fakt')::integer,
+       (v.payload ->> 'length_9_fakt')::integer,
+       (v.payload ->> 'length_10_fakt')::integer,
+       (v.payload ->> 'length_11_fakt')::integer,
+       (v.payload ->> 'length_12_fakt')::integer,
+       (v.payload ->> 't_1_fakt')::double precision,
+       (v.payload ->> 't_2_fakt')::double precision,
+       (v.payload ->> 't_3_fakt')::double precision,
+       (v.payload ->> 't_4_fakt')::double precision,
+       (v.payload ->> 't_5_fakt')::double precision,
+       (v.payload ->> 't_6_fakt')::double precision,
+       (v.payload ->> 't_7_fakt')::double precision,
+       (v.payload ->> 't_8_fakt')::double precision,
+       (v.payload ->> 't_9_fakt')::double precision,
+       (v.payload ->> 't_10_fakt')::double precision,
+       (v.payload ->> 't_11_fakt')::double precision,
+       (v.payload ->> 't_12_fakt')::double precision,
+       (v.payload ->> 't1_1_fakt')::double precision,
+       (v.payload ->> 't1_2_fakt')::double precision,
+       (v.payload ->> 't1_3_fakt')::double precision,
+       (v.payload ->> 't1_4_fakt')::double precision,
+       (v.payload ->> 't1_5_fakt')::double precision,
+       (v.payload ->> 't1_6_fakt')::double precision,
+       (v.payload ->> 't1_7_fakt')::double precision,
+       (v.payload ->> 't1_8_fakt')::double precision,
+       (v.payload ->> 't1_9_fakt')::double precision,
+       (v.payload ->> 't1_10_fakt')::double precision,
+       (v.payload ->> 't1_11_fakt')::double precision,
+       (v.payload ->> 't1_12_fakt')::double precision,
+       (v.payload ->> 't2_1_fakt')::double precision,
+       (v.payload ->> 't2_2_fakt')::double precision,
+       (v.payload ->> 't2_3_fakt')::double precision,
+       (v.payload ->> 't2_4_fakt')::double precision,
+       (v.payload ->> 't2_5_fakt')::double precision,
+       (v.payload ->> 't2_6_fakt')::double precision,
+       (v.payload ->> 't2_7_fakt')::double precision,
+       (v.payload ->> 't2_8_fakt')::double precision,
+       (v.payload ->> 't2_9_fakt')::double precision,
+       (v.payload ->> 't2_10_fakt')::double precision,
+       (v.payload ->> 't2_11_fakt')::double precision,
+       (v.payload ->> 't2_12_fakt')::double precision,
+       (v.payload ->> 'gpod_1_fakt')::double precision,
+       (v.payload ->> 'gpod_2_fakt')::double precision,
+       (v.payload ->> 'gpod_3_fakt')::double precision,
+       (v.payload ->> 'gpod_4_fakt')::double precision,
+       (v.payload ->> 'gpod_5_fakt')::double precision,
+       (v.payload ->> 'gpod_6_fakt')::double precision,
+       (v.payload ->> 'gpod_7_fakt')::double precision,
+       (v.payload ->> 'gpod_8_fakt')::double precision,
+       (v.payload ->> 'gpod_9_fakt')::double precision,
+       (v.payload ->> 'gpod_10_fakt')::double precision,
+       (v.payload ->> 'gpod_11_fakt')::double precision,
+       (v.payload ->> 'gpod_12_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_1_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_2_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_3_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_4_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_5_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_6_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_7_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_8_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_9_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_10_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_11_fakt')::double precision,
+       (v.payload ->> 'ggvs_pribor_12_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_1_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_2_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_3_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_4_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_5_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_6_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_7_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_8_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_9_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_10_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_11_fakt')::double precision,
+       (v.payload ->> 'gakt_tex_12_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_1_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_2_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_3_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_4_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_5_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_6_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_7_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_8_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_9_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_10_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_11_fakt')::double precision,
+       (v.payload ->> 'gakt_avarija_12_fakt')::double precision,
+       (v.payload ->> 'id_old')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'heatsources' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_heatsources_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -1341,7 +1749,25 @@ SELECT o.subtype_src_id AS id,
        o.stateid,
        o.heighttubemark,
        o.heightareamark
-FROM net.pump_station o;
+FROM net.pump_station o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'purpose')::text,
+       (v.payload ->> 'capacity')::double precision,
+       (v.payload ->> 'pumpcountflow')::integer,
+       (v.payload ->> 'pumpcountret')::integer,
+       (v.payload ->> 'state')::text,
+       (v.payload ->> 'stateid')::integer,
+       (v.payload ->> 'heighttubemark')::double precision,
+       (v.payload ->> 'heightareamark')::double precision
+FROM net.object_variant v
+WHERE v.src_table = 'pumpstations' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_pumpstations_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -1568,7 +1994,174 @@ SELECT o.subtype_src_id AS id,
        o.zd50,
        o.elevatornuminst,
        o.diameternozzle
-FROM net.consumer_real o;
+FROM net.consumer_real o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'consumerstateid')::integer,
+       (v.payload ->> 'automdegid')::integer,
+       (v.payload ->> 'sectconsumercode')::text,
+       (v.payload ->> 'schemenum')::text,
+       (v.payload ->> 'buildheight')::double precision,
+       (v.payload ->> 'accumcoeff')::double precision,
+       (v.payload ->> 'specexpendid')::integer,
+       (v.payload ->> 'calctemperatureid')::integer,
+       (v.payload ->> 'gvsloadgraphid')::integer,
+       (v.payload ->> 'varcoeffid')::integer,
+       (v.payload ->> 'calchldep')::double precision,
+       (v.payload ->> 'calchlindep')::double precision,
+       (v.payload ->> 'relloadfacade')::double precision,
+       (v.payload ->> 'calcinternhd')::double precision,
+       (v.payload ->> 'contcalchldep')::double precision,
+       (v.payload ->> 'contcalchlindep')::double precision,
+       (v.payload ->> 'contrelloadfacade')::double precision,
+       (v.payload ->> 'continternhd')::double precision,
+       (v.payload ->> 'perspcalchldep')::double precision,
+       (v.payload ->> 'perspcalchlindep')::double precision,
+       (v.payload ->> 'persprelloadfacade')::double precision,
+       (v.payload ->> 'perspinternhd')::double precision,
+       (v.payload ->> 'calchlventil')::double precision,
+       (v.payload ->> 'expendhwpart')::double precision,
+       (v.payload ->> 'contcalchlventil')::double precision,
+       (v.payload ->> 'perspcalchlventil')::double precision,
+       (v.payload ->> 'avghlcond')::double precision,
+       (v.payload ->> 'contavghlcond')::double precision,
+       (v.payload ->> 'perspavghlcond')::double precision,
+       (v.payload ->> 'avghlclosesys')::double precision,
+       (v.payload ->> 'avghlopensysflow')::double precision,
+       (v.payload ->> 'avghlopensysret')::double precision,
+       (v.payload ->> 'contavghlclosesys')::double precision,
+       (v.payload ->> 'contavghlopensysflow')::double precision,
+       (v.payload ->> 'contavghlopensysret')::double precision,
+       (v.payload ->> 'perspavghlclose')::double precision,
+       (v.payload ->> 'perspavghlopenflow')::double precision,
+       (v.payload ->> 'contavghlopenret')::double precision,
+       (v.payload ->> 'avghlgvsopenflow')::double precision,
+       (v.payload ->> 'avghlgvsopenret')::double precision,
+       (v.payload ->> 'avghlgvscloseparall')::double precision,
+       (v.payload ->> 'avghlgvsclosemix')::double precision,
+       (v.payload ->> 'avghlgvscloseconseq')::double precision,
+       (v.payload ->> 'avghlgvsclosepreon')::double precision,
+       (v.payload ->> 'contavghlgvsopenflow')::double precision,
+       (v.payload ->> 'contavghlgvsopenret')::double precision,
+       (v.payload ->> 'contavghlgvscloseparall')::double precision,
+       (v.payload ->> 'contavghlgvsclosemix')::double precision,
+       (v.payload ->> 'contavghlgvscloseconseq')::double precision,
+       (v.payload ->> 'contavghlgvsclosepreon')::double precision,
+       (v.payload ->> 'perspavghlgvsopenflow')::double precision,
+       (v.payload ->> 'perspavghlgvsopenret')::double precision,
+       (v.payload ->> 'perspavghlgvscloseparall')::double precision,
+       (v.payload ->> 'perspavghlgvsclosemix')::double precision,
+       (v.payload ->> 'perspavghlgvscloseconseq')::double precision,
+       (v.payload ->> 'perspavghlgvsclosepreon')::double precision,
+       (v.payload ->> 'hydromodesignid')::integer,
+       (v.payload ->> 'mixfactcoeff')::double precision,
+       (v.payload ->> 'hourirregcoeff')::double precision,
+       (v.payload ->> 'circhlosopen')::double precision,
+       (v.payload ->> 'temprecircpipe')::double precision,
+       (v.payload ->> 'setleakageflow')::double precision,
+       (v.payload ->> 'setleakageret')::double precision,
+       (v.payload ->> 'wemeteringdeviceid')::integer,
+       (v.payload ->> 'volwaterhs')::double precision,
+       (v.payload ->> 'volwatervs')::double precision,
+       (v.payload ->> 'hydroresclosesys')::double precision,
+       (v.payload ->> 'hydroresclosesyssummer')::double precision,
+       (v.payload ->> 'closesyscalcsignid')::integer,
+       (v.payload ->> 'hydroreswdoflow')::double precision,
+       (v.payload ->> 'calcsignopensysflowid')::integer,
+       (v.payload ->> 'hydroreswdoret')::double precision,
+       (v.payload ->> 'calcsignreswdoretid')::integer,
+       (v.payload ->> 'calcsignsetloadclosesys')::integer,
+       (v.payload ->> 'calcsignsetloadopensysflow')::integer,
+       (v.payload ->> 'calcsignsetloadopensysret')::integer,
+       (v.payload ->> 'hydrothrustin')::double precision,
+       (v.payload ->> 'hydrothrustout')::double precision,
+       (v.payload ->> 'calcexpenddep')::double precision,
+       (v.payload ->> 'calcexpendindep')::double precision,
+       (v.payload ->> 'calcexpendventil')::double precision,
+       (v.payload ->> 'calcexpendcond')::double precision,
+       (v.payload ->> 'calcexpendhwflow')::double precision,
+       (v.payload ->> 'calcexpendhwret')::double precision,
+       (v.payload ->> 'calcexpendrecircopen')::double precision,
+       (v.payload ->> 'calcexpendhwparall')::double precision,
+       (v.payload ->> 'calcexpendhwmix')::double precision,
+       (v.payload ->> 'calcexpendhwconseq')::double precision,
+       (v.payload ->> 'calcexpendhwpreon')::double precision,
+       (v.payload ->> 'throtstagesignid')::integer,
+       (v.payload ->> 'diameterthrotdiaph')::double precision,
+       (v.payload ->> 'diameterelevnozzle')::double precision,
+       (v.payload ->> 'temperchartsignid')::integer,
+       (v.payload ->> 'calcsignres')::integer,
+       (v.payload ->> 'calcsignhl')::integer,
+       (v.payload ->> 'parallheaterscount1')::integer,
+       (v.payload ->> 'parallheaterscount2')::integer,
+       (v.payload ->> 'parallheaterscountindep')::integer,
+       (v.payload ->> 'calcthrustloshs')::double precision,
+       (v.payload ->> 'calcthrustlosah')::double precision,
+       (v.payload ->> 'calcthrustlosac')::double precision,
+       (v.payload ->> 'calcthrustlosflow')::double precision,
+       (v.payload ->> 'calcthrustlosflowcirc')::double precision,
+       (v.payload ->> 'calcthrustinwdo')::double precision,
+       (v.payload ->> 'calcthrustlosheaters1')::double precision,
+       (v.payload ->> 'calcthrustlosheaters2')::double precision,
+       (v.payload ->> 'pdvalveinstalllocid')::integer,
+       (v.payload ->> 'setpdonregulator')::double precision,
+       (v.payload ->> 'calcferdiametersignid')::integer,
+       (v.payload ->> 'calctemphr')::double precision,
+       (v.payload ->> 'calctempvs')::double precision,
+       (v.payload ->> 'calctemphwdo')::double precision,
+       (v.payload ->> 'responsibleid')::integer,
+       (v.payload ->> 'contractnumber')::text,
+       (v.payload ->> 'stopvalvetypeid')::integer,
+       (v.payload ->> 'meterdevworksign')::integer,
+       (v.payload ->> 'meterdevsafety')::integer,
+       (v.payload ->> 'meterdevstampnum')::text,
+       (v.payload ->> 'isolationtype')::double precision,
+       (v.payload ->> 'buildingtypeid')::integer,
+       (v.payload ->> 'heatsourceptsid')::integer,
+       (v.payload ->> 'heatpointid')::integer,
+       (v.payload ->> 'countusergv')::integer,
+       (v.payload ->> 'countbusinessconsumers')::integer,
+       (v.payload ->> 'area')::double precision,
+       (v.payload ->> 'buildingvolume')::double precision,
+       (v.payload ->> 'basementvolume')::double precision,
+       (v.payload ->> 'builtinvolume')::double precision,
+       (v.payload ->> 'reducebuildingvolume')::double precision,
+       (v.payload ->> 'countfloors')::integer,
+       (v.payload ->> 'builtyear')::integer,
+       (v.payload ->> 'streetid')::integer,
+       (v.payload ->> 'housenumber')::text,
+       (v.payload ->> 'note_1')::text,
+       (v.payload ->> 'note_2')::text,
+       (v.payload ->> 'note_pts')::text,
+       (v.payload ->> 'note_regime')::text,
+       (v.payload ->> 'b23')::double precision,
+       (v.payload ->> 'b28')::double precision,
+       (v.payload ->> 'b32')::double precision,
+       (v.payload ->> 'b20')::double precision,
+       (v.payload ->> 'b14')::double precision,
+       (v.payload ->> 'b38')::double precision,
+       (v.payload ->> 'b35')::double precision,
+       (v.payload ->> 'b36')::double precision,
+       (v.payload ->> 'zd7')::integer,
+       (v.payload ->> 'zd8')::integer,
+       (v.payload ->> 'zd27')::integer,
+       (v.payload ->> 'zd28')::integer,
+       (v.payload ->> 'zd36')::integer,
+       (v.payload ->> 'zd38')::integer,
+       (v.payload ->> 'zd39')::integer,
+       (v.payload ->> 'zd48')::integer,
+       (v.payload ->> 'zd49')::integer,
+       (v.payload ->> 'zd50')::integer,
+       (v.payload ->> 'elevatornuminst')::integer,
+       (v.payload ->> 'diameternozzle')::double precision
+FROM net.object_variant v
+WHERE v.src_table = 'realconsumers' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_realconsumers_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -1949,7 +2542,30 @@ SELECT o.subtype_src_id AS id,
        o.chargeexpend,
        o.dischargeexpend,
        o.setpressret
-FROM net.refill_node o;
+FROM net.refill_node o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'externalsignid')::integer,
+       (v.payload ->> 'refillexpend')::double precision,
+       (v.payload ->> 'wdo')::double precision,
+       (v.payload ->> 'refillloss')::double precision,
+       (v.payload ->> 'diameterinternal')::double precision,
+       (v.payload ->> 'watervolup')::double precision,
+       (v.payload ->> 'watervoldown')::double precision,
+       (v.payload ->> 'watervolupset')::double precision,
+       (v.payload ->> 'potscount')::integer,
+       (v.payload ->> 'potssumvol')::double precision,
+       (v.payload ->> 'potworkingsign')::text,
+       (v.payload ->> 'chargeexpend')::double precision,
+       (v.payload ->> 'dischargeexpend')::double precision,
+       (v.payload ->> 'setpressret')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'refillnodes' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_refillnodes_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2044,7 +2660,32 @@ SELECT o.subtype_src_id AS id,
        o.diameternomin,
        o.calcexpendnodemix,
        o.pumpstationname
-FROM net.valve_3way o;
+FROM net.valve_3way o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS nodeid,
+       (v.payload ->> 'structure')::text,
+       (v.payload ->> 'state')::text,
+       (v.payload ->> 'purpose')::text,
+       (v.payload ->> 'calcmixfactcoeff')::double precision,
+       (v.payload ->> 'calcthrustlos')::double precision,
+       (v.payload ->> 'expendcharstraight')::text,
+       (v.payload ->> 'expendcharvert')::text,
+       (v.payload ->> 'authority')::double precision,
+       (v.payload ->> 'calccapdeviation')::integer,
+       (v.payload ->> 'type')::text,
+       (v.payload ->> 'capacity')::double precision,
+       (v.payload ->> 'regulator')::text,
+       (v.payload ->> 'maxpd')::double precision,
+       (v.payload ->> 'diameternomin')::double precision,
+       (v.payload ->> 'calcexpendnodemix')::double precision,
+       (v.payload ->> 'pumpstationname')::text
+FROM net.object_variant v
+WHERE v.src_table = 'threewayvalves' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_threewayvalves_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2136,7 +2777,25 @@ SELECT o.subtype_src_id AS id,
        o.contamincoeff,
        o.presscoeff,
        o.location
-FROM net.air_heater o;
+FROM net.air_heater o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'faninstall')::text,
+       (v.payload ->> 'scheme')::text,
+       (v.payload ->> 'airheaterscount')::double precision,
+       (v.payload ->> 'rowscount')::double precision,
+       (v.payload ->> 'storescount')::double precision,
+       (v.payload ->> 'airheatertype')::text,
+       (v.payload ->> 'contamincoeff')::double precision,
+       (v.payload ->> 'presscoeff')::double precision,
+       (v.payload ->> 'location')::text
+FROM net.object_variant v
+WHERE v.src_table = 'airheaters' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_airheaters_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2217,7 +2876,28 @@ SELECT o.subtype_src_id AS id,
        o.relatleakage,
        o.opc,
        o.damperarmaturestateid
-FROM net.damper o;
+FROM net.damper o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'dispatcherswitch')::text,
+       (v.payload ->> 'diametercondit')::double precision,
+       (v.payload ->> 'partdempopen')::double precision,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'standarddamplink')::integer,
+       (v.payload ->> 'turncount')::integer,
+       (v.payload ->> 'gatecontrol')::integer,
+       (v.payload ->> 'clue')::integer,
+       (v.payload ->> 'thrustcollar')::integer,
+       (v.payload ->> 'relatleakage')::double precision,
+       (v.payload ->> 'opc')::text,
+       (v.payload ->> 'damperarmaturestateid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'dampers' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_dampers_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2297,7 +2977,21 @@ SELECT o.subtype_src_id AS id,
        o.consinstdiaphcount,
        o.entrymark,
        o.stateid
-FROM net.diaphragm o;
+FROM net.diaphragm o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'throtdiaphloc')::text,
+       (v.payload ->> 'diameterinternal')::double precision,
+       (v.payload ->> 'consinstdiaphcount')::integer,
+       (v.payload ->> 'entrymark')::text,
+       (v.payload ->> 'stateid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'diaphragms' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_diaphragms_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2369,7 +3063,27 @@ SELECT o.subtype_src_id AS id,
        o.diametersuctionpipe,
        o.material,
        o.stateid
-FROM net.elevator o;
+FROM net.elevator o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'elevatortype')::integer,
+       (v.payload ->> 'elevatornuminst')::integer,
+       (v.payload ->> 'diameternozzle')::double precision,
+       (v.payload ->> 'entrymark')::text,
+       (v.payload ->> 'diameterchamber')::double precision,
+       (v.payload ->> 'length')::double precision,
+       (v.payload ->> 'diameterinletflange')::double precision,
+       (v.payload ->> 'diameteroutletflange')::double precision,
+       (v.payload ->> 'diametersuctionpipe')::double precision,
+       (v.payload ->> 'material')::text,
+       (v.payload ->> 'stateid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'elevators' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_elevators_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2446,7 +3160,20 @@ SELECT o.subtype_src_id AS id,
        o.heatexchcode,
        o.location,
        o.stateid
-FROM net.heat_exchanger o;
+FROM net.heat_exchanger o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'heatexchtype')::text,
+       (v.payload ->> 'heatexchcode')::integer,
+       (v.payload ->> 'location')::text,
+       (v.payload ->> 'stateid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'heatexchangers' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_heatexchangers_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -2654,7 +3381,165 @@ SELECT o.subtype_src_id AS id,
        o.sostkonstrukz,
        o.kategorii,
        o.mestn
-FROM net.pipe_section o;
+FROM net.pipe_section o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'pipesectionid')::integer,
+       (v.payload ->> 'pipesectstateidflow')::integer,
+       (v.payload ->> 'pipesectstateidret')::integer,
+       (v.payload ->> 'standardid')::integer,
+       (v.payload ->> 'standardtubelink')::integer,
+       (v.payload ->> 'tubescount')::integer,
+       (v.payload ->> 'diameterinternal')::double precision,
+       (v.payload ->> 'diametercondit')::double precision,
+       (v.payload ->> 'diameterexternal')::double precision,
+       (v.payload ->> 'wallthickness')::double precision,
+       (v.payload ->> 'pipesectlength')::double precision,
+       (v.payload ->> 'tuberoughness')::double precision,
+       (v.payload ->> 'locallosesshare')::double precision,
+       (v.payload ->> 'localressum')::double precision,
+       (v.payload ->> 'varcoeffidflow')::integer,
+       (v.payload ->> 'varcoeffidret')::integer,
+       (v.payload ->> 'calcheatlossignid')::integer,
+       (v.payload ->> 'tubingtypeid')::integer,
+       (v.payload ->> 'piperemonttypeid')::integer,
+       (v.payload ->> 'channelid')::integer,
+       (v.payload ->> 'constrchanwidth')::double precision,
+       (v.payload ->> 'constrchanheight')::double precision,
+       (v.payload ->> 'heattestscoeff')::double precision,
+       (v.payload ->> 'signnumwork')::integer,
+       (v.payload ->> 'isolmaterialid')::integer,
+       (v.payload ->> 'isolthickness')::double precision,
+       (v.payload ->> 'isolmaterialhccoeff')::double precision,
+       (v.payload ->> 'pipelinelayingdepth')::double precision,
+       (v.payload ->> 'isolhtcoeffabove')::double precision,
+       (v.payload ->> 'isolhtcoeffunder')::double precision,
+       (v.payload ->> 'airgroundhtcoeffunder')::double precision,
+       (v.payload ->> 'groundhccoeff')::double precision,
+       (v.payload ->> 'pipelineaxesdist')::double precision,
+       (v.payload ->> 'damagenum')::integer,
+       (v.payload ->> 'lasttransdate')::date,
+       (v.payload ->> 'lastisoldate')::date,
+       (v.payload ->> 'repairdatecapital')::date,
+       (v.payload ->> 'picdatecapital')::date,
+       (v.payload ->> 'repairdatemaint')::date,
+       (v.payload ->> 'picdatemaint')::date,
+       (v.payload ->> 'repairdateplantp')::date,
+       (v.payload ->> 'firstpicdatehp')::date,
+       (v.payload ->> 'lastmaintdatehp')::date,
+       (v.payload ->> 'sectexploitperiod')::integer,
+       (v.payload ->> 'buildingconstrstateid')::integer,
+       (v.payload ->> 'specdamagecoeff')::double precision,
+       (v.payload ->> 'specdamagecoeff2')::double precision,
+       (v.payload ->> 'powcabinstcount10')::integer,
+       (v.payload ->> 'powcabinstcount5')::integer,
+       (v.payload ->> 'powcabinstcount3')::integer,
+       (v.payload ->> 'powcabinstcount1')::integer,
+       (v.payload ->> 'powcabinstcount0')::integer,
+       (v.payload ->> 'powcabinterscount')::integer,
+       (v.payload ->> 'gasecpcount10')::integer,
+       (v.payload ->> 'gasecpcount5')::integer,
+       (v.payload ->> 'gasecpcount3')::integer,
+       (v.payload ->> 'gasecpcount1')::integer,
+       (v.payload ->> 'gasecpcount0')::integer,
+       (v.payload ->> 'gasecpinterscount')::integer,
+       (v.payload ->> 'eltranspcount10')::integer,
+       (v.payload ->> 'eltranspcount5')::integer,
+       (v.payload ->> 'eltranspcount3')::integer,
+       (v.payload ->> 'eltranspcount1')::integer,
+       (v.payload ->> 'eltranspcount0')::integer,
+       (v.payload ->> 'eltranspinterscount')::integer,
+       (v.payload ->> 'potentialdifflevelid')::integer,
+       (v.payload ->> 'corrosiondegoutid')::integer,
+       (v.payload ->> 'corrosiondeginid')::integer,
+       (v.payload ->> 'floodintensitygwid')::integer,
+       (v.payload ->> 'floodintensityfwid')::integer,
+       (v.payload ->> 'floodintensitytwid')::integer,
+       (v.payload ->> 'floodintensitybwid')::integer,
+       (v.payload ->> 'jointstightnessinfr')::integer,
+       (v.payload ->> 'chanconstrfract')::integer,
+       (v.payload ->> 'projsoldeviation')::integer,
+       (v.payload ->> 'constrbearreduce')::integer,
+       (v.payload ->> 'fixedsuppdestr')::integer,
+       (v.payload ->> 'sectwaterdumpid')::integer,
+       (v.payload ->> 'breakcomplexityid')::integer,
+       (v.payload ->> 'breakconsumvolid')::integer,
+       (v.payload ->> 'erwdifficultyid')::integer,
+       (v.payload ->> 'tubingpedestrianid')::integer,
+       (v.payload ->> 'tubingwayid')::integer,
+       (v.payload ->> 'populdamageid')::integer,
+       (v.payload ->> 'infrastrdamageid')::integer,
+       (v.payload ->> 'hydratestsdate')::date,
+       (v.payload ->> 'sectexpend')::double precision,
+       (v.payload ->> 'sectthrustloses')::double precision,
+       (v.payload ->> 'heattestsdate')::date,
+       (v.payload ->> 'temperoutair')::double precision,
+       (v.payload ->> 'temperground')::double precision,
+       (v.payload ->> 'expenddwflow')::double precision,
+       (v.payload ->> 'expenddwret')::double precision,
+       (v.payload ->> 'tempercoolflow')::double precision,
+       (v.payload ->> 'tempercoolret')::double precision,
+       (v.payload ->> 'temperdwflow')::double precision,
+       (v.payload ->> 'temperdwret')::double precision,
+       (v.payload ->> 'opc')::text,
+       (v.payload ->> 'tubecharactid')::integer,
+       (v.payload ->> 'tubetypeid')::integer,
+       (v.payload ->> 'tubematerial')::text,
+       (v.payload ->> 'tempermax')::double precision,
+       (v.payload ->> 'factorymanufid')::integer,
+       (v.payload ->> 'externmaterialid')::integer,
+       (v.payload ->> 'isolationtypeid')::integer,
+       (v.payload ->> 'externcoverthick')::double precision,
+       (v.payload ->> 'anticorrmaterialid')::integer,
+       (v.payload ->> 'magistralsite')::integer,
+       (v.payload ->> 'distsite')::integer,
+       (v.payload ->> 'exploitreg')::integer,
+       (v.payload ->> 'net')::text,
+       (v.payload ->> 'magistral')::integer,
+       (v.payload ->> 'exploitsite')::integer,
+       (v.payload ->> 'nettype')::integer,
+       (v.payload ->> 'crimpingquesite')::integer,
+       (v.payload ->> 'h')::double precision,
+       (v.payload ->> 'deltah')::double precision,
+       (v.payload ->> 'deltaq')::double precision,
+       (v.payload ->> 'q')::double precision,
+       (v.payload ->> 'primechanie')::text,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'inventnumber')::text,
+       (v.payload ->> 'objecttypeid')::integer,
+       (v.payload ->> 'sreda')::integer,
+       (v.payload ->> 'press')::double precision,
+       (v.payload ->> 'temperature')::double precision,
+       (v.payload ->> 'spoksluzhbirash')::integer,
+       (v.payload ->> 'ressurs')::integer,
+       (v.payload ->> 'pusk')::integer,
+       (v.payload ->> 'organizationid')::integer,
+       (v.payload ->> 'elektrich')::integer,
+       (v.payload ->> 'transportelekricht')::integer,
+       (v.payload ->> 'ponezial')::integer,
+       (v.payload ->> 'vodootved')::integer,
+       (v.payload ->> 'slozhokluzh')::integer,
+       (v.payload ->> 'otkluzhgkal')::integer,
+       (v.payload ->> 'avariivipoln')::integer,
+       (v.payload ->> 'pesehod')::integer,
+       (v.payload ->> 'zhddorogi')::integer,
+       (v.payload ->> 'ludiproklad')::integer,
+       (v.payload ->> 'uzherbludi')::integer,
+       (v.payload ->> 'uzherbsity')::integer,
+       (v.payload ->> 'vnesniivid')::integer,
+       (v.payload ->> 'sostoborudovania')::integer,
+       (v.payload ->> 'vnesnkorrozia')::integer,
+       (v.payload ->> 'vnunrenkorrozia')::integer,
+       (v.payload ->> 'sostkonstrukz')::integer,
+       (v.payload ->> 'kategorii')::integer,
+       (v.payload ->> 'mestn')::text
+FROM net.object_variant v
+WHERE v.src_table = 'heatpipesections' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_heatpipesections_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -3007,7 +3892,20 @@ SELECT o.subtype_src_id AS id,
        o.s_mest,
        o.k_mest,
        o.sum_mest
-FROM net.local_resistance o;
+FROM net.local_resistance o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'name_mest')::text,
+       (v.payload ->> 's_mest')::double precision,
+       (v.payload ->> 'k_mest')::integer,
+       (v.payload ->> 'sum_mest')::double precision
+FROM net.object_variant v
+WHERE v.src_table = 'localhydroresistances2' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_localhydroresistances2_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -3077,7 +3975,27 @@ SELECT o.subtype_src_id AS id,
        o.regulatorstateid,
        o.h,
        o.pipelinesignid
-FROM net.regulator_press o;
+FROM net.regulator_press o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'nodeid')::integer,
+       (v.payload ->> 'valvehydroresopen')::double precision,
+       (v.payload ->> 'valvehydroresclose')::double precision,
+       (v.payload ->> 'regvalverelcap')::integer,
+       (v.payload ->> 'relleakage')::double precision,
+       (v.payload ->> 'consdrip')::double precision,
+       (v.payload ->> 'workattrid')::integer,
+       (v.payload ->> 'deltah')::double precision,
+       (v.payload ->> 'regulatorstateid')::integer,
+       (v.payload ->> 'h')::double precision,
+       (v.payload ->> 'pipelinesignid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'pressregulators' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_pressregulators_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -3187,7 +4105,53 @@ SELECT o.subtype_src_id AS id,
        o.repaircountem,
        o.opc,
        o.stateid
-FROM net.pump o;
+FROM net.pump o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'offreason')::integer,
+       (v.payload ->> 'pumpstationid')::text,
+       (v.payload ->> 'number')::text,
+       (v.payload ->> 'thrust')::double precision,
+       (v.payload ->> 'standardpumpid')::integer,
+       (v.payload ->> 'parallagregcount')::integer,
+       (v.payload ->> 'drivetypeid')::integer,
+       (v.payload ->> 'rotordiametertypeid')::integer,
+       (v.payload ->> 'standardemid')::integer,
+       (v.payload ->> 'r0')::double precision,
+       (v.payload ->> 'r1')::double precision,
+       (v.payload ->> 'r2')::double precision,
+       (v.payload ->> 'e0')::double precision,
+       (v.payload ->> 'e1')::double precision,
+       (v.payload ->> 'e2')::double precision,
+       (v.payload ->> 'k0')::double precision,
+       (v.payload ->> 'k1')::double precision,
+       (v.payload ->> 'k2')::double precision,
+       (v.payload ->> 'r0_z')::double precision,
+       (v.payload ->> 'r1_z')::double precision,
+       (v.payload ->> 'r2_z')::double precision,
+       (v.payload ->> 'e0_z')::double precision,
+       (v.payload ->> 'e1_z')::double precision,
+       (v.payload ->> 'e2_z')::double precision,
+       (v.payload ->> 'k0_z')::double precision,
+       (v.payload ->> 'k1_z')::double precision,
+       (v.payload ->> 'k2_z')::double precision,
+       (v.payload ->> 'rotorrotspeedset')::double precision,
+       (v.payload ->> 'rotordiameterset')::double precision,
+       (v.payload ->> 'lastpumpreplacedate')::date,
+       (v.payload ->> 'lastemreplacedate')::date,
+       (v.payload ->> 'lastagregreplacedate')::date,
+       (v.payload ->> 'repaircountpump')::integer,
+       (v.payload ->> 'replacecountagreg')::integer,
+       (v.payload ->> 'repaircountem')::integer,
+       (v.payload ->> 'opc')::text,
+       (v.payload ->> 'stateid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'pumps' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_pumps_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -3317,7 +4281,21 @@ SELECT o.subtype_src_id AS id,
        o.count,
        o.totalequivsurface,
        o.stateid
-FROM net.radiator o;
+FROM net.radiator o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS lineid,
+       (v.payload ->> 'name')::text,
+       (v.payload ->> 'type')::text,
+       (v.payload ->> 'count')::text,
+       (v.payload ->> 'totalequivsurface')::text,
+       (v.payload ->> 'stateid')::integer
+FROM net.object_variant v
+WHERE v.src_table = 'systemradiators' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_systemradiators_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$

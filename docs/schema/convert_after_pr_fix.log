@@ -1,0 +1,58 @@
+подтипы читаются из *_legacy: 18 таблиц
+БД переключена на net, источник — таблицы *_legacy
+Очистка схемы net
+Фрагменты
+  fragment                           14 строк     0.0 с
+  fragment (восстановленные)         11 строк     0.1 с
+  assign_node                     57007 строк    43.9 с
+Точечные классы
+  connect_node                     1494 строк     0.1 с
+  consumer_general                28886 строк     3.7 с
+  heat_chamber                       22 строк     0.0 с
+  heat_source                       163 строк     0.0 с
+  pump_station                      222 строк     0.1 с
+  consumer_real                   26200 строк     3.7 с
+  refill_node                         1 строк     0.0 с
+  valve_3way                         13 строк     0.0 с
+  node_plain                      34489 строк     3.9 с
+  node_src_map                    91490 строк     1.1 с
+  assign_line                    134100 строк    72.3 с
+Линейные классы
+  air_heater                          0 строк     0.1 с
+  damper                            599 строк     0.3 с
+  diaphragm                           0 строк     0.1 с
+  elevator                            0 строк     0.0 с
+  heat_exchanger                      0 строк     0.0 с
+  pipe_section                    84624 строк    25.5 с
+  local_resistance                    0 строк     0.0 с
+  regulator_press                   493 строк     0.2 с
+  pump                              274 строк     0.1 с
+  radiator                            0 строк     0.0 с
+  line_plain                         26 строк     0.1 с
+Самостоятельные слои
+  repair_section                      5 строк     0.0 с
+  manhole                         18392 строк     0.4 с
+  support                          3611 строк     0.1 с
+  pressure_test_defect                1 строк     0.0 с
+  diameter_change                     4 строк     0.0 с
+  pipe_reconstructed                 44 строк     0.0 с
+  pipe_turn                       25214 строк     0.6 с
+  building_inlet                   5463 строк     0.1 с
+  building_inlet_line              5463 строк     0.2 с
+  building                       187202 строк     5.9 с
+  building_consumer               12466 строк     0.4 с
+  building_tu                      5115 строк     0.1 с
+Аспекты и дочерние таблицы
+  node_press_setting               5733 строк     0.2 с
+  node_direction                   1703 строк     0.1 с
+  node_metering_device               10 строк     0.0 с
+Линии без разрешимых концов
+  line_orphan                     40444 строк     2.7 с
+Пометка спорных объектов
+  node_reg: помечено                124 строк     0.8 с
+  line_reg: помечено                  0 строк     0.9 с
+  следующий id для новых объектов: 604332
+Сбор статистики
+
+ЗАФИКСИРОВАНО (COMMIT)
+Всего 187.9 с

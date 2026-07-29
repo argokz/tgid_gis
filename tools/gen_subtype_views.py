@@ -32,7 +32,16 @@ DROP VIEW IF EXISTS net.v_{src} CASCADE;
 CREATE VIEW net.v_{src} AS
 SELECT o.subtype_src_id AS id,
        o.id             AS {link}{cols}
-FROM net.{target} o;
+FROM net.{target} o
+UNION ALL
+-- Строки, не ставшие объектом: дубли и «проигравшие» чужому классу.
+-- Узел может иметь строки сразу в двух подтипах — старая модель это
+-- допускала, и расчётное ядро читает обе. Без этой части выборка
+-- вернула бы меньше строк, чем на исходной БД.
+SELECT (v.payload ->> 'id')::int AS id,
+       v.obj_id                  AS {link}{vcols}
+FROM net.object_variant v
+WHERE v.src_table = '{src}' AND NOT v.chosen;
 
 CREATE OR REPLACE FUNCTION net.v_{src}_ins() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog, public, net AS $fn$
@@ -119,9 +128,17 @@ def main():
         have = net_columns(cur, target)
         cols = [c for c in e['columns'] if c in have]
 
+        cur.execute("""SELECT column_name, data_type
+                       FROM information_schema.columns
+                       WHERE table_schema = 'net' AND table_name = %s""",
+                    (target,))
+        types = dict(cur.fetchall())
+
         out.append(VIEW.format(
             src=src, target=target, link=link, kind=kind, plain=plain,
             cols=''.join(',\n       o.%s' % c for c in cols),
+            vcols=''.join(",\n       (v.payload ->> '%s')::%s" %
+                          (c, types.get(c, 'text')) for c in cols),
             sets_new=''.join(',\n        %s = NEW.%s' % (c, c) for c in cols)))
 
         switch.append('ALTER TABLE public.%s RENAME TO %s_legacy;' % (src, src))

@@ -1,0 +1,112 @@
+{
+  "db_a": "almatygid_ref",
+  "db_b": "tgid_gis",
+  "fragment": 2,
+  "calc_a": 2,
+  "calc_b": 5,
+  "atol": 1e-06,
+  "rtol": 1e-06,
+  "tables": [
+    {
+      "table": "us_out",
+      "key": "nodeid",
+      "rows_a": 4908,
+      "rows_b": 4908,
+      "status": "mismatch",
+      "diff_cells": 200,
+      "max_abs": 18.149999999999977,
+      "worst_col": "pih",
+      "numeric_cols": 6
+    },
+    {
+      "table": "ut_out",
+      "key": "lineid",
+      "rows_a": 2773,
+      "rows_b": 2773,
+      "status": "mismatch",
+      "diff_cells": 1762,
+      "max_abs": 496.91535859521093,
+      "worst_col": "a13",
+      "numeric_cols": 39
+    },
+    {
+      "table": "pt_out",
+      "key": "nodeid",
+      "rows_a": 1304,
+      "rows_b": 1304,
+      "status": "mismatch",
+      "diff_cells": 5,
+      "max_abs": 5.158865112639657,
+      "worst_col": "a15",
+      "numeric_cols": 82
+    },
+    {
+      "table": "dr_out",
+      "key": "nodeid",
+      "rows_a": 0,
+      "rows_b": 0,
+      "status": "empty",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 0
+    },
+    {
+      "table": "ns_out",
+      "key": "lineid",
+      "rows_a": 2,
+      "rows_b": 2,
+      "status": "ok",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 14
+    },
+    {
+      "table": "rs_out",
+      "key": "lineid",
+      "rows_a": 2,
+      "rows_b": 2,
+      "status": "ok",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 13
+    },
+    {
+      "table": "bp_out",
+      "key": "lineid",
+      "rows_a": 0,
+      "rows_b": 0,
+      "status": "empty",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 0
+    },
+    {
+      "table": "ok_out",
+      "key": "lineid",
+      "rows_a": 0,
+      "rows_b": 0,
+      "status": "empty",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 0
+    },
+    {
+      "table": "is_out",
+      "status": "missing",
+      "rows_a": null,
+      "rows_b": null
+    },
+    {
+      "table": "po_out",
+      "status": "missing",
+      "rows_a": null,
+      "rows_b": null
+    }
+  ],
+  "tables_with_diffs": 3
+}

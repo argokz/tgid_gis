@@ -22,12 +22,15 @@ import psycopg2
 # в нескольких подтипах, но объектом становится ровно в одном.
 NODE_PRIORITY = [
     'heat_source', 'pump_station', 'consumer_real', 'consumer_general',
-    'valve_3way', 'regulator_press', 'heat_chamber', 'refill_node',
+    'valve_3way', 'heat_chamber', 'refill_node',
     'connect_node',
 ]
+# ВАЖНО: каждый target из mapping.json class_line обязан быть здесь.
+# regulator_press раньше выпал — все 509 pressregulators ушли в reject,
+# линии стали line_plain, sety не видел регуляторы → пустой rs_out.
 LINE_PRIORITY = [
     'pipe_section', 'pump', 'elevator', 'heat_exchanger', 'air_heater',
-    'damper', 'diaphragm', 'radiator', 'local_resistance',
+    'damper', 'diaphragm', 'radiator', 'local_resistance', 'regulator_press',
 ]
 
 GEOM_NODE = 'ST_SetSRID(ST_Point(n.x / {scale}, -n.y / {scale}), {srid})'
@@ -152,6 +155,10 @@ class Converter:
         prio = NODE_PRIORITY if kind == 'node' else LINE_PRIORITY
         link = 'nodeid' if kind == 'node' else 'lineid'
         by_target = {e['target']: e for e in entries}
+        missing = [e['target'] for e in entries if e['target'] not in prio]
+        if missing:
+            raise RuntimeError(
+                '%s: в PRIORITY нет классов из mapping: %s' % (kind, missing))
 
         parts = []
         for rank, target in enumerate(prio):
@@ -198,6 +205,27 @@ class Converter:
                     GROUP BY {link} HAVING count(*) > 1)
             """.format(src_full=self.sub(e['source']), src=e['source'], link=link,
                        k=kind, t=e['target'], kind=kind))
+
+        # Строки, проигравшие ЧУЖОМУ классу: узел может иметь строки сразу
+        # в realconsumers и generalizedconsumers, старая модель это
+        # допускала, и расчётное ядро читает обе. Объектом узел становится
+        # в одном классе, но вторую строку обязан вернуть слой
+        # совместимости — иначе расчёт видит меньше потребителей.
+        for e in entries:
+            self.run(cur, """
+                INSERT INTO net.object_variant
+                    (obj_id, obj_kind, target, src_table, src_id, chosen,
+                     score, payload)
+                SELECT s.{link}, '{kind}', '{t}', '{src}', s.id, false,
+                       net.data_score(to_jsonb(s)), to_jsonb(s)
+                FROM {src_full} s
+                JOIN _assign_{k} a ON a.obj_id = s.{link}
+                WHERE s.{link} IS NOT NULL
+                  AND a.target <> '{t}'
+                  AND NOT EXISTS (SELECT 1 FROM net.object_variant v
+                                  WHERE v.src_table = '{src}' AND v.src_id = s.id)
+            """.format(src_full=self.sub(e['source']), src=e['source'],
+                       link=link, k=kind, t=e['target'], kind=kind))
 
         # Строки подтипов, проигравшие приоритет или дубли, — в отчёт.
         for e in entries:

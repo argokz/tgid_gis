@@ -1,0 +1,128 @@
+{
+  "db_a": "almatygid",
+  "db_b": "tgid_gis",
+  "fragment": 1,
+  "calc_a": 3,
+  "calc_b": 6,
+  "atol": 1e-06,
+  "rtol": 1e-06,
+  "tables": [
+    {
+      "table": "us_out",
+      "key": "nodeid",
+      "rows_a": 4592,
+      "rows_b": 4592,
+      "status": "mismatch",
+      "diff_cells": 1098,
+      "max_abs": 2388639989219024.5,
+      "worst_col": "t",
+      "numeric_cols": 6
+    },
+    {
+      "table": "ut_out",
+      "key": "lineid",
+      "rows_a": 3459,
+      "rows_b": 3459,
+      "status": "mismatch",
+      "diff_cells": 5028,
+      "max_abs": 1.8312171058809523e+17,
+      "worst_col": "t2",
+      "numeric_cols": 39
+    },
+    {
+      "table": "pt_out",
+      "key": "nodeid",
+      "rows_a": 956,
+      "rows_b": 956,
+      "status": "mismatch",
+      "diff_cells": 2,
+      "max_abs": 3.922309862737841,
+      "worst_col": "qfact",
+      "numeric_cols": 82
+    },
+    {
+      "table": "dr_out",
+      "key": "nodeid",
+      "rows_a": 0,
+      "rows_b": 0,
+      "status": "empty",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 0
+    },
+    {
+      "table": "ns_out",
+      "key": "lineid",
+      "rows_a": 34,
+      "rows_b": 34,
+      "status": "ok",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 14
+    },
+    {
+      "table": "rs_out",
+      "key": "lineid",
+      "rows_a": 61,
+      "rows_b": 61,
+      "status": "ok",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 13
+    },
+    {
+      "table": "bp_out",
+      "key": "lineid",
+      "rows_a": 0,
+      "rows_b": 0,
+      "status": "empty",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 0
+    },
+    {
+      "table": "ok_out",
+      "key": "lineid",
+      "rows_a": 0,
+      "rows_b": 0,
+      "status": "empty",
+      "diff_cells": 0,
+      "max_abs": 0.0,
+      "worst_col": null,
+      "numeric_cols": 0
+    },
+    {
+      "table": "is_out",
+      "status": "missing",
+      "rows_a": null,
+      "rows_b": null
+    },
+    {
+      "table": "po_out",
+      "status": "missing",
+      "rows_a": null,
+      "rows_b": null
+    }
+  ],
+  "tables_with_diffs": 3,
+  "summary": {
+    "fragment": 1,
+    "tn": -25,
+    "calc_almatygid": 3,
+    "calc_tgid_gis": 6,
+    "positive_only_a": [],
+    "positive_only_b": [],
+    "positive_only_a_count": 0,
+    "positive_only_b_count": 0,
+    "rs_rows": [
+      61,
+      61
+    ],
+    "ut_a13_max": 33475.987103294814,
+    "structural_ok": true
+  }
+}

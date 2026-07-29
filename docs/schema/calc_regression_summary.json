@@ -1,0 +1,67 @@
+{
+  "after_fix": true,
+  "root_cause": "LINE_PRIORITY in converter/convert.py omitted regulator_press, so all 509 pressregulators were rejected and lines fell to line_plain; sety never saw pressRegulators → empty rs_out and missing topology.",
+  "fix": "Added regulator_press to LINE_PRIORITY; reconverted tgid_gis (493 rows).",
+  "fragment": 2,
+  "tn": -25,
+  "calc_almatygid": 2,
+  "calc_tgid_gis": 5,
+  "rs_out_a": 2,
+  "rs_out_b": 2,
+  "positive_only_a": [],
+  "positive_only_b": [],
+  "ut_common_lines": 1411,
+  "ut_top": [
+    {
+      "col": "a13",
+      "diff_cells": 177,
+      "max_abs": 496.91535859521093
+    },
+    {
+      "col": "qq",
+      "diff_cells": 177,
+      "max_abs": 73.57333333333332
+    },
+    {
+      "col": "tpot",
+      "diff_cells": 177,
+      "max_abs": 0.021256932261538453
+    },
+    {
+      "col": "a14",
+      "diff_cells": 176,
+      "max_abs": 83.85750736726655
+    },
+    {
+      "col": "a11",
+      "diff_cells": 176,
+      "max_abs": 25.92365655981375
+    },
+    {
+      "col": "a17",
+      "diff_cells": 176,
+      "max_abs": 2.735875671522649
+    },
+    {
+      "col": "a15",
+      "diff_cells": 176,
+      "max_abs": 2.4150962121772768
+    },
+    {
+      "col": "a10",
+      "diff_cells": 176,
+      "max_abs": 0.7269999999999999
+    }
+  ],
+  "baseline_noise_ut_max_abs": 496.927,
+  "before": {
+    "rs_out": "2 vs 0",
+    "us_out_rows": "4908 vs 4896",
+    "positive_only_a": [
+      534342,
+      534344
+    ],
+    "ut_a21_max": 938.067
+  },
+  "structural_ok": true
+}

@@ -18,15 +18,33 @@
 | 2 | Проект целевой модели, DDL, тесты целостности | готово — [02-target-model.md](docs/02-target-model.md) |
 | 3 | Классификация типов объектов по измерениям | готово |
 | 4 | Конвертер `public` → `net` | готово — [converter/convert.py](converter/convert.py) |
-| 5 | Валидация переноса (15 проверок) | готово — [converter/validate.py](converter/validate.py) |
+| 5 | Валидация переноса | готово — [converter/validate.py](converter/validate.py) |
 | 6 | Новые запросы чтения, замеры | готово — [03-performance.md](docs/03-performance.md) |
 | 7 | Готовность слоёв для QGIS, починка геометрии | готово |
 | 8 | Слой совместимости, переключение и откат | готово — [04-compat-layer.md](docs/04-compat-layer.md) |
 | 9 | Путь записи через `INSTEAD OF`, смена класса объекта | готово |
 | 10 | Новая БД `tgid_gis` на целевой схеме | готово — [tools/build_new_db.ps1](tools/build_new_db.ps1) |
 | 11 | Развёртывание запросов в приложение | готово — [tools/deploy_sql.ps1](tools/deploy_sql.ps1) |
-| 12 | Правки C++, сборка приложения | в работе |
-| 13 | «Тонкое» представление для отрисовки карты | — |
+| 12 | Правки C++, сборка приложения | готово — Qt 6.8.3, `gid8.exe`, проверка на `tgid_gis` |
+| 13 | «Тонкое» представление для отрисовки карты | готово — [sql/070_map_thin.sql](sql/070_map_thin.sql), замер [map_thin_bench.json](docs/schema/map_thin_bench.json) |
+| 14 | Развёртывание SQL + aqt при закрытом download.qt.io | готово |
+| 15 | Сборка и проверка приложения на новой БД | готово |
+| 16–17 | Сироты оборудования / «дубли» справочников | готово — [05](docs/05-orphan-equipment.md), [06](docs/06-duplicate-tables.md) |
+| 18 | Выбор строки у дублей по данным; защита от чтения из view | готово |
+| 19 | Спорные объекты: обе версии + `needs_review` | готово — [spornye_obekty.sql](sql/queries/spornye_obekty.sql) |
+| 20 | Подтипы тоже на `net` (views + INSTEAD OF) | готово — приложение работает полностью |
+| 21 | Регрессия гидравлического расчёта (sety) | **structural_ok** на фр. 2 и 1; фикс `regulator_press` — [09](docs/09-calc-regression-results.md) |
+| 22 | Разбор спорных потребителей глазами | очередь — [07](docs/07-duplicates-next.md) |
+| — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
+
+## Что дальше
+
+1. **Спорные потребители** — решение заказчика: [07](docs/07-duplicates-next.md),
+   [spornye_obekty.sql](sql/queries/spornye_obekty.sql).
+2. **Фрагменты без строки в `fragments`** (80, 91, …) — завести id или не считать рабочими.
+3. **Сходимость на фр. 1** — крупные Δ температур у виртуальных узлов; не structural.
+4. **WIP к коммиту** (не закоммичено): subtype `UNION ALL` / converter / calc tools / docs 07–10.
+5. Тонкая карта в C++ — по желанию.
 
 ## Новая БД и запуск приложения на ней
 
@@ -34,10 +52,14 @@
 $env:PGPASSWORD='...'; .\tools\build_new_db.ps1 -Source almatygid -Target tgid_gis
 psql -d tgid_gis -f sql/040_switch_to_net.sql   # nodes/linesobj -> представления
 psql -d tgid_gis -f sql/050_write_triggers.sql  # запись через представления
+psql -d tgid_gis -f sql/055_subtype_views.sql   # views подтипов в net
+psql -d tgid_gis -f sql/060_switch_subtypes.sql # public.*_subtype -> view
+psql -d tgid_gis -f sql/070_map_thin.sql        # тонкая карта
 .\tools\deploy_sql.ps1                          # новые us.sql / ut.sql в приложение
 ```
 
-Откат на каждом шаге: `sql/041_rollback_to_public.sql` и `.\tools\deploy_sql.ps1 -Rollback`.
+Откат: `sql/041_rollback_to_public.sql`, `sql/061_rollback_subtypes.sql`,
+`.\tools\deploy_sql.ps1 -Rollback`.
 
 ## Сборка приложения
 
@@ -59,11 +81,16 @@ psql -d tgid_gis -f sql/050_write_triggers.sql  # запись через пре
 
 **Скорость** (открытие одного фрагмента): линии **5.1x**, узлы **2.2x**.
 Схема фрагмента целиком: было ~660 мс, стало ~210 мс.
+Тонкая карта (шаг 13, фрагмент 80): узлы **4.2x**, линии **2.1x** относительно
+полных `us_net`/`ut_net` — см. [map_thin_bench.json](docs/schema/map_thin_bench.json).
 
-**Целостность**: 43 внешних ключа против 0 в исходной БД.
+**Целостность**: 45 внешних ключей в `net` против 0 в исходной БД.
 
 **Геометрия восстановлена**: было видно 53 966 узлов и 45 917 линий,
 стало 91 490 и 86 016.
+
+**Совместимость подтипов**: 18 таблиц-подтипов — представления над `net` с записью
+через `INSTEAD OF`; приложение создаёт типизированные объекты без потери класса.
 
 ## Порядок применения
 
@@ -76,12 +103,13 @@ python converter/validate.py --mapping converter/mapping.json         # пров
 psql -f sql/020_fix_geometry.sql       # необязательно: починка геометрии из источника
 ```
 
-Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге.
+Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге
+до `040_switch_to_net.sql`.
 
 ## Подключение
 
 Параметры берутся из переменных окружения, см. [.env.example](.env.example).
-Пароли в репозиторий не коммитятся.
+Пароли в репозиторий не коммитятся. Локально: скопировать в `.env`.
 
 ```bash
 cp .env.example .env   # заполнить
@@ -93,3 +121,4 @@ python tools/analyze_schema.py --schema docs/schema/almatygid.json --out docs/sc
 
 - PostgreSQL 16 + PostGIS 3.5
 - Python 3.10+, `psycopg2`
+- Для расчёта: venv sety (`H:\venv\sety`) + ODBC PostgreSQL + `gid8/python/sety`

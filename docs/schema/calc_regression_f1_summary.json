@@ -1,0 +1,16 @@
+{
+  "fragment": 1,
+  "tn": -25,
+  "calc_almatygid": 3,
+  "calc_tgid_gis": 6,
+  "positive_only_a": [],
+  "positive_only_b": [],
+  "positive_only_a_count": 0,
+  "positive_only_b_count": 0,
+  "rs_rows": [
+    61,
+    61
+  ],
+  "ut_a13_max": 33475.987103294814,
+  "structural_ok": true
+}
