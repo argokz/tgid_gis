@@ -4,26 +4,37 @@
 
 BEGIN;
 
-INSERT INTO net.fragment (id, name) VALUES (999, 'test');
+-- Идентификаторы берём из последовательности, а не константами:
+-- id объектов сохраняются из public, поэтому 1001 и 2001 в рабочей БД
+-- уже заняты, и тест с константами падал на нарушении уникальности.
+CREATE TEMP TABLE _ids AS
+SELECT nextval('net.obj_id_seq') AS n1,
+       nextval('net.obj_id_seq') AS n2,
+       nextval('net.obj_id_seq') AS n3,
+       nextval('net.obj_id_seq') AS l1,
+       (SELECT coalesce(max(id), 0) + 1000 FROM net.fragment) AS frag;
+
+INSERT INTO net.fragment (id, name)
+SELECT frag, 'проверка целостности' FROM _ids;
 
 -- 1. Вставка узла должна автоматически создать запись в реестре.
 INSERT INTO net.heat_chamber (id, fragment_id, geom)
-VALUES (1001, 999, ST_SetSRID(ST_Point(-2426.11, -1036.23), 9998));
+VALUES ((SELECT n1 FROM _ids), (SELECT frag FROM _ids), ST_SetSRID(ST_Point(-2426.11, -1036.23), 9998));
 
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM net.node_reg
-                   WHERE id = 1001 AND kind = 'heat_chamber') THEN
+                   WHERE id = (SELECT n1 FROM _ids) AND kind = 'heat_chamber') THEN
         RAISE EXCEPTION 'ПРОВАЛ: триггер не создал запись в net.node_reg';
     END IF;
 END $$;
 
 INSERT INTO net.heat_chamber (id, fragment_id, geom)
-VALUES (1002, 999, ST_SetSRID(ST_Point(-2431.62, -1078.37), 9998));
+VALUES ((SELECT n2 FROM _ids), (SELECT frag FROM _ids), ST_SetSRID(ST_Point(-2431.62, -1078.37), 9998));
 
 -- 2. Линия ссылается на реестр — вставка должна пройти.
 INSERT INTO net.pipe_section (id, fragment_id, node_from, node_to, geom)
-VALUES (2001, 999, 1001, 1002,
+VALUES ((SELECT l1 FROM _ids), (SELECT frag FROM _ids), (SELECT n1 FROM _ids), (SELECT n2 FROM _ids),
         ST_SetSRID(ST_MakeLine(ST_Point(-2426.11, -1036.23),
                                ST_Point(-2431.62, -1078.37)), 9998));
 
@@ -32,7 +43,7 @@ DO $$
 BEGIN
     BEGIN
         INSERT INTO net.pipe_section (id, fragment_id, node_from, node_to, geom)
-        VALUES (2002, 999, 1001, 999999,
+        VALUES ((SELECT l1 FROM _ids) + 500000, (SELECT frag FROM _ids), (SELECT n1 FROM _ids), 999999999,
                 ST_SetSRID(ST_MakeLine(ST_Point(0, 0), ST_Point(1, 1)), 9998));
         RAISE EXCEPTION 'ПРОВАЛ: принята линия с несуществующим узлом';
     EXCEPTION WHEN foreign_key_violation THEN
@@ -44,7 +55,7 @@ END $$;
 DO $$
 BEGIN
     BEGIN
-        DELETE FROM net.heat_chamber WHERE id = 1001;
+        DELETE FROM net.heat_chamber WHERE id = (SELECT n1 FROM _ids);
         RAISE EXCEPTION 'ПРОВАЛ: удалён узел, используемый линией';
     EXCEPTION WHEN foreign_key_violation THEN
         NULL;  -- ожидаемо
@@ -52,21 +63,21 @@ BEGIN
 END $$;
 
 -- 5. После удаления линии узел удаляется, реестр чистится триггером.
-DELETE FROM net.pipe_section WHERE id = 2001;
-DELETE FROM net.heat_chamber WHERE id = 1001;
+DELETE FROM net.pipe_section WHERE id = (SELECT l1 FROM _ids);
+DELETE FROM net.heat_chamber WHERE id = (SELECT n1 FROM _ids);
 
 DO $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM net.node_reg WHERE id = 1001) THEN
+    IF EXISTS (SELECT 1 FROM net.node_reg WHERE id = (SELECT n1 FROM _ids)) THEN
         RAISE EXCEPTION 'ПРОВАЛ: триггер не убрал запись из net.node_reg';
     END IF;
 END $$;
 
 -- 6. id выдаётся общей последовательностью — он уникален между таблицами.
 INSERT INTO net.heat_chamber (fragment_id, geom)
-VALUES (999, ST_SetSRID(ST_Point(0, 0), 9998));
+SELECT frag, ST_SetSRID(ST_Point(0, 0), 9998) FROM _ids;
 INSERT INTO net.consumer_real (fragment_id, geom)
-VALUES (999, ST_SetSRID(ST_Point(0, 0), 9998));
+SELECT frag, ST_SetSRID(ST_Point(0, 0), 9998) FROM _ids;
 
 DO $$
 DECLARE n int; d int;
@@ -83,13 +94,13 @@ END $$;
 -- 7. Аспект привязан к реестру: узел-потребитель может быть ещё и узлом
 --    задания давления, но ссылка на несуществующий узел недопустима.
 INSERT INTO net.consumer_general (id, fragment_id, geom)
-VALUES (1003, 999, ST_SetSRID(ST_Point(1, 1), 9998));
-INSERT INTO net.node_press_setting (node_id) VALUES (1003);
+VALUES ((SELECT n3 FROM _ids), (SELECT frag FROM _ids), ST_SetSRID(ST_Point(1, 1), 9998));
+INSERT INTO net.node_press_setting (node_id) VALUES ((SELECT n3 FROM _ids));
 
 DO $$
 BEGIN
     BEGIN
-        INSERT INTO net.node_press_setting (node_id) VALUES (888888);
+        INSERT INTO net.node_press_setting (node_id) VALUES (999999998);
         RAISE EXCEPTION 'ПРОВАЛ: аспект принят для несуществующего узла';
     EXCEPTION WHEN foreign_key_violation THEN
         NULL;  -- ожидаемо
