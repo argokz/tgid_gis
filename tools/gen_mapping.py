@@ -90,8 +90,15 @@ BASE_DROP = {
                  'globalid', 'gistable', 'sync', 'gis', 'sync_tgid', 'id_old'},
 }
 
-SUB_DROP = {'id', 'nodeid', 'lineid'}
+# Отбрасывается ТОЛЬКО та ссылка, по которой объект привязан: у
+# pressregulators заполнены обе (nodeid у 463 строк, lineid у 509),
+# и отчёты postgresql/sql/RD.sql, excel2/sql2/Регулятор давления.sql
+# читают именно nodeid. Снос обеих ломает эти выборки.
 LAYER_DROP = {'id', 'shape', 'nodeid', 'lineid'}
+
+
+def sub_drop(link):
+    return {'id', link}
 
 
 def main():
@@ -121,7 +128,7 @@ def main():
         } for c in keep}
 
     def entry(src, target, geom_kind, link, category):
-        drop = LAYER_DROP if category == 'layer' else SUB_DROP
+        drop = LAYER_DROP if category == 'layer' else sub_drop(link)
         keep = [c for c in cols[src] if c not in drop]
         return {
             'source': src,

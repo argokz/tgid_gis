@@ -50,16 +50,34 @@ class Converter:
         # нельзя — конвертер очистил бы net и читал сам из себя.
         self.src_nodes = 'public.nodes'
         self.src_lines = 'public.linesobj'
+        self.src_sub = {}
+
+    def sub(self, name):
+        """Имя источника для таблицы-подтипа с учётом подстановки видов."""
+        return 'public.%s' % self.src_sub.get(name, name)
 
     def resolve_sources(self, cur):
+        # Все имена в public с их видом: таблица или представление.
         cur.execute("""
             SELECT c.relname, c.relkind
             FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-            WHERE n.nspname = 'public'
-              AND c.relname IN ('nodes', 'linesobj',
-                                'nodes_legacy', 'linesobj_legacy')
+            WHERE n.nspname = 'public' AND c.relkind IN ('r', 'v')
         """)
         kinds = dict(cur.fetchall())
+        self._kinds = kinds
+
+        # После подстановки представлений таблицы-подтипы тоже читать нельзя:
+        # public.realconsumers становится видом над net.consumer_real,
+        # а net к этому моменту уже очищен.
+        self.src_sub = {}
+        for e in (self.m['class_node'] + self.m['class_line'] +
+                  self.m['layer'] + self.m['aspect'] + self.m['child']):
+            s = e['source']
+            if kinds.get(s) == 'v' and kinds.get(s + '_legacy') == 'r':
+                self.src_sub[s] = s + '_legacy'
+        if self.src_sub:
+            self.log('подтипы читаются из *_legacy: %d таблиц'
+                     % len(self.src_sub))
 
         if kinds.get('nodes') == 'v':
             if kinds.get('nodes_legacy') != 'r':
@@ -146,8 +164,9 @@ class Converter:
             parts.append(
                 "SELECT {link} AS obj_id, '{t}' AS target, {rank} AS rank, "
                 "id AS src_row, net.row_rank(to_jsonb(s)) AS score "
-                "FROM public.{src} s WHERE {link} IS NOT NULL".format(
-                    link=link, t=target, rank=rank, src=e['source']))
+                "FROM {src_full} s WHERE {link} IS NOT NULL".format(
+                    link=link, t=target, rank=rank,
+                    src_full=self.sub(e['source'])))
 
         cur.execute('DROP TABLE IF EXISTS _assign_%s' % kind)
         self.run(cur, """
@@ -171,14 +190,14 @@ class Converter:
                        (a.src_row = s.id),
                        net.data_score(to_jsonb(s)),
                        to_jsonb(s)
-                FROM public.{src} s
+                FROM {src_full} s
                 JOIN _assign_{k} a ON a.obj_id = s.{link} AND a.target = '{t}'
                 WHERE s.{link} IN (
-                    SELECT {link} FROM public.{src}
+                    SELECT {link} FROM {src_full}
                     WHERE {link} IS NOT NULL
                     GROUP BY {link} HAVING count(*) > 1)
-            """.format(src=e['source'], link=link, k=kind, t=e['target'],
-                       kind=kind))
+            """.format(src_full=self.sub(e['source']), src=e['source'], link=link,
+                       k=kind, t=e['target'], kind=kind))
 
         # Строки подтипов, проигравшие приоритет или дубли, — в отчёт.
         for e in entries:
@@ -194,14 +213,15 @@ class Converter:
                            'score_rejected', net.data_score(to_jsonb(s)),
                            'score_kept', a2.score,
                            'kept_id', a2.src_row)
-                FROM public.{src} s
+                FROM {src_full} s
                 LEFT JOIN _assign_{k} a
                        ON a.obj_id = s.{link} AND a.src_row = s.id
                                              AND a.target = '{t}'
                 LEFT JOIN _assign_{k} a2
                        ON a2.obj_id = s.{link} AND a2.target = '{t}'
                 WHERE s.{link} IS NOT NULL AND a.obj_id IS NULL
-            """.format(src=e['source'], link=link, k=kind, t=e['target']))
+            """.format(src_full=self.sub(e['source']), src=e['source'],
+                       link=link, k=kind, t=e['target']))
 
     # ---------- перенос классов ----------
 
@@ -265,12 +285,15 @@ class Converter:
         # в схеме public (nodeid, lineid, nodeid1, nodeid2), и перенумерация
         # порвала бы все эти связи. Реестры узлов и линий раздельные,
         # поэтому совпадение id узла и id линии допустимо.
-        head = ['id', 'fragment_id', 'geom', 'removed_at', 'src_id']
+        head = ['id', 'fragment_id', 'geom', 'removed_at', 'src_id',
+                'subtype_src_id']
         body = ['%s.id' % alias,
                 'f.id',
                 geom,
                 'CASE WHEN %s.removed <> 0 THEN now() END' % alias,
-                '%s.id' % alias]
+                '%s.id' % alias,
+                # id строки подтипа: приложение читает его как id2
+                ('s.id' if not plain else 'NULL::int')]
         if is_line:
             head[1:1] = ['node_from', 'node_to', 'node_from_src',
                          'node_to_src', 'fileid_src']
@@ -283,8 +306,8 @@ class Converter:
             where_cls = ('a.obj_id IS NULL'
                          if not plain else 'a.obj_id IS NULL')
         else:
-            join_sub = ('JOIN public.{src} s ON s.id = a.src_row\n'
-                        .format(src=e['source']))
+            join_sub = ('JOIN {src_full} s ON s.id = a.src_row\n'
+                        .format(src_full=self.sub(e['source'])))
             where_cls = "a.target = '%s'" % target
 
         if is_line:
@@ -329,9 +352,10 @@ class Converter:
             self.run(cur, """
                 INSERT INTO net.{t} (geom, src_id{extra})
                 SELECT ST_SetSRID(s.shape, {srid}), s.id{vals}
-                FROM public.{src} s
+                FROM {src_full} s
                 WHERE s.shape IS NOT NULL
-            """.format(t=e['target'], src=e['source'], srid=self.srid,
+            """.format(t=e['target'], src_full=self.sub(e['source']),
+                       srid=self.srid,
                        extra=(', ' + ', '.join(cols)) if cols else '',
                        vals=(', ' + ', '.join(vals)) if vals else ''),
                 e['target'])
@@ -342,12 +366,12 @@ class Converter:
             link = e['link_column']
             cols = [q(c) for c in e['columns']]
             vals = ['s.%s' % q(c) for c in e['columns']]
-            dedup = ('SELECT DISTINCT ON ({link}) * FROM public.{src} '
+            dedup = ('SELECT DISTINCT ON ({link}) * FROM {src_full} '
                      'WHERE {link} IS NOT NULL ORDER BY {link}, id DESC'
-                     .format(link=link, src=e['source'])
+                     .format(link=link, src_full=self.sub(e['source']))
                      if e['category'] == 'aspect'
-                     else 'SELECT * FROM public.{src} WHERE {link} IS NOT NULL'
-                     .format(src=e['source'], link=link))
+                     else 'SELECT * FROM {src_full} WHERE {link} IS NOT NULL'
+                     .format(src_full=self.sub(e['source']), link=link))
             self.run(cur, """
                 INSERT INTO net.{t} (node_id, src_id{extra})
                 SELECT r.id, s.id{vals}
@@ -366,10 +390,11 @@ class Converter:
                        CASE WHEN s.{link} IS NULL THEN 'ссылка на узел пуста'
                             ELSE 'узел не найден среди перенесённых' END,
                        jsonb_build_object('{link}', s.{link})
-                FROM public.{src} s
+                FROM {src_full} s
                 LEFT JOIN net.node_src_map r ON r.src_id = s.{link}
                 WHERE s.{link} IS NULL OR r.src_id IS NULL
-            """.format(src=e['source'], link=link))
+            """.format(src_full=self.sub(e['source']), src=e['source'],
+                       link=link))
 
     def mark_review(self, cur):
         """Пометить объекты, у которых сохранено больше одной версии.

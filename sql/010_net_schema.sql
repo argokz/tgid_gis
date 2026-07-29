@@ -1562,6 +1562,7 @@ CREATE TABLE IF NOT EXISTS net.regulator_press (
   , operatorid                       int
   , typ                              text
   , internalnodeid                   int
+  , nodeid                           int
   , valvehydroresopen                double precision
   , valvehydroresclose               double precision
   , regvalverelcap                   int

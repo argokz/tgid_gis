@@ -4830,6 +4830,7 @@
    "link_column": "lineid",
    "rows": 509,
    "columns": [
+    "nodeid",
     "valvehydroresopen",
     "valvehydroresclose",
     "regvalverelcap",
@@ -4842,6 +4843,11 @@
     "pipelinesignid"
    ],
    "column_types": {
+    "nodeid": {
+     "data_type": "integer",
+     "max_length": null,
+     "nullable": true
+    },
     "valvehydroresopen": {
      "data_type": "double precision",
      "max_length": null,
