@@ -45,6 +45,32 @@ class Converter:
         self.srid = mapping['srid']
         self.scale = mapping['coord_scale']
         self.stats = []
+        # Заполняется resolve_sources: после переключения БД на net
+        # public.nodes становится ПРЕДСТАВЛЕНИЕМ над net, и читать из него
+        # нельзя — конвертер очистил бы net и читал сам из себя.
+        self.src_nodes = 'public.nodes'
+        self.src_lines = 'public.linesobj'
+
+    def resolve_sources(self, cur):
+        cur.execute("""
+            SELECT c.relname, c.relkind
+            FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = 'public'
+              AND c.relname IN ('nodes', 'linesobj',
+                                'nodes_legacy', 'linesobj_legacy')
+        """)
+        kinds = dict(cur.fetchall())
+
+        if kinds.get('nodes') == 'v':
+            if kinds.get('nodes_legacy') != 'r':
+                raise SystemExit(
+                    'public.nodes — представление, а public.nodes_legacy нет. '
+                    'Сначала выполните sql/041_rollback_to_public.sql')
+            self.src_nodes = 'public.nodes_legacy'
+            self.src_lines = 'public.linesobj_legacy'
+            self.log('БД переключена на net, источник — таблицы *_legacy')
+        else:
+            self.log('источник — public.nodes / public.linesobj')
 
     def run(self, cur, sql, label=None):
         t0 = time.time()
@@ -90,14 +116,15 @@ class Converter:
             SELECT DISTINCT f.fileid,
                    'фрагмент ' || f.fileid || ' (восстановлен конвертером)'
             FROM (
-                SELECT fileid FROM public.nodes WHERE fileid IS NOT NULL
+                SELECT fileid FROM {src_nodes} WHERE fileid IS NOT NULL
                 UNION
-                SELECT fileid FROM public.linesobj WHERE fileid IS NOT NULL
+                SELECT fileid FROM {src_lines} WHERE fileid IS NOT NULL
             ) f
             LEFT JOIN net.fragment nf ON nf.id = f.fileid
             WHERE nf.id IS NULL
             ON CONFLICT (id) DO NOTHING
-        """, 'fragment (восстановленные)')
+        """.format(src_nodes=self.src_nodes, src_lines=self.src_lines),
+            'fragment (восстановленные)')
 
     # ---------- отнесение объектов к классам ----------
 
@@ -113,19 +140,21 @@ class Converter:
             e = by_target.get(target)
             if not e:
                 continue
+            # Строку выбираем по числу заполненных полей, а не по id:
+            # у дублей данные примерно поровну лежат то в старшей строке,
+            # то в младшей, и выбор по id терял бы заполненную запись.
             parts.append(
                 "SELECT {link} AS obj_id, '{t}' AS target, {rank} AS rank, "
-                "max(id) AS src_row "
-                "FROM public.{src} WHERE {link} IS NOT NULL "
-                "GROUP BY {link}".format(
+                "id AS src_row, net.data_score(to_jsonb(s)) AS score "
+                "FROM public.{src} s WHERE {link} IS NOT NULL".format(
                     link=link, t=target, rank=rank, src=e['source']))
 
         cur.execute('DROP TABLE IF EXISTS _assign_%s' % kind)
         self.run(cur, """
             CREATE TEMP TABLE _assign_{k} AS
-            SELECT DISTINCT ON (obj_id) obj_id, target, src_row
+            SELECT DISTINCT ON (obj_id) obj_id, target, src_row, score
             FROM ({parts}) u
-            ORDER BY obj_id, rank
+            ORDER BY obj_id, rank, score DESC, src_row DESC
         """.format(k=kind, parts=' UNION ALL '.join(parts)),
             'assign_%s' % kind)
         cur.execute('CREATE UNIQUE INDEX ON _assign_%s (obj_id)' % kind)
@@ -135,12 +164,22 @@ class Converter:
         for e in entries:
             self.run(cur, """
                 INSERT INTO net.conversion_reject (src_table, src_id, reason, detail)
-                SELECT '{src}', s.id, 'узел отнесён к другому классу или дубль',
-                       jsonb_build_object('obj_id', s.{link})
+                SELECT '{src}', s.id,
+                       CASE WHEN a2.obj_id IS NULL
+                            THEN 'узел отнесён к другому классу'
+                            ELSE 'дубль: выбрана строка с большим числом заполненных полей'
+                       END,
+                       jsonb_build_object(
+                           'obj_id', s.{link},
+                           'score_rejected', net.data_score(to_jsonb(s)),
+                           'score_kept', a2.score,
+                           'kept_id', a2.src_row)
                 FROM public.{src} s
                 LEFT JOIN _assign_{k} a
                        ON a.obj_id = s.{link} AND a.src_row = s.id
                                              AND a.target = '{t}'
+                LEFT JOIN _assign_{k} a2
+                       ON a2.obj_id = s.{link} AND a2.target = '{t}'
                 WHERE s.{link} IS NOT NULL AND a.obj_id IS NULL
             """.format(src=e['source'], link=link, k=kind, t=e['target']))
 
@@ -230,9 +269,9 @@ class Converter:
 
         if is_line:
             frm = """
-            FROM public.linesobj l
-            JOIN public.nodes n1 ON n1.id = l.nodeid1
-            JOIN public.nodes n2 ON n2.id = l.nodeid2
+            FROM {src_lines} l
+            JOIN {src_nodes} n1 ON n1.id = l.nodeid1
+            JOIN {src_nodes} n2 ON n2.id = l.nodeid2
             JOIN net.node_src_map nr1 ON nr1.src_id = l.nodeid1
             JOIN net.node_src_map nr2 ON nr2.src_id = l.nodeid2
             LEFT JOIN _assign_line a ON a.obj_id = l.id
@@ -240,16 +279,18 @@ class Converter:
             LEFT JOIN net.fragment f ON f.id = n1.fileid
             WHERE {where}
               AND (n1.x <> 0 OR n1.y <> 0) AND (n2.x <> 0 OR n2.y <> 0)
-            """.format(join_sub=join_sub, where=where_cls)
+            """.format(join_sub=join_sub, where=where_cls,
+                       src_nodes=self.src_nodes, src_lines=self.src_lines)
         else:
             frm = """
-            FROM public.nodes n
+            FROM {src_nodes} n
             LEFT JOIN _assign_node a ON a.obj_id = n.id
             {join_sub}
             LEFT JOIN net.fragment f ON f.id = n.fileid
             WHERE {where}
               AND (n.x <> 0 OR n.y <> 0)
-            """.format(join_sub=join_sub, where=where_cls)
+            """.format(join_sub=join_sub, where=where_cls,
+                       src_nodes=self.src_nodes, src_lines=self.src_lines)
 
         sql = ('INSERT INTO net.{t} ({cols})\nSELECT {vals}\n{frm}'
                .format(t=target,
@@ -345,14 +386,15 @@ class Converter:
                         WHEN n2.id IS NULL THEN 'не найден nodeid2'
                         ELSE 'у конца нет координат' END,
                    to_jsonb(l) - 'shape'
-            FROM public.linesobj l
-            LEFT JOIN public.nodes n1 ON n1.id = l.nodeid1
-            LEFT JOIN public.nodes n2 ON n2.id = l.nodeid2
+            FROM {src_lines} l
+            LEFT JOIN {src_nodes} n1 ON n1.id = l.nodeid1
+            LEFT JOIN {src_nodes} n2 ON n2.id = l.nodeid2
             WHERE l.removed = 0
               AND (n1.id IS NULL OR n2.id IS NULL
                    OR (n1.x = 0 AND n1.y = 0) OR (n2.x = 0 AND n2.y = 0))
             ON CONFLICT (id) DO NOTHING
-        """, 'line_orphan')
+        """.format(src_nodes=self.src_nodes, src_lines=self.src_lines),
+            'line_orphan')
 
 
 def main():
@@ -383,6 +425,7 @@ def main():
     c = Converter(conn, mapping, log)
     t0 = time.time()
     try:
+        c.resolve_sources(cur)
         if args.truncate:
             c.truncate(cur)
         c.fragments(cur)

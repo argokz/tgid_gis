@@ -75,6 +75,24 @@ SET search_path = pg_catalog, public AS $$
     WHERE p.path[1] > 1 AND p.path[1] < ST_NPoints(g);
 $$;
 
+-- Оценка «сколько в строке реально заполненных полей».
+--
+-- Нужна при выборе одной строки из нескольких, ссылающихся на один объект.
+-- Правило «взять строку с наибольшим id» неверно: из 121 пары-дубля
+-- в generalizedconsumers данные лежат только в СТАРШЕЙ строке в 50 случаях
+-- и только в младшей — в 42. Выбор по id терял бы тепловые нагрузки.
+CREATE OR REPLACE FUNCTION net.data_score(j jsonb)
+RETURNS int
+LANGUAGE sql IMMUTABLE
+SET search_path = pg_catalog, public AS $$
+    SELECT count(*)::int
+    FROM jsonb_each_text(j) e
+    WHERE e.value IS NOT NULL
+      AND e.value <> ''
+      AND e.value !~ '^-?0(\.0+)?$'   -- ноль в любом написании не считаем
+      AND e.key NOT IN ('id', 'nodeid', 'lineid');
+$$;
+
 -- Соответствие «старый public.nodes.id -> новый net.*.id».
 -- Нужно, чтобы линии и дочерние таблицы нашли свои узлы после переноса.
 CREATE TABLE IF NOT EXISTS net.node_src_map (
