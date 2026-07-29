@@ -93,6 +93,36 @@ SET search_path = pg_catalog, public AS $$
       AND e.key NOT IN ('id', 'nodeid', 'lineid');
 $$;
 
+-- Оценка с приоритетом тепловых нагрузок.
+--
+-- Одной только data_score недостаточно: строка, где нагрузка нулевая,
+-- но заполнено много справочных полей, обыгрывает строку с реальной
+-- нагрузкой. Для тепловой сети это заведомо неверный выбор — нагрузка
+-- определяет расчёт, а справочные ссылки восстановимы.
+--
+-- Поэтому поля нагрузок (calcHL*, avgHL*, calcExpend*) считаются
+-- отдельно и весят на порядок больше.
+CREATE OR REPLACE FUNCTION net.load_score(j jsonb)
+RETURNS int
+LANGUAGE sql IMMUTABLE
+SET search_path = pg_catalog, public AS $$
+    SELECT count(*)::int
+    FROM jsonb_each_text(j) e
+    WHERE e.value IS NOT NULL
+      AND e.value !~ '^-?0(\.0+)?$'
+      AND e.value <> ''
+      AND (e.key LIKE 'calchl%' OR e.key LIKE 'avghl%'
+           OR e.key LIKE 'calcexpend%');
+$$;
+
+-- Итоговый вес строки при выборе из нескольких версий объекта.
+CREATE OR REPLACE FUNCTION net.row_rank(j jsonb)
+RETURNS int
+LANGUAGE sql IMMUTABLE
+SET search_path = pg_catalog, public AS $$
+    SELECT net.load_score(j) * 1000 + net.data_score(j);
+$$;
+
 -- Соответствие «старый public.nodes.id -> новый net.*.id».
 -- Нужно, чтобы линии и дочерние таблицы нашли свои узлы после переноса.
 CREATE TABLE IF NOT EXISTS net.node_src_map (

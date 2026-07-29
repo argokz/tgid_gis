@@ -1,4 +1,4 @@
-"""Конвертер БД ТГИД: public (надтип + подтипы) -> net (одна таблица — один объект).
+﻿"""Конвертер БД ТГИД: public (надтип + подтипы) -> net (одна таблица — один объект).
 
 Свойства:
   * идемпотентен — повторный запуск даёт тот же результат (--truncate);
@@ -145,7 +145,7 @@ class Converter:
             # то в младшей, и выбор по id терял бы заполненную запись.
             parts.append(
                 "SELECT {link} AS obj_id, '{t}' AS target, {rank} AS rank, "
-                "id AS src_row, net.data_score(to_jsonb(s)) AS score "
+                "id AS src_row, net.row_rank(to_jsonb(s)) AS score "
                 "FROM public.{src} s WHERE {link} IS NOT NULL".format(
                     link=link, t=target, rank=rank, src=e['source']))
 
@@ -159,6 +159,26 @@ class Converter:
             'assign_%s' % kind)
         cur.execute('CREATE UNIQUE INDEX ON _assign_%s (obj_id)' % kind)
         cur.execute('ANALYZE _assign_%s' % kind)
+
+        # Все версии спорного объекта сохраняем целиком: решение по ним
+        # ещё не принято, и выбор конвертера — лишь предположение.
+        for e in entries:
+            self.run(cur, """
+                INSERT INTO net.object_variant
+                    (obj_id, obj_kind, target, src_table, src_id, chosen,
+                     score, payload)
+                SELECT s.{link}, '{kind}', '{t}', '{src}', s.id,
+                       (a.src_row = s.id),
+                       net.data_score(to_jsonb(s)),
+                       to_jsonb(s)
+                FROM public.{src} s
+                JOIN _assign_{k} a ON a.obj_id = s.{link} AND a.target = '{t}'
+                WHERE s.{link} IN (
+                    SELECT {link} FROM public.{src}
+                    WHERE {link} IS NOT NULL
+                    GROUP BY {link} HAVING count(*) > 1)
+            """.format(src=e['source'], link=link, k=kind, t=e['target'],
+                       kind=kind))
 
         # Строки подтипов, проигравшие приоритет или дубли, — в отчёт.
         for e in entries:
@@ -351,6 +371,22 @@ class Converter:
                 WHERE s.{link} IS NULL OR r.src_id IS NULL
             """.format(src=e['source'], link=link))
 
+    def mark_review(self, cur):
+        """Пометить объекты, у которых сохранено больше одной версии.
+
+        Пока решение не принято, выбор конвертера — предположение,
+        и это должно быть видно в самой базе, а не только в отчёте.
+        """
+        self.log('Пометка спорных объектов')
+        for reg, kind in (('node_reg', 'node'), ('line_reg', 'line')):
+            self.run(cur, """
+                UPDATE net.{reg} r SET needs_review = true
+                WHERE EXISTS (
+                    SELECT 1 FROM net.object_variant v
+                    WHERE v.obj_id = r.id AND v.obj_kind = '{kind}'
+                    GROUP BY v.obj_id HAVING count(*) > 1)
+            """.format(reg=reg, kind=kind), '%s: помечено' % reg)
+
     def bump_sequence(self, cur):
         """Сдвигаем последовательность выше всех перенесённых id, иначе
         новые объекты столкнутся с сохранёнными идентификаторами."""
@@ -439,6 +475,7 @@ def main():
         c.layers(cur)
         c.children(cur)
         c.orphans(cur)
+        c.mark_review(cur)
         c.bump_sequence(cur)
         c.analyze(cur)
 
