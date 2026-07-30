@@ -13,9 +13,11 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSplitter>
 #include <QStatusBar>
+#include <QStyledItemDelegate>
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -37,6 +39,101 @@ enum ObjectItemRole {
     OriginalValueRole,
     OriginalNullRole,
     EditableRole,
+    EditorKindRole,
+    OptionValuesRole,
+    OptionLabelsRole,
+    CurrentValueRole,
+    CurrentNullRole,
+};
+
+class ObjectValueDelegate final : public QStyledItemDelegate {
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    QWidget* createEditor(
+        QWidget* parent,
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override
+    {
+        const QString editorKind =
+            index.data(EditorKindRole).toString();
+        if (editorKind == QStringLiteral("lookup")
+            || editorKind == QStringLiteral("boolean")) {
+            auto* combo = new QComboBox(parent);
+            combo->addItem(QStringLiteral("NULL"), QString());
+            if (editorKind == QStringLiteral("boolean")) {
+                combo->addItem(QStringLiteral("Да"), QStringLiteral("да"));
+                combo->addItem(QStringLiteral("Нет"), QStringLiteral("нет"));
+            } else {
+                const QStringList values =
+                    index.data(OptionValuesRole).toStringList();
+                const QStringList labels =
+                    index.data(OptionLabelsRole).toStringList();
+                for (qsizetype i = 0; i < values.size(); ++i) {
+                    combo->addItem(
+                        i < labels.size() ? labels.at(i) : values.at(i),
+                        values.at(i));
+                }
+            }
+            return combo;
+        }
+        if (editorKind == QStringLiteral("multiline")) {
+            return new QPlainTextEdit(parent);
+        }
+        return QStyledItemDelegate::createEditor(parent, option, index);
+    }
+
+    void setEditorData(
+        QWidget* editor,
+        const QModelIndex& index) const override
+    {
+        if (auto* combo = qobject_cast<QComboBox*>(editor)) {
+            if (index.data(CurrentNullRole).toBool()) {
+                combo->setCurrentIndex(0);
+                return;
+            }
+            const QString current =
+                index.data(CurrentValueRole).toString();
+            int optionIndex = combo->findData(current);
+            if (optionIndex < 0) {
+                combo->addItem(
+                    QStringLiteral("%1 (нет в справочнике)").arg(current),
+                    current);
+                optionIndex = combo->count() - 1;
+            }
+            combo->setCurrentIndex(optionIndex);
+            return;
+        }
+        if (auto* textEdit = qobject_cast<QPlainTextEdit*>(editor)) {
+            textEdit->setPlainText(index.data(Qt::EditRole).toString());
+            return;
+        }
+        QStyledItemDelegate::setEditorData(editor, index);
+    }
+
+    void setModelData(
+        QWidget* editor,
+        QAbstractItemModel* model,
+        const QModelIndex& index) const override
+    {
+        if (auto* combo = qobject_cast<QComboBox*>(editor)) {
+            const bool isNull = combo->currentIndex() == 0;
+            const QString value =
+                isNull ? QString() : combo->currentData().toString();
+            model->setData(index, isNull, CurrentNullRole);
+            model->setData(index, value, CurrentValueRole);
+            model->setData(
+                index,
+                isNull ? QStringLiteral("NULL") : combo->currentText(),
+                Qt::EditRole);
+            return;
+        }
+        if (auto* textEdit = qobject_cast<QPlainTextEdit*>(editor)) {
+            model->setData(index, textEdit->toPlainText(), Qt::EditRole);
+            return;
+        }
+        QStyledItemDelegate::setModelData(editor, model, index);
+    }
 };
 
 QTableWidgetItem* readOnlyItem(const QString& text)
@@ -256,6 +353,8 @@ void MainWindow::buildInterface()
         | QAbstractItemView::SelectedClicked);
     objectTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
     objectTable_->setAlternatingRowColors(true);
+    objectTable_->setItemDelegateForColumn(
+        1, new ObjectValueDelegate(objectTable_));
     objectTable_->verticalHeader()->setVisible(false);
     objectTable_->horizontalHeader()->setSectionResizeMode(
         0, QHeaderView::ResizeToContents);
@@ -752,17 +851,51 @@ void MainWindow::displayObjectDetails(
     bool hasEditableAttributes = false;
     for (qsizetype row = 0; row < details.attributes.size(); ++row) {
         const repo::ObjectAttribute& attribute = details.attributes.at(row);
-        auto* nameItem = readOnlyItem(attribute.displayName);
+        const QString fieldLabel =
+            attribute.unit.isEmpty()
+                ? attribute.displayName
+                : QStringLiteral("%1, %2")
+                      .arg(attribute.displayName, attribute.unit);
+        auto* nameItem = readOnlyItem(fieldLabel);
         nameItem->setToolTip(
-            QStringLiteral("%1\nТип: %2")
-                .arg(attribute.name, attribute.dataType));
-        auto* valueItem = new QTableWidgetItem(
-            attribute.isNull ? QStringLiteral("NULL") : attribute.value);
+            QStringLiteral("%1\nТип: %2%3")
+                .arg(
+                    attribute.name,
+                    attribute.dataType,
+                    attribute.groupName.isEmpty()
+                        ? QString()
+                        : QStringLiteral("\nГруппа: %1")
+                              .arg(attribute.groupName)));
+        QString displayValue =
+            attribute.isNull ? QStringLiteral("NULL") : attribute.value;
+        if (!attribute.isNull
+            && attribute.editorKind == QStringLiteral("lookup")) {
+            for (const repo::ObjectFieldOption& option : attribute.options) {
+                if (option.value == attribute.value) {
+                    displayValue = option.label;
+                    break;
+                }
+            }
+        }
+        auto* valueItem = new QTableWidgetItem(displayValue);
+        QStringList optionValues;
+        QStringList optionLabels;
+        optionValues.reserve(attribute.options.size());
+        optionLabels.reserve(attribute.options.size());
+        for (const repo::ObjectFieldOption& option : attribute.options) {
+            optionValues.append(option.value);
+            optionLabels.append(option.label);
+        }
         valueItem->setData(AttributeNameRole, attribute.name);
         valueItem->setData(DatabaseTypeRole, attribute.databaseType);
         valueItem->setData(OriginalValueRole, attribute.value);
         valueItem->setData(OriginalNullRole, attribute.isNull);
         valueItem->setData(EditableRole, attribute.editable);
+        valueItem->setData(EditorKindRole, attribute.editorKind);
+        valueItem->setData(OptionValuesRole, optionValues);
+        valueItem->setData(OptionLabelsRole, optionLabels);
+        valueItem->setData(CurrentValueRole, attribute.value);
+        valueItem->setData(CurrentNullRole, attribute.isNull);
         if (!attribute.editable || details.archived) {
             valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
         } else {
@@ -814,8 +947,19 @@ void MainWindow::saveObjectDetails()
             valueItem->data(OriginalNullRole).toBool();
         const QString originalValue =
             valueItem->data(OriginalValueRole).toString();
-        const QString value = valueItem->text();
-        if ((originalNull && value == QStringLiteral("NULL"))
+        const QString editorKind =
+            valueItem->data(EditorKindRole).toString();
+        const bool currentNull =
+            editorKind == QStringLiteral("lookup")
+                || editorKind == QStringLiteral("boolean")
+                ? valueItem->data(CurrentNullRole).toBool()
+                : valueItem->text() == QStringLiteral("NULL");
+        const QString value =
+            editorKind == QStringLiteral("lookup")
+                || editorKind == QStringLiteral("boolean")
+                ? valueItem->data(CurrentValueRole).toString()
+                : valueItem->text();
+        if ((originalNull && currentNull)
             || (!originalNull && value == originalValue)) {
             continue;
         }
@@ -825,7 +969,7 @@ void MainWindow::saveObjectDetails()
         change.databaseType =
             valueItem->data(DatabaseTypeRole).toString();
         change.value = value;
-        change.setNull = value == QStringLiteral("NULL");
+        change.setNull = currentNull;
         changes.append(std::move(change));
     }
 

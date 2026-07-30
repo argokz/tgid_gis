@@ -113,10 +113,11 @@ SchemaStatus DatabaseConnection::inspectSchema() const
             "       to_regclass('meta.layer_catalog') IS NOT NULL,"
             "       to_regclass('net.node_reg') IS NOT NULL,"
             "       to_regclass('net.line_reg') IS NOT NULL,"
-            "       to_regclass('net.v_map_nodes') IS NOT NULL,"
-            "       to_regclass('net.v_map_lines') IS NOT NULL,"
-            "       to_regclass('meta.object_change_log') IS NOT NULL,"
-            "       EXISTS (SELECT 1 FROM public.spatial_ref_sys"
+             "       to_regclass('net.v_map_nodes') IS NOT NULL,"
+             "       to_regclass('net.v_map_lines') IS NOT NULL,"
+             "       to_regclass('meta.object_change_log') IS NOT NULL,"
+             "       to_regclass('meta.field_catalog') IS NOT NULL,"
+             "       EXISTS (SELECT 1 FROM public.spatial_ref_sys"
             "               WHERE srid = 9998),"
             "       EXISTS (SELECT 1 FROM information_schema.columns"
             "               WHERE table_schema = 'net'"
@@ -153,10 +154,11 @@ SchemaStatus DatabaseConnection::inspectSchema() const
         QStringLiteral("meta.layer_catalog"),
         QStringLiteral("net.node_reg"),
         QStringLiteral("net.line_reg"),
-        QStringLiteral("net.v_map_nodes"),
-        QStringLiteral("net.v_map_lines"),
-        QStringLiteral("meta.object_change_log"),
-        QStringLiteral("SRID 9998"),
+         QStringLiteral("net.v_map_nodes"),
+         QStringLiteral("net.v_map_lines"),
+         QStringLiteral("meta.object_change_log"),
+         QStringLiteral("meta.field_catalog"),
+         QStringLiteral("SRID 9998"),
         QStringLiteral("net.*.row_version"),
         QStringLiteral("net.*.object_insert_log"),
         QStringLiteral("net.*.line_topology"),

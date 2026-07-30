@@ -176,11 +176,24 @@ int main(int argc, char* argv[])
                     << details.error;
                 return 8;
             }
+            qsizetype lookupFields = 0;
+            qsizetype lookupOptions = 0;
+            for (const tgid::repo::ObjectAttribute& attribute
+                 : details.attributes) {
+                if (attribute.editorKind == QStringLiteral("lookup")) {
+                    ++lookupFields;
+                    lookupOptions += attribute.options.size();
+                }
+            }
             qInfo().noquote()
-                << QStringLiteral("OK: объект=%1:%2 атрибутов=%3")
+                << QStringLiteral(
+                       "OK: объект=%1:%2 атрибутов=%3 "
+                       "справочных_полей=%4 вариантов=%5")
                        .arg(details.classTable)
                        .arg(details.id)
-                       .arg(details.attributes.size());
+                       .arg(details.attributes.size())
+                       .arg(lookupFields)
+                       .arg(lookupOptions);
         }
 
         if (parser.isSet(setObjectOption)) {

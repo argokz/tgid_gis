@@ -7,12 +7,21 @@
 
 namespace tgid::repo {
 
+struct ObjectFieldOption final {
+    QString value;
+    QString label;
+};
+
 struct ObjectAttribute final {
     QString name;
     QString displayName;
     QString dataType;
     QString databaseType;
     QString value;
+    QString unit;
+    QString groupName;
+    QString editorKind;
+    QList<ObjectFieldOption> options;
     bool isNull = false;
     bool editable = false;
 };

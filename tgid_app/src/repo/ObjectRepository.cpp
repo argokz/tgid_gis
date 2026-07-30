@@ -118,6 +118,63 @@ QString jsonValueToString(const QJsonValue& value)
         QJsonDocument(value.toObject()).toJson(QJsonDocument::Compact));
 }
 
+QList<ObjectFieldOption> loadLookupOptions(
+    const QSqlDatabase& database,
+    const QString& schemaName,
+    const QString& tableName,
+    const QString& valueColumn,
+    const QString& labelColumn,
+    QString* error)
+{
+    QList<ObjectFieldOption> result;
+    if (!safeIdentifier().match(schemaName).hasMatch()
+        || !safeIdentifier().match(tableName).hasMatch()
+        || !safeIdentifier().match(valueColumn).hasMatch()
+        || !safeIdentifier().match(labelColumn).hasMatch()) {
+        if (error != nullptr) {
+            *error = QStringLiteral("Недопустимые метаданные справочника");
+        }
+        return result;
+    }
+
+    const QSqlDriver* driver = database.driver();
+    const QString escapedSchema =
+        driver->escapeIdentifier(schemaName, QSqlDriver::TableName);
+    const QString escapedTable =
+        driver->escapeIdentifier(tableName, QSqlDriver::TableName);
+    const QString escapedValue =
+        driver->escapeIdentifier(valueColumn, QSqlDriver::FieldName);
+    const QString escapedLabel =
+        driver->escapeIdentifier(labelColumn, QSqlDriver::FieldName);
+
+    QSqlQuery query(database);
+    if (!query.exec(
+            QStringLiteral(
+                "SELECT %1::text AS option_value,"
+                "       coalesce(%2::text, %1::text) AS option_label"
+                "  FROM %3.%4"
+                " WHERE %1 IS NOT NULL"
+                " ORDER BY option_label, option_value"
+                " LIMIT 2000")
+                .arg(
+                    escapedValue,
+                    escapedLabel,
+                    escapedSchema,
+                    escapedTable))) {
+        if (error != nullptr) {
+            *error = query.lastError().text();
+        }
+        return result;
+    }
+    while (query.next()) {
+        ObjectFieldOption option;
+        option.value = query.value(0).toString();
+        option.label = query.value(1).toString();
+        result.append(std::move(option));
+    }
+    return result;
+}
+
 }  // namespace
 
 ObjectDetails ObjectRepository::load(
@@ -181,7 +238,11 @@ ObjectDetails ObjectRepository::load(
     columnQuery.prepare(QStringLiteral(
         "SELECT a.attname,"
         "       format_type(a.atttypid, a.atttypmod),"
-        "       coalesce(col_description(c.oid, a.attnum), ''),"
+        "       coalesce("
+        "           nullif(fc.display_name, ''),"
+        "           nullif(col_description(c.oid, a.attnum), ''),"
+        "           a.attname"
+        "       ),"
         "       t.typname,"
         "       a.attgenerated = ''"
         "       AND a.attidentity = ''"
@@ -196,17 +257,33 @@ ObjectDetails ObjectRepository::load(
         "           'bool', 'text', 'varchar', 'bpchar', 'date',"
         "           'timestamp', 'timestamptz', 'time', 'timetz', 'uuid',"
         "           'json', 'jsonb'"
-        "       ) AS editable"
+        "       )"
+        "       AND coalesce(fc.is_editable, true) AS editable,"
+        "       coalesce(fc.unit, ''),"
+        "       coalesce("
+        "           fc.editor_kind,"
+        "           CASE WHEN t.typname = 'bool' THEN 'boolean' ELSE 'text' END"
+        "       ),"
+        "       coalesce(fc.lookup_schema, ''),"
+        "       coalesce(fc.lookup_table, ''),"
+        "       coalesce(fc.lookup_value_column, ''),"
+        "       coalesce(fc.lookup_label_column, ''),"
+        "       coalesce(fc.group_name, '')"
         "  FROM pg_class c"
         "  JOIN pg_namespace n ON n.oid = c.relnamespace"
         "  JOIN pg_attribute a ON a.attrelid = c.oid"
         "  JOIN pg_type t ON t.oid = a.atttypid"
+        "  LEFT JOIN meta.field_catalog fc"
+        "    ON fc.table_schema = n.nspname"
+        "   AND fc.table_name = c.relname"
+        "   AND fc.column_name = a.attname"
         " WHERE n.nspname = 'net'"
         "   AND c.relname = :table_name"
         "   AND a.attnum > 0"
         "   AND NOT a.attisdropped"
         "   AND a.attname <> 'geom'"
-        " ORDER BY a.attnum"));
+        "   AND coalesce(fc.is_visible, true)"
+        " ORDER BY coalesce(fc.display_order, 10000 + a.attnum), a.attnum"));
     columnQuery.bindValue(QStringLiteral(":table_name"), classTable);
     if (!columnQuery.exec()) {
         result.error = columnQuery.lastError().text();
@@ -217,11 +294,16 @@ ObjectDetails ObjectRepository::load(
         ObjectAttribute attribute;
         attribute.name = columnQuery.value(0).toString();
         attribute.dataType = columnQuery.value(1).toString();
-        const QString comment = columnQuery.value(2).toString().trimmed();
+        attribute.displayName = columnQuery.value(2).toString().trimmed();
         attribute.databaseType = columnQuery.value(3).toString();
         attribute.editable = columnQuery.value(4).toBool();
-        attribute.displayName =
-            comment.isEmpty() ? attribute.name : comment;
+        attribute.unit = columnQuery.value(5).toString().trimmed();
+        attribute.editorKind = columnQuery.value(6).toString().trimmed();
+        const QString lookupSchema = columnQuery.value(7).toString();
+        const QString lookupTable = columnQuery.value(8).toString();
+        const QString lookupValueColumn = columnQuery.value(9).toString();
+        const QString lookupLabelColumn = columnQuery.value(10).toString();
+        attribute.groupName = columnQuery.value(11).toString().trimmed();
         const QJsonValue value = values.value(attribute.name);
         attribute.isNull = value.isNull() || value.isUndefined();
         if (attribute.name == QStringLiteral("removed_at")) {
@@ -236,6 +318,22 @@ ObjectDetails ObjectRepository::load(
                     : QStringLiteral("нет");
         } else {
             attribute.value = jsonValueToString(value);
+        }
+        if (attribute.editorKind == QStringLiteral("lookup")) {
+            QString lookupError;
+            attribute.options = loadLookupOptions(
+                database,
+                lookupSchema,
+                lookupTable,
+                lookupValueColumn,
+                lookupLabelColumn,
+                &lookupError);
+            if (!lookupError.isEmpty()) {
+                result.error =
+                    QStringLiteral("Не удалось загрузить справочник для %1: %2")
+                        .arg(attribute.name, lookupError);
+                return result;
+            }
         }
         result.attributes.append(std::move(attribute));
     }
@@ -280,6 +378,10 @@ UpdateResult ObjectRepository::update(
         "  JOIN pg_namespace n ON n.oid = c.relnamespace"
         "  JOIN pg_attribute a ON a.attrelid = c.oid"
         "  JOIN pg_type t ON t.oid = a.atttypid"
+        "  LEFT JOIN meta.field_catalog fc"
+        "    ON fc.table_schema = n.nspname"
+        "   AND fc.table_name = c.relname"
+        "   AND fc.column_name = a.attname"
         " WHERE n.nspname = 'net'"
         "   AND c.relname = :table_name"
         "   AND a.attnum > 0"
@@ -291,7 +393,9 @@ UpdateResult ObjectRepository::update(
         "       'node_from_src', 'node_to_src', 'fileid_src', 'src_id',"
         "       'removed_at', 'row_version', 'updated_at', 'updated_by',"
         "       'coords_legacy', 'geom'"
-        "   )"));
+        "   )"
+        "   AND coalesce(fc.is_visible, true)"
+        "   AND coalesce(fc.is_editable, true)"));
     metadataQuery.bindValue(QStringLiteral(":table_name"), classTable);
     if (!metadataQuery.exec()) {
         result.error = metadataQuery.lastError().text();
