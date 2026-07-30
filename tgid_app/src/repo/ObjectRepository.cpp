@@ -154,8 +154,7 @@ QList<ObjectFieldOption> loadLookupOptions(
                 "       coalesce(%2::text, %1::text) AS option_label"
                 "  FROM %3.%4"
                 " WHERE %1 IS NOT NULL"
-                " ORDER BY option_label, option_value"
-                " LIMIT 2000")
+                " ORDER BY option_label, option_value")
                 .arg(
                     escapedValue,
                     escapedLabel,

@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS meta.field_catalog (
 );
 
 COMMENT ON TABLE meta.field_catalog IS
-    'Подписи, порядок и редакторы полей объектных карточек Qt/QGIS';
+    'Подписи, порядок и редакторы полей объектных карточек Qt';
 
 CREATE INDEX IF NOT EXISTS field_catalog_order_idx
     ON meta.field_catalog (table_schema, table_name, display_order, column_name);
@@ -117,7 +117,16 @@ JOIN information_schema.columns column_info
   ON column_info.table_schema = layer.schema_name
  AND column_info.table_name = layer.table_name
  AND column_info.column_name = specs.column_name
-ON CONFLICT (table_schema, table_name, column_name) DO NOTHING;
+ON CONFLICT (table_schema, table_name, column_name) DO UPDATE
+SET display_name = EXCLUDED.display_name,
+    unit = EXCLUDED.unit,
+    editor_kind = EXCLUDED.editor_kind,
+    lookup_schema = EXCLUDED.lookup_schema,
+    lookup_table = EXCLUDED.lookup_table,
+    lookup_value_column = EXCLUDED.lookup_value_column,
+    lookup_label_column = EXCLUDED.lookup_label_column,
+    display_order = EXCLUDED.display_order,
+    group_name = EXCLUDED.group_name;
 
 INSERT INTO meta.schema_version (version, description)
 VALUES (7, 'Метаданные карточек и справочные редакторы Qt')
