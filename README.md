@@ -39,6 +39,8 @@
 | 21 | Регрессия гидравлического расчёта (sety) | **structural_ok** на фр. 2 и 1; фикс `regulator_press` — [09](docs/09-calc-regression-results.md) |
 | 22 | Разбор спорных потребителей глазами | очередь — [07](docs/07-duplicates-next.md) |
 | 23 | Новый Qt-клиент: карта, карточка и безопасное редактирование | готово — [tgid_app](tgid_app) |
+| 24–26 | История, архив, создание объектов и топология Qt/QGIS | готово |
+| 27 | Реестр функций и SQL старого ТГИД | готово — [12](docs/12-legacy-function-inventory.md) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -47,8 +49,18 @@
    [spornye_obekty.sql](sql/queries/spornye_obekty.sql).
 2. **Фрагменты без строки в `fragments`** (80, 91, …) — завести id или не считать рабочими.
 3. **Сходимость на фр. 1** — крупные Δ температур у виртуальных узлов; не structural.
-4. **WIP к коммиту** (не закоммичено): subtype `UNION ALL` / converter / calc tools / docs 07–10.
-5. Тонкая карта в C++ — по желанию.
+4. **Функциональная матрица** — утвердить обязательные команды из
+   [инвентаризации](docs/12-legacy-function-inventory.md).
+5. **Чистый расчётный контур** — схема `calc`, запись результатов без
+   legacy-таблиц `public.*_out` и запуск из нового Qt-клиента.
+
+Инвентаризация старого интерфейса и SQL воспроизводится командой:
+
+```bash
+python tools/inventory_legacy.py
+```
+
+Полный машинный реестр: [legacy_inventory.json](docs/schema/legacy_inventory.json).
 
 ## Новая БД и запуск приложения на ней
 
