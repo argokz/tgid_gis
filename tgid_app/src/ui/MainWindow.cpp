@@ -1,0 +1,1123 @@
+#include "ui/MainWindow.h"
+
+#include "ui/MapView.h"
+
+#include <QAbstractItemView>
+#include <QApplication>
+#include <QComboBox>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QDockWidget>
+#include <QHash>
+#include <QHeaderView>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSplitter>
+#include <QStatusBar>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QTimer>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QtConcurrentRun>
+
+#include <utility>
+
+namespace tgid::ui {
+namespace {
+
+enum ObjectItemRole {
+    AttributeNameRole = Qt::UserRole,
+    DatabaseTypeRole,
+    OriginalValueRole,
+    OriginalNullRole,
+    EditableRole,
+};
+
+QTableWidgetItem* readOnlyItem(const QString& text)
+{
+    auto* item = new QTableWidgetItem(text);
+    item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+    return item;
+}
+
+}  // namespace
+
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent)
+    , config_(db::DatabaseConfig::fromEnvironment())
+{
+    buildInterface();
+    mapWatcher_ = new QFutureWatcher<repo::MapData>(this);
+    connect(mapWatcher_, &QFutureWatcher<repo::MapData>::finished,
+            this, &MainWindow::finishMapLoad);
+    QTimer::singleShot(0, this, &MainWindow::connectAndRefresh);
+}
+
+void MainWindow::buildInterface()
+{
+    setWindowTitle(QStringLiteral("ТГИД — объектная GIS-БД"));
+    resize(1280, 780);
+
+    auto* centralWidget = new QWidget(this);
+    auto* layout = new QVBoxLayout(centralWidget);
+
+    auto* title = new QLabel(
+        QStringLiteral("<h2>ТГИД</h2>"
+                       "<p>Новый клиент для схем net / ref / meta</p>"),
+        centralWidget);
+    layout->addWidget(title);
+
+    connectionLabel_ = new QLabel(
+        QStringLiteral("Подключение: %1").arg(config_.displayName()),
+        centralWidget);
+    connectionLabel_->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    layout->addWidget(connectionLabel_);
+
+    statusLabel_ = new QLabel(QStringLiteral("Проверка БД…"), centralWidget);
+    statusLabel_->setWordWrap(true);
+    layout->addWidget(statusLabel_);
+
+    refreshButton_ =
+        new QPushButton(QStringLiteral("Подключиться / обновить"), centralWidget);
+    connect(refreshButton_, &QPushButton::clicked,
+            this, &MainWindow::connectAndRefresh);
+    layout->addWidget(refreshButton_, 0, Qt::AlignLeft);
+
+    auto* tabs = new QTabWidget(centralWidget);
+
+    auto* mapTab = new QWidget(tabs);
+    auto* mapTabLayout = new QVBoxLayout(mapTab);
+    mapTabLayout->setContentsMargins(0, 0, 0, 0);
+    auto* splitter = new QSplitter(Qt::Horizontal, mapTab);
+
+    auto* fragmentPanel = new QWidget(splitter);
+    auto* fragmentLayout = new QVBoxLayout(fragmentPanel);
+    fragmentLayout->setContentsMargins(8, 8, 8, 8);
+    fragmentLayout->addWidget(
+        new QLabel(QStringLiteral("<b>Фрагменты сети</b>"), fragmentPanel));
+    fragmentTree_ = new QTreeWidget(fragmentPanel);
+    fragmentTree_->setHeaderHidden(true);
+    fragmentTree_->setMinimumWidth(250);
+    fragmentTree_->setUniformRowHeights(true);
+    fragmentTree_->setSelectionMode(QAbstractItemView::SingleSelection);
+    connect(fragmentTree_, &QTreeWidget::itemSelectionChanged,
+            this, &MainWindow::loadSelectedFragment);
+    fragmentLayout->addWidget(fragmentTree_, 1);
+    splitter->addWidget(fragmentPanel);
+
+    auto* mapPanel = new QWidget(splitter);
+    auto* mapLayout = new QVBoxLayout(mapPanel);
+    mapLayout->setContentsMargins(8, 8, 8, 8);
+    auto* mapToolbar = new QHBoxLayout();
+    mapStatusLabel_ =
+        new QLabel(QStringLiteral("Фрагмент не выбран"), mapPanel);
+    mapToolbar->addWidget(mapStatusLabel_, 1);
+    pointClassCombo_ = new QComboBox(mapPanel);
+    pointClassCombo_->setMinimumWidth(145);
+    pointClassCombo_->setToolTip(QStringLiteral("Класс нового узла"));
+    pointClassCombo_->setEnabled(false);
+    mapToolbar->addWidget(pointClassCombo_);
+    createPointButton_ =
+        new QPushButton(QStringLiteral("Создать точку"), mapPanel);
+    createPointButton_->setCheckable(true);
+    createPointButton_->setEnabled(false);
+    connect(createPointButton_, &QPushButton::toggled,
+            this, &MainWindow::togglePointCreation);
+    mapToolbar->addWidget(createPointButton_);
+    lineClassCombo_ = new QComboBox(mapPanel);
+    lineClassCombo_->setMinimumWidth(145);
+    lineClassCombo_->setToolTip(QStringLiteral("Класс новой линии"));
+    lineClassCombo_->setEnabled(false);
+    mapToolbar->addWidget(lineClassCombo_);
+    createLineButton_ =
+        new QPushButton(QStringLiteral("Создать линию"), mapPanel);
+    createLineButton_->setCheckable(true);
+    createLineButton_->setEnabled(false);
+    connect(createLineButton_, &QPushButton::toggled,
+            this, &MainWindow::toggleLineCreation);
+    mapToolbar->addWidget(createLineButton_);
+    fitMapButton_ = new QPushButton(QStringLiteral("Показать целиком"), mapPanel);
+    fitMapButton_->setEnabled(false);
+    mapToolbar->addWidget(fitMapButton_);
+    mapLayout->addLayout(mapToolbar);
+    mapView_ = new MapView(mapPanel);
+    connect(fitMapButton_, &QPushButton::clicked,
+            mapView_, &MapView::fitToData);
+    connect(mapView_, &MapView::objectSelected,
+            this, &MainWindow::showObjectDetails);
+    connect(mapView_, &MapView::objectSelectionCleared,
+            this, &MainWindow::clearObjectDetails);
+    connect(mapView_, &MapView::pointPlacementRequested,
+            this, &MainWindow::createPointAt);
+    connect(mapView_, &MapView::lineStartSelected,
+            this, &MainWindow::showLineStart);
+    connect(mapView_, &MapView::linePlacementRequested,
+            this, &MainWindow::createLineBetween);
+    connect(mapView_, &MapView::lineEndpointMissed, this, [this]() {
+        statusBar()->showMessage(
+            QStringLiteral(
+                "Выберите другой узел: щелчок должен попадать по точке"));
+    });
+    mapLayout->addWidget(mapView_, 1);
+    splitter->addWidget(mapPanel);
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
+    splitter->setSizes({280, 920});
+    mapTabLayout->addWidget(splitter);
+    tabs->addTab(mapTab, QStringLiteral("Карта"));
+
+    auto* catalogTab = new QWidget(tabs);
+    auto* catalogLayout = new QVBoxLayout(catalogTab);
+    layerTable_ = new QTableWidget(catalogTab);
+    layerTable_->setColumnCount(7);
+    layerTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Название"),
+        QStringLiteral("Схема"),
+        QStringLiteral("Таблица"),
+        QStringLiteral("Геометрия"),
+        QStringLiteral("SRID"),
+        QStringLiteral("Редактирование"),
+        QStringLiteral("Тип"),
+    });
+    layerTable_->setAlternatingRowColors(true);
+    layerTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    layerTable_->setSelectionMode(QAbstractItemView::SingleSelection);
+    layerTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    layerTable_->horizontalHeader()->setStretchLastSection(true);
+    layerTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    catalogLayout->addWidget(layerTable_, 1);
+    tabs->addTab(catalogTab, QStringLiteral("GIS-слои"));
+
+    auto* archiveTab = new QWidget(tabs);
+    auto* archiveLayout = new QVBoxLayout(archiveTab);
+    auto* archiveToolbar = new QHBoxLayout();
+    archiveToolbar->addWidget(
+        new QLabel(
+            QStringLiteral(
+                "Дважды щёлкните объект, чтобы открыть карточку"),
+            archiveTab),
+        1);
+    refreshArchiveButton_ =
+        new QPushButton(QStringLiteral("Обновить архив"), archiveTab);
+    connect(refreshArchiveButton_, &QPushButton::clicked,
+            this, &MainWindow::refreshArchive);
+    archiveToolbar->addWidget(refreshArchiveButton_);
+    archiveLayout->addLayout(archiveToolbar);
+    archiveTable_ = new QTableWidget(archiveTab);
+    archiveTable_->setColumnCount(5);
+    archiveTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Тип"),
+        QStringLiteral("ID"),
+        QStringLiteral("Фрагмент"),
+        QStringLiteral("Название"),
+        QStringLiteral("В архиве с"),
+    });
+    archiveTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    archiveTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    archiveTable_->setSelectionMode(QAbstractItemView::SingleSelection);
+    archiveTable_->setAlternatingRowColors(true);
+    archiveTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    archiveTable_->horizontalHeader()->setStretchLastSection(true);
+    connect(archiveTable_, &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openArchivedObject);
+    archiveLayout->addWidget(archiveTable_, 1);
+    tabs->addTab(archiveTab, QStringLiteral("Архив"));
+    layout->addWidget(tabs, 1);
+
+    setCentralWidget(centralWidget);
+
+    objectDock_ = new QDockWidget(QStringLiteral("Карточка объекта"), this);
+    objectDock_->setAllowedAreas(
+        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    objectDock_->setMinimumWidth(330);
+    auto* objectPanel = new QWidget(objectDock_);
+    auto* objectLayout = new QVBoxLayout(objectPanel);
+    objectTitleLabel_ =
+        new QLabel(QStringLiteral("Выберите объект на карте"), objectPanel);
+    objectTitleLabel_->setWordWrap(true);
+    objectLayout->addWidget(objectTitleLabel_);
+    objectTable_ = new QTableWidget(objectPanel);
+    objectTable_->setColumnCount(2);
+    objectTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Поле"),
+        QStringLiteral("Значение"),
+    });
+    objectTable_->setEditTriggers(
+        QAbstractItemView::DoubleClicked
+        | QAbstractItemView::EditKeyPressed
+        | QAbstractItemView::SelectedClicked);
+    objectTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    objectTable_->setAlternatingRowColors(true);
+    objectTable_->verticalHeader()->setVisible(false);
+    objectTable_->horizontalHeader()->setSectionResizeMode(
+        0, QHeaderView::ResizeToContents);
+    objectTable_->horizontalHeader()->setStretchLastSection(true);
+    objectLayout->addWidget(objectTable_, 1);
+    auto* objectButtons = new QHBoxLayout();
+    reloadObjectButton_ =
+        new QPushButton(QStringLiteral("Перезагрузить"), objectPanel);
+    reloadObjectButton_->setEnabled(false);
+    connect(reloadObjectButton_, &QPushButton::clicked,
+            this, &MainWindow::reloadObjectDetails);
+    objectButtons->addWidget(reloadObjectButton_);
+    saveObjectButton_ =
+        new QPushButton(QStringLiteral("Сохранить"), objectPanel);
+    saveObjectButton_->setEnabled(false);
+    connect(saveObjectButton_, &QPushButton::clicked,
+            this, &MainWindow::saveObjectDetails);
+    objectButtons->addWidget(saveObjectButton_);
+    objectLayout->addLayout(objectButtons);
+    auto* lifecycleButtons = new QHBoxLayout();
+    historyObjectButton_ =
+        new QPushButton(QStringLiteral("История"), objectPanel);
+    historyObjectButton_->setEnabled(false);
+    connect(historyObjectButton_, &QPushButton::clicked,
+            this, &MainWindow::showObjectHistory);
+    lifecycleButtons->addWidget(historyObjectButton_);
+    archiveObjectButton_ =
+        new QPushButton(QStringLiteral("В архив"), objectPanel);
+    archiveObjectButton_->setEnabled(false);
+    connect(archiveObjectButton_, &QPushButton::clicked,
+            this, &MainWindow::toggleObjectArchive);
+    lifecycleButtons->addWidget(archiveObjectButton_);
+    objectLayout->addLayout(lifecycleButtons);
+    objectDock_->setWidget(objectPanel);
+    addDockWidget(Qt::RightDockWidgetArea, objectDock_);
+
+    statusBar()->showMessage(QStringLiteral("Готово к подключению"));
+}
+
+void MainWindow::connectAndRefresh()
+{
+    refreshButton_->setEnabled(false);
+    statusLabel_->setStyleSheet({});
+    statusLabel_->setText(QStringLiteral("Подключение и проверка схемы…"));
+    QApplication::processEvents();
+
+    QString error;
+    if (!connection_.open(config_, &error)) {
+        showError(error);
+        return;
+    }
+
+    const db::SchemaStatus schemaStatus = connection_.inspectSchema();
+    if (!schemaStatus.valid) {
+        showError(schemaStatus.error);
+        return;
+    }
+
+    const QList<repo::LayerInfo> layers =
+        layerRepository_.load(connection_.database(), &error);
+    if (!error.isEmpty()) {
+        showError(error);
+        return;
+    }
+
+    const QList<repo::FragmentInfo> fragments =
+        fragmentRepository_.loadActive(connection_.database(), &error);
+    if (!error.isEmpty()) {
+        showError(error);
+        return;
+    }
+
+    showLayers(layers, schemaStatus);
+    populatePointClasses(layers);
+    populateLineClasses(layers);
+    populateFragments(fragments);
+    refreshArchive();
+    statusLabel_->setText(
+        statusLabel_->text()
+        + QStringLiteral(" Фрагментов: %1.").arg(fragments.size()));
+}
+
+void MainWindow::showError(const QString& message)
+{
+    fragmentTree_->clear();
+    layerTable_->setRowCount(0);
+    archiveTable_->setRowCount(0);
+    mapView_->clearMap();
+    clearObjectDetails();
+    mapStatusLabel_->setText(QStringLiteral("Карта недоступна"));
+    fitMapButton_->setEnabled(false);
+    createPointButton_->setChecked(false);
+    createPointButton_->setEnabled(false);
+    pointClassCombo_->clear();
+    pointClassCombo_->setEnabled(false);
+    createLineButton_->setChecked(false);
+    createLineButton_->setEnabled(false);
+    lineClassCombo_->clear();
+    lineClassCombo_->setEnabled(false);
+    statusLabel_->setStyleSheet(QStringLiteral("color: #b42318;"));
+    statusLabel_->setText(QStringLiteral("Ошибка: %1").arg(message));
+    statusBar()->showMessage(QStringLiteral("Подключение не выполнено"));
+    refreshButton_->setEnabled(true);
+}
+
+void MainWindow::populateFragments(
+    const QList<repo::FragmentInfo>& fragments)
+{
+    fragmentTree_->clear();
+    QHash<QString, QTreeWidgetItem*> settlementItems;
+
+    for (const repo::FragmentInfo& fragment : fragments) {
+        const QString settlement =
+            fragment.settlement.trimmed().isEmpty()
+                ? QStringLiteral("Без населённого пункта")
+                : fragment.settlement.trimmed();
+        QTreeWidgetItem* settlementItem = settlementItems.value(settlement);
+        if (settlementItem == nullptr) {
+            settlementItem = new QTreeWidgetItem(fragmentTree_, {settlement});
+            settlementItem->setFlags(
+                settlementItem->flags() & ~Qt::ItemIsSelectable);
+            settlementItem->setExpanded(true);
+            settlementItems.insert(settlement, settlementItem);
+        }
+
+        QString title = fragment.name;
+        QStringList details;
+        if (!fragment.season.isEmpty()) {
+            details.append(fragment.season);
+        }
+        if (!fragment.year.isEmpty()) {
+            details.append(fragment.year);
+        }
+        if (!details.isEmpty()) {
+            title += QStringLiteral(" (%1)").arg(details.join(QStringLiteral(", ")));
+        }
+
+        auto* fragmentItem =
+            new QTreeWidgetItem(settlementItem, {title});
+        fragmentItem->setData(0, Qt::UserRole, fragment.id);
+        fragmentItem->setToolTip(
+            0, QStringLiteral("ID: %1\nСистемное имя: %2")
+                   .arg(fragment.id)
+                   .arg(fragment.systemName));
+    }
+
+    mapStatusLabel_->setText(
+        QStringLiteral("Выберите фрагмент слева"));
+}
+
+void MainWindow::populatePointClasses(
+    const QList<repo::LayerInfo>& layers)
+{
+    pointClassCombo_->clear();
+    for (const repo::LayerInfo& layer : layers) {
+        if (layer.schemaName != QStringLiteral("net")
+            || layer.geometryType.toUpper() != QStringLiteral("POINT")
+            || !layer.editable
+            || !layer.supportsFragment) {
+            continue;
+        }
+        pointClassCombo_->addItem(
+            QStringLiteral("%1 (%2)")
+                .arg(layer.displayName, layer.tableName),
+            layer.tableName);
+    }
+    pointClassCombo_->setEnabled(pointClassCombo_->count() > 0);
+}
+
+void MainWindow::populateLineClasses(
+    const QList<repo::LayerInfo>& layers)
+{
+    lineClassCombo_->clear();
+    for (const repo::LayerInfo& layer : layers) {
+        if (layer.schemaName != QStringLiteral("net")
+            || layer.geometryType.toUpper() != QStringLiteral("LINESTRING")
+            || !layer.editable
+            || !layer.supportsFragment) {
+            continue;
+        }
+        lineClassCombo_->addItem(
+            QStringLiteral("%1 (%2)")
+                .arg(layer.displayName, layer.tableName),
+            layer.tableName);
+    }
+    lineClassCombo_->setEnabled(lineClassCombo_->count() > 0);
+}
+
+void MainWindow::loadSelectedFragment()
+{
+    if (mapWatcher_->isRunning()) {
+        return;
+    }
+
+    QTreeWidgetItem* item = fragmentTree_->currentItem();
+    if (item == nullptr) {
+        return;
+    }
+    const QVariant fragmentValue = item->data(0, Qt::UserRole);
+    if (!fragmentValue.isValid()) {
+        return;
+    }
+
+    const int fragmentId = fragmentValue.toInt();
+    if (createPointButton_->isChecked()) {
+        createPointButton_->setChecked(false);
+    }
+    if (createLineButton_->isChecked()) {
+        createLineButton_->setChecked(false);
+    }
+    fragmentTree_->setEnabled(false);
+    refreshButton_->setEnabled(false);
+    fitMapButton_->setEnabled(false);
+    mapStatusLabel_->setText(
+        QStringLiteral("Загрузка фрагмента %1…").arg(fragmentId));
+    statusBar()->showMessage(QStringLiteral("Загрузка геометрии"));
+    mapLoadTimer_.restart();
+
+    const db::DatabaseConfig config = config_;
+    mapWatcher_->setFuture(QtConcurrent::run([config, fragmentId]() {
+        return repo::MapRepository().loadFragment(config, fragmentId);
+    }));
+}
+
+void MainWindow::finishMapLoad()
+{
+    fragmentTree_->setEnabled(true);
+    refreshButton_->setEnabled(true);
+
+    const bool preserveObject = preserveObjectAfterMapLoad_;
+    preserveObjectAfterMapLoad_ = false;
+    repo::MapData mapData = mapWatcher_->result();
+    if (!mapData.isValid()) {
+        mapView_->clearMap();
+        mapStatusLabel_->setText(
+            QStringLiteral("Ошибка загрузки: %1").arg(mapData.error));
+        statusBar()->showMessage(QStringLiteral("Фрагмент не загружен"));
+        return;
+    }
+
+    const qsizetype nodeCount = mapData.nodes.size();
+    const qsizetype lineCount = mapData.lines.size();
+    const int fragmentId = mapData.fragmentId;
+    mapView_->setMapData(std::move(mapData));
+    if (!preserveObject) {
+        clearObjectDetails();
+    }
+    fitMapButton_->setEnabled(nodeCount > 0 || lineCount > 0);
+    createPointButton_->setEnabled(
+        (nodeCount > 0 || lineCount > 0)
+        && pointClassCombo_->count() > 0);
+    pointClassCombo_->setEnabled(pointClassCombo_->count() > 0);
+    createLineButton_->setEnabled(
+        nodeCount >= 2 && lineClassCombo_->count() > 0);
+    lineClassCombo_->setEnabled(lineClassCombo_->count() > 0);
+    mapStatusLabel_->setText(
+        QStringLiteral("Фрагмент %1: %2 узлов, %3 линий, %4 мс")
+            .arg(fragmentId)
+            .arg(nodeCount)
+            .arg(lineCount)
+            .arg(mapLoadTimer_.elapsed()));
+    statusBar()->showMessage(QStringLiteral("Фрагмент загружен"));
+    if (pendingObjectId_ != 0) {
+        const qint64 objectId = pendingObjectId_;
+        const QString classTable = pendingObjectClassTable_;
+        pendingObjectId_ = 0;
+        pendingObjectClassTable_.clear();
+        const bool isNode = pendingObjectIsNode_;
+        pendingObjectIsNode_ = false;
+        showObjectDetails(objectId, classTable, isNode);
+        statusBar()->showMessage(
+            QStringLiteral("Создан объект %1 #%2")
+                .arg(classTable)
+                .arg(objectId));
+    }
+}
+
+void MainWindow::togglePointCreation(bool enabled)
+{
+    if (enabled) {
+        if (createLineButton_->isChecked()) {
+            createLineButton_->setChecked(false);
+        }
+        QTreeWidgetItem* item = fragmentTree_->currentItem();
+        if (item == nullptr
+            || !item->data(0, Qt::UserRole).isValid()
+            || pointClassCombo_->currentData().toString().isEmpty()) {
+            createPointButton_->setChecked(false);
+            return;
+        }
+    }
+
+    mapView_->setPointCreationMode(enabled);
+    createPointButton_->setText(
+        enabled ? QStringLiteral("Отмена")
+                : QStringLiteral("Создать точку"));
+    pointClassCombo_->setEnabled(
+        !enabled && pointClassCombo_->count() > 0);
+    lineClassCombo_->setEnabled(
+        !enabled && !createLineButton_->isChecked()
+        && lineClassCombo_->count() > 0);
+    fragmentTree_->setEnabled(!enabled && !mapWatcher_->isRunning());
+    statusBar()->showMessage(
+        enabled
+            ? QStringLiteral("Укажите положение нового объекта на карте")
+            : QStringLiteral("Режим создания выключен"));
+}
+
+void MainWindow::createPointAt(QPointF position)
+{
+    QTreeWidgetItem* item = fragmentTree_->currentItem();
+    const QString classTable = pointClassCombo_->currentData().toString();
+    if (item == nullptr || classTable.isEmpty()) {
+        return;
+    }
+    const QVariant fragmentValue = item->data(0, Qt::UserRole);
+    if (!fragmentValue.isValid()) {
+        return;
+    }
+    const int fragmentId = fragmentValue.toInt();
+    if (QMessageBox::question(
+            this,
+            QStringLiteral("Создание объекта"),
+            QStringLiteral(
+                "Создать %1 во фрагменте %2?\nX = %3\nY = %4")
+                .arg(classTable)
+                .arg(fragmentId)
+                .arg(position.x(), 0, 'f', 3)
+                .arg(position.y(), 0, 'f', 3))
+        != QMessageBox::Yes) {
+        return;
+    }
+
+    createPointButton_->setChecked(false);
+    createPointButton_->setEnabled(false);
+    const repo::CreateObjectResult result =
+        objectRepository_.createPoint(
+            connection_.database(),
+            classTable,
+            fragmentId,
+            position);
+    if (!result.success) {
+        createPointButton_->setEnabled(true);
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка создания"), result.error);
+        return;
+    }
+
+    pendingObjectId_ = result.id;
+    pendingObjectClassTable_ = classTable;
+    pendingObjectIsNode_ = true;
+    loadSelectedFragment();
+}
+
+void MainWindow::toggleLineCreation(bool enabled)
+{
+    if (enabled) {
+        if (createPointButton_->isChecked()) {
+            createPointButton_->setChecked(false);
+        }
+        QTreeWidgetItem* item = fragmentTree_->currentItem();
+        if (item == nullptr
+            || !item->data(0, Qt::UserRole).isValid()
+            || lineClassCombo_->currentData().toString().isEmpty()) {
+            createLineButton_->setChecked(false);
+            return;
+        }
+    }
+
+    mapView_->setLineCreationMode(enabled);
+    createLineButton_->setText(
+        enabled ? QStringLiteral("Отмена")
+                : QStringLiteral("Создать линию"));
+    lineClassCombo_->setEnabled(
+        !enabled && lineClassCombo_->count() > 0);
+    pointClassCombo_->setEnabled(
+        !enabled && !createPointButton_->isChecked()
+        && pointClassCombo_->count() > 0);
+    fragmentTree_->setEnabled(!enabled && !mapWatcher_->isRunning());
+    statusBar()->showMessage(
+        enabled
+            ? QStringLiteral("Выберите начальный узел новой линии")
+            : QStringLiteral("Режим создания линии выключен"));
+}
+
+void MainWindow::showLineStart(qint64 nodeId)
+{
+    statusBar()->showMessage(
+        QStringLiteral(
+            "Начальный узел #%1 выбран. Выберите конечный узел.")
+            .arg(nodeId));
+}
+
+void MainWindow::createLineBetween(qint64 nodeFrom, qint64 nodeTo)
+{
+    QTreeWidgetItem* item = fragmentTree_->currentItem();
+    const QString classTable = lineClassCombo_->currentData().toString();
+    if (item == nullptr || classTable.isEmpty()) {
+        return;
+    }
+    const QVariant fragmentValue = item->data(0, Qt::UserRole);
+    if (!fragmentValue.isValid()) {
+        return;
+    }
+    const int fragmentId = fragmentValue.toInt();
+    if (QMessageBox::question(
+            this,
+            QStringLiteral("Создание линии"),
+            QStringLiteral(
+                "Создать %1 во фрагменте %2?\n"
+                "Начальный узел: #%3\nКонечный узел: #%4")
+                .arg(classTable)
+                .arg(fragmentId)
+                .arg(nodeFrom)
+                .arg(nodeTo))
+        != QMessageBox::Yes) {
+        statusBar()->showMessage(
+            QStringLiteral("Выберите начальный узел новой линии"));
+        return;
+    }
+
+    createLineButton_->setChecked(false);
+    createLineButton_->setEnabled(false);
+    const repo::CreateObjectResult result =
+        objectRepository_.createLine(
+            connection_.database(),
+            classTable,
+            fragmentId,
+            nodeFrom,
+            nodeTo);
+    if (!result.success) {
+        createLineButton_->setEnabled(true);
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка создания линии"), result.error);
+        return;
+    }
+
+    pendingObjectId_ = result.id;
+    pendingObjectClassTable_ = classTable;
+    pendingObjectIsNode_ = false;
+    loadSelectedFragment();
+}
+
+void MainWindow::showObjectDetails(
+    qint64 id,
+    QString classTable,
+    bool isNode)
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+
+    const repo::ObjectDetails details =
+        objectRepository_.load(connection_.database(), classTable, id);
+    if (!details.isValid()) {
+        objectTitleLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        objectTitleLabel_->setText(
+            QStringLiteral("Ошибка карточки: %1").arg(details.error));
+        objectTable_->setRowCount(0);
+        saveObjectButton_->setEnabled(false);
+        reloadObjectButton_->setEnabled(false);
+        archiveObjectButton_->setEnabled(false);
+        historyObjectButton_->setEnabled(false);
+        currentObjectDetails_ = {};
+        return;
+    }
+
+    displayObjectDetails(details, isNode);
+}
+
+void MainWindow::displayObjectDetails(
+    const repo::ObjectDetails& details,
+    bool isNode)
+{
+    currentObjectDetails_ = details;
+    currentObjectIsNode_ = isNode;
+
+    objectTitleLabel_->setStyleSheet({});
+    objectTitleLabel_->setText(
+        QStringLiteral("<b>%1 #%2</b><br>%3 · версия %4%5")
+            .arg(details.classTable)
+            .arg(details.id)
+            .arg(isNode ? QStringLiteral("Узел")
+                        : QStringLiteral("Линейный объект"))
+            .arg(details.rowVersion)
+            .arg(details.archived ? QStringLiteral(" · В АРХИВЕ")
+                                  : QString()));
+    objectTitleLabel_->setStyleSheet(
+        details.archived ? QStringLiteral("color: #b54708;") : QString());
+
+    objectTable_->setSortingEnabled(false);
+    objectTable_->setRowCount(details.attributes.size());
+    bool hasEditableAttributes = false;
+    for (qsizetype row = 0; row < details.attributes.size(); ++row) {
+        const repo::ObjectAttribute& attribute = details.attributes.at(row);
+        auto* nameItem = readOnlyItem(attribute.displayName);
+        nameItem->setToolTip(
+            QStringLiteral("%1\nТип: %2")
+                .arg(attribute.name, attribute.dataType));
+        auto* valueItem = new QTableWidgetItem(
+            attribute.isNull ? QStringLiteral("NULL") : attribute.value);
+        valueItem->setData(AttributeNameRole, attribute.name);
+        valueItem->setData(DatabaseTypeRole, attribute.databaseType);
+        valueItem->setData(OriginalValueRole, attribute.value);
+        valueItem->setData(OriginalNullRole, attribute.isNull);
+        valueItem->setData(EditableRole, attribute.editable);
+        if (!attribute.editable || details.archived) {
+            valueItem->setFlags(valueItem->flags() & ~Qt::ItemIsEditable);
+        } else {
+            hasEditableAttributes = true;
+            valueItem->setToolTip(
+                QStringLiteral(
+                    "Дважды щёлкните для редактирования. "
+                    "Введите NULL, чтобы очистить поле. Тип: %1")
+                    .arg(attribute.dataType));
+        }
+        if (attribute.isNull) {
+            valueItem->setForeground(QColor(QStringLiteral("#94a3b8")));
+        }
+        objectTable_->setItem(row, 0, nameItem);
+        objectTable_->setItem(row, 1, valueItem);
+    }
+    objectTable_->setSortingEnabled(true);
+    saveObjectButton_->setEnabled(hasEditableAttributes);
+    reloadObjectButton_->setEnabled(true);
+    archiveObjectButton_->setEnabled(details.canArchive);
+    archiveObjectButton_->setText(
+        details.archived ? QStringLiteral("Восстановить")
+                         : QStringLiteral("В архив"));
+    historyObjectButton_->setEnabled(true);
+    objectDock_->show();
+    objectDock_->raise();
+    statusBar()->showMessage(
+        QStringLiteral("Выбран %1 #%2")
+            .arg(details.classTable)
+            .arg(details.id));
+}
+
+void MainWindow::saveObjectDetails()
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()) {
+        return;
+    }
+
+    QList<repo::AttributeChange> changes;
+    for (int row = 0; row < objectTable_->rowCount(); ++row) {
+        QTableWidgetItem* valueItem = objectTable_->item(row, 1);
+        if (valueItem == nullptr
+            || !valueItem->data(EditableRole).toBool()) {
+            continue;
+        }
+
+        const bool originalNull =
+            valueItem->data(OriginalNullRole).toBool();
+        const QString originalValue =
+            valueItem->data(OriginalValueRole).toString();
+        const QString value = valueItem->text();
+        if ((originalNull && value == QStringLiteral("NULL"))
+            || (!originalNull && value == originalValue)) {
+            continue;
+        }
+
+        repo::AttributeChange change;
+        change.name = valueItem->data(AttributeNameRole).toString();
+        change.databaseType =
+            valueItem->data(DatabaseTypeRole).toString();
+        change.value = value;
+        change.setNull = value == QStringLiteral("NULL");
+        changes.append(std::move(change));
+    }
+
+    if (changes.isEmpty()) {
+        statusBar()->showMessage(QStringLiteral("Изменений нет"));
+        return;
+    }
+
+    saveObjectButton_->setEnabled(false);
+    const repo::UpdateResult result = objectRepository_.update(
+        connection_.database(),
+        currentObjectDetails_.classTable,
+        currentObjectDetails_.id,
+        currentObjectDetails_.rowVersion,
+        changes);
+
+    if (result.conflict) {
+        reloadObjectDetails();
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Конфликт редактирования"),
+            QStringLiteral(
+                "Объект был изменён другим пользователем. "
+                "Карточка перезагружена; повторите правку на новой версии."));
+        return;
+    }
+    if (!result.success) {
+        saveObjectButton_->setEnabled(true);
+        QMessageBox::critical(
+            this,
+            QStringLiteral("Ошибка сохранения"),
+            result.error);
+        return;
+    }
+
+    reloadObjectDetails();
+    statusBar()->showMessage(
+        QStringLiteral("Изменения сохранены, версия %1")
+            .arg(result.rowVersion));
+}
+
+void MainWindow::reloadObjectDetails()
+{
+    if (currentObjectDetails_.classTable.isEmpty()) {
+        return;
+    }
+    showObjectDetails(
+        currentObjectDetails_.id,
+        currentObjectDetails_.classTable,
+        currentObjectIsNode_);
+}
+
+void MainWindow::toggleObjectArchive()
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()
+        || !currentObjectDetails_.canArchive) {
+        return;
+    }
+
+    const bool archive = !currentObjectDetails_.archived;
+    const QString action =
+        archive ? QStringLiteral("переместить в архив")
+                : QStringLiteral("восстановить");
+    if (QMessageBox::question(
+            this,
+            archive ? QStringLiteral("Архивирование объекта")
+                    : QStringLiteral("Восстановление объекта"),
+            QStringLiteral("Действительно %1 объект %2 #%3?")
+                .arg(action, currentObjectDetails_.classTable)
+                .arg(currentObjectDetails_.id))
+        != QMessageBox::Yes) {
+        return;
+    }
+
+    archiveObjectButton_->setEnabled(false);
+    const repo::UpdateResult result = objectRepository_.setArchived(
+        connection_.database(),
+        currentObjectDetails_.classTable,
+        currentObjectDetails_.id,
+        currentObjectDetails_.rowVersion,
+        archive);
+    if (result.conflict) {
+        reloadObjectDetails();
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Конфликт редактирования"),
+            QStringLiteral(
+                "Состояние объекта уже изменено другим пользователем. "
+                "Карточка перезагружена."));
+        return;
+    }
+    if (!result.success) {
+        archiveObjectButton_->setEnabled(true);
+        QMessageBox::critical(
+            this,
+            QStringLiteral("Ошибка"),
+            result.error);
+        return;
+    }
+
+    reloadObjectDetails();
+    refreshArchive();
+    QTreeWidgetItem* selectedFragment = fragmentTree_->currentItem();
+    if (selectedFragment != nullptr
+        && selectedFragment->data(0, Qt::UserRole).isValid()
+        && !mapWatcher_->isRunning()) {
+        preserveObjectAfterMapLoad_ = true;
+        loadSelectedFragment();
+    }
+    statusBar()->showMessage(
+        archive ? QStringLiteral("Объект перемещён в архив")
+                : QStringLiteral("Объект восстановлен"));
+}
+
+void MainWindow::showObjectHistory()
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()) {
+        return;
+    }
+
+    QString error;
+    const QList<repo::ObjectHistoryEntry> entries =
+        objectRepository_.loadHistory(
+            connection_.database(),
+            currentObjectDetails_.classTable,
+            currentObjectDetails_.id,
+            &error);
+    if (!error.isEmpty()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка истории"), error);
+        return;
+    }
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(
+        QStringLiteral("История %1 #%2")
+            .arg(currentObjectDetails_.classTable)
+            .arg(currentObjectDetails_.id));
+    dialog.resize(980, 440);
+    auto* layout = new QVBoxLayout(&dialog);
+    auto* table = new QTableWidget(&dialog);
+    table->setColumnCount(6);
+    table->setHorizontalHeaderLabels({
+        QStringLiteral("Версия"),
+        QStringLiteral("Операция"),
+        QStringLiteral("Время"),
+        QStringLiteral("Пользователь"),
+        QStringLiteral("Приложение"),
+        QStringLiteral("Изменённые поля"),
+    });
+    table->setRowCount(entries.size());
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setAlternatingRowColors(true);
+    for (qsizetype row = 0; row < entries.size(); ++row) {
+        const repo::ObjectHistoryEntry& entry = entries.at(row);
+        QString operation = entry.operation;
+        if (operation == QStringLiteral("update")) {
+            operation = QStringLiteral("изменение");
+        } else if (operation == QStringLiteral("archive")) {
+            operation = QStringLiteral("архив");
+        } else if (operation == QStringLiteral("restore")) {
+            operation = QStringLiteral("восстановление");
+        }
+        table->setItem(
+            row, 0, readOnlyItem(QString::number(entry.rowVersion)));
+        table->setItem(row, 1, readOnlyItem(operation));
+        table->setItem(row, 2, readOnlyItem(entry.changedAt));
+        table->setItem(row, 3, readOnlyItem(entry.changedBy));
+        table->setItem(row, 4, readOnlyItem(entry.applicationName));
+        table->setItem(row, 5, readOnlyItem(entry.changedFields));
+    }
+    table->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    table->horizontalHeader()->setStretchLastSection(true);
+    layout->addWidget(table);
+    auto* buttons =
+        new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+    connect(buttons, &QDialogButtonBox::rejected,
+            &dialog, &QDialog::reject);
+    layout->addWidget(buttons);
+    dialog.exec();
+}
+
+void MainWindow::refreshArchive()
+{
+    if (!connection_.isOpen()) {
+        archiveTable_->setRowCount(0);
+        return;
+    }
+
+    refreshArchiveButton_->setEnabled(false);
+    QString error;
+    const QList<repo::ArchivedObjectInfo> objects =
+        objectRepository_.loadArchived(connection_.database(), &error);
+    if (!error.isEmpty()) {
+        archiveTable_->setRowCount(0);
+        refreshArchiveButton_->setEnabled(true);
+        statusBar()->showMessage(
+            QStringLiteral("Ошибка архива: %1").arg(error));
+        return;
+    }
+
+    archiveTable_->setSortingEnabled(false);
+    archiveTable_->setRowCount(objects.size());
+    for (qsizetype row = 0; row < objects.size(); ++row) {
+        const repo::ArchivedObjectInfo& object = objects.at(row);
+        auto* classItem = readOnlyItem(object.classTable);
+        classItem->setData(Qt::UserRole, object.id);
+        classItem->setData(Qt::UserRole + 1, object.isNode);
+        archiveTable_->setItem(row, 0, classItem);
+        archiveTable_->setItem(
+            row, 1, readOnlyItem(QString::number(object.id)));
+        archiveTable_->setItem(
+            row, 2,
+            readOnlyItem(
+                object.fragmentId == 0
+                    ? QString()
+                    : QString::number(object.fragmentId)));
+        archiveTable_->setItem(row, 3, readOnlyItem(object.label));
+        archiveTable_->setItem(row, 4, readOnlyItem(object.archivedAt));
+    }
+    archiveTable_->setSortingEnabled(true);
+    refreshArchiveButton_->setEnabled(true);
+}
+
+void MainWindow::openArchivedObject(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = archiveTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    showObjectDetails(
+        item->data(Qt::UserRole).toLongLong(),
+        item->text(),
+        item->data(Qt::UserRole + 1).toBool());
+}
+
+void MainWindow::clearObjectDetails()
+{
+    objectTitleLabel_->setStyleSheet({});
+    objectTitleLabel_->setText(
+        QStringLiteral("Выберите объект на карте"));
+    objectTable_->setRowCount(0);
+    saveObjectButton_->setEnabled(false);
+    reloadObjectButton_->setEnabled(false);
+    archiveObjectButton_->setEnabled(false);
+    historyObjectButton_->setEnabled(false);
+    currentObjectDetails_ = {};
+    currentObjectIsNode_ = false;
+}
+
+void MainWindow::showLayers(
+    const QList<repo::LayerInfo>& layers,
+    const db::SchemaStatus& status)
+{
+    layerTable_->setSortingEnabled(false);
+    layerTable_->setRowCount(layers.size());
+
+    for (qsizetype row = 0; row < layers.size(); ++row) {
+        const repo::LayerInfo& layer = layers.at(row);
+        layerTable_->setItem(
+            row, 0, readOnlyItem(layer.displayName));
+        layerTable_->setItem(
+            row, 1, readOnlyItem(layer.schemaName));
+        layerTable_->setItem(
+            row, 2, readOnlyItem(layer.tableName));
+        layerTable_->setItem(
+            row, 3, readOnlyItem(layer.geometryType));
+        layerTable_->setItem(
+            row, 4, readOnlyItem(QString::number(layer.srid)));
+        layerTable_->setItem(
+            row, 5,
+            readOnlyItem(layer.editable ? QStringLiteral("да")
+                                        : QStringLiteral("нет")));
+        layerTable_->setItem(
+            row, 6, readOnlyItem(layer.kind));
+    }
+
+    layerTable_->setSortingEnabled(true);
+    statusLabel_->setStyleSheet(QStringLiteral("color: #067647;"));
+    statusLabel_->setText(
+        QStringLiteral(
+            "Подключено к %1 от имени %2. Версия схемы: %3. Слоёв: %4.")
+            .arg(status.database, status.user)
+            .arg(status.version)
+            .arg(layers.size()));
+    statusBar()->showMessage(QStringLiteral("Контракт БД проверен"));
+    refreshButton_->setEnabled(true);
+}
+
+}  // namespace tgid::ui

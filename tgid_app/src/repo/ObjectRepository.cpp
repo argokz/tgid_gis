@@ -1,0 +1,807 @@
+#include "repo/ObjectRepository.h"
+
+#include <QHash>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QRegularExpression>
+#include <QSqlDriver>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QVariant>
+
+#include <cmath>
+#include <utility>
+
+namespace tgid::repo {
+namespace {
+
+const QRegularExpression& safeIdentifier()
+{
+    static const QRegularExpression expression(
+        QStringLiteral("^[a-z_][a-z0-9_]*$"));
+    return expression;
+}
+
+bool tableIsPublished(
+    const QSqlDatabase& database,
+    const QString& classTable,
+    QString* error)
+{
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT EXISTS ("
+        "  SELECT 1 FROM meta.layer_catalog"
+        "   WHERE schema_name = 'net' AND table_name = :table_name"
+        ")"));
+    query.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!query.exec() || !query.next()) {
+        if (error != nullptr) {
+            *error = query.lastError().text();
+        }
+        return false;
+    }
+    if (!query.value(0).toBool()) {
+        if (error != nullptr) {
+            *error =
+                QStringLiteral("Таблица отсутствует в meta.layer_catalog");
+        }
+        return false;
+    }
+    return true;
+}
+
+QString castForDatabaseType(const QString& databaseType)
+{
+    static const QHash<QString, QString> casts = {
+        {QStringLiteral("int2"), QStringLiteral("smallint")},
+        {QStringLiteral("int4"), QStringLiteral("integer")},
+        {QStringLiteral("int8"), QStringLiteral("bigint")},
+        {QStringLiteral("float4"), QStringLiteral("real")},
+        {QStringLiteral("float8"), QStringLiteral("double precision")},
+        {QStringLiteral("numeric"), QStringLiteral("numeric")},
+        {QStringLiteral("bool"), QStringLiteral("boolean")},
+        {QStringLiteral("text"), QStringLiteral("text")},
+        {QStringLiteral("varchar"), QStringLiteral("text")},
+        {QStringLiteral("bpchar"), QStringLiteral("text")},
+        {QStringLiteral("date"), QStringLiteral("date")},
+        {QStringLiteral("timestamp"), QStringLiteral("timestamp")},
+        {QStringLiteral("timestamptz"),
+         QStringLiteral("timestamp with time zone")},
+        {QStringLiteral("time"), QStringLiteral("time")},
+        {QStringLiteral("timetz"), QStringLiteral("time with time zone")},
+        {QStringLiteral("uuid"), QStringLiteral("uuid")},
+        {QStringLiteral("json"), QStringLiteral("json")},
+        {QStringLiteral("jsonb"), QStringLiteral("jsonb")},
+    };
+    return casts.value(databaseType);
+}
+
+QVariant valueForBinding(const AttributeChange& change)
+{
+    if (change.databaseType != QStringLiteral("bool")) {
+        return change.value;
+    }
+
+    const QString value = change.value.trimmed().toLower();
+    if (value == QStringLiteral("да") || value == QStringLiteral("yes")
+        || value == QStringLiteral("1")) {
+        return QStringLiteral("true");
+    }
+    if (value == QStringLiteral("нет") || value == QStringLiteral("no")
+        || value == QStringLiteral("0")) {
+        return QStringLiteral("false");
+    }
+    return value;
+}
+
+QString jsonValueToString(const QJsonValue& value)
+{
+    if (value.isNull() || value.isUndefined()) {
+        return {};
+    }
+    if (value.isString()) {
+        return value.toString();
+    }
+    if (value.isBool()) {
+        return value.toBool() ? QStringLiteral("да") : QStringLiteral("нет");
+    }
+    if (value.isDouble()) {
+        return QString::number(value.toDouble(), 'g', 15);
+    }
+    if (value.isArray()) {
+        return QString::fromUtf8(
+            QJsonDocument(value.toArray()).toJson(QJsonDocument::Compact));
+    }
+    return QString::fromUtf8(
+        QJsonDocument(value.toObject()).toJson(QJsonDocument::Compact));
+}
+
+}  // namespace
+
+ObjectDetails ObjectRepository::load(
+    const QSqlDatabase& database,
+    const QString& classTable,
+    qint64 id) const
+{
+    ObjectDetails result;
+    result.id = id;
+    result.classTable = classTable;
+
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+
+    const QString escapedTable = database.driver()->escapeIdentifier(
+        classTable, QSqlDriver::TableName);
+    QSqlQuery objectQuery(database);
+    objectQuery.prepare(
+        QStringLiteral(
+            "SELECT jsonb_object_agg(e.key, e.value)"
+            "  FROM net.%1 AS t"
+            " CROSS JOIN LATERAL"
+            "       jsonb_each_text(to_jsonb(t) - 'geom') AS e(key, value)"
+            " WHERE t.id = :id"
+            " GROUP BY t.id")
+            .arg(escapedTable));
+    objectQuery.bindValue(QStringLiteral(":id"), id);
+    if (!objectQuery.exec()) {
+        result.error = objectQuery.lastError().text();
+        return result;
+    }
+    if (!objectQuery.next()) {
+        result.error = QStringLiteral("Объект не найден");
+        return result;
+    }
+
+    QByteArray jsonBytes = objectQuery.value(0).toByteArray();
+    if (jsonBytes.isEmpty()) {
+        jsonBytes = objectQuery.value(0).toString().toUtf8();
+    }
+    QJsonParseError parseError;
+    const QJsonDocument document =
+        QJsonDocument::fromJson(jsonBytes, &parseError);
+    if (parseError.error != QJsonParseError::NoError
+        || !document.isObject()) {
+        result.error =
+            QStringLiteral("Не удалось разобрать атрибуты объекта: %1")
+                .arg(parseError.errorString());
+        return result;
+    }
+    const QJsonObject values = document.object();
+    result.rowVersion =
+        values.value(QStringLiteral("row_version")).toVariant().toLongLong();
+
+    QSqlQuery columnQuery(database);
+    columnQuery.prepare(QStringLiteral(
+        "SELECT a.attname,"
+        "       format_type(a.atttypid, a.atttypmod),"
+        "       coalesce(col_description(c.oid, a.attnum), ''),"
+        "       t.typname,"
+        "       a.attgenerated = ''"
+        "       AND a.attidentity = ''"
+        "       AND a.attname NOT IN ("
+        "           'id', 'fragment_id', 'node_from', 'node_to',"
+        "           'node_from_src', 'node_to_src', 'fileid_src', 'src_id',"
+        "           'removed_at', 'row_version', 'updated_at', 'updated_by',"
+        "           'coords_legacy'"
+        "       )"
+        "       AND t.typname IN ("
+        "           'int2', 'int4', 'int8', 'float4', 'float8', 'numeric',"
+        "           'bool', 'text', 'varchar', 'bpchar', 'date',"
+        "           'timestamp', 'timestamptz', 'time', 'timetz', 'uuid',"
+        "           'json', 'jsonb'"
+        "       ) AS editable"
+        "  FROM pg_class c"
+        "  JOIN pg_namespace n ON n.oid = c.relnamespace"
+        "  JOIN pg_attribute a ON a.attrelid = c.oid"
+        "  JOIN pg_type t ON t.oid = a.atttypid"
+        " WHERE n.nspname = 'net'"
+        "   AND c.relname = :table_name"
+        "   AND a.attnum > 0"
+        "   AND NOT a.attisdropped"
+        "   AND a.attname <> 'geom'"
+        " ORDER BY a.attnum"));
+    columnQuery.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!columnQuery.exec()) {
+        result.error = columnQuery.lastError().text();
+        return result;
+    }
+
+    while (columnQuery.next()) {
+        ObjectAttribute attribute;
+        attribute.name = columnQuery.value(0).toString();
+        attribute.dataType = columnQuery.value(1).toString();
+        const QString comment = columnQuery.value(2).toString().trimmed();
+        attribute.databaseType = columnQuery.value(3).toString();
+        attribute.editable = columnQuery.value(4).toBool();
+        attribute.displayName =
+            comment.isEmpty() ? attribute.name : comment;
+        const QJsonValue value = values.value(attribute.name);
+        attribute.isNull = value.isNull() || value.isUndefined();
+        if (attribute.name == QStringLiteral("removed_at")) {
+            result.canArchive = true;
+            result.archived = !attribute.isNull;
+        }
+        if (attribute.databaseType == QStringLiteral("bool")
+            && !attribute.isNull && value.isString()) {
+            attribute.value =
+                value.toString() == QStringLiteral("true")
+                    ? QStringLiteral("да")
+                    : QStringLiteral("нет");
+        } else {
+            attribute.value = jsonValueToString(value);
+        }
+        result.attributes.append(std::move(attribute));
+    }
+
+    return result;
+}
+
+UpdateResult ObjectRepository::update(
+    QSqlDatabase database,
+    const QString& classTable,
+    qint64 id,
+    qint64 expectedVersion,
+    const QList<AttributeChange>& changes) const
+{
+    UpdateResult result;
+    result.rowVersion = expectedVersion;
+
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+    if (expectedVersion < 1) {
+        result.error = QStringLiteral("Некорректная версия объекта");
+        return result;
+    }
+    if (changes.isEmpty()) {
+        result.success = true;
+        return result;
+    }
+
+    QSqlQuery metadataQuery(database);
+    metadataQuery.prepare(QStringLiteral(
+        "SELECT a.attname, t.typname"
+        "  FROM pg_class c"
+        "  JOIN pg_namespace n ON n.oid = c.relnamespace"
+        "  JOIN pg_attribute a ON a.attrelid = c.oid"
+        "  JOIN pg_type t ON t.oid = a.atttypid"
+        " WHERE n.nspname = 'net'"
+        "   AND c.relname = :table_name"
+        "   AND a.attnum > 0"
+        "   AND NOT a.attisdropped"
+        "   AND a.attgenerated = ''"
+        "   AND a.attidentity = ''"
+        "   AND a.attname NOT IN ("
+        "       'id', 'fragment_id', 'node_from', 'node_to',"
+        "       'node_from_src', 'node_to_src', 'fileid_src', 'src_id',"
+        "       'removed_at', 'row_version', 'updated_at', 'updated_by',"
+        "       'coords_legacy', 'geom'"
+        "   )"));
+    metadataQuery.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!metadataQuery.exec()) {
+        result.error = metadataQuery.lastError().text();
+        return result;
+    }
+
+    QHash<QString, QString> editableColumns;
+    while (metadataQuery.next()) {
+        const QString name = metadataQuery.value(0).toString();
+        const QString databaseType = metadataQuery.value(1).toString();
+        if (!castForDatabaseType(databaseType).isEmpty()) {
+            editableColumns.insert(name, databaseType);
+        }
+    }
+
+    QStringList assignments;
+    QList<QVariant> bindValues;
+    for (const AttributeChange& change : changes) {
+        if (!safeIdentifier().match(change.name).hasMatch()
+            || !editableColumns.contains(change.name)
+            || editableColumns.value(change.name) != change.databaseType) {
+            result.error =
+                QStringLiteral("Поле «%1» нельзя редактировать").arg(change.name);
+            return result;
+        }
+
+        const QString escapedColumn = database.driver()->escapeIdentifier(
+            change.name, QSqlDriver::FieldName);
+        if (change.setNull) {
+            assignments.append(
+                QStringLiteral("%1 = NULL").arg(escapedColumn));
+        } else {
+            assignments.append(
+                QStringLiteral("%1 = CAST(? AS %2)")
+                    .arg(escapedColumn,
+                         castForDatabaseType(change.databaseType)));
+            bindValues.append(valueForBinding(change));
+        }
+    }
+
+    const QString escapedTable = database.driver()->escapeIdentifier(
+        classTable, QSqlDriver::TableName);
+    QSqlQuery updateQuery(database);
+    updateQuery.prepare(
+        QStringLiteral(
+            "UPDATE net.%1 SET %2"
+            " WHERE id = ? AND row_version = ?"
+            " RETURNING row_version")
+            .arg(escapedTable, assignments.join(QStringLiteral(", "))));
+    for (const QVariant& value : std::as_const(bindValues)) {
+        updateQuery.addBindValue(value);
+    }
+    updateQuery.addBindValue(id);
+    updateQuery.addBindValue(expectedVersion);
+
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+    if (!updateQuery.exec()) {
+        result.error = updateQuery.lastError().text();
+        database.rollback();
+        return result;
+    }
+    if (!updateQuery.next()) {
+        result.conflict = true;
+        result.error =
+            QStringLiteral("Объект уже изменён другим пользователем или удалён");
+        database.rollback();
+        return result;
+    }
+
+    result.rowVersion = updateQuery.value(0).toLongLong();
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        return result;
+    }
+    result.success = true;
+    return result;
+}
+
+UpdateResult ObjectRepository::setArchived(
+    QSqlDatabase database,
+    const QString& classTable,
+    qint64 id,
+    qint64 expectedVersion,
+    bool archived) const
+{
+    UpdateResult result;
+    result.rowVersion = expectedVersion;
+
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+
+    QSqlQuery columnQuery(database);
+    columnQuery.prepare(QStringLiteral(
+        "SELECT EXISTS ("
+        "  SELECT 1"
+        "    FROM information_schema.columns"
+        "   WHERE table_schema = 'net'"
+        "     AND table_name = :table_name"
+        "     AND column_name = 'removed_at'"
+        ")"));
+    columnQuery.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!columnQuery.exec() || !columnQuery.next()) {
+        result.error = columnQuery.lastError().text();
+        return result;
+    }
+    if (!columnQuery.value(0).toBool()) {
+        result.error =
+            QStringLiteral("Этот тип объекта не поддерживает архивирование");
+        return result;
+    }
+
+    const QString escapedTable = database.driver()->escapeIdentifier(
+        classTable, QSqlDriver::TableName);
+    QSqlQuery query(database);
+    query.prepare(
+        QStringLiteral(
+            "UPDATE net.%1"
+            "   SET removed_at = CASE"
+            "       WHEN CAST(? AS boolean) THEN clock_timestamp()"
+            "       ELSE NULL END"
+            " WHERE id = ?"
+            "   AND row_version = ?"
+            "   AND (removed_at IS NOT NULL) <> CAST(? AS boolean)"
+            " RETURNING row_version")
+            .arg(escapedTable));
+    query.addBindValue(archived);
+    query.addBindValue(id);
+    query.addBindValue(expectedVersion);
+    query.addBindValue(archived);
+
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+    if (!query.exec()) {
+        result.error = query.lastError().text();
+        database.rollback();
+        return result;
+    }
+    if (!query.next()) {
+        result.conflict = true;
+        result.error =
+            QStringLiteral("Состояние или версия объекта уже изменились");
+        database.rollback();
+        return result;
+    }
+
+    result.rowVersion = query.value(0).toLongLong();
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        return result;
+    }
+    result.success = true;
+    return result;
+}
+
+QList<ObjectHistoryEntry> ObjectRepository::loadHistory(
+    const QSqlDatabase& database,
+    const QString& classTable,
+    qint64 id,
+    QString* error) const
+{
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        if (error != nullptr) {
+            *error = QStringLiteral("Недопустимое имя таблицы");
+        }
+        return {};
+    }
+    QString catalogError;
+    if (!tableIsPublished(database, classTable, &catalogError)) {
+        if (error != nullptr) {
+            *error = catalogError;
+        }
+        return {};
+    }
+
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT row_version,"
+        "       operation,"
+        "       to_char(changed_at, 'YYYY-MM-DD HH24:MI:SSOF'),"
+        "       changed_by,"
+        "       coalesce(application_name, ''),"
+        "       changed_fields::text"
+        "  FROM meta.object_change_log"
+        " WHERE schema_name = 'net'"
+        "   AND table_name = :table_name"
+        "   AND object_id = :object_id"
+        " ORDER BY row_version DESC, id DESC"));
+    query.bindValue(QStringLiteral(":table_name"), classTable);
+    query.bindValue(QStringLiteral(":object_id"), id);
+    if (!query.exec()) {
+        if (error != nullptr) {
+            *error = query.lastError().text();
+        }
+        return {};
+    }
+
+    QList<ObjectHistoryEntry> entries;
+    while (query.next()) {
+        ObjectHistoryEntry entry;
+        entry.rowVersion = query.value(0).toLongLong();
+        entry.operation = query.value(1).toString();
+        entry.changedAt = query.value(2).toString();
+        entry.changedBy = query.value(3).toString();
+        entry.applicationName = query.value(4).toString();
+        entry.changedFields = query.value(5).toString();
+        entries.append(std::move(entry));
+    }
+    if (error != nullptr) {
+        error->clear();
+    }
+    return entries;
+}
+
+QList<ArchivedObjectInfo> ObjectRepository::loadArchived(
+    const QSqlDatabase& database,
+    QString* error) const
+{
+    QSqlQuery tableQuery(database);
+    if (!tableQuery.exec(QStringLiteral(
+            "SELECT l.table_name,"
+            "       upper(l.geometry_type) IN ('POINT', 'MULTIPOINT')"
+            "  FROM meta.layer_catalog AS l"
+            " WHERE l.schema_name = 'net'"
+            "   AND EXISTS ("
+            "       SELECT 1 FROM information_schema.columns AS c"
+            "        WHERE c.table_schema = l.schema_name"
+            "          AND c.table_name = l.table_name"
+            "          AND c.column_name = 'removed_at'"
+            "   )"
+            " ORDER BY l.sort_order, l.table_name"))) {
+        if (error != nullptr) {
+            *error = tableQuery.lastError().text();
+        }
+        return {};
+    }
+
+    QStringList branches;
+    while (tableQuery.next()) {
+        const QString tableName = tableQuery.value(0).toString();
+        if (!safeIdentifier().match(tableName).hasMatch()) {
+            continue;
+        }
+        const QString escapedTable = database.driver()->escapeIdentifier(
+            tableName, QSqlDriver::TableName);
+        const QString isNode =
+            tableQuery.value(1).toBool()
+                ? QStringLiteral("true")
+                : QStringLiteral("false");
+        branches.append(
+            QStringLiteral(
+                "SELECT '%1'::text AS class_table,"
+                "       t.id,"
+                "       coalesce(nullif(to_jsonb(t)->>'fragment_id', '')::int,"
+                "                0) AS fragment_id,"
+                "       coalesce(nullif(to_jsonb(t)->>'nodename', ''),"
+                "                nullif(to_jsonb(t)->>'name', ''),"
+                "                nullif(to_jsonb(t)->>'memo', ''), '')"
+                "           AS label,"
+                "       to_char(t.removed_at, 'YYYY-MM-DD HH24:MI:SSOF')"
+                "           AS archived_at,"
+                "       %2 AS is_node"
+                "  FROM net.%3 AS t"
+                " WHERE t.removed_at IS NOT NULL")
+                .arg(tableName, isNode, escapedTable));
+    }
+
+    if (branches.isEmpty()) {
+        if (error != nullptr) {
+            error->clear();
+        }
+        return {};
+    }
+
+    QSqlQuery query(database);
+    if (!query.exec(
+            QStringLiteral(
+                "SELECT * FROM (%1) AS archived"
+                " ORDER BY archived_at DESC, class_table, id"
+                " LIMIT 10000")
+                .arg(branches.join(QStringLiteral(" UNION ALL "))))) {
+        if (error != nullptr) {
+            *error = query.lastError().text();
+        }
+        return {};
+    }
+
+    QList<ArchivedObjectInfo> objects;
+    while (query.next()) {
+        ArchivedObjectInfo object;
+        object.classTable = query.value(0).toString();
+        object.id = query.value(1).toLongLong();
+        object.fragmentId = query.value(2).toInt();
+        object.label = query.value(3).toString();
+        object.archivedAt = query.value(4).toString();
+        object.isNode = query.value(5).toBool();
+        objects.append(std::move(object));
+    }
+    if (error != nullptr) {
+        error->clear();
+    }
+    return objects;
+}
+
+CreateObjectResult ObjectRepository::createPoint(
+    QSqlDatabase database,
+    const QString& classTable,
+    int fragmentId,
+    const QPointF& position) const
+{
+    CreateObjectResult result;
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (fragmentId <= 0
+        || !std::isfinite(position.x())
+        || !std::isfinite(position.y())) {
+        result.error = QStringLiteral("Некорректный фрагмент или координаты");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+
+    QSqlQuery metadataQuery(database);
+    metadataQuery.prepare(QStringLiteral(
+        "SELECT upper(l.geometry_type), l.srid, l.is_editable,"
+        "       EXISTS ("
+        "           SELECT 1 FROM information_schema.columns AS c"
+        "            WHERE c.table_schema = 'net'"
+        "              AND c.table_name = l.table_name"
+        "              AND c.column_name = 'fragment_id'"
+        "       )"
+        "  FROM meta.layer_catalog AS l"
+        " WHERE l.schema_name = 'net'"
+        "   AND l.table_name = :table_name"));
+    metadataQuery.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!metadataQuery.exec() || !metadataQuery.next()) {
+        result.error = metadataQuery.lastError().text();
+        return result;
+    }
+    if (metadataQuery.value(0).toString() != QStringLiteral("POINT")
+        || !metadataQuery.value(2).toBool()
+        || !metadataQuery.value(3).toBool()) {
+        result.error = QStringLiteral(
+            "Создание поддерживается только для редактируемых "
+            "точечных классов с fragment_id");
+        return result;
+    }
+    const int srid = metadataQuery.value(1).toInt();
+    if (srid <= 0) {
+        result.error = QStringLiteral("Некорректный SRID слоя");
+        return result;
+    }
+
+    QSqlQuery fragmentQuery(database);
+    fragmentQuery.prepare(QStringLiteral(
+        "SELECT EXISTS (SELECT 1 FROM net.fragment"
+        "               WHERE id = :fragment_id"
+        "                 AND removed_at IS NULL)"));
+    fragmentQuery.bindValue(QStringLiteral(":fragment_id"), fragmentId);
+    if (!fragmentQuery.exec() || !fragmentQuery.next()) {
+        result.error = fragmentQuery.lastError().text();
+        return result;
+    }
+    if (!fragmentQuery.value(0).toBool()) {
+        result.error = QStringLiteral("Фрагмент не найден или архивирован");
+        return result;
+    }
+
+    const QString escapedTable = database.driver()->escapeIdentifier(
+        classTable, QSqlDriver::TableName);
+    QSqlQuery insertQuery(database);
+    insertQuery.prepare(
+        QStringLiteral(
+            "INSERT INTO net.%1 (fragment_id, geom)"
+            " VALUES (?, ST_SetSRID("
+            "     ST_MakePoint(CAST(? AS double precision),"
+            "                  CAST(? AS double precision)), %2))"
+            " RETURNING id, row_version")
+            .arg(escapedTable)
+            .arg(srid));
+    insertQuery.addBindValue(fragmentId);
+    insertQuery.addBindValue(position.x());
+    insertQuery.addBindValue(position.y());
+
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+    if (!insertQuery.exec() || !insertQuery.next()) {
+        result.error = insertQuery.lastError().text();
+        database.rollback();
+        return result;
+    }
+    result.id = insertQuery.value(0).toLongLong();
+    result.rowVersion = insertQuery.value(1).toLongLong();
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        result.id = 0;
+        return result;
+    }
+    result.success = true;
+    return result;
+}
+
+CreateObjectResult ObjectRepository::createLine(
+    QSqlDatabase database,
+    const QString& classTable,
+    int fragmentId,
+    qint64 nodeFrom,
+    qint64 nodeTo) const
+{
+    CreateObjectResult result;
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (fragmentId <= 0 || nodeFrom <= 0 || nodeTo <= 0
+        || nodeFrom == nodeTo) {
+        result.error =
+            QStringLiteral("Некорректный фрагмент или конечные узлы");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+
+    QSqlQuery metadataQuery(database);
+    metadataQuery.prepare(QStringLiteral(
+        "SELECT upper(l.geometry_type), l.is_editable,"
+        "       count(c.column_name) = 3"
+        "  FROM meta.layer_catalog AS l"
+        "  LEFT JOIN information_schema.columns AS c"
+        "    ON c.table_schema = l.schema_name"
+        "   AND c.table_name = l.table_name"
+        "   AND c.column_name IN ('fragment_id', 'node_from', 'node_to')"
+        " WHERE l.schema_name = 'net'"
+        "   AND l.table_name = :table_name"
+        " GROUP BY l.geometry_type, l.is_editable"));
+    metadataQuery.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!metadataQuery.exec() || !metadataQuery.next()) {
+        result.error = metadataQuery.lastError().text();
+        return result;
+    }
+    if (metadataQuery.value(0).toString() != QStringLiteral("LINESTRING")
+        || !metadataQuery.value(1).toBool()
+        || !metadataQuery.value(2).toBool()) {
+        result.error = QStringLiteral(
+            "Создание поддерживается только для сетевых классов LineString");
+        return result;
+    }
+
+    const QString escapedTable = database.driver()->escapeIdentifier(
+        classTable, QSqlDriver::TableName);
+    QSqlQuery insertQuery(database);
+    insertQuery.prepare(
+        QStringLiteral(
+            "INSERT INTO net.%1 (fragment_id, node_from, node_to)"
+            " VALUES (?, ?, ?)"
+            " RETURNING id, row_version")
+            .arg(escapedTable));
+    insertQuery.addBindValue(fragmentId);
+    insertQuery.addBindValue(nodeFrom);
+    insertQuery.addBindValue(nodeTo);
+
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+    if (!insertQuery.exec() || !insertQuery.next()) {
+        result.error = insertQuery.lastError().text();
+        database.rollback();
+        return result;
+    }
+    result.id = insertQuery.value(0).toLongLong();
+    result.rowVersion = insertQuery.value(1).toLongLong();
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        result.id = 0;
+        return result;
+    }
+    result.success = true;
+    return result;
+}
+
+}  // namespace tgid::repo
