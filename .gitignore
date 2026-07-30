@@ -14,6 +14,7 @@ venv/
 *.dump
 *.backup
 docs/schema/*.raw.sql
+docs/schema/calc_log_*.txt
 
 # Редакторы / ОС
 .vscode/

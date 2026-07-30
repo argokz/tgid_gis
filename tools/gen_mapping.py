@@ -50,21 +50,49 @@ CLASS_LINE = {
     'localhydroresistances2': 'local_resistance',
 }
 
-# B. Самостоятельные слои: геометрия своя, ссылки на nodes/linesobj нет
-LAYER = {
-    'ugol_povorota_truboprovoda': 'pipe_turn',
-    'lyuki': 'manhole',
-    'opora': 'support',
-    'vvod_v_zdanie': 'building_inlet',
-    'vvody_v_zdanie': 'building_inlet_line',
-    'perehod_diametra': 'diameter_change',
-    'kapremont_uchastki_remonta': 'repair_section',
-    'opressovka_defekt': 'pressure_test_defect',
-    'zdaniya_2': 'building',
-    'zdaniya_potrebiteley': 'building_consumer',
-    'zdaniya_tu': 'building_tu',
-    'truby_rekonstruiruemye': 'pipe_reconstructed',
-}
+# B. Самостоятельные слои: геометрия своя, ссылки на nodes/linesobj нет.
+#
+# Исходные geometry(Geometry) нельзя переносить в таком виде: ArcGIS/QGIS
+# ожидают один стабильный тип на слой. Однородные таблицы получают точный тип,
+# смешанные физически разделяются. Polygon/LineString нормализуются в Multi*,
+# чтобы одиночная и составная геометрия не жили в одном слое.
+LAYER = [
+    ('ugol_povorota_truboprovoda', 'pipe_turn',
+     'Point', ['POINT'], None),
+    ('lyuki', 'manhole',
+     'Point', ['POINT'], None),
+    ('opora', 'support',
+     'Point', ['POINT'], None),
+    ('vvod_v_zdanie', 'building_inlet',
+     'Point', ['POINT'], None),
+    ('vvody_v_zdanie', 'building_inlet_line',
+     'Point', ['POINT'], None),
+    ('perehod_diametra', 'diameter_change',
+     'Point', ['POINT'], None),
+    ('kapremont_uchastki_remonta', 'repair_section',
+     'LineString', ['LINESTRING'], None),
+    ('opressovka_defekt', 'pressure_test_defect',
+     'Point', ['POINT'], None),
+    ('zdaniya_2', 'building',
+     'MultiPolygon', ['POLYGON', 'MULTIPOLYGON'], 'multi_polygon'),
+
+    ('zdaniya_potrebiteley', 'building_consumer_point',
+     'Point', ['POINT'], None),
+    ('zdaniya_potrebiteley', 'building_consumer_line',
+     'MultiLineString', ['LINESTRING', 'MULTILINESTRING'], 'multi_line'),
+    ('zdaniya_potrebiteley', 'building_consumer_area',
+     'MultiPolygon', ['POLYGON', 'MULTIPOLYGON'], 'multi_polygon'),
+
+    ('zdaniya_tu', 'building_tu_line',
+     'MultiLineString', ['LINESTRING', 'MULTILINESTRING'], 'multi_line'),
+    ('zdaniya_tu', 'building_tu_area',
+     'MultiPolygon', ['POLYGON', 'MULTIPOLYGON'], 'multi_polygon'),
+
+    ('truby_rekonstruiruemye', 'pipe_reconstructed_point',
+     'Point', ['POINT'], None),
+    ('truby_rekonstruiruemye', 'pipe_reconstructed_line',
+     'MultiLineString', ['LINESTRING', 'MULTILINESTRING'], 'multi_line'),
+]
 
 # C. Аспекты узла (1:1, но узел при этом принадлежит другому классу)
 ASPECT = {
@@ -127,10 +155,11 @@ def main():
             'nullable': types[src][c]['is_nullable'] == 'YES',
         } for c in keep}
 
-    def entry(src, target, geom_kind, link, category):
+    def entry(src, target, geom_kind, link, category,
+              source_geometry_types=None, geometry_transform=None):
         drop = LAYER_DROP if category == 'layer' else sub_drop(link)
         keep = [c for c in cols[src] if c not in drop]
-        return {
+        result = {
             'source': src,
             'target': target,
             'category': category,
@@ -140,6 +169,11 @@ def main():
             'columns': keep,
             'column_types': col_meta(src, keep),
         }
+        if source_geometry_types:
+            result['source_geometry_types'] = source_geometry_types
+        if geometry_transform:
+            result['geometry_transform'] = geometry_transform
+        return result
 
     mapping = {
         'srid': 9998,
@@ -155,9 +189,10 @@ def main():
                        for s, t in sorted(CLASS_NODE.items())],
         'class_line': [entry(s, t, 'LineString', 'lineid', 'class_line')
                        for s, t in sorted(CLASS_LINE.items())],
-        'layer': [entry(s, t, geom.get(s, {}).get('type', 'Geometry'),
-                        None, 'layer')
-                  for s, t in sorted(LAYER.items())],
+        'layer': [entry(s, t, geometry_type, None, 'layer',
+                        source_geometry_types, geometry_transform)
+                  for (s, t, geometry_type, source_geometry_types,
+                       geometry_transform) in LAYER],
         'aspect': [entry(s, t, None, link, 'aspect')
                    for s, (t, link) in sorted(ASPECT.items())],
         'child': [entry(s, t, None, link, 'child')

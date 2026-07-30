@@ -125,6 +125,9 @@ CREATE TABLE IF NOT EXISTS net.connect_node (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -172,6 +175,9 @@ CREATE TABLE IF NOT EXISTS net.consumer_general (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -370,6 +376,9 @@ CREATE TABLE IF NOT EXISTS net.heat_chamber (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -427,6 +436,9 @@ CREATE TABLE IF NOT EXISTS net.heat_source (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -681,6 +693,9 @@ CREATE TABLE IF NOT EXISTS net.pump_station (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -736,6 +751,9 @@ CREATE TABLE IF NOT EXISTS net.consumer_real (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -940,6 +958,9 @@ CREATE TABLE IF NOT EXISTS net.refill_node (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -999,6 +1020,9 @@ CREATE TABLE IF NOT EXISTS net.valve_3way (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -1061,6 +1085,9 @@ CREATE TABLE IF NOT EXISTS net.node_plain (
   , geom         geometry(Point, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , internalnodeid                   int
   , externalcodeid                   int
   , externalnodename                 text
@@ -1114,6 +1141,9 @@ CREATE TABLE IF NOT EXISTS net.air_heater (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1157,6 +1187,9 @@ CREATE TABLE IF NOT EXISTS net.damper (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1204,6 +1237,9 @@ CREATE TABLE IF NOT EXISTS net.diaphragm (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1244,6 +1280,9 @@ CREATE TABLE IF NOT EXISTS net.elevator (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1290,6 +1329,9 @@ CREATE TABLE IF NOT EXISTS net.heat_exchanger (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1328,6 +1370,9 @@ CREATE TABLE IF NOT EXISTS net.pipe_section (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1511,6 +1556,9 @@ CREATE TABLE IF NOT EXISTS net.local_resistance (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1550,6 +1598,9 @@ CREATE TABLE IF NOT EXISTS net.regulator_press (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1596,6 +1647,9 @@ CREATE TABLE IF NOT EXISTS net.pump (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1668,6 +1722,9 @@ CREATE TABLE IF NOT EXISTS net.radiator (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1708,6 +1765,9 @@ CREATE TABLE IF NOT EXISTS net.line_plain (
   , geom         geometry(LineString, 9998) NOT NULL
   , removed_at   timestamptz
   , src_id       int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , externalsignlineid               int
   , location                         text
   , hydrores                         double precision
@@ -1733,25 +1793,44 @@ CREATE TRIGGER line_plain_reg AFTER INSERT OR DELETE ON net.line_plain
 
 -- ============ САМОСТОЯТЕЛЬНЫЕ СЛОИ ============
 
--- repair_section  <-  public.kapremont_uchastki_remonta  (5 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.repair_section (
+-- pipe_turn  <-  public.ugol_povorota_truboprovoda  (25214 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.pipe_turn (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(Point, 9998) NOT NULL
   , src_id  int
-  , id_remont                        int
-  , idp1                             int
-  , ido1                             int
-  , idp2                             int
-  , ido2                             int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , priznak_truboprovoda             int
+  , kod1                             text
+  , uzel1                            text
+  , kod2                             text
+  , uzel2                            text
+  , diametr_truboprovoda             text
+  , ugol_povorota                    int
+  , primechanie                      text
+  , vysotnaya_otmetka_ktp            double precision
+  , vysotnaya_otmetka_truby          double precision
+  , geodezicheskaya_organizatsiya    text
+  , god_sdachi_v_ekspluatatsiyu      text
+  , geodezicheskaya_otmetka          double precision
+  , naimenovanie_nachalnogo_uzla_truby text
+  , naimenovanie_konechnogo_uzla_truby text
+  , vysotnaya_otmetka                double precision
+  , id_geopoint                      int
+  , angle                            double precision
 );
-CREATE INDEX IF NOT EXISTS repair_section_geom_idx ON net.repair_section USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS repair_section_src_uidx ON net.repair_section (src_id);
+CREATE INDEX IF NOT EXISTS pipe_turn_geom_idx ON net.pipe_turn USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS pipe_turn_src_uidx ON net.pipe_turn (src_id);
 
 -- manhole  <-  public.lyuki  (18392 строк, самостоятельный слой)
 CREATE TABLE IF NOT EXISTS net.manhole (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(Point, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , "name"                           text
   , elevation_ktp                    double precision
   , elevation_tr                     double precision
@@ -1775,8 +1854,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS manhole_src_uidx ON net.manhole (src_id);
 -- support  <-  public.opora  (3611 строк, самостоятельный слой)
 CREATE TABLE IF NOT EXISTS net.support (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(Point, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , mestoraspolozhenie               int
   , priznak_truboprovoda             int
   , vysotnaya_otmetka                double precision
@@ -1799,106 +1881,14 @@ CREATE TABLE IF NOT EXISTS net.support (
 CREATE INDEX IF NOT EXISTS support_geom_idx ON net.support USING gist (geom);
 CREATE UNIQUE INDEX IF NOT EXISTS support_src_uidx ON net.support (src_id);
 
--- pressure_test_defect  <-  public.opressovka_defekt  (1 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.pressure_test_defect (
-    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
-  , src_id  int
-  , opressovki_uchastok_ocheredi     int
-  , data_provedeniya                 date
-  , kod_rs_nachalnoy_kamery          text
-  , nachalnaya_kamera                text
-  , kod_rs_konechnoy_kamery          text
-  , konechnaya_kamera                text
-);
-CREATE INDEX IF NOT EXISTS pressure_test_defect_geom_idx ON net.pressure_test_defect USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS pressure_test_defect_src_uidx ON net.pressure_test_defect (src_id);
-
--- diameter_change  <-  public.perehod_diametra  (4 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.diameter_change (
-    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
-  , src_id  int
-  , priznak_truboprovoda             int
-  , vysotnaya_otmetka                double precision
-  , nachalnyy_diametr                int
-  , konechnyy_diametr                int
-  , mesto_raspolozheniya             text
-  , primechanie                      text
-  , kod                              text
-  , uzel                             text
-  , id_geopoint                      int
-  , prinadlezhnost                   text
-  , geodezicheskaya_otmetka          double precision
-  , naimenovanie_nachalnogo_uzla_truby text
-  , angle                            double precision
-);
-CREATE INDEX IF NOT EXISTS diameter_change_geom_idx ON net.diameter_change USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS diameter_change_src_uidx ON net.diameter_change (src_id);
-
--- pipe_reconstructed  <-  public.truby_rekonstruiruemye  (44 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.pipe_reconstructed (
-    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
-  , src_id  int
-  , sostoyanie_stroitelstva          text
-  , gorod                            text
-  , mikrorayon                       text
-  , ulitsa                           text
-  , dom                              text
-  , kommentariy                      text
-  , nachalnaya_kamera                text
-  , konechnaya_kamera                text
-  , nomer_tu                         text
-  , data_vydachi_tu                  date
-  , sostoyanie_dogovora              text
-  , naimenovanie_organizatsii__zaprashivayuschey_tu text
-  , naimenovanie_obekta              text
-  , rayon_ekspluatatsii              text
-  , istochnik                        text
-  , dlina                            double precision
-  , diametr_uslovnyy                 double precision
-  , diametr_vnutrenniy               double precision
-  , tolschina_stenki                 double precision
-  , tip_truby                        text
-  , vid_prokladki                    text
-  , harakteristika_truby             text
-);
-CREATE INDEX IF NOT EXISTS pipe_reconstructed_geom_idx ON net.pipe_reconstructed USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS pipe_reconstructed_src_uidx ON net.pipe_reconstructed (src_id);
-
--- pipe_turn  <-  public.ugol_povorota_truboprovoda  (25214 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.pipe_turn (
-    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
-  , src_id  int
-  , priznak_truboprovoda             int
-  , kod1                             text
-  , uzel1                            text
-  , kod2                             text
-  , uzel2                            text
-  , diametr_truboprovoda             text
-  , ugol_povorota                    int
-  , primechanie                      text
-  , vysotnaya_otmetka_ktp            double precision
-  , vysotnaya_otmetka_truby          double precision
-  , geodezicheskaya_organizatsiya    text
-  , god_sdachi_v_ekspluatatsiyu      text
-  , geodezicheskaya_otmetka          double precision
-  , naimenovanie_nachalnogo_uzla_truby text
-  , naimenovanie_konechnogo_uzla_truby text
-  , vysotnaya_otmetka                double precision
-  , id_geopoint                      int
-  , angle                            double precision
-);
-CREATE INDEX IF NOT EXISTS pipe_turn_geom_idx ON net.pipe_turn USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS pipe_turn_src_uidx ON net.pipe_turn (src_id);
-
 -- building_inlet  <-  public.vvod_v_zdanie  (5463 строк, самостоятельный слой)
 CREATE TABLE IF NOT EXISTS net.building_inlet (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(Point, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , "name"                           text
   , elevation_ktp                    double precision
   , elevation_tr                     double precision
@@ -1919,8 +1909,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS building_inlet_src_uidx ON net.building_inlet 
 -- building_inlet_line  <-  public.vvody_v_zdanie  (5463 строк, самостоятельный слой)
 CREATE TABLE IF NOT EXISTS net.building_inlet_line (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(Point, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , vysotnaya_otmetka                double precision
   , primechanie                      text
   , sposob_vvoda                     int
@@ -1929,11 +1922,74 @@ CREATE TABLE IF NOT EXISTS net.building_inlet_line (
 CREATE INDEX IF NOT EXISTS building_inlet_line_geom_idx ON net.building_inlet_line USING gist (geom);
 CREATE UNIQUE INDEX IF NOT EXISTS building_inlet_line_src_uidx ON net.building_inlet_line (src_id);
 
+-- diameter_change  <-  public.perehod_diametra  (4 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.diameter_change (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(Point, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , priznak_truboprovoda             int
+  , vysotnaya_otmetka                double precision
+  , nachalnyy_diametr                int
+  , konechnyy_diametr                int
+  , mesto_raspolozheniya             text
+  , primechanie                      text
+  , kod                              text
+  , uzel                             text
+  , id_geopoint                      int
+  , prinadlezhnost                   text
+  , geodezicheskaya_otmetka          double precision
+  , naimenovanie_nachalnogo_uzla_truby text
+  , angle                            double precision
+);
+CREATE INDEX IF NOT EXISTS diameter_change_geom_idx ON net.diameter_change USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS diameter_change_src_uidx ON net.diameter_change (src_id);
+
+-- repair_section  <-  public.kapremont_uchastki_remonta  (5 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.repair_section (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(LineString, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , id_remont                        int
+  , idp1                             int
+  , ido1                             int
+  , idp2                             int
+  , ido2                             int
+);
+CREATE INDEX IF NOT EXISTS repair_section_geom_idx ON net.repair_section USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS repair_section_src_uidx ON net.repair_section (src_id);
+
+-- pressure_test_defect  <-  public.opressovka_defekt  (1 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.pressure_test_defect (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(Point, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , opressovki_uchastok_ocheredi     int
+  , data_provedeniya                 date
+  , kod_rs_nachalnoy_kamery          text
+  , nachalnaya_kamera                text
+  , kod_rs_konechnoy_kamery          text
+  , konechnaya_kamera                text
+);
+CREATE INDEX IF NOT EXISTS pressure_test_defect_geom_idx ON net.pressure_test_defect USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS pressure_test_defect_src_uidx ON net.pressure_test_defect (src_id);
+
 -- building  <-  public.zdaniya_2  (187203 строк, самостоятельный слой)
 CREATE TABLE IF NOT EXISTS net.building (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(MultiPolygon, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , objectid                         numeric
   , floor                            text
   , number_1                         text
@@ -1959,11 +2015,14 @@ CREATE TABLE IF NOT EXISTS net.building (
 CREATE INDEX IF NOT EXISTS building_geom_idx ON net.building USING gist (geom);
 CREATE UNIQUE INDEX IF NOT EXISTS building_src_uidx ON net.building (src_id);
 
--- building_consumer  <-  public.zdaniya_potrebiteley  (12466 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.building_consumer (
+-- building_consumer_point  <-  public.zdaniya_potrebiteley  (12466 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.building_consumer_point (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(Point, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , gorod                            text
   , mikrorayon                       text
   , ulitsa                           text
@@ -1971,14 +2030,53 @@ CREATE TABLE IF NOT EXISTS net.building_consumer (
   , kod_rs_uzla_prisoedineniya       text
   , uzel_prisoedineniya              text
 );
-CREATE INDEX IF NOT EXISTS building_consumer_geom_idx ON net.building_consumer USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS building_consumer_src_uidx ON net.building_consumer (src_id);
+CREATE INDEX IF NOT EXISTS building_consumer_point_geom_idx ON net.building_consumer_point USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS building_consumer_point_src_uidx ON net.building_consumer_point (src_id);
 
--- building_tu  <-  public.zdaniya_tu  (5197 строк, самостоятельный слой)
-CREATE TABLE IF NOT EXISTS net.building_tu (
+-- building_consumer_line  <-  public.zdaniya_potrebiteley  (12466 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.building_consumer_line (
     id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
-  , geom    geometry(Geometry, 9998) NOT NULL
+  , geom    geometry(MultiLineString, 9998) NOT NULL
   , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , gorod                            text
+  , mikrorayon                       text
+  , ulitsa                           text
+  , dom                              text
+  , kod_rs_uzla_prisoedineniya       text
+  , uzel_prisoedineniya              text
+);
+CREATE INDEX IF NOT EXISTS building_consumer_line_geom_idx ON net.building_consumer_line USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS building_consumer_line_src_uidx ON net.building_consumer_line (src_id);
+
+-- building_consumer_area  <-  public.zdaniya_potrebiteley  (12466 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.building_consumer_area (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(MultiPolygon, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , gorod                            text
+  , mikrorayon                       text
+  , ulitsa                           text
+  , dom                              text
+  , kod_rs_uzla_prisoedineniya       text
+  , uzel_prisoedineniya              text
+);
+CREATE INDEX IF NOT EXISTS building_consumer_area_geom_idx ON net.building_consumer_area USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS building_consumer_area_src_uidx ON net.building_consumer_area (src_id);
+
+-- building_tu_line  <-  public.zdaniya_tu  (5197 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.building_tu_line (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(MultiLineString, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
   , gorod                            text
   , mikrorayon                       text
   , ulitsa                           text
@@ -1989,8 +2087,97 @@ CREATE TABLE IF NOT EXISTS net.building_tu (
   , kod_rs_uzla_prisoedineniya       text
   , uzel_prisoedineniya              text
 );
-CREATE INDEX IF NOT EXISTS building_tu_geom_idx ON net.building_tu USING gist (geom);
-CREATE UNIQUE INDEX IF NOT EXISTS building_tu_src_uidx ON net.building_tu (src_id);
+CREATE INDEX IF NOT EXISTS building_tu_line_geom_idx ON net.building_tu_line USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS building_tu_line_src_uidx ON net.building_tu_line (src_id);
+
+-- building_tu_area  <-  public.zdaniya_tu  (5197 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.building_tu_area (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(MultiPolygon, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , gorod                            text
+  , mikrorayon                       text
+  , ulitsa                           text
+  , dom                              text
+  , kommentariy                      text
+  , istochnik                        int
+  , rayon_ekspluatatsii              int
+  , kod_rs_uzla_prisoedineniya       text
+  , uzel_prisoedineniya              text
+);
+CREATE INDEX IF NOT EXISTS building_tu_area_geom_idx ON net.building_tu_area USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS building_tu_area_src_uidx ON net.building_tu_area (src_id);
+
+-- pipe_reconstructed_point  <-  public.truby_rekonstruiruemye  (44 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.pipe_reconstructed_point (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(Point, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , sostoyanie_stroitelstva          text
+  , gorod                            text
+  , mikrorayon                       text
+  , ulitsa                           text
+  , dom                              text
+  , kommentariy                      text
+  , nachalnaya_kamera                text
+  , konechnaya_kamera                text
+  , nomer_tu                         text
+  , data_vydachi_tu                  date
+  , sostoyanie_dogovora              text
+  , naimenovanie_organizatsii__zaprashivayuschey_tu text
+  , naimenovanie_obekta              text
+  , rayon_ekspluatatsii              text
+  , istochnik                        text
+  , dlina                            double precision
+  , diametr_uslovnyy                 double precision
+  , diametr_vnutrenniy               double precision
+  , tolschina_stenki                 double precision
+  , tip_truby                        text
+  , vid_prokladki                    text
+  , harakteristika_truby             text
+);
+CREATE INDEX IF NOT EXISTS pipe_reconstructed_point_geom_idx ON net.pipe_reconstructed_point USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS pipe_reconstructed_point_src_uidx ON net.pipe_reconstructed_point (src_id);
+
+-- pipe_reconstructed_line  <-  public.truby_rekonstruiruemye  (44 строк, самостоятельный слой)
+CREATE TABLE IF NOT EXISTS net.pipe_reconstructed_line (
+    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')
+  , geom    geometry(MultiLineString, 9998) NOT NULL
+  , src_id  int
+  , row_version  bigint NOT NULL DEFAULT 1
+  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()
+  , updated_by   text NOT NULL DEFAULT current_user
+  , sostoyanie_stroitelstva          text
+  , gorod                            text
+  , mikrorayon                       text
+  , ulitsa                           text
+  , dom                              text
+  , kommentariy                      text
+  , nachalnaya_kamera                text
+  , konechnaya_kamera                text
+  , nomer_tu                         text
+  , data_vydachi_tu                  date
+  , sostoyanie_dogovora              text
+  , naimenovanie_organizatsii__zaprashivayuschey_tu text
+  , naimenovanie_obekta              text
+  , rayon_ekspluatatsii              text
+  , istochnik                        text
+  , dlina                            double precision
+  , diametr_uslovnyy                 double precision
+  , diametr_vnutrenniy               double precision
+  , tolschina_stenki                 double precision
+  , tip_truby                        text
+  , vid_prokladki                    text
+  , harakteristika_truby             text
+);
+CREATE INDEX IF NOT EXISTS pipe_reconstructed_line_geom_idx ON net.pipe_reconstructed_line USING gist (geom);
+CREATE UNIQUE INDEX IF NOT EXISTS pipe_reconstructed_line_src_uidx ON net.pipe_reconstructed_line (src_id);
 
 -- ============ АСПЕКТЫ И ДОЧЕРНИЕ ТАБЛИЦЫ ============
 

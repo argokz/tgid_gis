@@ -404,13 +404,30 @@ class Converter:
         for e in self.m['layer']:
             cols = [q(c) for c in e['columns']]
             vals = ['s.%s' % q(c) for c in e['columns']]
+            geom = 'ST_SetSRID(s.shape, {srid})'.format(srid=self.srid)
+            transform = e.get('geometry_transform')
+            if transform == 'multi_line':
+                geom = 'ST_Multi(ST_CollectionExtract(%s, 2))' % geom
+            elif transform == 'multi_polygon':
+                geom = ('ST_Multi(ST_CollectionExtract('
+                        'ST_MakeValid(%s), 3))' % geom)
+            elif transform:
+                raise ValueError('Неизвестное преобразование геометрии: %s'
+                                 % transform)
+
+            where = ['s.shape IS NOT NULL']
+            source_types = e.get('source_geometry_types', [])
+            if source_types:
+                allowed = ', '.join("'%s'" % t for t in source_types)
+                where.append('GeometryType(s.shape) IN (%s)' % allowed)
+
             self.run(cur, """
                 INSERT INTO net.{t} (geom, src_id{extra})
-                SELECT ST_SetSRID(s.shape, {srid}), s.id{vals}
+                SELECT {geom}, s.id{vals}
                 FROM {src_full} s
-                WHERE s.shape IS NOT NULL
+                WHERE {where}
             """.format(t=e['target'], src_full=self.sub(e['source']),
-                       srid=self.srid,
+                       geom=geom, where=' AND '.join(where),
                        extra=(', ' + ', '.join(cols)) if cols else '',
                        vals=(', ' + ', '.join(vals)) if vals else ''),
                 e['target'])

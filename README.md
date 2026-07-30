@@ -10,6 +10,9 @@
 3. Совместимость: существующее приложение ТГИД продолжает работать во время и после миграции.
 4. Скорость: убрать мега-джойны на 26 таблиц при каждом открытии схемы.
 
+**Полная переписка (продукт без compat):** [docs/11-full-rewrite.md](docs/11-full-rewrite.md) —
+чистая БД `net`+`ref` для QGIS/ArcGIS и новое приложение. Сборка: `tools/build_clean_gis_db.ps1`.
+
 ## Состояние
 
 | Шаг | Что | Статус |
@@ -35,6 +38,7 @@
 | 20 | Подтипы тоже на `net` (views + INSTEAD OF) | готово — приложение работает полностью |
 | 21 | Регрессия гидравлического расчёта (sety) | **structural_ok** на фр. 2 и 1; фикс `regulator_press` — [09](docs/09-calc-regression-results.md) |
 | 22 | Разбор спорных потребителей глазами | очередь — [07](docs/07-duplicates-next.md) |
+| 23 | Новый Qt-клиент: карта, карточка и безопасное редактирование | готово — [tgid_app](tgid_app) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -101,6 +105,13 @@ python converter/convert.py --mapping converter/mapping.json          # проб
 python converter/convert.py --mapping converter/mapping.json --apply  # запись
 python converter/validate.py --mapping converter/mapping.json         # проверки
 psql -f sql/020_fix_geometry.sql       # необязательно: починка геометрии из источника
+psql -f sql/070_map_thin.sql           # тонкие представления карты для Qt
+psql -f sql/080_concurrency.sql        # row_version и защита совместного редактирования
+psql -f sql/090_object_history.sql     # общий журнал Qt/QGIS и архивирование
+psql -f sql/095_object_insert_history.sql # аудит новых объектов
+psql -f sql/096_line_topology.sql       # единая топология линий Qt/QGIS
+psql -f sql/097_node_topology.sql       # перенос концов линий при перемещении узлов
+psql -f sql/100_gis_catalog.sql        # каталог слоёв QGIS/Qt и версия схемы
 ```
 
 Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге

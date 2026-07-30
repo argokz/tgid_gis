@@ -160,6 +160,13 @@ def reg_trigger(target, reg):
             % (target, target, target, target, reg, target))
 
 
+CONCURRENCY_COLUMNS = [
+    '  , row_version  bigint NOT NULL DEFAULT 1',
+    '  , updated_at   timestamptz NOT NULL DEFAULT clock_timestamp()',
+    '  , updated_by   text NOT NULL DEFAULT current_user',
+]
+
+
 def emit_class(e, base_cols, base_types, is_line):
     t = e['target']
     L = ['\n-- %s  <-  public.%s  (%s строк, %s)'
@@ -186,6 +193,7 @@ def emit_class(e, base_cols, base_types, is_line):
           # NULL у объектов, созданных уже после миграции.
           # Уникальный индекс это допускает: в PostgreSQL NULL не конфликтуют.
           '  , src_id       int']
+    L += CONCURRENCY_COLUMNS
 
     seen = set()
     for c in base_cols:
@@ -220,12 +228,23 @@ def emit_class(e, base_cols, base_types, is_line):
 
 def emit_layer(e):
     t = e['target']
+    geometry_type = {
+        'GEOMETRY': 'Geometry',
+        'POINT': 'Point',
+        'LINESTRING': 'LineString',
+        'POLYGON': 'Polygon',
+        'MULTIPOINT': 'MultiPoint',
+        'MULTILINESTRING': 'MultiLineString',
+        'MULTIPOLYGON': 'MultiPolygon',
+    }.get((e.get('geometry') or 'Geometry').upper(),
+          e.get('geometry') or 'Geometry')
     L = ['\n-- %s  <-  public.%s  (%s строк, самостоятельный слой)'
          % (t, e['source'], e['rows']),
          'CREATE TABLE IF NOT EXISTS net.%s (' % t,
          "    id      bigint PRIMARY KEY DEFAULT nextval('net.obj_id_seq')",
-         '  , geom    geometry(Geometry, 9998) NOT NULL',
+         '  , geom    geometry(%s, 9998) NOT NULL' % geometry_type,
          '  , src_id  int']
+    L += CONCURRENCY_COLUMNS
     seen = set()
     for c in e['columns']:
         if c in seen:

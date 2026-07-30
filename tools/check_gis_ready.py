@@ -7,6 +7,7 @@ import argparse
 import os
 
 import psycopg2
+from psycopg2 import sql
 
 
 def main():
@@ -23,36 +24,93 @@ def main():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT g.f_table_name, g.type, g.srid,
+        SELECT g.f_table_name, g.f_geometry_column, g.type, g.srid,
                EXISTS (SELECT 1 FROM pg_index i
-                       JOIN pg_class c ON c.oid = i.indrelid
-                       JOIN pg_namespace ns ON ns.oid = c.relnamespace
-                       WHERE ns.nspname = 'net' AND c.relname = g.f_table_name
-                         AND i.indisprimary) AS has_pk,
-               EXISTS (SELECT 1 FROM pg_indexes
-                       WHERE schemaname = 'net' AND tablename = g.f_table_name
-                         AND indexdef LIKE '%gist%') AS has_gist
+                       JOIN pg_attribute pa
+                         ON pa.attrelid = i.indrelid
+                        AND pa.attnum = ANY(i.indkey)
+                       WHERE i.indrelid = c.oid
+                         AND i.indisprimary
+                         AND pa.attname = 'id'
+                         AND pa.atttypid IN ('int4'::regtype, 'int8'::regtype)
+                         AND array_length(i.indkey, 1) = 1) AS has_integer_pk,
+               EXISTS (SELECT 1 FROM pg_index i
+                       JOIN pg_class ic ON ic.oid = i.indexrelid
+                       JOIN pg_am am ON am.oid = ic.relam
+                       JOIN pg_attribute ga
+                         ON ga.attrelid = i.indrelid
+                        AND ga.attnum = ANY(i.indkey)
+                       WHERE i.indrelid = c.oid
+                         AND am.amname = 'gist'
+                         AND ga.attname = g.f_geometry_column) AS has_gist,
+               a.attnotnull AS geom_not_null
         FROM geometry_columns g
+        JOIN pg_namespace n ON n.nspname = g.f_table_schema
+        JOIN pg_class c
+          ON c.relnamespace = n.oid
+         AND c.relname = g.f_table_name
+         AND c.relkind IN ('r', 'p')
+        JOIN pg_attribute a
+          ON a.attrelid = c.oid
+         AND a.attname = g.f_geometry_column
+         AND NOT a.attisdropped
         WHERE g.f_table_schema = 'net'
-        ORDER BY g.f_table_name
+        ORDER BY g.f_table_name, g.f_geometry_column
     """)
     rows = cur.fetchall()
 
-    print('%-26s %-12s %6s %6s %6s %10s %8s' % (
-        'СЛОЙ', 'ГЕОМЕТРИЯ', 'SRID', 'PK', 'GIST', 'ОБЪЕКТОВ', 'БИТЫХ'))
+    print('%-26s %-12s %6s %6s %6s %6s %10s %8s  %s' % (
+        'СЛОЙ', 'ГЕОМЕТРИЯ', 'SRID', 'PK', 'GIST', 'NN',
+        'ОБЪЕКТОВ', 'БИТЫХ', 'ФАКТИЧЕСКИЕ ТИПЫ / ПРОБЛЕМЫ'))
     problems = 0
     total = 0
-    for name, gtype, srid, pk, gist in rows:
-        cur.execute('SELECT count(*), count(*) FILTER '
-                    '(WHERE NOT ST_IsValid(geom)) FROM net.%s' % name)
-        n, bad = cur.fetchone()
+    for name, geom_column, gtype, srid, pk, gist, not_null in rows:
+        cur.execute(
+            sql.SQL("""
+                SELECT count(*),
+                       count(*) FILTER (WHERE {geom} IS NULL),
+                       count(*) FILTER (
+                           WHERE {geom} IS NOT NULL
+                             AND NOT ST_IsValid({geom})),
+                       array_agg(DISTINCT GeometryType({geom}))
+                           FILTER (WHERE {geom} IS NOT NULL)
+                FROM {schema}.{table}
+            """).format(
+                geom=sql.Identifier(geom_column),
+                schema=sql.Identifier('net'),
+                table=sql.Identifier(name),
+            )
+        )
+        n, nulls, bad, actual_types = cur.fetchone()
+        actual_types = actual_types or []
         total += n
-        ok = pk and gist and srid == 9998 and bad == 0
+        reasons = []
+        if not pk:
+            reasons.append('нет целочисленного PK id')
+        if not gist:
+            reasons.append('нет GiST по геометрии')
+        if not not_null or nulls:
+            reasons.append('геометрия допускает/содержит NULL')
+        if srid != 9998:
+            reasons.append('SRID != 9998')
+        if bad:
+            reasons.append('невалидная геометрия')
+        if gtype.upper() == 'GEOMETRY':
+            reasons.append('тип geometry не конкретизирован')
+        if len(actual_types) > 1:
+            reasons.append('смешанные типы')
+        if (actual_types and gtype.upper() != 'GEOMETRY'
+                and any(t.upper() != gtype.upper() for t in actual_types)):
+            reasons.append('фактический тип не совпадает с DDL')
+        ok = not reasons
         if not ok:
             problems += 1
-        print('%-26s %-12s %6s %6s %6s %10d %8d %s' % (
+        type_text = ','.join(actual_types) if actual_types else '-'
+        suffix = '' if ok else '  <-- ' + '; '.join(reasons)
+        print('%-26s %-12s %6s %6s %6s %6s %10d %8d  %s%s' % (
             name, gtype, srid, 'да' if pk else 'НЕТ',
-            'да' if gist else 'НЕТ', n, bad, '' if ok else '  <-- проблема'))
+            'да' if gist else 'НЕТ', 'да' if not_null else 'НЕТ',
+            n, bad, type_text, suffix))
 
     cur.execute("SELECT count(*) FROM spatial_ref_sys WHERE srid = 9998 "
                 "AND proj4text IS NOT NULL AND proj4text <> ''")

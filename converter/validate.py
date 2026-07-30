@@ -36,6 +36,21 @@ def main():
     cur = conn.cursor()
     checks = []
 
+    # После переключения compat public.nodes/public.linesobj становятся
+    # представлениями над net. Сверять net с ними бессмысленно: проверка
+    # сравнивала бы результат сам с собой. Если сохранены исходные таблицы,
+    # всегда используем *_legacy; до переключения — обычные public-таблицы.
+    cur.execute("""
+        SELECT to_regclass('public.nodes_legacy'),
+               to_regclass('public.linesobj_legacy')
+    """)
+    legacy_nodes, legacy_lines = cur.fetchone()
+    source_nodes = ('public.nodes_legacy' if legacy_nodes
+                    else 'public.nodes')
+    source_lines = ('public.linesobj_legacy' if legacy_lines
+                    else 'public.linesobj')
+    print('Источник сверки: %s, %s' % (source_nodes, source_lines))
+
     def check(name, sql, ok_pred, detail=''):
         cur.execute(sql)
         row = cur.fetchone()
@@ -51,17 +66,20 @@ def main():
     line_tables = [e['target'] for e in m['class_line']] + ['line_plain']
 
     node_union = ' UNION ALL '.join(
-        'SELECT src_id, geom FROM net.%s' % t for t in node_tables)
+        'SELECT id, src_id, geom, removed_at FROM net.%s' % t
+        for t in node_tables)
     line_union = ' UNION ALL '.join(
-        'SELECT src_id, geom FROM net.%s' % t for t in line_tables)
+        'SELECT id, src_id, geom, removed_at, node_from, node_to, '
+        'node_from_src, node_to_src FROM net.%s' % t
+        for t in line_tables)
 
     print('\n=== ГЕОМЕТРИЯ ===')
 
     check('узлы: geom совпал с прежним public.shape',
           """SELECT count(*), count(*) FILTER (
                  WHERE ST_DWithin(u.geom, n.shape, %f))
-             FROM (%s) u JOIN public.nodes n ON n.id = u.src_id
-             WHERE n.shape IS NOT NULL""" % (TOL, node_union),
+             FROM (%s) u JOIN %s n ON n.id = u.src_id
+             WHERE n.shape IS NOT NULL""" % (TOL, node_union, source_nodes),
           lambda tot, ok: tot == ok and tot > 0,
           'расхождение означает неверную формулу пересчёта координат')
 
@@ -75,9 +93,10 @@ def main():
                    AND ST_DWithin(ST_EndPoint(u.geom),
                        ST_SetSRID(ST_Point(n2.x/100.0, -n2.y/100.0), 9998), %f))
              FROM (%s) u
-             JOIN public.linesobj l ON l.id = u.src_id
-             JOIN public.nodes n1 ON n1.id = l.nodeid1
-             JOIN public.nodes n2 ON n2.id = l.nodeid2""" % (TOL, TOL, line_union),
+             JOIN %s l ON l.id = u.src_id
+             JOIN %s n1 ON n1.id = l.nodeid1
+             JOIN %s n2 ON n2.id = l.nodeid2"""
+          % (TOL, TOL, line_union, source_lines, source_nodes, source_nodes),
           lambda tot, ok: tot == ok and tot > 0,
           'проверяет привязку линии к узлам')
 
@@ -86,30 +105,30 @@ def main():
                  WHERE ST_NPoints(u.geom)
                        = 2 + coalesce(array_length(
                              net.parse_coords(l.coords, 100.0), 1), 0))
-             FROM (%s) u JOIN public.linesobj l ON l.id = u.src_id"""
-          % line_union,
+             FROM (%s) u JOIN %s l ON l.id = u.src_id"""
+          % (line_union, source_lines),
           lambda tot, ok: tot == ok and tot > 0,
           'проверяет разбор coords и порядок вершин')
 
     check('[справочно] устаревших public.shape у линий',
           """SELECT count(*) FROM (%s) u
-             JOIN public.linesobj l ON l.id = u.src_id
+             JOIN %s l ON l.id = u.src_id
              WHERE l.shape IS NOT NULL
                AND ST_HausdorffDistance(u.geom, l.shape) >= %f"""
-          % (line_union, TOL),
+          % (line_union, source_lines, TOL),
           lambda n: n >= 0,
           'shape не пересчитывался после правки координат — расхождение ожидаемо')
 
     check('узлы: геометрия появилась там, где её не было',
           """SELECT count(*) FROM (%s) u
-             JOIN public.nodes n ON n.id = u.src_id
-             WHERE n.shape IS NULL""" % node_union,
+             JOIN %s n ON n.id = u.src_id
+             WHERE n.shape IS NULL""" % (node_union, source_nodes),
           lambda n: n >= 0)
 
     check('линии: геометрия появилась там, где её не было',
           """SELECT count(*) FROM (%s) u
-             JOIN public.linesobj l ON l.id = u.src_id
-             WHERE l.shape IS NULL""" % line_union,
+             JOIN %s l ON l.id = u.src_id
+             WHERE l.shape IS NULL""" % (line_union, source_lines),
           lambda n: n >= 0)
 
     check('нет вырожденных линий (меньше 2 точек)',
@@ -119,20 +138,41 @@ def main():
 
     print('\n=== ПОЛНОТА ПЕРЕНОСА ===')
 
-    check('узлы: перенесено + без координат = всего живых',
+    check('узлы: перенесены все строки с координатами',
           """SELECT (SELECT count(*) FROM (%s) u),
-                    (SELECT count(*) FROM public.nodes
-                     WHERE removed = 0 AND x = 0 AND y = 0),
-                    (SELECT count(*) FROM public.nodes)""" % node_union,
-          lambda moved, nogeo, total: moved + nogeo <= total)
+                    (SELECT count(*) FROM %s
+                     WHERE x <> 0 OR y <> 0),
+                    (SELECT count(*) FROM %s
+                     WHERE x = 0 AND y = 0),
+                    (SELECT count(*) FROM %s)"""
+          % (node_union, source_nodes, source_nodes, source_nodes),
+          lambda moved, convertible, nogeo, total:
+              moved == convertible and moved + nogeo == total,
+          'требуется точное равенство, строки без координат считаются отдельно')
 
-    check('линии: перенесено + без топологии = всего живых',
+    check('активные узлы: перенесены все строки с координатами',
+          """SELECT (SELECT count(*) FROM (%s) u
+                     WHERE removed_at IS NULL),
+                    (SELECT count(*) FROM %s
+                     WHERE removed = 0 AND (x <> 0 OR y <> 0))"""
+          % (node_union, source_nodes),
+          lambda moved, source: moved == source)
+
+    check('линии: перенесено + без топологии = всего',
           """SELECT (SELECT count(*) FROM (%s) u),
                     (SELECT count(*) FROM net.line_orphan),
-                    (SELECT count(*) FROM public.linesobj WHERE removed = 0)"""
-          % line_union,
-          lambda moved, orph, alive: moved + orph >= alive * 0.99,
-          'допускается расхождение до 1 % на записи с removed<>0')
+                    (SELECT count(*) FROM %s)"""
+          % (line_union, source_lines),
+          lambda moved, orph, total: moved + orph == total,
+          'ни одна исходная строка линии не должна исчезнуть или учитываться дважды')
+
+    check('активные линии: перенесено + без топологии = всего',
+          """SELECT (SELECT count(*) FROM (%s) u
+                     WHERE removed_at IS NULL),
+                    (SELECT count(*) FROM net.line_orphan),
+                    (SELECT count(*) FROM %s WHERE removed = 0)"""
+          % (line_union, source_lines),
+          lambda moved, orph, total: moved + orph == total)
 
     print('\n=== СОХРАННОСТЬ ИДЕНТИФИКАТОРОВ ===')
 
@@ -173,20 +213,21 @@ def main():
     # fragment_id означает, что объект пропадёт из выдачи целиком.
     check('узлы: fragment_id заполнен везде, где был fileid',
           """SELECT count(*), count(*) FILTER (WHERE u.fragment_id IS NOT NULL)
-             FROM (%s) u JOIN public.nodes n ON n.id = u.src_id
+             FROM (%s) u JOIN %s n ON n.id = u.src_id
              WHERE n.fileid IS NOT NULL"""
-          % ' UNION ALL '.join('SELECT src_id, fragment_id FROM net.%s' % t
-                               for t in node_tables),
+          % (' UNION ALL '.join(
+              'SELECT src_id, fragment_id FROM net.%s' % t
+              for t in node_tables), source_nodes),
           lambda tot, ok: tot == ok and tot > 0,
           'NULL здесь = объект не найдётся по AND n.fileID IN (...)')
 
     check('узлы: набор фрагментов совпадает с исходным',
-          """SELECT (SELECT count(DISTINCT fileid) FROM public.nodes
+          """SELECT (SELECT count(DISTINCT fileid) FROM %s
                      WHERE removed = 0 AND fileid IS NOT NULL),
                     (SELECT count(DISTINCT fragment_id) FROM (%s) u
                      WHERE fragment_id IS NOT NULL)"""
-          % ' UNION ALL '.join('SELECT fragment_id FROM net.%s' % t
-                               for t in node_tables),
+          % (source_nodes, ' UNION ALL '.join(
+              'SELECT fragment_id FROM net.%s' % t for t in node_tables)),
           lambda src, got: src == got)
 
     print('\n=== ЦЕЛОСТНОСТЬ NET ===')
@@ -203,9 +244,11 @@ def main():
 
     check('нет линий с висящими концами',
           """SELECT count(*) FROM (%s) u
-             LEFT JOIN net.node_reg r ON r.id = u.src_id
-             WHERE FALSE""" % line_union,
-          lambda n: n == 0, 'гарантируется внешним ключом')
+             LEFT JOIN net.node_reg n1 ON n1.id = u.node_from
+             LEFT JOIN net.node_reg n2 ON n2.id = u.node_to
+             WHERE n1.id IS NULL OR n2.id IS NULL""" % line_union,
+          lambda n: n == 0,
+          'проверяются оба фактических FK каждой перенесённой линии')
 
     check('src_id уникален среди узлов',
           """SELECT count(*), count(DISTINCT src_id) FROM (%s) u
@@ -227,7 +270,9 @@ def main():
 
     failed = [c for c in checks if not c['ok']]
     if args.report:
-        os.makedirs(os.path.dirname(args.report), exist_ok=True)
+        report_dir = os.path.dirname(args.report)
+        if report_dir:
+            os.makedirs(report_dir, exist_ok=True)
         with open(args.report, 'w', encoding='utf-8') as f:
             json.dump(checks, f, ensure_ascii=False, indent=1)
 

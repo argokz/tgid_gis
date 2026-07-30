@@ -91,10 +91,52 @@ SELECT * FROM (
       FROM net.damper WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'VO', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'air_heater'
+      FROM net.air_heater WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'DG', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'diaphragm'
+      FROM net.diaphragm WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'EL', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'elevator'
+      FROM net.elevator WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'HE', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'heat_exchanger'
+      FROM net.heat_exchanger WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'LR', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'local_resistance'
+      FROM net.local_resistance WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'RP', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'regulator_press'
+      FROM net.regulator_press WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
            'HC', displaysign, NULL::double precision,
            NULL::double precision, NULL::integer,
            coords_legacy, 0, id, externalsignlineid, geom, 'pump'
       FROM net.pump WHERE removed_at IS NULL
+    UNION ALL
+    SELECT src_id, fragment_id, node_from_src, node_to_src,
+           'RA', displaysign, NULL::double precision,
+           NULL::double precision, NULL::integer,
+           coords_legacy, 0, id, externalsignlineid, geom, 'radiator'
+      FROM net.radiator WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, node_from_src, node_to_src,
            NULL::text, displaysign, NULL::double precision,
