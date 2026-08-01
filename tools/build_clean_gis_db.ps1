@@ -186,10 +186,11 @@ Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\111_line_join.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\112_node_move.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\113_object_reclass.sql')
 
-Write-Host '10. Результаты calc и справочник внешних кодов'
+Write-Host '10. Результаты calc и справочники ref'
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\120_calc_schema.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\123_externalcodes_reference.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\124_ref_single_copy.sql')
+Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\125_ref_move.sql')
 
 Write-Host '11. Строгий GIS-аудит'
 & python (Join-Path $root 'tools\check_gis_ready.py') --db $BuildDatabase

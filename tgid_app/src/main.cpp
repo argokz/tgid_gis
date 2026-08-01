@@ -8,6 +8,7 @@
 #include "repo/PipeLengthReportRepository.h"
 #include "repo/PipeVolumeReportRepository.h"
 #include "repo/SearchRepository.h"
+#include "repo/ZeroLoadConsumerRepository.h"
 #include "ui/MainWindow.h"
 
 #include <QApplication>
@@ -177,6 +178,20 @@ int main(int argc, char* argv[])
         QStringLiteral("Поиск в списке закрытых потребителей"),
         QStringLiteral("text"));
     parser.addOption(closedConsumerSearchOption);
+    const QCommandLineOption zeroLoadConsumersOption(
+        QStringLiteral("zero-load-consumers"),
+        QStringLiteral("Потребители с нулевой нагрузкой (onPotNagr0)"));
+    parser.addOption(zeroLoadConsumersOption);
+    const QCommandLineOption zeroLoadConsumerFragmentOption(
+        QStringLiteral("zero-load-consumer-fragment"),
+        QStringLiteral("Ограничить нулевую нагрузку фрагментом"),
+        QStringLiteral("fragment_id"));
+    parser.addOption(zeroLoadConsumerFragmentOption);
+    const QCommandLineOption zeroLoadConsumerSearchOption(
+        QStringLiteral("zero-load-consumer-search"),
+        QStringLiteral("Поиск потребителей с нулевой нагрузкой"),
+        QStringLiteral("text"));
+    parser.addOption(zeroLoadConsumerSearchOption);
     const QCommandLineOption reportArchivedOption(
         QStringLiteral("report-archived"),
         QStringLiteral("Включить архивные участки в отчёт"));
@@ -208,7 +223,8 @@ int main(int argc, char* argv[])
         || parser.isSet(pipeLengthReportOption)
         || parser.isSet(pipeVolumeReportOption)
         || parser.isSet(heatConsumptionReportOption)
-        || parser.isSet(closedConsumersOption)) {
+        || parser.isSet(closedConsumersOption)
+        || parser.isSet(zeroLoadConsumersOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -1158,6 +1174,53 @@ int main(int argc, char* argv[])
             }
             qInfo().noquote()
                 << QStringLiteral("OK_CLOSED: найдено=%1 лимит=%2")
+                       .arg(rows.size())
+                       .arg(criteria.limit);
+        }
+
+        if (parser.isSet(zeroLoadConsumersOption)) {
+            bool fragmentValid = true;
+            const int fragmentId =
+                parser.isSet(zeroLoadConsumerFragmentOption)
+                    ? parser.value(zeroLoadConsumerFragmentOption)
+                          .toInt(&fragmentValid)
+                    : 0;
+            if (!fragmentValid || fragmentId < 0) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Некорректный --zero-load-consumer-fragment");
+                return 44;
+            }
+            tgid::repo::ZeroLoadConsumerCriteria criteria;
+            criteria.fragmentId = fragmentId;
+            criteria.searchText =
+                parser.value(zeroLoadConsumerSearchOption).trimmed();
+            criteria.limit = 2000;
+            QString listError;
+            const QList<tgid::repo::ZeroLoadConsumerRow> rows =
+                tgid::repo::ZeroLoadConsumerRepository().load(
+                    connection.database(), criteria, &listError);
+            if (!listError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ошибка списка потребителей с нулевой нагрузкой:")
+                    << listError;
+                return 45;
+            }
+            for (const tgid::repo::ZeroLoadConsumerRow& row : rows) {
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "ZERO_LOAD: table=%1 id=%2 source_id=%3 fragment=%4 code=%5 node=%6 name=%7")
+                           .arg(row.classTable)
+                           .arg(row.id)
+                           .arg(row.sourceId)
+                           .arg(row.fragmentId)
+                           .arg(row.externalCode,
+                                row.externalNodeName,
+                                row.consumerName);
+            }
+            qInfo().noquote()
+                << QStringLiteral("OK_ZERO_LOAD: найдено=%1 лимит=%2")
                        .arg(rows.size())
                        .arg(criteria.limit);
         }

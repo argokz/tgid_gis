@@ -873,6 +873,71 @@ void MainWindow::buildInterface()
     tabs->addTab(
         closedConsumersTab, QStringLiteral("Закрытые потребители"));
 
+    auto* zeroLoadTab = new QWidget(tabs);
+    auto* zeroLoadLayout = new QVBoxLayout(zeroLoadTab);
+    auto* zeroLoadToolbar = new QHBoxLayout();
+    zeroLoadToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), zeroLoadTab));
+    zeroLoadConsumerFragmentCombo_ = new QComboBox(zeroLoadTab);
+    zeroLoadConsumerFragmentCombo_->setMinimumWidth(240);
+    zeroLoadConsumerFragmentCombo_->setEnabled(false);
+    zeroLoadToolbar->addWidget(zeroLoadConsumerFragmentCombo_, 1);
+    zeroLoadToolbar->addWidget(
+        new QLabel(QStringLiteral("Фильтр:"), zeroLoadTab));
+    zeroLoadConsumerSearchEdit_ = new QLineEdit(zeroLoadTab);
+    zeroLoadConsumerSearchEdit_->setClearButtonEnabled(true);
+    zeroLoadConsumerSearchEdit_->setPlaceholderText(
+        QStringLiteral("Код, имя узла, потребитель или исходный ID"));
+    zeroLoadToolbar->addWidget(zeroLoadConsumerSearchEdit_, 1);
+    refreshZeroLoadConsumersButton_ = new QPushButton(
+        QStringLiteral("Найти"), zeroLoadTab);
+    refreshZeroLoadConsumersButton_->setEnabled(false);
+    connect(refreshZeroLoadConsumersButton_, &QPushButton::clicked,
+            this, &MainWindow::refreshZeroLoadConsumers);
+    connect(zeroLoadConsumerSearchEdit_, &QLineEdit::returnPressed,
+            this, &MainWindow::refreshZeroLoadConsumers);
+    zeroLoadToolbar->addWidget(refreshZeroLoadConsumersButton_);
+    exportZeroLoadConsumersButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), zeroLoadTab);
+    exportZeroLoadConsumersButton_->setEnabled(false);
+    connect(exportZeroLoadConsumersButton_, &QPushButton::clicked,
+            this, &MainWindow::exportZeroLoadConsumers);
+    zeroLoadToolbar->addWidget(exportZeroLoadConsumersButton_);
+    zeroLoadLayout->addLayout(zeroLoadToolbar);
+    zeroLoadConsumersStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Нулевая нагрузка определяется по исходным правилам "
+            "onPotNagr0. Двойной щелчок открывает карточку."),
+        zeroLoadTab);
+    zeroLoadConsumersStatusLabel_->setWordWrap(true);
+    zeroLoadLayout->addWidget(zeroLoadConsumersStatusLabel_);
+    zeroLoadConsumersTable_ = new QTableWidget(zeroLoadTab);
+    zeroLoadConsumersTable_->setColumnCount(7);
+    zeroLoadConsumersTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Класс"),
+        QStringLiteral("ID"),
+        QStringLiteral("Исходный ID"),
+        QStringLiteral("Внешний код"),
+        QStringLiteral("Внешнее имя узла"),
+        QStringLiteral("Потребитель"),
+        QStringLiteral("Фрагмент"),
+    });
+    zeroLoadConsumersTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    zeroLoadConsumersTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    zeroLoadConsumersTable_->setSelectionMode(
+        QAbstractItemView::SingleSelection);
+    zeroLoadConsumersTable_->setAlternatingRowColors(true);
+    zeroLoadConsumersTable_->setSortingEnabled(true);
+    zeroLoadConsumersTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    zeroLoadConsumersTable_->horizontalHeader()->setStretchLastSection(true);
+    connect(zeroLoadConsumersTable_, &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openZeroLoadConsumer);
+    zeroLoadLayout->addWidget(zeroLoadConsumersTable_, 1);
+    tabs->addTab(zeroLoadTab, QStringLiteral("Нулевая нагрузка"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -1072,6 +1137,14 @@ void MainWindow::showError(const QString& message)
     refreshClosedConsumersButton_->setEnabled(false);
     exportClosedConsumersButton_->setEnabled(false);
     closedConsumersStatusLabel_->setText(
+        QStringLiteral("Список недоступен"));
+    zeroLoadConsumersTable_->setRowCount(0);
+    zeroLoadConsumerRows_.clear();
+    zeroLoadConsumerFragmentCombo_->clear();
+    zeroLoadConsumerFragmentCombo_->setEnabled(false);
+    refreshZeroLoadConsumersButton_->setEnabled(false);
+    exportZeroLoadConsumersButton_->setEnabled(false);
+    zeroLoadConsumersStatusLabel_->setText(
         QStringLiteral("Список недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
@@ -1617,6 +1690,7 @@ void MainWindow::populateReportFragments(
     volumeFragmentCombo_->clear();
     heatFragmentCombo_->clear();
     closedConsumerFragmentCombo_->clear();
+    zeroLoadConsumerFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     volumeFragmentCombo_->addItem(
@@ -1624,6 +1698,8 @@ void MainWindow::populateReportFragments(
     heatFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты с расчётами"), 0);
     closedConsumerFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
+    zeroLoadConsumerFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
@@ -1641,6 +1717,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         closedConsumerFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        zeroLoadConsumerFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1684,6 +1763,16 @@ void MainWindow::populateReportFragments(
     closedConsumersTable_->setRowCount(0);
     closedConsumersStatusLabel_->setStyleSheet({});
     closedConsumersStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и нажмите «Найти»"));
+    zeroLoadConsumerFragmentCombo_->setEnabled(
+        zeroLoadConsumerFragmentCombo_->count() > 0);
+    refreshZeroLoadConsumersButton_->setEnabled(
+        zeroLoadConsumerFragmentCombo_->count() > 0);
+    exportZeroLoadConsumersButton_->setEnabled(false);
+    zeroLoadConsumerRows_.clear();
+    zeroLoadConsumersTable_->setRowCount(0);
+    zeroLoadConsumersStatusLabel_->setStyleSheet({});
+    zeroLoadConsumersStatusLabel_->setText(
         QStringLiteral("Выберите параметры и нажмите «Найти»"));
 }
 
@@ -2314,6 +2403,170 @@ void MainWindow::exportClosedConsumers()
         stream << csvCell(row.classTable) << ';'
                << row.id << ';'
                << row.sourceId << ';'
+               << row.fragmentId << ';'
+               << csvCell(row.externalCode) << ';'
+               << csvCell(row.externalNodeName) << ';'
+               << csvCell(row.consumerName) << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::refreshZeroLoadConsumers()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::ZeroLoadConsumerCriteria criteria;
+    criteria.fragmentId =
+        zeroLoadConsumerFragmentCombo_->currentData().toInt();
+    criteria.searchText = zeroLoadConsumerSearchEdit_->text().trimmed();
+    criteria.limit = 2000;
+
+    refreshZeroLoadConsumersButton_->setEnabled(false);
+    exportZeroLoadConsumersButton_->setEnabled(false);
+    zeroLoadConsumersStatusLabel_->setStyleSheet({});
+    zeroLoadConsumersStatusLabel_->setText(
+        QStringLiteral("Загрузка потребителей с нулевой нагрузкой…"));
+    QApplication::processEvents();
+
+    QString error;
+    zeroLoadConsumerRows_ = zeroLoadConsumerRepository_.load(
+        connection_.database(), criteria, &error);
+    refreshZeroLoadConsumersButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        zeroLoadConsumerRows_.clear();
+        zeroLoadConsumersTable_->setRowCount(0);
+        zeroLoadConsumersStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        zeroLoadConsumersStatusLabel_->setText(
+            QStringLiteral("Ошибка списка: %1").arg(error));
+        return;
+    }
+
+    zeroLoadConsumersTable_->setSortingEnabled(false);
+    zeroLoadConsumersTable_->setRowCount(zeroLoadConsumerRows_.size());
+    qsizetype unclassifiedCount = 0;
+    for (qsizetype rowIndex = 0;
+         rowIndex < zeroLoadConsumerRows_.size(); ++rowIndex) {
+        const repo::ZeroLoadConsumerRow& row =
+            zeroLoadConsumerRows_.at(rowIndex);
+        QString classLabel;
+        if (row.classTable == QStringLiteral("consumer_real")) {
+            classLabel = QStringLiteral("Реальный");
+        } else if (row.classTable == QStringLiteral("consumer_general")) {
+            classLabel = QStringLiteral("Обобщённый");
+        } else {
+            classLabel = QStringLiteral("Не классифицирован");
+            ++unclassifiedCount;
+        }
+        QTableWidgetItem* classItem = readOnlyItem(classLabel);
+        classItem->setData(Qt::UserRole, row.id);
+        classItem->setData(Qt::UserRole + 1, row.classTable);
+        if (!row.hasObjectCard()) {
+            classItem->setToolTip(
+                QStringLiteral(
+                    "Legacy-узел не имеет канонического объектного класса"));
+        }
+        zeroLoadConsumersTable_->setItem(rowIndex, 0, classItem);
+        zeroLoadConsumersTable_->setItem(
+            rowIndex, 1,
+            readOnlyItem(row.id > 0 ? QString::number(row.id)
+                                    : QStringLiteral("—")));
+        zeroLoadConsumersTable_->setItem(
+            rowIndex, 2, readOnlyItem(QString::number(row.sourceId)));
+        zeroLoadConsumersTable_->setItem(
+            rowIndex, 3, readOnlyItem(row.externalCode));
+        zeroLoadConsumersTable_->setItem(
+            rowIndex, 4, readOnlyItem(row.externalNodeName));
+        zeroLoadConsumersTable_->setItem(
+            rowIndex, 5, readOnlyItem(row.consumerName));
+        zeroLoadConsumersTable_->setItem(
+            rowIndex, 6, readOnlyItem(QString::number(row.fragmentId)));
+    }
+    zeroLoadConsumersTable_->setSortingEnabled(true);
+    exportZeroLoadConsumersButton_->setEnabled(
+        !zeroLoadConsumerRows_.isEmpty());
+    zeroLoadConsumersStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    if (zeroLoadConsumerRows_.size() == criteria.limit) {
+        zeroLoadConsumersStatusLabel_->setText(
+            QStringLiteral("Показаны первые %1 строк — уточните фильтр")
+                .arg(criteria.limit));
+    } else if (unclassifiedCount > 0) {
+        zeroLoadConsumersStatusLabel_->setText(
+            QStringLiteral(
+                "Найдено: %1; без канонического класса: %2")
+                .arg(zeroLoadConsumerRows_.size())
+                .arg(unclassifiedCount));
+    } else {
+        zeroLoadConsumersStatusLabel_->setText(
+            QStringLiteral("Найдено потребителей: %1")
+                .arg(zeroLoadConsumerRows_.size()));
+    }
+}
+
+void MainWindow::openZeroLoadConsumer(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = zeroLoadConsumersTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    const qint64 objectId = item->data(Qt::UserRole).toLongLong();
+    const QString classTable = item->data(Qt::UserRole + 1).toString();
+    if (objectId <= 0 || classTable == QStringLiteral("unclassified")) {
+        zeroLoadConsumersStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b54708;"));
+        zeroLoadConsumersStatusLabel_->setText(
+            QStringLiteral(
+                "Узел не имеет канонического класса; исходный ID доступен в таблице"));
+        return;
+    }
+    showObjectDetails(objectId, classTable, true);
+}
+
+void MainWindow::exportZeroLoadConsumers()
+{
+    if (zeroLoadConsumerRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт потребителей с нулевой нагрузкой"),
+        QStringLiteral("tgid_zero_load_consumers.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("Класс")) << ';'
+           << csvCell(QStringLiteral("ID")) << ';'
+           << csvCell(QStringLiteral("Исходный ID")) << ';'
+           << csvCell(QStringLiteral("Фрагмент")) << ';'
+           << csvCell(QStringLiteral("Внешний код")) << ';'
+           << csvCell(QStringLiteral("Внешнее имя узла")) << ';'
+           << csvCell(QStringLiteral("Потребитель")) << '\n';
+    for (const repo::ZeroLoadConsumerRow& row : zeroLoadConsumerRows_) {
+        stream << csvCell(row.classTable) << ';';
+        if (row.id > 0) {
+            stream << row.id;
+        }
+        stream << ';' << row.sourceId << ';'
                << row.fragmentId << ';'
                << csvCell(row.externalCode) << ';'
                << csvCell(row.externalNodeName) << ';'

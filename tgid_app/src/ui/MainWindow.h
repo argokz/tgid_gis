@@ -11,6 +11,7 @@
 #include "repo/PipeLengthReportRepository.h"
 #include "repo/PipeVolumeReportRepository.h"
 #include "repo/SearchRepository.h"
+#include "repo/ZeroLoadConsumerRepository.h"
 
 #include <QElapsedTimer>
 #include <QFutureWatcher>
@@ -77,6 +78,9 @@ private slots:
     void refreshClosedConsumers();
     void exportClosedConsumers();
     void openClosedConsumer(int row, int column);
+    void refreshZeroLoadConsumers();
+    void exportZeroLoadConsumers();
+    void openZeroLoadConsumer(int row, int column);
 
 private:
     void buildInterface();
@@ -107,6 +111,7 @@ private:
     repo::PipeLengthReportRepository pipeLengthReportRepository_;
     repo::PipeVolumeReportRepository pipeVolumeReportRepository_;
     repo::SearchRepository searchRepository_;
+    repo::ZeroLoadConsumerRepository zeroLoadConsumerRepository_;
 
     QLabel* connectionLabel_ = nullptr;
     QLabel* statusLabel_ = nullptr;
@@ -166,6 +171,12 @@ private:
     QPushButton* exportClosedConsumersButton_ = nullptr;
     QLabel* closedConsumersStatusLabel_ = nullptr;
     QTableWidget* closedConsumersTable_ = nullptr;
+    QComboBox* zeroLoadConsumerFragmentCombo_ = nullptr;
+    QLineEdit* zeroLoadConsumerSearchEdit_ = nullptr;
+    QPushButton* refreshZeroLoadConsumersButton_ = nullptr;
+    QPushButton* exportZeroLoadConsumersButton_ = nullptr;
+    QLabel* zeroLoadConsumersStatusLabel_ = nullptr;
+    QTableWidget* zeroLoadConsumersTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -184,6 +195,7 @@ private:
     QList<repo::PipeVolumeReportRow> pipeVolumeReportRows_;
     repo::HeatConsumptionReportResult heatConsumptionReport_;
     QList<repo::ClosedConsumerRow> closedConsumerRows_;
+    QList<repo::ZeroLoadConsumerRow> zeroLoadConsumerRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;

@@ -168,7 +168,7 @@ ALTER DATABASE tgid_gis SET search_path = public, net, ref, calc;
 
 ## Шаг 3 выполнен: 212 справочников в `ref`
 
-[`sql/124_ref_move.sql`](../sql/124_ref_move.sql) переносит справочники
+[`sql/125_ref_move.sql`](../sql/125_ref_move.sql) переносит справочники
 из `public` в `ref`. Список в скрипте **явный**, а не вычисляемый по
 маске: миграцию продуктовой БД читают глазами при разборе, и она не
 должна зависеть от эвристики, которая завтра классифицирует иначе.
@@ -179,7 +179,7 @@ ALTER DATABASE tgid_gis SET search_path = public, net, ref, calc;
 `ALTER TABLE ... SET SCHEMA` не ломает ни внешние ключи, ни
 представления: и те и другие держат таблицу по OID, а не по имени.
 
-Откат — [`sql/125_ref_move_rollback.sql`](../sql/125_ref_move_rollback.sql).
+Откат — [`sql/126_ref_move_rollback.sql`](../sql/126_ref_move_rollback.sql).
 
 Проверка: расчёт отработал, сверка — 0 таблиц с расхождениями.
 

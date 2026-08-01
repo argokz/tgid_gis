@@ -14,7 +14,7 @@
 -- Обращения по имени без схемы продолжают работать через search_path
 -- базы (public, net, ref, calc).
 --
--- Откат: sql/125_ref_move_rollback.sql.
+-- Откат: sql/126_ref_move_rollback.sql.
 
 BEGIN;
 

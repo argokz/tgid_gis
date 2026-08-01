@@ -54,6 +54,7 @@
 | 38 | Запрос `aZap1`: объём воды в сети и выделенных трубопроводах | готово — [описание](docs/21-network-volume.md) |
 | 39 | Запросы `aZap3–aZap5`: теплопотребление последнего расчёта | готово — [описание](docs/22-heat-consumption-report.md) |
 | 40 | Запрос `aZap6`: закрытые потребители и справочник внешних кодов | готово — [описание](docs/23-closed-consumers.md), [123](sql/123_externalcodes_reference.sql) |
+| 41 | Запрос `onPotNagr0`: потребители с нулевой нагрузкой | готово — [описание](docs/24-zero-load-consumers.md), [тест](sql/tests/test_zero_load_consumers.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -147,6 +148,7 @@ psql -f sql/113_object_reclass.sql      # смена класса узла ил�
 psql -f sql/120_calc_schema.sql         # результаты расчётов в схему calc
 psql -f sql/123_externalcodes_reference.sql # externalcodes в ref и FK узлов
 psql -f sql/124_ref_single_copy.sql          # удалить проверенные дубли справочников public
+psql -f sql/125_ref_move.sql                 # перенести остальные справочники public в ref
 ```
 
 До шага 123 откат выполняется через `DROP SCHEMA net CASCADE`, исходные таблицы
