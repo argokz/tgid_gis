@@ -104,6 +104,11 @@ int main(int argc, char* argv[])
         QStringLiteral("Переместить узел: table:id:x:y"),
         QStringLiteral("table:id:x:y"));
     parser.addOption(moveNodeOption);
+    const QCommandLineOption reclassObjectOption(
+        QStringLiteral("reclass-object"),
+        QStringLiteral("Изменить класс объекта: source:id:target"),
+        QStringLiteral("source:id:target"));
+    parser.addOption(reclassObjectOption);
     const QCommandLineOption batchSetOption(
         QStringLiteral("batch-set"),
         QStringLiteral("Изменить одно поле нескольких объектов: table:field:value"),
@@ -169,6 +174,7 @@ int main(int argc, char* argv[])
         || parser.isSet(splitLineOption)
         || parser.isSet(joinLinesOption)
         || parser.isSet(moveNodeOption)
+        || parser.isSet(reclassObjectOption)
         || parser.isSet(batchSetOption)
         || parser.isSet(searchObjectsOption)
         || parser.isSet(searchConditionOption)
@@ -644,6 +650,47 @@ int main(int argc, char* argv[])
                        .arg(id)
                        .arg(moveResult.rowVersion)
                        .arg(moveResult.connectedLines);
+        }
+
+        if (parser.isSet(reclassObjectOption)) {
+            const QStringList parts =
+                parser.value(reclassObjectOption).split(':');
+            bool idValid = false;
+            bool versionValid = false;
+            if (parts.size() != 3 || parts.at(0).isEmpty()
+                || parts.at(2).isEmpty()
+                || !parser.isSet(expectedVersionOption)) {
+                return 35;
+            }
+            const qint64 id = parts.at(1).toLongLong(&idValid);
+            const qint64 version = parser.value(expectedVersionOption)
+                                       .toLongLong(&versionValid);
+            if (!idValid || !versionValid) {
+                return 35;
+            }
+            const tgid::repo::ReclassResult reclassResult =
+                tgid::repo::ObjectRepository().reclassObject(
+                    connection.database(), parts.at(0), id, version,
+                    parts.at(2));
+            if (reclassResult.conflict) {
+                qCritical().noquote()
+                    << QStringLiteral("CONFLICT:") << reclassResult.error;
+                return 36;
+            }
+            if (!reclassResult.success) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка смены класса:")
+                    << reclassResult.error;
+                return 37;
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK: объект=%1:%2 новый_класс=%3 версия=%4 полей=%5")
+                       .arg(parts.at(0))
+                       .arg(id)
+                       .arg(reclassResult.targetTable)
+                       .arg(reclassResult.rowVersion)
+                       .arg(reclassResult.copiedFields);
         }
 
         if (parser.isSet(batchSetOption)) {

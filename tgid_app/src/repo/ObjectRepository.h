@@ -34,6 +34,7 @@ struct ObjectDetails final {
     bool canArchive = false;
     bool canSplit = false;
     bool canJoin = false;
+    bool canReclass = false;
     QList<ObjectAttribute> attributes;
     QString error;
 
@@ -118,6 +119,21 @@ struct MoveNodeResult final {
     QString error;
 };
 
+struct ReclassTarget final {
+    QString tableName;
+    QString displayName;
+};
+
+struct ReclassResult final {
+    bool success = false;
+    bool conflict = false;
+    bool isNode = false;
+    QString targetTable;
+    qint64 rowVersion = 0;
+    int copiedFields = 0;
+    QString error;
+};
+
 class ObjectRepository final {
 public:
     [[nodiscard]] ObjectDetails load(
@@ -195,6 +211,18 @@ public:
         qint64 id,
         qint64 expectedVersion,
         const QPointF& position) const;
+
+    [[nodiscard]] QList<ReclassTarget> loadReclassTargets(
+        const QSqlDatabase& database,
+        const QString& sourceTable,
+        QString* error) const;
+
+    [[nodiscard]] ReclassResult reclassObject(
+        QSqlDatabase database,
+        const QString& sourceTable,
+        qint64 id,
+        qint64 expectedVersion,
+        const QString& targetTable) const;
 };
 
 }  // namespace tgid::repo

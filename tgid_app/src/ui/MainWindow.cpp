@@ -762,6 +762,12 @@ void MainWindow::buildInterface()
     connect(historyObjectButton_, &QPushButton::clicked,
             this, &MainWindow::showObjectHistory);
     lifecycleButtons->addWidget(historyObjectButton_);
+    reclassObjectButton_ =
+        new QPushButton(QStringLiteral("Изменить тип"), objectPanel);
+    reclassObjectButton_->setEnabled(false);
+    connect(reclassObjectButton_, &QPushButton::clicked,
+            this, &MainWindow::reclassCurrentObject);
+    lifecycleButtons->addWidget(reclassObjectButton_);
     archiveObjectButton_ =
         new QPushButton(QStringLiteral("В архив"), objectPanel);
     archiveObjectButton_->setEnabled(false);
@@ -2554,6 +2560,7 @@ void MainWindow::showObjectDetails(
         reloadObjectButton_->setEnabled(false);
         archiveObjectButton_->setEnabled(false);
         historyObjectButton_->setEnabled(false);
+        reclassObjectButton_->setEnabled(false);
         moveNodeButton_->setChecked(false);
         moveNodeButton_->setEnabled(false);
         splitLineButton_->setChecked(false);
@@ -2685,6 +2692,8 @@ void MainWindow::displayObjectDetails(
         details.archived ? QStringLiteral("Восстановить")
                          : QStringLiteral("В архив"));
     historyObjectButton_->setEnabled(true);
+    reclassObjectButton_->setEnabled(
+        details.canReclass && !details.archived);
     moveNodeButton_->setEnabled(
         isNode && !details.archived
         && mapView_->hasSelectedNode(details.id, details.classTable));
@@ -2905,10 +2914,14 @@ void MainWindow::showObjectHistory()
         QString operation = entry.operation;
         if (operation == QStringLiteral("update")) {
             operation = QStringLiteral("изменение");
+        } else if (operation == QStringLiteral("insert")) {
+            operation = QStringLiteral("создание");
         } else if (operation == QStringLiteral("archive")) {
             operation = QStringLiteral("архив");
         } else if (operation == QStringLiteral("restore")) {
             operation = QStringLiteral("восстановление");
+        } else if (operation == QStringLiteral("reclass")) {
+            operation = QStringLiteral("смена типа");
         }
         table->setItem(
             row, 0, readOnlyItem(QString::number(entry.rowVersion)));
@@ -2928,6 +2941,125 @@ void MainWindow::showObjectHistory()
             &dialog, &QDialog::reject);
     layout->addWidget(buttons);
     dialog.exec();
+}
+
+void MainWindow::reclassCurrentObject()
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()
+        || currentObjectDetails_.archived
+        || !currentObjectDetails_.canReclass) {
+        return;
+    }
+    QString error;
+    const QList<repo::ReclassTarget> targets =
+        objectRepository_.loadReclassTargets(
+            connection_.database(),
+            currentObjectDetails_.classTable,
+            &error);
+    if (!error.isEmpty()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Смена типа"), error);
+        return;
+    }
+    if (targets.isEmpty()) {
+        QMessageBox::information(
+            this, QStringLiteral("Смена типа"),
+            QStringLiteral("Для этого объекта нет совместимых классов"));
+        return;
+    }
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(QStringLiteral("Изменить тип объекта"));
+    dialog.setMinimumWidth(480);
+    auto* layout = new QVBoxLayout(&dialog);
+    auto* explanation = new QLabel(
+        QStringLiteral(
+            "Объект: <b>%1 #%2</b><br><br>"
+            "Общие атрибуты, ID, геометрия и топология сохранятся. "
+            "Если в исходном классе заполнены поля, которых нет в новом, "
+            "сервер отменит операцию без потери данных.")
+            .arg(currentObjectDetails_.classTable)
+            .arg(currentObjectDetails_.id),
+        &dialog);
+    explanation->setWordWrap(true);
+    layout->addWidget(explanation);
+    layout->addWidget(new QLabel(QStringLiteral("Новый тип:"), &dialog));
+    auto* targetCombo = new QComboBox(&dialog);
+    for (const repo::ReclassTarget& target : targets) {
+        targetCombo->addItem(
+            QStringLiteral("%1 (%2)")
+                .arg(target.displayName, target.tableName),
+            target.tableName);
+    }
+    layout->addWidget(targetCombo);
+    auto* buttons = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    connect(buttons, &QDialogButtonBox::accepted,
+            &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected,
+            &dialog, &QDialog::reject);
+    layout->addWidget(buttons);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    const QString targetTable = targetCombo->currentData().toString();
+    if (targetTable.isEmpty()
+        || QMessageBox::question(
+               this,
+               QStringLiteral("Подтверждение смены типа"),
+               QStringLiteral("Изменить тип %1 #%2 на %3?")
+                   .arg(currentObjectDetails_.classTable)
+                   .arg(currentObjectDetails_.id)
+                   .arg(targetTable))
+               != QMessageBox::Yes) {
+        return;
+    }
+
+    reclassObjectButton_->setEnabled(false);
+    const QString sourceTable = currentObjectDetails_.classTable;
+    const qint64 objectId = currentObjectDetails_.id;
+    const repo::ReclassResult result = objectRepository_.reclassObject(
+        connection_.database(), sourceTable, objectId,
+        currentObjectDetails_.rowVersion, targetTable);
+    if (result.conflict) {
+        reloadObjectDetails();
+        QMessageBox::warning(
+            this, QStringLiteral("Конфликт редактирования"),
+            QStringLiteral(
+                "Объект уже изменён другим пользователем. "
+                "Карточка перезагружена."));
+        return;
+    }
+    if (!result.success) {
+        reclassObjectButton_->setEnabled(true);
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка смены типа"), result.error);
+        return;
+    }
+
+    QMessageBox::information(
+        this, QStringLiteral("Тип изменён"),
+        QStringLiteral(
+            "Объект #%1 перенесён из %2 в %3. "
+            "Сохранено общих полей: %4.")
+            .arg(objectId)
+            .arg(sourceTable, result.targetTable)
+            .arg(result.copiedFields));
+    pendingObjectId_ = objectId;
+    pendingObjectClassTable_ = result.targetTable;
+    pendingObjectIsNode_ = result.isNode;
+    QTreeWidgetItem* fragmentItem = fragmentTree_->currentItem();
+    if (fragmentItem != nullptr
+        && fragmentItem->data(0, Qt::UserRole).isValid()
+        && !mapWatcher_->isRunning()) {
+        loadSelectedFragment();
+    } else {
+        pendingObjectId_ = 0;
+        pendingObjectClassTable_.clear();
+        pendingObjectIsNode_ = false;
+        showObjectDetails(objectId, result.targetTable, result.isNode);
+    }
 }
 
 void MainWindow::refreshArchive()
@@ -2995,6 +3127,7 @@ void MainWindow::clearObjectDetails()
     reloadObjectButton_->setEnabled(false);
     archiveObjectButton_->setEnabled(false);
     historyObjectButton_->setEnabled(false);
+    reclassObjectButton_->setEnabled(false);
     moveNodeButton_->setChecked(false);
     moveNodeButton_->setEnabled(false);
     splitLineButton_->setChecked(false);

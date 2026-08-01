@@ -50,6 +50,7 @@
 | 34 | Отчёт протяжённости трубопроводов по `net.pipe_section` | готово — [описание](docs/17-pipe-length-report.md) |
 | 35 | Многополевые объектные запросы с 1–8 AND-условиями | готово — [описание](docs/18-multifield-search.md) |
 | 36 | Атомарное перемещение узлов из Qt с перестроением линий | готово — [описание](docs/19-node-move.md), [112](sql/112_node_move.sql), [тест](sql/tests/test_node_move.sql) |
+| 37 | Безопасная смена класса узлов и линий без потери данных | готово — [описание](docs/20-object-reclass.md), [113](sql/113_object_reclass.sql), [тест](sql/tests/test_object_reclass.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -139,6 +140,7 @@ psql -f sql/106_complete_field_catalog.sql # все поля и типизиро
 psql -f sql/110_line_split.sql          # атомарное разрезание трубопровода
 psql -f sql/111_line_join.sql           # безопасное соединение двух участков
 psql -f sql/112_node_move.sql           # перемещение узла и аудит геометрии
+psql -f sql/113_object_reclass.sql      # смена класса узла или линии
 ```
 
 Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге

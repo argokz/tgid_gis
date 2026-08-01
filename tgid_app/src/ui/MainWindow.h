@@ -42,6 +42,7 @@ private slots:
     void reloadObjectDetails();
     void toggleObjectArchive();
     void showObjectHistory();
+    void reclassCurrentObject();
     void refreshArchive();
     void openArchivedObject(int row, int column);
     void togglePointCreation(bool enabled);
@@ -139,6 +140,7 @@ private:
     QPushButton* reloadObjectButton_ = nullptr;
     QPushButton* archiveObjectButton_ = nullptr;
     QPushButton* historyObjectButton_ = nullptr;
+    QPushButton* reclassObjectButton_ = nullptr;
     MapView* mapView_ = nullptr;
     QFutureWatcher<repo::MapData>* mapWatcher_ = nullptr;
     QElapsedTimer mapLoadTimer_;

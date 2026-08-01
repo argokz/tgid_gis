@@ -184,6 +184,7 @@ Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\106_complete_field_catalog.
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\110_line_split.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\111_line_join.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\112_node_move.sql')
+Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\113_object_reclass.sql')
 
 Write-Host '10. Строгий GIS-аудит'
 & python (Join-Path $root 'tools\check_gis_ready.py') --db $BuildDatabase

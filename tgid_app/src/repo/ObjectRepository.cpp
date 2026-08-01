@@ -196,9 +196,21 @@ ObjectDetails ObjectRepository::load(
 
     QSqlQuery capabilityQuery(database);
     capabilityQuery.prepare(QStringLiteral(
-        "SELECT can_split, can_join"
-        "  FROM meta.layer_catalog"
-        " WHERE schema_name = 'net' AND table_name = :table_name"));
+        "SELECT layer.can_split, layer.can_join,"
+        "       EXISTS ("
+        "           SELECT 1"
+        "             FROM pg_class c"
+        "             JOIN pg_namespace n ON n.oid = c.relnamespace"
+        "             JOIN pg_trigger tg ON tg.tgrelid = c.oid"
+        "            WHERE n.nspname = 'net'"
+        "              AND c.relname = layer.table_name"
+        "              AND NOT tg.tgisinternal"
+        "              AND tg.tgfoid IN ("
+        "                  'net.reg_node_sync'::regproc,"
+        "                  'net.reg_line_sync'::regproc))"
+        "  FROM meta.layer_catalog AS layer"
+        " WHERE layer.schema_name = 'net'"
+        "   AND layer.table_name = :table_name"));
     capabilityQuery.bindValue(QStringLiteral(":table_name"), classTable);
     if (!capabilityQuery.exec() || !capabilityQuery.next()) {
         result.error = capabilityQuery.lastError().text();
@@ -206,6 +218,7 @@ ObjectDetails ObjectRepository::load(
     }
     result.canSplit = capabilityQuery.value(0).toBool();
     result.canJoin = capabilityQuery.value(1).toBool();
+    result.canReclass = capabilityQuery.value(2).toBool();
 
     const QString escapedTable = database.driver()->escapeIdentifier(
         classTable, QSqlDriver::TableName);
@@ -825,10 +838,31 @@ QList<ObjectHistoryEntry> ObjectRepository::loadHistory(
         "       changed_by,"
         "       coalesce(application_name, ''),"
         "       changed_fields::text"
-        "  FROM meta.object_change_log"
-        " WHERE schema_name = 'net'"
-        "   AND table_name = :table_name"
-        "   AND object_id = :object_id"
+        "  FROM meta.object_change_log AS history"
+        " WHERE history.schema_name = 'net'"
+        "   AND history.object_id = :object_id"
+        "   AND (history.table_name = :table_name OR EXISTS ("
+        "       SELECT 1"
+        "         FROM pg_class source_class"
+        "         JOIN pg_namespace source_namespace"
+        "           ON source_namespace.oid = source_class.relnamespace"
+        "         JOIN pg_trigger source_trigger"
+        "           ON source_trigger.tgrelid = source_class.oid"
+        "         JOIN pg_class history_class"
+        "           ON history_class.relname = history.table_name"
+        "         JOIN pg_namespace history_namespace"
+        "           ON history_namespace.oid = history_class.relnamespace"
+        "          AND history_namespace.nspname = 'net'"
+        "         JOIN pg_trigger history_trigger"
+        "           ON history_trigger.tgrelid = history_class.oid"
+        "          AND history_trigger.tgfoid = source_trigger.tgfoid"
+        "        WHERE source_namespace.nspname = 'net'"
+        "          AND source_class.relname = :table_name"
+        "          AND NOT source_trigger.tgisinternal"
+        "          AND NOT history_trigger.tgisinternal"
+        "          AND source_trigger.tgfoid IN ("
+        "              'net.reg_node_sync'::regproc,"
+        "              'net.reg_line_sync'::regproc)))"
         " ORDER BY row_version DESC, id DESC"));
     query.bindValue(QStringLiteral(":table_name"), classTable);
     query.bindValue(QStringLiteral(":object_id"), id);
@@ -1334,6 +1368,127 @@ MoveNodeResult ObjectRepository::moveNode(
     if (result.rowVersion <= expectedVersion || result.connectedLines < 0) {
         result.error = QStringLiteral(
             "Сервер вернул некорректный результат перемещения");
+        database.rollback();
+        return result;
+    }
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        return result;
+    }
+    result.success = true;
+    return result;
+}
+
+QList<ReclassTarget> ObjectRepository::loadReclassTargets(
+    const QSqlDatabase& database,
+    const QString& sourceTable,
+    QString* error) const
+{
+    QList<ReclassTarget> result;
+    if (error != nullptr) {
+        error->clear();
+    }
+    if (!database.isOpen()
+        || !safeIdentifier().match(sourceTable).hasMatch()) {
+        if (error != nullptr) {
+            *error = QStringLiteral("Некорректный исходный класс");
+        }
+        return result;
+    }
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT target_layer.table_name, target_layer.display_name_ru"
+        "  FROM meta.layer_catalog AS target_layer"
+        "  JOIN pg_namespace target_namespace"
+        "    ON target_namespace.nspname = target_layer.schema_name"
+        "  JOIN pg_class target_class"
+        "    ON target_class.relnamespace = target_namespace.oid"
+        "   AND target_class.relname = target_layer.table_name"
+        "  JOIN pg_trigger target_trigger"
+        "    ON target_trigger.tgrelid = target_class.oid"
+        "   AND NOT target_trigger.tgisinternal"
+        "  JOIN pg_namespace source_namespace ON source_namespace.nspname = 'net'"
+        "  JOIN pg_class source_class"
+        "    ON source_class.relnamespace = source_namespace.oid"
+        "   AND source_class.relname = :source_table"
+        "  JOIN pg_trigger source_trigger"
+        "    ON source_trigger.tgrelid = source_class.oid"
+        "   AND source_trigger.tgfoid = target_trigger.tgfoid"
+        "   AND NOT source_trigger.tgisinternal"
+        " WHERE target_layer.schema_name = 'net'"
+        "   AND target_layer.is_editable"
+        "   AND target_layer.table_name <> :source_table"
+        "   AND target_trigger.tgfoid IN ("
+        "       'net.reg_node_sync'::regproc,"
+        "       'net.reg_line_sync'::regproc)"
+        " ORDER BY target_layer.sort_order, target_layer.display_name_ru"));
+    query.bindValue(QStringLiteral(":source_table"), sourceTable);
+    if (!query.exec()) {
+        if (error != nullptr) {
+            *error = query.lastError().text();
+        }
+        return result;
+    }
+    while (query.next()) {
+        result.append({query.value(0).toString(), query.value(1).toString()});
+    }
+    return result;
+}
+
+ReclassResult ObjectRepository::reclassObject(
+    QSqlDatabase database,
+    const QString& sourceTable,
+    qint64 id,
+    qint64 expectedVersion,
+    const QString& targetTable) const
+{
+    ReclassResult result;
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(sourceTable).hasMatch()
+        || !safeIdentifier().match(targetTable).hasMatch()
+        || id <= 0 || expectedVersion <= 0
+        || sourceTable == targetTable) {
+        result.error = QStringLiteral("Некорректные параметры смены класса");
+        return result;
+    }
+    if (!tableIsPublished(database, sourceTable, &result.error)
+        || !tableIsPublished(database, targetTable, &result.error)) {
+        return result;
+    }
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT target_table, new_version, copied_fields, object_is_node"
+        "  FROM net.reclass_object("
+        "      CAST(? AS text), CAST(? AS bigint), CAST(? AS bigint),"
+        "      CAST(? AS text))"));
+    query.addBindValue(sourceTable);
+    query.addBindValue(id);
+    query.addBindValue(expectedVersion);
+    query.addBindValue(targetTable);
+    if (!query.exec() || !query.next()) {
+        result.error = query.lastError().text();
+        result.conflict = result.error.contains(
+            QStringLiteral("CONFLICT:"), Qt::CaseInsensitive);
+        database.rollback();
+        return result;
+    }
+    result.targetTable = query.value(0).toString();
+    result.rowVersion = query.value(1).toLongLong();
+    result.copiedFields = query.value(2).toInt();
+    result.isNode = query.value(3).toBool();
+    if (result.targetTable != targetTable
+        || result.rowVersion != expectedVersion + 1
+        || result.copiedFields < 0) {
+        result.error = QStringLiteral(
+            "Сервер вернул некорректный результат смены класса");
         database.rollback();
         return result;
     }

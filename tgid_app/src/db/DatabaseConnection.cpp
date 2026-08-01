@@ -126,6 +126,9 @@ SchemaStatus DatabaseConnection::inspectSchema() const
             "       to_regprocedure("
             "           'net.move_node(text,bigint,bigint,double precision,double precision)'"
             "       ) IS NOT NULL,"
+            "       to_regprocedure("
+            "           'net.reclass_object(text,bigint,bigint,text)'"
+            "       ) IS NOT NULL,"
             "       NOT EXISTS ("
             "           SELECT 1"
             "             FROM meta.layer_catalog layer"
@@ -224,6 +227,7 @@ SchemaStatus DatabaseConnection::inspectSchema() const
         QStringLiteral("net.split_line"),
         QStringLiteral("net.join_lines"),
         QStringLiteral("net.move_node"),
+        QStringLiteral("net.reclass_object"),
         QStringLiteral("meta.field_catalog coverage"),
         QStringLiteral("meta.field_catalog lookup targets"),
         QStringLiteral("SRID 9998"),
