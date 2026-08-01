@@ -79,6 +79,11 @@ def differs(va, vb, atol, rtol):
     return d > atol and d / scale > rtol, d
 
 
+def is_virtual(k):
+    """Ключ виртуального узла: движок нумерует их отрицательными id."""
+    return bool(k) and isinstance(k[0], int) and k[0] < 0
+
+
 def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
     qa.execute('SELECT count(*) FROM public.%s WHERE calculationid = %%s'
                % table, (ida,))
@@ -91,7 +96,7 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
         'table': table, 'key': key,
         'rows_a': na, 'rows_b': nb,
         'status': None, 'diff_cells': 0, 'max_abs': 0.0, 'worst_col': None,
-        'numeric_cols': 0,
+        'numeric_cols': 0, 'virtual_rows': 0, 'virtual_unmatched': 0,
     }
     if na != nb:
         info['status'] = 'row_count_mismatch'
@@ -109,6 +114,8 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
     diffs = 0
     maxd = 0.0
     worst = None
+    virt_rows = virt_unmatched = 0
+    first = True
     for c in cols:
         qa.execute(
             'SELECT %s, %s FROM public.%s WHERE calculationid = %%s' % (', '.join(key), c, table), (ida,))
@@ -118,6 +125,17 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
         rows_b = {r[:-1]: r[-1] for r in qb.fetchall()}
         keys = set(rows_a) | set(rows_b)
         for k in keys:
+            # Отрицательный id — виртуальный узел, созданный движком по ходу
+            # расчёта, а не объект БД. Его номер зависит от порядка создания
+            # и между прогонами не совпадает, поэтому такие строки в вердикт
+            # не идут: иначе сверка вечно показывает ~135 «расхождений»,
+            # за которыми нет ни одного реального объекта.
+            if is_virtual(k):
+                if first:
+                    virt_rows += 1
+                    if k not in rows_a or k not in rows_b:
+                        virt_unmatched += 1
+                continue
             if k not in rows_a or k not in rows_b:
                 diffs += 1
                 continue
@@ -126,6 +144,10 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
                 diffs += 1
                 if d is not None and d > maxd:
                     maxd, worst = d, c
+        first = False
+
+    info['virtual_rows'] = virt_rows
+    info['virtual_unmatched'] = virt_unmatched
 
     info['diff_cells'] = diffs
     info['max_abs'] = maxd
@@ -207,6 +229,12 @@ def main():
             print('%-10s %10d %10d  совпадает по всем %d числовым полям'
                   % (table, info['rows_a'], info['rows_b'],
                      info['numeric_cols']))
+
+        v = info.get('virtual_rows') or 0
+        if v:
+            print('%-10s %10s %10s  + %d виртуальных узлов вне сверки'
+                  ' (без пары %d)'
+                  % ('', '', '', v, info.get('virtual_unmatched') or 0))
 
     ca.close()
     cb.close()

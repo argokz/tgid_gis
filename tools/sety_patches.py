@@ -50,6 +50,15 @@ PATCHES = [
      'нигде не вызывалась — все узловые типы читались старым запросом.'),
     ('read_gid.py', 'net_mode.zn_query',
      'Подключение нативного чтения узлов с заданным напором.'),
+    ('net_mode.py', 'def pt_node_query',
+     'Чтение узлов для пьезометрии. Старый путь через представление '
+     'nodes давал иные числа: с ним ut_out расходился на 0.195, '
+     'pt_out на 5.16, с нативным совпадение точное.'),
+    ('read_gid.py', 'net_mode.pt_node_query',
+     'Подключение pt_node_query в read_pt_line.'),
+    ('read_vnutr.py', 'net_mode.pt_node_query',
+     'Подключение pt_node_query в read_pt_vnutr — внутренние схемы '
+     'потребителей.'),
     ('w_calc.py', 'def _diag_positions',
      'Позиции диагонали в CSC считаются один раз на подсеть.'),
     ('w_calc.py', 'matrix0._csc',

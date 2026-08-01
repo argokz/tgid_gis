@@ -115,6 +115,35 @@ def line_query(tn, cols, s_fileID):
     """
 
 
+def pt_node_query(tn, cols, s_fileID):
+    """Замена запросов read_pt_line и read_pt_vnutr.
+
+    Тот же шаблон, что у node_query, но без условия
+    internalNodeID IS NULL: пьезометрия читает и внутренние узлы.
+    Полей пять, без internalnodeid — порядок обязан совпадать
+    с распаковкой строки в вызывающем коде.
+    """
+    cls = NODE_CLASS.get(tn.lower())
+    if not cls:
+        return None
+    return f"""
+        SELECT o.subtype_src_id AS id, o.id AS nodeID,
+               o.externalSignID, o.externalCodeID, o.externalNodeName,
+               {cols}
+        FROM net.{cls} o
+        WHERE o.removed_at IS NULL
+          AND o.fragment_id IN ({s_fileID})
+        UNION ALL
+        SELECT x.id, x.obj_id,
+               r.externalsignid, r.externalcodeid, r.externalnodename,
+               {cols.replace('o.', 'x.')}
+        FROM net.extra_{tn} x
+        JOIN net.node_reg r ON r.id = x.obj_id
+        WHERE NOT r.removed
+          AND r.fragment_id IN ({s_fileID})
+    """
+
+
 def zn_query(s_fileID):
     """Замена запроса read_zn — узлы с заданным напором.
 
