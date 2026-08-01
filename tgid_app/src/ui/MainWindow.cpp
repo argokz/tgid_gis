@@ -5,16 +5,25 @@
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QComboBox>
+#include <QCompleter>
+#include <QDate>
+#include <QDateEdit>
+#include <QDateTime>
+#include <QDateTimeEdit>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDockWidget>
+#include <QFont>
 #include <QHash>
 #include <QHeaderView>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QSplitter>
 #include <QStatusBar>
 #include <QStyledItemDelegate>
@@ -60,11 +69,20 @@ public:
         if (editorKind == QStringLiteral("lookup")
             || editorKind == QStringLiteral("boolean")) {
             auto* combo = new QComboBox(parent);
+            combo->setMaxVisibleItems(20);
             combo->addItem(QStringLiteral("NULL"), QString());
             if (editorKind == QStringLiteral("boolean")) {
                 combo->addItem(QStringLiteral("Да"), QStringLiteral("да"));
                 combo->addItem(QStringLiteral("Нет"), QStringLiteral("нет"));
             } else {
+                combo->setEditable(true);
+                combo->setInsertPolicy(QComboBox::NoInsert);
+                combo->lineEdit()->setPlaceholderText(
+                    QStringLiteral("Введите часть названия"));
+                combo->completer()->setCaseSensitivity(Qt::CaseInsensitive);
+                combo->completer()->setFilterMode(Qt::MatchContains);
+                combo->completer()->setCompletionMode(
+                    QCompleter::PopupCompletion);
                 const QStringList values =
                     index.data(OptionValuesRole).toStringList();
                 const QStringList labels =
@@ -76,6 +94,42 @@ public:
                 }
             }
             return combo;
+        }
+        if (editorKind == QStringLiteral("integer")
+            || editorKind == QStringLiteral("decimal")) {
+            auto* lineEdit = new QLineEdit(parent);
+            const QString pattern =
+                editorKind == QStringLiteral("integer")
+                    ? QStringLiteral("^-?[0-9]*$")
+                    : QStringLiteral(
+                          "^-?[0-9]*([\\.,][0-9]*)?"
+                          "([eE][+-]?[0-9]*)?$");
+            lineEdit->setValidator(new QRegularExpressionValidator(
+                QRegularExpression(pattern), lineEdit));
+            lineEdit->setAlignment(Qt::AlignRight);
+            lineEdit->setProperty("tgidEditorKind", editorKind);
+            return lineEdit;
+        }
+        if (editorKind == QStringLiteral("date")) {
+            auto* dateEdit = new QDateEdit(parent);
+            dateEdit->setCalendarPopup(true);
+            dateEdit->setDisplayFormat(QStringLiteral("yyyy-MM-dd"));
+            dateEdit->setMinimumDate(QDate(1752, 1, 1));
+            dateEdit->setMaximumDate(QDate(9999, 12, 31));
+            dateEdit->setSpecialValueText(QStringLiteral("NULL"));
+            return dateEdit;
+        }
+        if (editorKind == QStringLiteral("datetime")) {
+            auto* dateTimeEdit = new QDateTimeEdit(parent);
+            dateTimeEdit->setCalendarPopup(true);
+            dateTimeEdit->setDisplayFormat(
+                QStringLiteral("yyyy-MM-dd HH:mm:ss"));
+            dateTimeEdit->setMinimumDateTime(
+                QDateTime(QDate(1752, 1, 1), QTime(0, 0)));
+            dateTimeEdit->setMaximumDateTime(
+                QDateTime(QDate(9999, 12, 31), QTime(23, 59, 59)));
+            dateTimeEdit->setSpecialValueText(QStringLiteral("NULL"));
+            return dateTimeEdit;
         }
         if (editorKind == QStringLiteral("multiline")) {
             return new QPlainTextEdit(parent);
@@ -104,6 +158,41 @@ public:
             combo->setCurrentIndex(optionIndex);
             return;
         }
+        if (auto* dateTimeEdit = qobject_cast<QDateTimeEdit*>(editor)) {
+            if (index.data(CurrentNullRole).toBool()) {
+                dateTimeEdit->setDateTime(dateTimeEdit->minimumDateTime());
+                return;
+            }
+            QDateTime dateTime = QDateTime::fromString(
+                index.data(CurrentValueRole).toString(), Qt::ISODate);
+            if (!dateTime.isValid()) {
+                dateTime = QDateTime::fromString(
+                    index.data(CurrentValueRole).toString(),
+                    QStringLiteral("yyyy-MM-dd HH:mm:ss"));
+            }
+            dateTimeEdit->setDateTime(
+                dateTime.isValid() ? dateTime
+                                   : dateTimeEdit->minimumDateTime());
+            return;
+        }
+        if (auto* dateEdit = qobject_cast<QDateEdit*>(editor)) {
+            if (index.data(CurrentNullRole).toBool()) {
+                dateEdit->setDate(dateEdit->minimumDate());
+                return;
+            }
+            const QDate date = QDate::fromString(
+                index.data(CurrentValueRole).toString().left(10),
+                Qt::ISODate);
+            dateEdit->setDate(date.isValid() ? date : dateEdit->minimumDate());
+            return;
+        }
+        if (auto* lineEdit = qobject_cast<QLineEdit*>(editor);
+            lineEdit != nullptr
+            && lineEdit->property("tgidEditorKind").isValid()) {
+            lineEdit->setText(index.data(Qt::EditRole).toString());
+            lineEdit->selectAll();
+            return;
+        }
         if (auto* textEdit = qobject_cast<QPlainTextEdit*>(editor)) {
             textEdit->setPlainText(index.data(Qt::EditRole).toString());
             return;
@@ -117,6 +206,17 @@ public:
         const QModelIndex& index) const override
     {
         if (auto* combo = qobject_cast<QComboBox*>(editor)) {
+            if (index.data(EditorKindRole).toString()
+                    == QStringLiteral("lookup")
+                && combo->currentIndex() < 0) {
+                const int matchingIndex = combo->findText(
+                    combo->currentText(), Qt::MatchFixedString);
+                if (matchingIndex < 0) {
+                    QApplication::beep();
+                    return;
+                }
+                combo->setCurrentIndex(matchingIndex);
+            }
             const bool isNull = combo->currentIndex() == 0;
             const QString value =
                 isNull ? QString() : combo->currentData().toString();
@@ -126,6 +226,46 @@ public:
                 index,
                 isNull ? QStringLiteral("NULL") : combo->currentText(),
                 Qt::EditRole);
+            return;
+        }
+        if (auto* dateTimeEdit = qobject_cast<QDateTimeEdit*>(editor)) {
+            const bool isNull =
+                dateTimeEdit->dateTime() == dateTimeEdit->minimumDateTime();
+            const QString value =
+                isNull
+                    ? QString()
+                    : dateTimeEdit->dateTime().toString(Qt::ISODate);
+            model->setData(index, isNull, CurrentNullRole);
+            model->setData(index, value, CurrentValueRole);
+            model->setData(
+                index,
+                isNull ? QStringLiteral("NULL") : value,
+                Qt::EditRole);
+            return;
+        }
+        if (auto* dateEdit = qobject_cast<QDateEdit*>(editor)) {
+            const bool isNull = dateEdit->date() == dateEdit->minimumDate();
+            model->setData(index, isNull, CurrentNullRole);
+            model->setData(
+                index,
+                isNull ? QString() : dateEdit->date().toString(Qt::ISODate),
+                CurrentValueRole);
+            model->setData(
+                index,
+                isNull ? QStringLiteral("NULL")
+                       : dateEdit->date().toString(Qt::ISODate),
+                Qt::EditRole);
+            return;
+        }
+        if (auto* lineEdit = qobject_cast<QLineEdit*>(editor);
+            lineEdit != nullptr
+            && lineEdit->property("tgidEditorKind").isValid()) {
+            QString value = lineEdit->text().trimmed();
+            if (lineEdit->property("tgidEditorKind").toString()
+                == QStringLiteral("decimal")) {
+                value.replace(',', '.');
+            }
+            model->setData(index, value, Qt::EditRole);
             return;
         }
         if (auto* textEdit = qobject_cast<QPlainTextEdit*>(editor)) {
@@ -356,6 +496,7 @@ void MainWindow::buildInterface()
     objectTable_->setItemDelegateForColumn(
         1, new ObjectValueDelegate(objectTable_));
     objectTable_->verticalHeader()->setVisible(false);
+    objectTable_->horizontalHeader()->setSectionsClickable(false);
     objectTable_->horizontalHeader()->setSectionResizeMode(
         0, QHeaderView::ResizeToContents);
     objectTable_->horizontalHeader()->setStretchLastSection(true);
@@ -847,10 +988,31 @@ void MainWindow::displayObjectDetails(
         details.archived ? QStringLiteral("color: #b54708;") : QString());
 
     objectTable_->setSortingEnabled(false);
-    objectTable_->setRowCount(details.attributes.size());
+    objectTable_->clearSpans();
+    objectTable_->setRowCount(0);
     bool hasEditableAttributes = false;
-    for (qsizetype row = 0; row < details.attributes.size(); ++row) {
-        const repo::ObjectAttribute& attribute = details.attributes.at(row);
+    QString currentGroup;
+    for (const repo::ObjectAttribute& attribute : details.attributes) {
+        const QString attributeGroup =
+            attribute.groupName.isEmpty()
+                ? QStringLiteral("Параметры")
+                : attribute.groupName;
+        if (attributeGroup != currentGroup) {
+            currentGroup = attributeGroup;
+            const int groupRow = objectTable_->rowCount();
+            objectTable_->insertRow(groupRow);
+            auto* groupItem = readOnlyItem(currentGroup);
+            groupItem->setFlags(Qt::ItemIsEnabled);
+            groupItem->setBackground(QColor(QStringLiteral("#e2e8f0")));
+            QFont groupFont = groupItem->font();
+            groupFont.setBold(true);
+            groupItem->setFont(groupFont);
+            objectTable_->setItem(groupRow, 0, groupItem);
+            objectTable_->setSpan(groupRow, 0, 1, 2);
+        }
+
+        const int row = objectTable_->rowCount();
+        objectTable_->insertRow(row);
         const QString fieldLabel =
             attribute.unit.isEmpty()
                 ? attribute.displayName
@@ -912,7 +1074,6 @@ void MainWindow::displayObjectDetails(
         objectTable_->setItem(row, 0, nameItem);
         objectTable_->setItem(row, 1, valueItem);
     }
-    objectTable_->setSortingEnabled(true);
     saveObjectButton_->setEnabled(hasEditableAttributes);
     reloadObjectButton_->setEnabled(true);
     archiveObjectButton_->setEnabled(details.canArchive);

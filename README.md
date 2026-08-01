@@ -42,6 +42,7 @@
 | 24–26 | История, архив, создание объектов и топология Qt/QGIS | готово |
 | 27 | Реестр функций и SQL старого ТГИД | готово — [12](docs/12-legacy-function-inventory.md) |
 | 28 | Справочники `ref` и метаданные карточек Qt | готово — [098](sql/098_core_references.sql), [105](sql/105_ui_field_catalog.sql) |
+| 29 | Полный каталог полей и типизированные редакторы Qt | готово — [106](sql/106_complete_field_catalog.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -127,6 +128,7 @@ psql -f sql/097_node_topology.sql       # перенос концов линий
 psql -f sql/098_core_references.sql      # справочники ref; запускать, пока доступен public
 psql -f sql/100_gis_catalog.sql        # каталог слоёв QGIS/Qt и версия схемы
 psql -f sql/105_ui_field_catalog.sql    # подписи, единицы и справочные редакторы Qt
+psql -f sql/106_complete_field_catalog.sql # все поля и типизированные редакторы Qt
 ```
 
 Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге
