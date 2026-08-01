@@ -79,37 +79,54 @@ def main():
         FROM information_schema.tables
         WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
     """)
-    kind = {}
+    # Имя без схемы разрешается по search_path. Наследие — это не
+    # «имя написано без схемы», а «имя разрешается в public». После
+    # переезда таблиц в calc/ref те же запросы уже целевые, и считать
+    # их наследием — значит показывать работу, которой нет.
+    # Порядок тот же, что в search_path базы.
+    ORDER = ('public', 'net', 'ref', 'calc', 'meta')
+    qualified, bare = {}, {}
     for sch, tab, typ in cur.fetchall():
-        kind['%s.%s' % (sch, tab)] = typ
-        kind.setdefault(tab, ('%s|%s' % (sch, typ)))
+        qualified['%s.%s' % (sch, tab)] = (sch, typ)
+        if sch not in ORDER:
+            continue
+        prev = bare.get(tab)
+        if prev is None or ORDER.index(sch) < ORDER.index(prev[0]):
+            bare[tab] = (sch, typ)
     conn.close()
 
     target, legacy, unknown = {}, {}, {}
+    resolved = {}
     for name, files in hits.items():
-        if name.startswith(('net.', 'ref.', 'meta.', 'calc.')):
-            target[name] = files
-            continue
-        key = kind.get(name) or kind.get('public.' + name)
-        if key is None:
-            unknown[name] = files
+        if '.' in name:
+            info = qualified.get(name)
         else:
+            info = bare.get(name)
+        if info is None:
+            unknown[name] = files
+            continue
+        resolved[name] = info
+        if info[0] == 'public':
             legacy[name] = files
+        else:
+            target[name] = files
 
-    def show(title, d, with_type=False):
+    def show(title, d, detail=False):
         print('\n%s: %d' % (title, len(d)))
         for name in sorted(d, key=lambda n: (-len(d[n]), n)):
             t = ''
-            if with_type:
-                k = kind.get('public.' + name) or kind.get(name) or ''
-                t = ' [%s]' % ('представление' if 'VIEW' in str(k) else 'таблица')
+            if detail:
+                sch, typ = resolved[name]
+                t = ' -> %s [%s]' % (
+                    sch, 'представление' if 'VIEW' in typ else 'таблица')
             fl = sorted(d[name])
             more = '' if len(fl) <= 3 else ' +%d' % (len(fl) - 3)
-            print('  %-28s%s  %s%s' % (name, t, ', '.join(fl[:3]), more))
+            print('  %-26s%-22s %s%s'
+                  % (name, t, ', '.join(fl[:3]), more))
 
-    show('целевые (net/ref/meta/calc)', target)
-    show('НАСЛЕДИЕ — переписать или перенести', legacy, with_type=True)
-    show('не сопоставлено со схемой', unknown)
+    show('целевые (разрешаются в net/ref/calc/meta)', target, detail=True)
+    show('НАСЛЕДИЕ — разрешаются в public', legacy, detail=True)
+    show('не сопоставлено со схемой (импорты Python и т.п.)', unknown)
 
     print('\nИтого имён: %d, из них наследия: %d'
           % (len(hits), len(legacy)))
