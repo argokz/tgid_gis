@@ -1006,6 +1006,73 @@ void MainWindow::buildInterface()
     disconnectedLayout->addWidget(disconnectedConsumersTable_, 1);
     tabs->addTab(disconnectedTab, QStringLiteral("Отключённые потребители"));
 
+    auto* closedPipeTab = new QWidget(tabs);
+    auto* closedPipeLayout = new QVBoxLayout(closedPipeTab);
+    auto* closedPipeToolbar = new QHBoxLayout();
+    closedPipeToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), closedPipeTab));
+    closedPipeFragmentCombo_ = new QComboBox(closedPipeTab);
+    closedPipeFragmentCombo_->setMinimumWidth(240);
+    closedPipeFragmentCombo_->setEnabled(false);
+    closedPipeToolbar->addWidget(closedPipeFragmentCombo_, 1);
+    closedPipeToolbar->addWidget(
+        new QLabel(QStringLiteral("Фильтр:"), closedPipeTab));
+    closedPipeSearchEdit_ = new QLineEdit(closedPipeTab);
+    closedPipeSearchEdit_->setClearButtonEnabled(true);
+    closedPipeSearchEdit_->setPlaceholderText(
+        QStringLiteral("Код/имя узла или исходный ID участка"));
+    closedPipeToolbar->addWidget(closedPipeSearchEdit_, 1);
+    refreshClosedPipeSectionsButton_ = new QPushButton(
+        QStringLiteral("Найти"), closedPipeTab);
+    refreshClosedPipeSectionsButton_->setEnabled(false);
+    connect(refreshClosedPipeSectionsButton_, &QPushButton::clicked,
+            this, &MainWindow::refreshClosedPipeSections);
+    connect(closedPipeSearchEdit_, &QLineEdit::returnPressed,
+            this, &MainWindow::refreshClosedPipeSections);
+    closedPipeToolbar->addWidget(refreshClosedPipeSectionsButton_);
+    exportClosedPipeSectionsButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), closedPipeTab);
+    exportClosedPipeSectionsButton_->setEnabled(false);
+    connect(exportClosedPipeSectionsButton_, &QPushButton::clicked,
+            this, &MainWindow::exportClosedPipeSections);
+    closedPipeToolbar->addWidget(exportClosedPipeSectionsButton_);
+    closedPipeLayout->addLayout(closedPipeToolbar);
+    closedPipeSectionsStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Закрытый участок: состояние подачи и обратки равно 2. "
+            "Двойной щелчок открывает карточку."),
+        closedPipeTab);
+    closedPipeSectionsStatusLabel_->setWordWrap(true);
+    closedPipeLayout->addWidget(closedPipeSectionsStatusLabel_);
+    closedPipeSectionsTable_ = new QTableWidget(closedPipeTab);
+    closedPipeSectionsTable_->setColumnCount(9);
+    closedPipeSectionsTable_->setHorizontalHeaderLabels({
+        QStringLiteral("ID"),
+        QStringLiteral("Исходный ID"),
+        QStringLiteral("Код начала"),
+        QStringLiteral("Узел начала"),
+        QStringLiteral("Код конца"),
+        QStringLiteral("Узел конца"),
+        QStringLiteral("Длина, м"),
+        QStringLiteral("Внутр. диаметр, мм"),
+        QStringLiteral("Фрагмент"),
+    });
+    closedPipeSectionsTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    closedPipeSectionsTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    closedPipeSectionsTable_->setSelectionMode(
+        QAbstractItemView::SingleSelection);
+    closedPipeSectionsTable_->setAlternatingRowColors(true);
+    closedPipeSectionsTable_->setSortingEnabled(true);
+    closedPipeSectionsTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    closedPipeSectionsTable_->horizontalHeader()->setStretchLastSection(true);
+    connect(closedPipeSectionsTable_, &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openClosedPipeSection);
+    closedPipeLayout->addWidget(closedPipeSectionsTable_, 1);
+    tabs->addTab(closedPipeTab, QStringLiteral("Закрытые участки"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -1221,6 +1288,14 @@ void MainWindow::showError(const QString& message)
     refreshDisconnectedConsumersButton_->setEnabled(false);
     exportDisconnectedConsumersButton_->setEnabled(false);
     disconnectedConsumersStatusLabel_->setText(
+        QStringLiteral("Список недоступен"));
+    closedPipeSectionsTable_->setRowCount(0);
+    closedPipeSectionRows_.clear();
+    closedPipeFragmentCombo_->clear();
+    closedPipeFragmentCombo_->setEnabled(false);
+    refreshClosedPipeSectionsButton_->setEnabled(false);
+    exportClosedPipeSectionsButton_->setEnabled(false);
+    closedPipeSectionsStatusLabel_->setText(
         QStringLiteral("Список недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
@@ -1768,6 +1843,7 @@ void MainWindow::populateReportFragments(
     closedConsumerFragmentCombo_->clear();
     zeroLoadConsumerFragmentCombo_->clear();
     disconnectedConsumerFragmentCombo_->clear();
+    closedPipeFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     volumeFragmentCombo_->addItem(
@@ -1779,6 +1855,8 @@ void MainWindow::populateReportFragments(
     zeroLoadConsumerFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     disconnectedConsumerFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
+    closedPipeFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
@@ -1802,6 +1880,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         disconnectedConsumerFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        closedPipeFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1865,6 +1946,16 @@ void MainWindow::populateReportFragments(
     disconnectedConsumersTable_->setRowCount(0);
     disconnectedConsumersStatusLabel_->setStyleSheet({});
     disconnectedConsumersStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и нажмите «Найти»"));
+    closedPipeFragmentCombo_->setEnabled(
+        closedPipeFragmentCombo_->count() > 0);
+    refreshClosedPipeSectionsButton_->setEnabled(
+        closedPipeFragmentCombo_->count() > 0);
+    exportClosedPipeSectionsButton_->setEnabled(false);
+    closedPipeSectionRows_.clear();
+    closedPipeSectionsTable_->setRowCount(0);
+    closedPipeSectionsStatusLabel_->setStyleSheet({});
+    closedPipeSectionsStatusLabel_->setText(
         QStringLiteral("Выберите параметры и нажмите «Найти»"));
 }
 
