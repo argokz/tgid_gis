@@ -938,6 +938,74 @@ void MainWindow::buildInterface()
     zeroLoadLayout->addWidget(zeroLoadConsumersTable_, 1);
     tabs->addTab(zeroLoadTab, QStringLiteral("Нулевая нагрузка"));
 
+    auto* disconnectedTab = new QWidget(tabs);
+    auto* disconnectedLayout = new QVBoxLayout(disconnectedTab);
+    auto* disconnectedToolbar = new QHBoxLayout();
+    disconnectedToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), disconnectedTab));
+    disconnectedConsumerFragmentCombo_ = new QComboBox(disconnectedTab);
+    disconnectedConsumerFragmentCombo_->setMinimumWidth(240);
+    disconnectedConsumerFragmentCombo_->setEnabled(false);
+    disconnectedToolbar->addWidget(disconnectedConsumerFragmentCombo_, 1);
+    disconnectedToolbar->addWidget(
+        new QLabel(QStringLiteral("Фильтр:"), disconnectedTab));
+    disconnectedConsumerSearchEdit_ = new QLineEdit(disconnectedTab);
+    disconnectedConsumerSearchEdit_->setClearButtonEnabled(true);
+    disconnectedConsumerSearchEdit_->setPlaceholderText(
+        QStringLiteral("Код, имя узла, потребитель или исходный ID"));
+    disconnectedToolbar->addWidget(disconnectedConsumerSearchEdit_, 1);
+    refreshDisconnectedConsumersButton_ = new QPushButton(
+        QStringLiteral("Найти"), disconnectedTab);
+    refreshDisconnectedConsumersButton_->setEnabled(false);
+    connect(refreshDisconnectedConsumersButton_, &QPushButton::clicked,
+            this, &MainWindow::refreshDisconnectedConsumers);
+    connect(disconnectedConsumerSearchEdit_, &QLineEdit::returnPressed,
+            this, &MainWindow::refreshDisconnectedConsumers);
+    disconnectedToolbar->addWidget(refreshDisconnectedConsumersButton_);
+    exportDisconnectedConsumersButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), disconnectedTab);
+    exportDisconnectedConsumersButton_->setEnabled(false);
+    connect(exportDisconnectedConsumersButton_, &QPushButton::clicked,
+            this, &MainWindow::exportDisconnectedConsumers);
+    disconnectedToolbar->addWidget(exportDisconnectedConsumersButton_);
+    disconnectedLayout->addLayout(disconnectedToolbar);
+    disconnectedConsumersStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Отключённый потребитель: нет строки PT_OUT в последнем "
+            "расчёте фрагмента."),
+        disconnectedTab);
+    disconnectedConsumersStatusLabel_->setWordWrap(true);
+    disconnectedLayout->addWidget(disconnectedConsumersStatusLabel_);
+    disconnectedConsumersTable_ = new QTableWidget(disconnectedTab);
+    disconnectedConsumersTable_->setColumnCount(9);
+    disconnectedConsumersTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Класс"),
+        QStringLiteral("ID"),
+        QStringLiteral("Исходный ID"),
+        QStringLiteral("Внешний код"),
+        QStringLiteral("Внешнее имя узла"),
+        QStringLiteral("Потребитель"),
+        QStringLiteral("Фрагмент"),
+        QStringLiteral("Расчёт"),
+        QStringLiteral("Причина"),
+    });
+    disconnectedConsumersTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    disconnectedConsumersTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    disconnectedConsumersTable_->setSelectionMode(
+        QAbstractItemView::SingleSelection);
+    disconnectedConsumersTable_->setAlternatingRowColors(true);
+    disconnectedConsumersTable_->setSortingEnabled(true);
+    disconnectedConsumersTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    disconnectedConsumersTable_->horizontalHeader()->setStretchLastSection(
+        true);
+    connect(disconnectedConsumersTable_, &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openDisconnectedConsumer);
+    disconnectedLayout->addWidget(disconnectedConsumersTable_, 1);
+    tabs->addTab(disconnectedTab, QStringLiteral("Отключённые потребители"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -1145,6 +1213,14 @@ void MainWindow::showError(const QString& message)
     refreshZeroLoadConsumersButton_->setEnabled(false);
     exportZeroLoadConsumersButton_->setEnabled(false);
     zeroLoadConsumersStatusLabel_->setText(
+        QStringLiteral("Список недоступен"));
+    disconnectedConsumersTable_->setRowCount(0);
+    disconnectedConsumerRows_.clear();
+    disconnectedConsumerFragmentCombo_->clear();
+    disconnectedConsumerFragmentCombo_->setEnabled(false);
+    refreshDisconnectedConsumersButton_->setEnabled(false);
+    exportDisconnectedConsumersButton_->setEnabled(false);
+    disconnectedConsumersStatusLabel_->setText(
         QStringLiteral("Список недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
@@ -1691,6 +1767,7 @@ void MainWindow::populateReportFragments(
     heatFragmentCombo_->clear();
     closedConsumerFragmentCombo_->clear();
     zeroLoadConsumerFragmentCombo_->clear();
+    disconnectedConsumerFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     volumeFragmentCombo_->addItem(
@@ -1700,6 +1777,8 @@ void MainWindow::populateReportFragments(
     closedConsumerFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     zeroLoadConsumerFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
+    disconnectedConsumerFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
@@ -1720,6 +1799,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         zeroLoadConsumerFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        disconnectedConsumerFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1773,6 +1855,16 @@ void MainWindow::populateReportFragments(
     zeroLoadConsumersTable_->setRowCount(0);
     zeroLoadConsumersStatusLabel_->setStyleSheet({});
     zeroLoadConsumersStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и нажмите «Найти»"));
+    disconnectedConsumerFragmentCombo_->setEnabled(
+        disconnectedConsumerFragmentCombo_->count() > 0);
+    refreshDisconnectedConsumersButton_->setEnabled(
+        disconnectedConsumerFragmentCombo_->count() > 0);
+    exportDisconnectedConsumersButton_->setEnabled(false);
+    disconnectedConsumerRows_.clear();
+    disconnectedConsumersTable_->setRowCount(0);
+    disconnectedConsumersStatusLabel_->setStyleSheet({});
+    disconnectedConsumersStatusLabel_->setText(
         QStringLiteral("Выберите параметры и нажмите «Найти»"));
 }
 
@@ -2571,6 +2663,198 @@ void MainWindow::exportZeroLoadConsumers()
                << csvCell(row.externalCode) << ';'
                << csvCell(row.externalNodeName) << ';'
                << csvCell(row.consumerName) << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::refreshDisconnectedConsumers()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::DisconnectedConsumerCriteria criteria;
+    criteria.fragmentId =
+        disconnectedConsumerFragmentCombo_->currentData().toInt();
+    criteria.searchText =
+        disconnectedConsumerSearchEdit_->text().trimmed();
+    criteria.limit = 5000;
+
+    refreshDisconnectedConsumersButton_->setEnabled(false);
+    exportDisconnectedConsumersButton_->setEnabled(false);
+    disconnectedConsumersStatusLabel_->setStyleSheet({});
+    disconnectedConsumersStatusLabel_->setText(
+        QStringLiteral("Загрузка отключённых потребителей…"));
+    QApplication::processEvents();
+
+    QString error;
+    disconnectedConsumerRows_ = disconnectedConsumerRepository_.load(
+        connection_.database(), criteria, &error);
+    refreshDisconnectedConsumersButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        disconnectedConsumerRows_.clear();
+        disconnectedConsumersTable_->setRowCount(0);
+        disconnectedConsumersStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        disconnectedConsumersStatusLabel_->setText(
+            QStringLiteral("Ошибка списка: %1").arg(error));
+        return;
+    }
+
+    disconnectedConsumersTable_->setSortingEnabled(false);
+    disconnectedConsumersTable_->setRowCount(
+        disconnectedConsumerRows_.size());
+    qsizetype noCalculationCount = 0;
+    qsizetype unclassifiedCount = 0;
+    for (qsizetype rowIndex = 0;
+         rowIndex < disconnectedConsumerRows_.size(); ++rowIndex) {
+        const repo::DisconnectedConsumerRow& row =
+            disconnectedConsumerRows_.at(rowIndex);
+        QString classLabel;
+        if (row.classTable == QStringLiteral("consumer_real")) {
+            classLabel = QStringLiteral("Реальный");
+        } else if (row.classTable == QStringLiteral("consumer_general")) {
+            classLabel = QStringLiteral("Обобщённый");
+        } else {
+            classLabel = QStringLiteral("Не классифицирован");
+            ++unclassifiedCount;
+        }
+        if (!row.hasCalculation()) {
+            ++noCalculationCount;
+        }
+        QTableWidgetItem* classItem = readOnlyItem(classLabel);
+        classItem->setData(Qt::UserRole, row.id);
+        classItem->setData(Qt::UserRole + 1, row.classTable);
+        if (!row.hasObjectCard()) {
+            classItem->setToolTip(
+                QStringLiteral(
+                    "Legacy-узел не имеет канонического объектного класса"));
+        }
+        disconnectedConsumersTable_->setItem(rowIndex, 0, classItem);
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 1,
+            readOnlyItem(row.id > 0 ? QString::number(row.id)
+                                    : QStringLiteral("—")));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 2, readOnlyItem(QString::number(row.sourceId)));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 3, readOnlyItem(row.externalCode));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 4, readOnlyItem(row.externalNodeName));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 5, readOnlyItem(row.consumerName));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 6, readOnlyItem(QString::number(row.fragmentId)));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 7,
+            readOnlyItem(row.hasCalculation()
+                             ? QString::number(row.calculationId)
+                             : QStringLiteral("—")));
+        disconnectedConsumersTable_->setItem(
+            rowIndex, 8,
+            readOnlyItem(
+                row.hasCalculation()
+                    ? QStringLiteral("Нет результата PT_OUT")
+                    : QStringLiteral("Нет расчёта фрагмента")));
+    }
+    disconnectedConsumersTable_->setSortingEnabled(true);
+    exportDisconnectedConsumersButton_->setEnabled(
+        !disconnectedConsumerRows_.isEmpty());
+    disconnectedConsumersStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    if (disconnectedConsumerRows_.size() == criteria.limit) {
+        disconnectedConsumersStatusLabel_->setText(
+            QStringLiteral(
+                "Показаны первые %1 строк — выберите фрагмент или задайте фильтр")
+                .arg(criteria.limit));
+    } else {
+        disconnectedConsumersStatusLabel_->setText(
+            QStringLiteral(
+                "Найдено: %1; без расчёта: %2; без PT_OUT: %3; без класса: %4")
+                .arg(disconnectedConsumerRows_.size())
+                .arg(noCalculationCount)
+                .arg(disconnectedConsumerRows_.size() - noCalculationCount)
+                .arg(unclassifiedCount));
+    }
+}
+
+void MainWindow::openDisconnectedConsumer(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = disconnectedConsumersTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    const qint64 objectId = item->data(Qt::UserRole).toLongLong();
+    const QString classTable = item->data(Qt::UserRole + 1).toString();
+    if (objectId <= 0 || classTable == QStringLiteral("unclassified")) {
+        disconnectedConsumersStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b54708;"));
+        disconnectedConsumersStatusLabel_->setText(
+            QStringLiteral(
+                "Узел не имеет канонического класса; исходный ID доступен в таблице"));
+        return;
+    }
+    showObjectDetails(objectId, classTable, true);
+}
+
+void MainWindow::exportDisconnectedConsumers()
+{
+    if (disconnectedConsumerRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт отключённых потребителей"),
+        QStringLiteral("tgid_disconnected_consumers.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("Класс")) << ';'
+           << csvCell(QStringLiteral("ID")) << ';'
+           << csvCell(QStringLiteral("Исходный ID")) << ';'
+           << csvCell(QStringLiteral("Фрагмент")) << ';'
+           << csvCell(QStringLiteral("Внешний код")) << ';'
+           << csvCell(QStringLiteral("Внешнее имя узла")) << ';'
+           << csvCell(QStringLiteral("Потребитель")) << ';'
+           << csvCell(QStringLiteral("Расчёт")) << ';'
+           << csvCell(QStringLiteral("Причина")) << '\n';
+    for (const repo::DisconnectedConsumerRow& row
+         : disconnectedConsumerRows_) {
+        stream << csvCell(row.classTable) << ';';
+        if (row.id > 0) {
+            stream << row.id;
+        }
+        stream << ';' << row.sourceId << ';'
+               << row.fragmentId << ';'
+               << csvCell(row.externalCode) << ';'
+               << csvCell(row.externalNodeName) << ';'
+               << csvCell(row.consumerName) << ';';
+        if (row.hasCalculation()) {
+            stream << row.calculationId;
+        }
+        stream << ';'
+               << csvCell(
+                      row.hasCalculation()
+                          ? QStringLiteral("Нет результата PT_OUT")
+                          : QStringLiteral("Нет расчёта фрагмента"))
+               << '\n';
     }
     stream.flush();
     if (!file.commit()) {

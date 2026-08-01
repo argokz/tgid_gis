@@ -55,6 +55,7 @@
 | 39 | Запросы `aZap3–aZap5`: теплопотребление последнего расчёта | готово — [описание](docs/22-heat-consumption-report.md) |
 | 40 | Запрос `aZap6`: закрытые потребители и справочник внешних кодов | готово — [описание](docs/23-closed-consumers.md), [123](sql/123_externalcodes_reference.sql) |
 | 41 | Запрос `onPotNagr0`: потребители с нулевой нагрузкой | готово — [описание](docs/24-zero-load-consumers.md), [тест](sql/tests/test_zero_load_consumers.sql) |
+| 42 | Запрос `onPotrOtkl`: отключённые потребители по результатам расчёта | готово — [описание](docs/25-disconnected-consumers.md), [тест](sql/tests/test_disconnected_consumers.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше

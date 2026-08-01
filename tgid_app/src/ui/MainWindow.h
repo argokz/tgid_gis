@@ -3,6 +3,7 @@
 #include "db/DatabaseConfig.h"
 #include "db/DatabaseConnection.h"
 #include "repo/ClosedConsumerRepository.h"
+#include "repo/DisconnectedConsumerRepository.h"
 #include "repo/FragmentRepository.h"
 #include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
@@ -81,6 +82,9 @@ private slots:
     void refreshZeroLoadConsumers();
     void exportZeroLoadConsumers();
     void openZeroLoadConsumer(int row, int column);
+    void refreshDisconnectedConsumers();
+    void exportDisconnectedConsumers();
+    void openDisconnectedConsumer(int row, int column);
 
 private:
     void buildInterface();
@@ -104,6 +108,7 @@ private:
     db::DatabaseConfig config_;
     db::DatabaseConnection connection_;
     repo::ClosedConsumerRepository closedConsumerRepository_;
+    repo::DisconnectedConsumerRepository disconnectedConsumerRepository_;
     repo::FragmentRepository fragmentRepository_;
     repo::HeatConsumptionReportRepository heatConsumptionReportRepository_;
     repo::LayerCatalogRepository layerRepository_;
@@ -177,6 +182,12 @@ private:
     QPushButton* exportZeroLoadConsumersButton_ = nullptr;
     QLabel* zeroLoadConsumersStatusLabel_ = nullptr;
     QTableWidget* zeroLoadConsumersTable_ = nullptr;
+    QComboBox* disconnectedConsumerFragmentCombo_ = nullptr;
+    QLineEdit* disconnectedConsumerSearchEdit_ = nullptr;
+    QPushButton* refreshDisconnectedConsumersButton_ = nullptr;
+    QPushButton* exportDisconnectedConsumersButton_ = nullptr;
+    QLabel* disconnectedConsumersStatusLabel_ = nullptr;
+    QTableWidget* disconnectedConsumersTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -196,6 +207,7 @@ private:
     repo::HeatConsumptionReportResult heatConsumptionReport_;
     QList<repo::ClosedConsumerRow> closedConsumerRows_;
     QList<repo::ZeroLoadConsumerRow> zeroLoadConsumerRows_;
+    QList<repo::DisconnectedConsumerRow> disconnectedConsumerRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;

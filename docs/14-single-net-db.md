@@ -304,8 +304,8 @@ WHERE l.removed = 0
 
 ### Решение
 
-[`sql/126_attic.sql`](../sql/126_attic.sql) и
-[`sql/128_attic_empty.sql`](../sql/128_attic_empty.sql) переносят
+[`sql/127_attic.sql`](../sql/127_attic.sql) и
+[`sql/129_attic_empty.sql`](../sql/129_attic_empty.sql) переносят
 в схему `attic`:
 
 * 20 таблиц `*_legacy` — единственная копия мёртвых атрибутов;
@@ -320,7 +320,7 @@ WHERE l.removed = 0
 Пустота каждой таблицы перепроверяется внутри транзакции: между
 построением списка и запуском скрипта в неё могли что-то записать.
 
-Откат — [`sql/127_attic_rollback.sql`](../sql/127_attic_rollback.sql).
+Откат — [`sql/128_attic_rollback.sql`](../sql/128_attic_rollback.sql).
 
 ### Результат
 

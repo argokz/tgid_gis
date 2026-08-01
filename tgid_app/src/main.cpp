@@ -1,6 +1,7 @@
 #include "db/DatabaseConfig.h"
 #include "db/DatabaseConnection.h"
 #include "repo/ClosedConsumerRepository.h"
+#include "repo/DisconnectedConsumerRepository.h"
 #include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
@@ -192,6 +193,20 @@ int main(int argc, char* argv[])
         QStringLiteral("Поиск потребителей с нулевой нагрузкой"),
         QStringLiteral("text"));
     parser.addOption(zeroLoadConsumerSearchOption);
+    const QCommandLineOption disconnectedConsumersOption(
+        QStringLiteral("disconnected-consumers"),
+        QStringLiteral("Потребители без результата последнего расчёта"));
+    parser.addOption(disconnectedConsumersOption);
+    const QCommandLineOption disconnectedConsumerFragmentOption(
+        QStringLiteral("disconnected-consumer-fragment"),
+        QStringLiteral("Ограничить отключённых потребителей фрагментом"),
+        QStringLiteral("fragment_id"));
+    parser.addOption(disconnectedConsumerFragmentOption);
+    const QCommandLineOption disconnectedConsumerSearchOption(
+        QStringLiteral("disconnected-consumer-search"),
+        QStringLiteral("Поиск отключённых потребителей"),
+        QStringLiteral("text"));
+    parser.addOption(disconnectedConsumerSearchOption);
     const QCommandLineOption reportArchivedOption(
         QStringLiteral("report-archived"),
         QStringLiteral("Включить архивные участки в отчёт"));
@@ -224,7 +239,8 @@ int main(int argc, char* argv[])
         || parser.isSet(pipeVolumeReportOption)
         || parser.isSet(heatConsumptionReportOption)
         || parser.isSet(closedConsumersOption)
-        || parser.isSet(zeroLoadConsumersOption)) {
+        || parser.isSet(zeroLoadConsumersOption)
+        || parser.isSet(disconnectedConsumersOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -1221,6 +1237,55 @@ int main(int argc, char* argv[])
             }
             qInfo().noquote()
                 << QStringLiteral("OK_ZERO_LOAD: найдено=%1 лимит=%2")
+                       .arg(rows.size())
+                       .arg(criteria.limit);
+        }
+
+        if (parser.isSet(disconnectedConsumersOption)) {
+            bool fragmentValid = true;
+            const int fragmentId =
+                parser.isSet(disconnectedConsumerFragmentOption)
+                    ? parser.value(disconnectedConsumerFragmentOption)
+                          .toInt(&fragmentValid)
+                    : 0;
+            if (!fragmentValid || fragmentId < 0) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Некорректный --disconnected-consumer-fragment");
+                return 46;
+            }
+            tgid::repo::DisconnectedConsumerCriteria criteria;
+            criteria.fragmentId = fragmentId;
+            criteria.searchText =
+                parser.value(disconnectedConsumerSearchOption).trimmed();
+            criteria.limit = 5000;
+            QString listError;
+            const QList<tgid::repo::DisconnectedConsumerRow> rows =
+                tgid::repo::DisconnectedConsumerRepository().load(
+                    connection.database(), criteria, &listError);
+            if (!listError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ошибка списка отключённых потребителей:")
+                    << listError;
+                return 47;
+            }
+            for (const tgid::repo::DisconnectedConsumerRow& row : rows) {
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "DISCONNECTED: table=%1 id=%2 source_id=%3 fragment=%4 calculation=%5 code=%6 node=%7 name=%8")
+                           .arg(row.classTable)
+                           .arg(row.id)
+                           .arg(row.sourceId)
+                           .arg(row.fragmentId)
+                           .arg(row.calculationId)
+                           .arg(row.externalCode,
+                                row.externalNodeName,
+                                row.consumerName);
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK_DISCONNECTED: найдено=%1 лимит=%2")
                        .arg(rows.size())
                        .arg(criteria.limit);
         }
