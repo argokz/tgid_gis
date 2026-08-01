@@ -46,6 +46,7 @@
 | 30 | Атомарное разрезание трубопровода из Qt | готово — [описание](docs/13-line-split.md), [110](sql/110_line_split.sql), [тест](sql/tests/test_line_split.sql) |
 | 31 | Безопасное соединение двух трубопроводных участков из Qt | готово — [описание](docs/14-line-join.md), [111](sql/111_line_join.sql), [тест](sql/tests/test_line_join.sql) |
 | 32 | Атомарное массовое редактирование объектов из Qt | готово — [описание](docs/15-batch-edit.md) |
+| 33 | Универсальный типизированный поиск по объектным таблицам | готово — [описание](docs/16-object-search.md) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
