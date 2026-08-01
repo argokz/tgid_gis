@@ -15,6 +15,7 @@
 #include <QDialogButtonBox>
 #include <QDockWidget>
 #include <QFont>
+#include <QFileDialog>
 #include <QHash>
 #include <QHeaderView>
 #include <QHBoxLayout>
@@ -25,12 +26,15 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QSaveFile>
 #include <QSplitter>
 #include <QStatusBar>
+#include <QStringConverter>
 #include <QStyledItemDelegate>
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QTextStream>
 #include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -282,6 +286,12 @@ QTableWidgetItem* readOnlyItem(const QString& text)
     auto* item = new QTableWidgetItem(text);
     item->setFlags(item->flags() & ~Qt::ItemIsEditable);
     return item;
+}
+
+QString csvCell(QString value)
+{
+    value.replace('"', QStringLiteral("\"\""));
+    return QStringLiteral("\"%1\"").arg(value);
 }
 
 }  // namespace
@@ -551,6 +561,78 @@ void MainWindow::buildInterface()
     searchLayout->addWidget(searchTable_, 1);
     tabs->addTab(searchTab, QStringLiteral("Поиск"));
 
+    auto* reportTab = new QWidget(tabs);
+    auto* reportLayout = new QVBoxLayout(reportTab);
+    auto* reportToolbar = new QHBoxLayout();
+    reportToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), reportTab));
+    reportFragmentCombo_ = new QComboBox(reportTab);
+    reportFragmentCombo_->setMinimumWidth(240);
+    reportFragmentCombo_->setEnabled(false);
+    reportToolbar->addWidget(reportFragmentCombo_, 1);
+    reportToolbar->addWidget(
+        new QLabel(QStringLiteral("Группировка:"), reportTab));
+    reportGroupingCombo_ = new QComboBox(reportTab);
+    reportGroupingCombo_->addItem(
+        QStringLiteral("Без группировки"), QStringLiteral("none"));
+    reportGroupingCombo_->addItem(
+        QStringLiteral("Условный диаметр"), QStringLiteral("diameter"));
+    reportGroupingCombo_->addItem(
+        QStringLiteral("Тип прокладки"), QStringLiteral("tubing_type"));
+    reportGroupingCombo_->addItem(
+        QStringLiteral("Материал изоляции"), QStringLiteral("insulation"));
+    reportToolbar->addWidget(reportGroupingCombo_);
+    reportArchivedCheck_ = new QCheckBox(
+        QStringLiteral("Включая архив"), reportTab);
+    reportToolbar->addWidget(reportArchivedCheck_);
+    reportSelectedCheck_ = new QCheckBox(
+        QStringLiteral("Только выбранные на карте"), reportTab);
+    reportSelectedCheck_->setToolTip(
+        QStringLiteral(
+            "На карте должны быть выбраны участки pipe_section"));
+    connect(reportSelectedCheck_, &QCheckBox::toggled,
+            reportFragmentCombo_, &QComboBox::setDisabled);
+    reportToolbar->addWidget(reportSelectedCheck_);
+    runPipeLengthReportButton_ = new QPushButton(
+        QStringLiteral("Сформировать"), reportTab);
+    runPipeLengthReportButton_->setEnabled(false);
+    connect(runPipeLengthReportButton_, &QPushButton::clicked,
+            this, &MainWindow::executePipeLengthReport);
+    reportToolbar->addWidget(runPipeLengthReportButton_);
+    exportPipeLengthReportButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), reportTab);
+    exportPipeLengthReportButton_->setEnabled(false);
+    connect(exportPipeLengthReportButton_, &QPushButton::clicked,
+            this, &MainWindow::exportPipeLengthReport);
+    reportToolbar->addWidget(exportPipeLengthReportButton_);
+    reportLayout->addLayout(reportToolbar);
+    pipeLengthReportStatusLabel_ = new QLabel(
+        QStringLiteral("Сформируйте отчёт по активным pipe_section"),
+        reportTab);
+    pipeLengthReportStatusLabel_->setWordWrap(true);
+    reportLayout->addWidget(pipeLengthReportStatusLabel_);
+    pipeLengthReportTable_ = new QTableWidget(reportTab);
+    pipeLengthReportTable_->setColumnCount(7);
+    pipeLengthReportTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Группа"),
+        QStringLiteral("Участков"),
+        QStringLiteral("Паспортная, м"),
+        QStringLiteral("По геометрии, м"),
+        QStringLiteral("Рабочая, м"),
+        QStringLiteral("Паспорт − геометрия, м"),
+        QStringLiteral("Без паспортной длины"),
+    });
+    pipeLengthReportTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    pipeLengthReportTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    pipeLengthReportTable_->setAlternatingRowColors(true);
+    pipeLengthReportTable_->setSortingEnabled(true);
+    pipeLengthReportTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    pipeLengthReportTable_->horizontalHeader()->setStretchLastSection(true);
+    reportLayout->addWidget(pipeLengthReportTable_, 1);
+    tabs->addTab(reportTab, QStringLiteral("Протяжённость"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -692,6 +774,7 @@ void MainWindow::connectAndRefresh()
     populateLineClasses(layers);
     populateSearchClasses(layers);
     populateFragments(fragments);
+    populateReportFragments(fragments);
     refreshArchive();
     statusLabel_->setText(
         statusLabel_->text()
@@ -712,6 +795,14 @@ void MainWindow::showError(const QString& message)
     searchOperatorCombo_->setEnabled(false);
     searchButton_->setEnabled(false);
     searchStatusLabel_->setText(QStringLiteral("Поиск недоступен"));
+    pipeLengthReportTable_->setRowCount(0);
+    pipeLengthReportRows_.clear();
+    reportFragmentCombo_->clear();
+    reportFragmentCombo_->setEnabled(false);
+    runPipeLengthReportButton_->setEnabled(false);
+    exportPipeLengthReportButton_->setEnabled(false);
+    pipeLengthReportStatusLabel_->setText(
+        QStringLiteral("Отчёт недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
     mapStatusLabel_->setText(QStringLiteral("Карта недоступна"));
@@ -1101,6 +1192,232 @@ void MainWindow::openSearchResult(int row, int column)
         item->data(Qt::UserRole).toLongLong(),
         item->data(Qt::UserRole + 1).toString(),
         item->data(Qt::UserRole + 2).toBool());
+}
+
+void MainWindow::populateReportFragments(
+    const QList<repo::FragmentInfo>& fragments)
+{
+    reportFragmentCombo_->clear();
+    reportFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
+    for (const repo::FragmentInfo& fragment : fragments) {
+        QString label = fragment.name;
+        if (!fragment.settlement.trimmed().isEmpty()) {
+            label = QStringLiteral("%1 — %2")
+                        .arg(fragment.settlement.trimmed(), fragment.name);
+        }
+        reportFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+    }
+    reportFragmentCombo_->setEnabled(
+        reportFragmentCombo_->count() > 0
+        && !reportSelectedCheck_->isChecked());
+    runPipeLengthReportButton_->setEnabled(
+        reportFragmentCombo_->count() > 0);
+    exportPipeLengthReportButton_->setEnabled(false);
+    pipeLengthReportRows_.clear();
+    pipeLengthReportTable_->setRowCount(0);
+    pipeLengthReportStatusLabel_->setStyleSheet({});
+    pipeLengthReportStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и сформируйте отчёт"));
+}
+
+void MainWindow::executePipeLengthReport()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::PipeLengthReportCriteria criteria;
+    criteria.fragmentId = reportSelectedCheck_->isChecked()
+                              ? 0
+                              : reportFragmentCombo_->currentData().toInt();
+    criteria.grouping = reportGroupingCombo_->currentData().toString();
+    criteria.includeArchived = reportArchivedCheck_->isChecked();
+    if (reportSelectedCheck_->isChecked()) {
+        const QList<SelectedMapObject> selected = mapView_->selectedObjects();
+        for (const SelectedMapObject& object : selected) {
+            if (object.isNode
+                || object.classTable != QStringLiteral("pipe_section")) {
+                QMessageBox::warning(
+                    this,
+                    QStringLiteral("Отчёт протяжённости"),
+                    QStringLiteral(
+                        "Для отчёта должны быть выбраны только pipe_section"));
+                return;
+            }
+            criteria.pipeIds.append(object.id);
+        }
+        if (criteria.pipeIds.isEmpty()) {
+            QMessageBox::warning(
+                this,
+                QStringLiteral("Отчёт протяжённости"),
+                QStringLiteral(
+                    "Сначала выберите участки pipe_section на карте"));
+            return;
+        }
+    }
+    runPipeLengthReportButton_->setEnabled(false);
+    exportPipeLengthReportButton_->setEnabled(false);
+    pipeLengthReportStatusLabel_->setStyleSheet({});
+    pipeLengthReportStatusLabel_->setText(
+        QStringLiteral("Расчёт протяжённости…"));
+    QApplication::processEvents();
+
+    QString error;
+    pipeLengthReportRows_ = pipeLengthReportRepository_.load(
+        connection_.database(), criteria, &error);
+    runPipeLengthReportButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        pipeLengthReportRows_.clear();
+        pipeLengthReportTable_->setRowCount(0);
+        pipeLengthReportStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        pipeLengthReportStatusLabel_->setText(
+            QStringLiteral("Ошибка отчёта: %1").arg(error));
+        return;
+    }
+
+    qint64 totalCount = 0;
+    qint64 totalMissing = 0;
+    double totalPassport = 0.0;
+    double totalGeometry = 0.0;
+    double totalEffective = 0.0;
+    for (const repo::PipeLengthReportRow& row : pipeLengthReportRows_) {
+        totalCount += row.pipeCount;
+        totalMissing += row.missingPassportCount;
+        totalPassport += row.passportLength;
+        totalGeometry += row.geometryLength;
+        totalEffective += row.effectiveLength;
+    }
+    const bool addTotalRow = pipeLengthReportRows_.size() > 1;
+    pipeLengthReportTable_->setSortingEnabled(false);
+    pipeLengthReportTable_->setRowCount(
+        pipeLengthReportRows_.size() + (addTotalRow ? 1 : 0));
+    const auto putRow = [this](
+                            qsizetype tableRow,
+                            const QString& label,
+                            qint64 count,
+                            double passport,
+                            double geometry,
+                            double effective,
+                            qint64 missing,
+                            bool bold) {
+        const QStringList values = {
+            label,
+            QString::number(count),
+            QString::number(passport, 'f', 2),
+            QString::number(geometry, 'f', 2),
+            QString::number(effective, 'f', 2),
+            QString::number(passport - geometry, 'f', 2),
+            QString::number(missing),
+        };
+        for (qsizetype column = 0; column < values.size(); ++column) {
+            QTableWidgetItem* item = readOnlyItem(values.at(column));
+            if (bold) {
+                QFont font = item->font();
+                font.setBold(true);
+                item->setFont(font);
+                item->setBackground(QColor(QStringLiteral("#e2e8f0")));
+            }
+            if (column > 0) {
+                item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            }
+            pipeLengthReportTable_->setItem(tableRow, column, item);
+        }
+    };
+    for (qsizetype rowIndex = 0;
+         rowIndex < pipeLengthReportRows_.size(); ++rowIndex) {
+        const repo::PipeLengthReportRow& row =
+            pipeLengthReportRows_.at(rowIndex);
+        putRow(rowIndex, row.groupLabel, row.pipeCount,
+               row.passportLength, row.geometryLength,
+               row.effectiveLength, row.missingPassportCount, false);
+    }
+    if (addTotalRow) {
+        putRow(pipeLengthReportRows_.size(), QStringLiteral("ИТОГО"),
+               totalCount, totalPassport, totalGeometry,
+               totalEffective, totalMissing, true);
+    }
+    exportPipeLengthReportButton_->setEnabled(
+        !pipeLengthReportRows_.isEmpty());
+    pipeLengthReportStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    pipeLengthReportStatusLabel_->setText(
+        QStringLiteral(
+            "Участков: %1 · рабочая длина: %2 км · "
+            "паспорт не заполнен: %3")
+            .arg(totalCount)
+            .arg(totalEffective / 1000.0, 0, 'f', 3)
+            .arg(totalMissing));
+}
+
+void MainWindow::exportPipeLengthReport()
+{
+    if (pipeLengthReportRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт отчёта"),
+        QStringLiteral("tgid_pipe_length.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("Группа")) << ';'
+           << csvCell(QStringLiteral("Участков")) << ';'
+           << csvCell(QStringLiteral("Паспортная длина, м")) << ';'
+           << csvCell(QStringLiteral("Геометрическая длина, м")) << ';'
+           << csvCell(QStringLiteral("Рабочая длина, м")) << ';'
+           << csvCell(QStringLiteral("Паспорт - геометрия, м")) << ';'
+           << csvCell(QStringLiteral("Без паспортной длины")) << '\n';
+    qint64 totalCount = 0;
+    qint64 totalMissing = 0;
+    double totalPassport = 0.0;
+    double totalGeometry = 0.0;
+    double totalEffective = 0.0;
+    for (const repo::PipeLengthReportRow& row : pipeLengthReportRows_) {
+        stream << csvCell(row.groupLabel) << ';'
+               << row.pipeCount << ';'
+               << QString::number(row.passportLength, 'f', 2) << ';'
+               << QString::number(row.geometryLength, 'f', 2) << ';'
+               << QString::number(row.effectiveLength, 'f', 2) << ';'
+               << QString::number(
+                      row.passportLength - row.geometryLength, 'f', 2)
+               << ';' << row.missingPassportCount << '\n';
+        totalCount += row.pipeCount;
+        totalMissing += row.missingPassportCount;
+        totalPassport += row.passportLength;
+        totalGeometry += row.geometryLength;
+        totalEffective += row.effectiveLength;
+    }
+    if (pipeLengthReportRows_.size() > 1) {
+        stream << csvCell(QStringLiteral("ИТОГО")) << ';'
+               << totalCount << ';'
+               << QString::number(totalPassport, 'f', 2) << ';'
+               << QString::number(totalGeometry, 'f', 2) << ';'
+               << QString::number(totalEffective, 'f', 2) << ';'
+               << QString::number(totalPassport - totalGeometry, 'f', 2)
+               << ';' << totalMissing << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
 }
 
 void MainWindow::loadSelectedFragment()

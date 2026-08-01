@@ -3,6 +3,7 @@
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
+#include "repo/PipeLengthReportRepository.h"
 #include "repo/SearchRepository.h"
 #include "ui/MainWindow.h"
 
@@ -127,6 +128,20 @@ int main(int argc, char* argv[])
         QStringLiteral("search-archived"),
         QStringLiteral("Включить архивные строки в поиск"));
     parser.addOption(searchArchivedOption);
+    const QCommandLineOption pipeLengthReportOption(
+        QStringLiteral("pipe-length-report"),
+        QStringLiteral("Отчёт протяжённости: grouping[:fragment_id]"),
+        QStringLiteral("grouping[:fragment_id]"));
+    parser.addOption(pipeLengthReportOption);
+    const QCommandLineOption reportArchivedOption(
+        QStringLiteral("report-archived"),
+        QStringLiteral("Включить архивные участки в отчёт"));
+    parser.addOption(reportArchivedOption);
+    const QCommandLineOption reportPipeIdsOption(
+        QStringLiteral("report-pipe-ids"),
+        QStringLiteral("Ограничить отчёт ID участков через запятую"),
+        QStringLiteral("id,id,..."));
+    parser.addOption(reportPipeIdsOption);
     parser.process(application);
 
     if (parser.isSet(checkDatabaseOption)
@@ -142,7 +157,8 @@ int main(int argc, char* argv[])
         || parser.isSet(splitLineOption)
         || parser.isSet(joinLinesOption)
         || parser.isSet(batchSetOption)
-        || parser.isSet(searchObjectsOption)) {
+        || parser.isSet(searchObjectsOption)
+        || parser.isSet(pipeLengthReportOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -712,6 +728,84 @@ int main(int argc, char* argv[])
                 << QStringLiteral("OK: найдено=%1 лимит=%2")
                        .arg(results.size())
                        .arg(criteria.limit);
+        }
+
+        if (parser.isSet(pipeLengthReportOption)) {
+            const QStringList parts =
+                parser.value(pipeLengthReportOption).split(':');
+            bool fragmentValid = true;
+            const int fragmentId =
+                parts.size() == 2
+                    ? parts.at(1).toInt(&fragmentValid)
+                    : 0;
+            if (parts.isEmpty() || parts.size() > 2
+                || parts.at(0).isEmpty() || !fragmentValid
+                || fragmentId < 0) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ожидается --pipe-length-report grouping[:fragment_id]");
+                return 30;
+            }
+            tgid::repo::PipeLengthReportCriteria criteria;
+            criteria.grouping = parts.at(0);
+            criteria.fragmentId = fragmentId;
+            criteria.includeArchived = parser.isSet(reportArchivedOption);
+            if (parser.isSet(reportPipeIdsOption)) {
+                const QStringList ids = parser.value(reportPipeIdsOption)
+                                            .split(',', Qt::SkipEmptyParts);
+                bool idsValid = !ids.isEmpty();
+                for (const QString& idText : ids) {
+                    bool idValid = false;
+                    const qint64 id = idText.toLongLong(&idValid);
+                    if (!idValid || id <= 0) {
+                        idsValid = false;
+                        break;
+                    }
+                    criteria.pipeIds.append(id);
+                }
+                if (!idsValid) {
+                    return 30;
+                }
+            }
+            QString reportError;
+            const QList<tgid::repo::PipeLengthReportRow> rows =
+                tgid::repo::PipeLengthReportRepository().load(
+                    connection.database(), criteria, &reportError);
+            if (!reportError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка отчёта:") << reportError;
+                return 31;
+            }
+            qint64 totalCount = 0;
+            qint64 totalMissing = 0;
+            double totalPassport = 0.0;
+            double totalGeometry = 0.0;
+            double totalEffective = 0.0;
+            for (const tgid::repo::PipeLengthReportRow& row : rows) {
+                totalCount += row.pipeCount;
+                totalMissing += row.missingPassportCount;
+                totalPassport += row.passportLength;
+                totalGeometry += row.geometryLength;
+                totalEffective += row.effectiveLength;
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "ROW: %1 count=%2 passport=%3 geometry=%4 effective=%5 missing=%6")
+                           .arg(row.groupLabel)
+                           .arg(row.pipeCount)
+                           .arg(row.passportLength, 0, 'f', 2)
+                           .arg(row.geometryLength, 0, 'f', 2)
+                           .arg(row.effectiveLength, 0, 'f', 2)
+                           .arg(row.missingPassportCount);
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK: групп=%1 участков=%2 паспорт=%3 геометрия=%4 рабочая=%5 без_паспорта=%6")
+                       .arg(rows.size())
+                       .arg(totalCount)
+                       .arg(totalPassport, 0, 'f', 2)
+                       .arg(totalGeometry, 0, 'f', 2)
+                       .arg(totalEffective, 0, 'f', 2)
+                       .arg(totalMissing);
         }
         return 0;
     }

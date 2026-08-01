@@ -6,6 +6,7 @@
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
+#include "repo/PipeLengthReportRepository.h"
 #include "repo/SearchRepository.h"
 
 #include <QElapsedTimer>
@@ -59,6 +60,8 @@ private slots:
     void refreshSearchValueInputs();
     void executeSearch();
     void openSearchResult(int row, int column);
+    void executePipeLengthReport();
+    void exportPipeLengthReport();
 
 private:
     void buildInterface();
@@ -69,6 +72,7 @@ private:
     void populateLineClasses(const QList<repo::LayerInfo>& layers);
     void populateFragments(const QList<repo::FragmentInfo>& fragments);
     void populateSearchClasses(const QList<repo::LayerInfo>& layers);
+    void populateReportFragments(const QList<repo::FragmentInfo>& fragments);
     void showError(const QString& message);
     void showLayers(
         const QList<repo::LayerInfo>& layers,
@@ -79,6 +83,7 @@ private:
     repo::FragmentRepository fragmentRepository_;
     repo::LayerCatalogRepository layerRepository_;
     repo::ObjectRepository objectRepository_;
+    repo::PipeLengthReportRepository pipeLengthReportRepository_;
     repo::SearchRepository searchRepository_;
 
     QLabel* connectionLabel_ = nullptr;
@@ -107,6 +112,14 @@ private:
     QPushButton* searchButton_ = nullptr;
     QLabel* searchStatusLabel_ = nullptr;
     QTableWidget* searchTable_ = nullptr;
+    QComboBox* reportFragmentCombo_ = nullptr;
+    QComboBox* reportGroupingCombo_ = nullptr;
+    QCheckBox* reportArchivedCheck_ = nullptr;
+    QCheckBox* reportSelectedCheck_ = nullptr;
+    QPushButton* runPipeLengthReportButton_ = nullptr;
+    QPushButton* exportPipeLengthReportButton_ = nullptr;
+    QLabel* pipeLengthReportStatusLabel_ = nullptr;
+    QTableWidget* pipeLengthReportTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -119,6 +132,7 @@ private:
     QElapsedTimer mapLoadTimer_;
     repo::ObjectDetails currentObjectDetails_;
     QList<repo::SearchField> searchFields_;
+    QList<repo::PipeLengthReportRow> pipeLengthReportRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;
