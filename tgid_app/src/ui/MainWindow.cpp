@@ -2957,6 +2957,156 @@ void MainWindow::exportDisconnectedConsumers()
         QStringLiteral("Отчёт сохранён: %1").arg(fileName));
 }
 
+void MainWindow::refreshClosedPipeSections()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::ClosedPipeSectionCriteria criteria;
+    criteria.fragmentId = closedPipeFragmentCombo_->currentData().toInt();
+    criteria.searchText = closedPipeSearchEdit_->text().trimmed();
+    criteria.limit = 2000;
+
+    refreshClosedPipeSectionsButton_->setEnabled(false);
+    exportClosedPipeSectionsButton_->setEnabled(false);
+    closedPipeSectionsStatusLabel_->setStyleSheet({});
+    closedPipeSectionsStatusLabel_->setText(
+        QStringLiteral("Загрузка закрытых участков…"));
+    QApplication::processEvents();
+
+    QString error;
+    closedPipeSectionRows_ = closedPipeSectionRepository_.load(
+        connection_.database(), criteria, &error);
+    refreshClosedPipeSectionsButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        closedPipeSectionRows_.clear();
+        closedPipeSectionsTable_->setRowCount(0);
+        closedPipeSectionsStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        closedPipeSectionsStatusLabel_->setText(
+            QStringLiteral("Ошибка списка: %1").arg(error));
+        return;
+    }
+
+    closedPipeSectionsTable_->setSortingEnabled(false);
+    closedPipeSectionsTable_->setRowCount(closedPipeSectionRows_.size());
+    for (qsizetype rowIndex = 0;
+         rowIndex < closedPipeSectionRows_.size(); ++rowIndex) {
+        const repo::ClosedPipeSectionRow& row =
+            closedPipeSectionRows_.at(rowIndex);
+        QTableWidgetItem* idItem =
+            readOnlyItem(QString::number(row.id));
+        idItem->setData(Qt::UserRole, row.id);
+        closedPipeSectionsTable_->setItem(rowIndex, 0, idItem);
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 1, readOnlyItem(QString::number(row.sourceId)));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 2, readOnlyItem(row.nodeFromCode));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 3, readOnlyItem(row.nodeFromName));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 4, readOnlyItem(row.nodeToCode));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 5, readOnlyItem(row.nodeToName));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 6,
+            readOnlyItem(row.pipeLengthIsNull
+                             ? QString()
+                             : QString::number(row.pipeLength, 'f', 3)));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 7,
+            readOnlyItem(row.internalDiameterIsNull
+                             ? QString()
+                             : QString::number(row.internalDiameter, 'f', 3)));
+        closedPipeSectionsTable_->setItem(
+            rowIndex, 8, readOnlyItem(QString::number(row.fragmentId)));
+    }
+    closedPipeSectionsTable_->setSortingEnabled(true);
+    exportClosedPipeSectionsButton_->setEnabled(
+        !closedPipeSectionRows_.isEmpty());
+    closedPipeSectionsStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    if (closedPipeSectionRows_.size() == criteria.limit) {
+        closedPipeSectionsStatusLabel_->setText(
+            QStringLiteral(
+                "Показаны первые %1 строк — выберите фрагмент или задайте фильтр")
+                .arg(criteria.limit));
+    } else {
+        closedPipeSectionsStatusLabel_->setText(
+            QStringLiteral("Найдено закрытых участков: %1")
+                .arg(closedPipeSectionRows_.size()));
+    }
+}
+
+void MainWindow::openClosedPipeSection(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = closedPipeSectionsTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    const qint64 objectId = item->data(Qt::UserRole).toLongLong();
+    if (objectId > 0) {
+        showObjectDetails(objectId, QStringLiteral("pipe_section"), false);
+    }
+}
+
+void MainWindow::exportClosedPipeSections()
+{
+    if (closedPipeSectionRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт закрытых участков"),
+        QStringLiteral("tgid_closed_pipe_sections.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("ID")) << ';'
+           << csvCell(QStringLiteral("Исходный ID")) << ';'
+           << csvCell(QStringLiteral("Код начала")) << ';'
+           << csvCell(QStringLiteral("Имя начала")) << ';'
+           << csvCell(QStringLiteral("Код конца")) << ';'
+           << csvCell(QStringLiteral("Имя конца")) << ';'
+           << csvCell(QStringLiteral("Длина, м")) << ';'
+           << csvCell(QStringLiteral("Внутренний диаметр")) << ';'
+           << csvCell(QStringLiteral("Фрагмент")) << '\n';
+    for (const repo::ClosedPipeSectionRow& row : closedPipeSectionRows_) {
+        stream << row.id << ';' << row.sourceId << ';'
+               << csvCell(row.nodeFromCode) << ';'
+               << csvCell(row.nodeFromName) << ';'
+               << csvCell(row.nodeToCode) << ';'
+               << csvCell(row.nodeToName) << ';';
+        if (!row.pipeLengthIsNull) {
+            stream << QString::number(row.pipeLength, 'f', 3);
+        }
+        stream << ';';
+        if (!row.internalDiameterIsNull) {
+            stream << QString::number(row.internalDiameter, 'f', 3);
+        }
+        stream << ';' << row.fragmentId << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
 void MainWindow::loadSelectedFragment()
 {
     if (mapWatcher_->isRunning()) {
