@@ -27,6 +27,8 @@ qt_add_executable(tgid_app
     src/repo/ClosedPipeSectionRepository.h
     src/repo/DisconnectedConsumerRepository.cpp
     src/repo/DisconnectedConsumerRepository.h
+    src/repo/DisconnectedPipeSectionRepository.cpp
+    src/repo/DisconnectedPipeSectionRepository.h
     src/repo/ZeroLoadConsumerRepository.cpp
     src/repo/ZeroLoadConsumerRepository.h
     src/repo/FragmentRepository.cpp

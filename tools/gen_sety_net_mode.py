@@ -53,6 +53,16 @@ def is_net(conn):
     return _is_net
 
 
+def fragment_table(conn):
+    """Имя таблицы фрагментов для подстановки в запрос.
+
+    В net объект называется fragment (единственное число, как остальные
+    классы), в старой схеме — fragments. Имена не совпадают, поэтому
+    search_path тут не помогает и подстановка нужна явная.
+    """
+    return 'net.fragment' if is_net(conn) else 'fragments'
+
+
 def node_query(tn, cols, s_fileID):
     """Замена запроса read_node2.
 
@@ -190,16 +200,18 @@ LEFT JOIN
 
     JOIN
     (
+        -- LEFT JOIN fragments здесь был и ничего не давал: колонки
+        -- fr в выборке подзапроса не участвуют. Убран заодно с
+        -- переводом на net — иначе тянул бы public.fragments.
         SELECT c.fileID, max(c.id) AS cid
         FROM CALCULATION c
-        LEFT JOIN fragments fr ON fr.id = c.fileID
         GROUP BY c.fileID
     ) calc ON n2.fragment_id = calc.fileID
           AND usP.calculationID = calc.cid AND usO.calculationID = calc.cid
 
 ) us2 ON us2.kod = sp.kod_m AND us2.name = sp.uzel_m
      AND us2.fileID = sp.fragment_resultid
-LEFT JOIN fragments fr ON fr.id = sp.fragment_resultid
+LEFT JOIN net.fragment fr ON fr.id = sp.fragment_resultid
 
 WHERE n.fragment_id IN ({s_fileID})
 """
