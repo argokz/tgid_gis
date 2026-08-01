@@ -46,6 +46,8 @@ private slots:
     void openArchivedObject(int row, int column);
     void togglePointCreation(bool enabled);
     void createPointAt(QPointF position);
+    void toggleNodeMove(bool enabled);
+    void moveSelectedNodeAt(QPointF position);
     void toggleLineCreation(bool enabled);
     void createLineBetween(qint64 nodeFrom, qint64 nodeTo);
     void showLineStart(qint64 nodeId);
@@ -99,6 +101,7 @@ private:
     QPushButton* fitMapButton_ = nullptr;
     QComboBox* pointClassCombo_ = nullptr;
     QPushButton* createPointButton_ = nullptr;
+    QPushButton* moveNodeButton_ = nullptr;
     QComboBox* lineClassCombo_ = nullptr;
     QPushButton* createLineButton_ = nullptr;
     QPushButton* splitLineButton_ = nullptr;

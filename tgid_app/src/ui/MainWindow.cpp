@@ -378,6 +378,13 @@ void MainWindow::buildInterface()
     connect(createPointButton_, &QPushButton::toggled,
             this, &MainWindow::togglePointCreation);
     mapToolbar->addWidget(createPointButton_);
+    moveNodeButton_ =
+        new QPushButton(QStringLiteral("Переместить узел"), mapPanel);
+    moveNodeButton_->setCheckable(true);
+    moveNodeButton_->setEnabled(false);
+    connect(moveNodeButton_, &QPushButton::toggled,
+            this, &MainWindow::toggleNodeMove);
+    mapToolbar->addWidget(moveNodeButton_);
     lineClassCombo_ = new QComboBox(mapPanel);
     lineClassCombo_->setMinimumWidth(145);
     lineClassCombo_->setToolTip(QStringLiteral("Класс новой линии"));
@@ -432,6 +439,8 @@ void MainWindow::buildInterface()
     });
     connect(mapView_, &MapView::pointPlacementRequested,
             this, &MainWindow::createPointAt);
+    connect(mapView_, &MapView::nodeMoveRequested,
+            this, &MainWindow::moveSelectedNodeAt);
     connect(mapView_, &MapView::lineStartSelected,
             this, &MainWindow::showLineStart);
     connect(mapView_, &MapView::linePlacementRequested,
@@ -839,6 +848,8 @@ void MainWindow::showError(const QString& message)
     fitMapButton_->setEnabled(false);
     createPointButton_->setChecked(false);
     createPointButton_->setEnabled(false);
+    moveNodeButton_->setChecked(false);
+    moveNodeButton_->setEnabled(false);
     pointClassCombo_->clear();
     pointClassCombo_->setEnabled(false);
     createLineButton_->setChecked(false);
@@ -1613,6 +1624,9 @@ void MainWindow::loadSelectedFragment()
     if (createPointButton_->isChecked()) {
         createPointButton_->setChecked(false);
     }
+    if (moveNodeButton_->isChecked()) {
+        moveNodeButton_->setChecked(false);
+    }
     if (createLineButton_->isChecked()) {
         createLineButton_->setChecked(false);
     }
@@ -1693,6 +1707,9 @@ void MainWindow::finishMapLoad()
 void MainWindow::togglePointCreation(bool enabled)
 {
     if (enabled) {
+        if (moveNodeButton_->isChecked()) {
+            moveNodeButton_->setChecked(false);
+        }
         if (createLineButton_->isChecked()) {
             createLineButton_->setChecked(false);
         }
@@ -1775,9 +1792,115 @@ void MainWindow::createPointAt(QPointF position)
     loadSelectedFragment();
 }
 
+void MainWindow::toggleNodeMove(bool enabled)
+{
+    if (enabled) {
+        if (currentObjectDetails_.classTable.isEmpty()
+            || !currentObjectIsNode_ || currentObjectDetails_.archived
+            || !mapView_->hasSelectedNode(
+                currentObjectDetails_.id,
+                currentObjectDetails_.classTable)) {
+            moveNodeButton_->setChecked(false);
+            return;
+        }
+        if (createPointButton_->isChecked()) {
+            createPointButton_->setChecked(false);
+        }
+        if (createLineButton_->isChecked()) {
+            createLineButton_->setChecked(false);
+        }
+        if (splitLineButton_->isChecked()) {
+            splitLineButton_->setChecked(false);
+        }
+        if (joinLinesButton_->isChecked()) {
+            joinLinesButton_->setChecked(false);
+        }
+    }
+    mapView_->setNodeMoveMode(
+        enabled,
+        currentObjectDetails_.id,
+        currentObjectDetails_.classTable);
+    batchEditButton_->setEnabled(false);
+    moveNodeButton_->setText(
+        enabled ? QStringLiteral("Отмена перемещения")
+                : QStringLiteral("Переместить узел"));
+    pointClassCombo_->setEnabled(
+        !enabled && !createPointButton_->isChecked()
+        && pointClassCombo_->count() > 0);
+    lineClassCombo_->setEnabled(
+        !enabled && !createLineButton_->isChecked()
+        && lineClassCombo_->count() > 0);
+    fragmentTree_->setEnabled(!enabled && !mapWatcher_->isRunning());
+    statusBar()->showMessage(
+        enabled
+            ? QStringLiteral("Укажите новое положение выбранного узла")
+            : QStringLiteral("Режим перемещения выключен"));
+}
+
+void MainWindow::moveSelectedNodeAt(QPointF position)
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()
+        || !currentObjectIsNode_ || currentObjectDetails_.archived) {
+        return;
+    }
+    if (QMessageBox::question(
+            this,
+            QStringLiteral("Перемещение узла"),
+            QStringLiteral(
+                "Переместить %1 #%2?\nX = %3\nY = %4\n\n"
+                "Концы всех подключённых линий будут перестроены.")
+                .arg(currentObjectDetails_.classTable)
+                .arg(currentObjectDetails_.id)
+                .arg(position.x(), 0, 'f', 3)
+                .arg(position.y(), 0, 'f', 3))
+        != QMessageBox::Yes) {
+        statusBar()->showMessage(
+            QStringLiteral("Укажите другое положение узла"));
+        return;
+    }
+
+    moveNodeButton_->setChecked(false);
+    moveNodeButton_->setEnabled(false);
+    const QString classTable = currentObjectDetails_.classTable;
+    const qint64 nodeId = currentObjectDetails_.id;
+    const repo::MoveNodeResult result = objectRepository_.moveNode(
+        connection_.database(), classTable, nodeId,
+        currentObjectDetails_.rowVersion, position);
+    if (result.conflict) {
+        reloadObjectDetails();
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Конфликт редактирования"),
+            QStringLiteral(
+                "Узел уже изменён другим пользователем. "
+                "Карточка перезагружена."));
+        return;
+    }
+    if (!result.success) {
+        moveNodeButton_->setEnabled(
+            currentObjectIsNode_ && !currentObjectDetails_.archived);
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка перемещения"), result.error);
+        return;
+    }
+    QMessageBox::information(
+        this,
+        QStringLiteral("Узел перемещён"),
+        QStringLiteral("Перестроено подключённых линий: %1")
+            .arg(result.connectedLines));
+    pendingObjectId_ = nodeId;
+    pendingObjectClassTable_ = classTable;
+    pendingObjectIsNode_ = true;
+    loadSelectedFragment();
+}
+
 void MainWindow::toggleLineCreation(bool enabled)
 {
     if (enabled) {
+        if (moveNodeButton_->isChecked()) {
+            moveNodeButton_->setChecked(false);
+        }
         if (createPointButton_->isChecked()) {
             createPointButton_->setChecked(false);
         }
@@ -1886,6 +2009,9 @@ void MainWindow::toggleLineSplit(bool enabled)
         }
         if (createPointButton_->isChecked()) {
             createPointButton_->setChecked(false);
+        }
+        if (moveNodeButton_->isChecked()) {
+            moveNodeButton_->setChecked(false);
         }
         if (createLineButton_->isChecked()) {
             createLineButton_->setChecked(false);
@@ -1996,6 +2122,9 @@ void MainWindow::toggleLineJoin(bool enabled)
         }
         if (createPointButton_->isChecked()) {
             createPointButton_->setChecked(false);
+        }
+        if (moveNodeButton_->isChecked()) {
+            moveNodeButton_->setChecked(false);
         }
         if (createLineButton_->isChecked()) {
             createLineButton_->setChecked(false);
@@ -2425,6 +2554,8 @@ void MainWindow::showObjectDetails(
         reloadObjectButton_->setEnabled(false);
         archiveObjectButton_->setEnabled(false);
         historyObjectButton_->setEnabled(false);
+        moveNodeButton_->setChecked(false);
+        moveNodeButton_->setEnabled(false);
         splitLineButton_->setChecked(false);
         splitLineButton_->setEnabled(false);
         joinLinesButton_->setChecked(false);
@@ -2440,6 +2571,9 @@ void MainWindow::displayObjectDetails(
     const repo::ObjectDetails& details,
     bool isNode)
 {
+    if (moveNodeButton_->isChecked()) {
+        moveNodeButton_->setChecked(false);
+    }
     currentObjectDetails_ = details;
     currentObjectIsNode_ = isNode;
     batchEditButton_->setEnabled(false);
@@ -2551,6 +2685,9 @@ void MainWindow::displayObjectDetails(
         details.archived ? QStringLiteral("Восстановить")
                          : QStringLiteral("В архив"));
     historyObjectButton_->setEnabled(true);
+    moveNodeButton_->setEnabled(
+        isNode && !details.archived
+        && mapView_->hasSelectedNode(details.id, details.classTable));
     splitLineButton_->setEnabled(
         !isNode && !details.archived && details.canSplit
         && mapView_->hasSelectedLine(details.id, details.classTable));
@@ -2858,6 +2995,8 @@ void MainWindow::clearObjectDetails()
     reloadObjectButton_->setEnabled(false);
     archiveObjectButton_->setEnabled(false);
     historyObjectButton_->setEnabled(false);
+    moveNodeButton_->setChecked(false);
+    moveNodeButton_->setEnabled(false);
     splitLineButton_->setChecked(false);
     splitLineButton_->setEnabled(false);
     joinLinesButton_->setChecked(false);

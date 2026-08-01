@@ -110,6 +110,14 @@ struct JoinLinesResult final {
     QString error;
 };
 
+struct MoveNodeResult final {
+    bool success = false;
+    bool conflict = false;
+    qint64 rowVersion = 0;
+    int connectedLines = 0;
+    QString error;
+};
+
 class ObjectRepository final {
 public:
     [[nodiscard]] ObjectDetails load(
@@ -180,6 +188,13 @@ public:
         qint64 firstExpectedVersion,
         qint64 secondId,
         qint64 secondExpectedVersion) const;
+
+    [[nodiscard]] MoveNodeResult moveNode(
+        QSqlDatabase database,
+        const QString& classTable,
+        qint64 id,
+        qint64 expectedVersion,
+        const QPointF& position) const;
 };
 
 }  // namespace tgid::repo

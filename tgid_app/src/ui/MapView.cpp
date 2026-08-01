@@ -112,6 +112,7 @@ void MapView::clearMap()
     pointCreationMode_ = false;
     lineCreationMode_ = false;
     lineSplitMode_ = false;
+    nodeMoveMode_ = false;
     lineJoinMode_ = false;
     lineStartNodeId_ = 0;
     joinFirstLineId_ = 0;
@@ -126,6 +127,7 @@ void MapView::setPointCreationMode(bool enabled)
     if (pointCreationMode_) {
         lineCreationMode_ = false;
         lineSplitMode_ = false;
+        nodeMoveMode_ = false;
         lineJoinMode_ = false;
         lineStartNodeId_ = 0;
     }
@@ -141,6 +143,7 @@ void MapView::setLineCreationMode(bool enabled)
     if (lineCreationMode_) {
         pointCreationMode_ = false;
         lineSplitMode_ = false;
+        nodeMoveMode_ = false;
         lineJoinMode_ = false;
     }
     lineStartNodeId_ = 0;
@@ -157,12 +160,33 @@ void MapView::setLineSplitMode(bool enabled)
     if (lineSplitMode_) {
         pointCreationMode_ = false;
         lineCreationMode_ = false;
+        nodeMoveMode_ = false;
         lineJoinMode_ = false;
         lineStartNodeId_ = 0;
     }
     panning_ = false;
     dragging_ = false;
     setCursor(lineSplitMode_ ? Qt::CrossCursor : Qt::OpenHandCursor);
+    update();
+}
+
+void MapView::setNodeMoveMode(
+    bool enabled, qint64 nodeId, const QString& classTable)
+{
+    nodeMoveMode_ = enabled && hasGeometry_
+                    && selectedId_ == nodeId && nodeId != 0
+                    && selectedIsNode_
+                    && selectedClassTable_ == classTable;
+    if (nodeMoveMode_) {
+        pointCreationMode_ = false;
+        lineCreationMode_ = false;
+        lineSplitMode_ = false;
+        lineJoinMode_ = false;
+        lineStartNodeId_ = 0;
+    }
+    panning_ = false;
+    dragging_ = false;
+    setCursor(nodeMoveMode_ ? Qt::CrossCursor : Qt::OpenHandCursor);
     update();
 }
 
@@ -178,6 +202,7 @@ void MapView::setLineJoinMode(
         pointCreationMode_ = false;
         lineCreationMode_ = false;
         lineSplitMode_ = false;
+        nodeMoveMode_ = false;
         lineStartNodeId_ = 0;
         joinFirstLineId_ = firstId;
         joinFirstClassTable_ = firstClassTable;
@@ -196,6 +221,13 @@ bool MapView::hasSelectedLine(qint64 id, const QString& classTable) const
     return selectedObjects_.size() == 1
            && selectedId_ == id && selectedClassTable_ == classTable
            && !selectedIsNode_;
+}
+
+bool MapView::hasSelectedNode(qint64 id, const QString& classTable) const
+{
+    return selectedObjects_.size() == 1
+           && selectedId_ == id && selectedClassTable_ == classTable
+           && selectedIsNode_;
 }
 
 QList<SelectedMapObject> MapView::selectedObjects() const
@@ -332,6 +364,13 @@ void MapView::paintEvent(QPaintEvent*)
             Qt::AlignLeft | Qt::AlignVCenter,
             QStringLiteral(
                 "РАЗРЕЗАНИЕ: укажите точку на выбранной линии"));
+    } else if (nodeMoveMode_) {
+        painter.setPen(QColor(QStringLiteral("#b42318")));
+        painter.drawText(
+            QRect(12, 36, width() - 24, 24),
+            Qt::AlignLeft | Qt::AlignVCenter,
+            QStringLiteral(
+                "ПЕРЕМЕЩЕНИЕ: укажите новое положение узла"));
     } else if (lineJoinMode_) {
         painter.setPen(QColor(QStringLiteral("#b42318")));
         painter.drawText(
@@ -346,7 +385,7 @@ void MapView::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton
         && (pointCreationMode_ || lineCreationMode_ || lineSplitMode_
-            || lineJoinMode_)) {
+            || nodeMoveMode_ || lineJoinMode_)) {
         event->accept();
         return;
     }
@@ -400,6 +439,11 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
         event->accept();
         return;
     }
+    if (event->button() == Qt::LeftButton && nodeMoveMode_) {
+        emit nodeMoveRequested(screenToWorld(event->position()));
+        event->accept();
+        return;
+    }
     if (event->button() == Qt::LeftButton && lineJoinMode_) {
         selectJoinLineAt(event->position());
         event->accept();
@@ -422,7 +466,7 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
 void MapView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     if (pointCreationMode_ || lineCreationMode_ || lineSplitMode_
-        || lineJoinMode_) {
+        || nodeMoveMode_ || lineJoinMode_) {
         event->accept();
         return;
     }

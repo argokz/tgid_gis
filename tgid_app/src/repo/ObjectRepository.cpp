@@ -1280,4 +1280,70 @@ JoinLinesResult ObjectRepository::joinLines(
     return result;
 }
 
+MoveNodeResult ObjectRepository::moveNode(
+    QSqlDatabase database,
+    const QString& classTable,
+    qint64 id,
+    qint64 expectedVersion,
+    const QPointF& position) const
+{
+    MoveNodeResult result;
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (id <= 0 || expectedVersion <= 0
+        || !std::isfinite(position.x())
+        || !std::isfinite(position.y())) {
+        result.error = QStringLiteral("Некорректные параметры перемещения");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT new_version, connected_lines"
+        "  FROM net.move_node("
+        "      CAST(? AS text), CAST(? AS bigint), CAST(? AS bigint),"
+        "      CAST(? AS double precision), CAST(? AS double precision)"
+        "  )"));
+    query.addBindValue(classTable);
+    query.addBindValue(id);
+    query.addBindValue(expectedVersion);
+    query.addBindValue(position.x());
+    query.addBindValue(position.y());
+    if (!query.exec() || !query.next()) {
+        result.error = query.lastError().text();
+        result.conflict = result.error.contains(
+            QStringLiteral("CONFLICT:"), Qt::CaseInsensitive);
+        database.rollback();
+        return result;
+    }
+    result.rowVersion = query.value(0).toLongLong();
+    result.connectedLines = query.value(1).toInt();
+    if (result.rowVersion <= expectedVersion || result.connectedLines < 0) {
+        result.error = QStringLiteral(
+            "Сервер вернул некорректный результат перемещения");
+        database.rollback();
+        return result;
+    }
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        return result;
+    }
+    result.success = true;
+    return result;
+}
+
 }  // namespace tgid::repo

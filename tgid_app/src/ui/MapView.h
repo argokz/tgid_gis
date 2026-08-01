@@ -32,10 +32,15 @@ public:
     void setPointCreationMode(bool enabled);
     void setLineCreationMode(bool enabled);
     void setLineSplitMode(bool enabled);
+    void setNodeMoveMode(
+        bool enabled, qint64 nodeId = 0,
+        const QString& classTable = {});
     void setLineJoinMode(
         bool enabled, qint64 firstId = 0,
         const QString& firstClassTable = {});
     [[nodiscard]] bool hasSelectedLine(
+        qint64 id, const QString& classTable) const;
+    [[nodiscard]] bool hasSelectedNode(
         qint64 id, const QString& classTable) const;
     [[nodiscard]] QList<SelectedMapObject> selectedObjects() const;
 
@@ -52,6 +57,7 @@ signals:
     void linePlacementRequested(qint64 nodeFrom, qint64 nodeTo);
     void lineEndpointMissed();
     void lineSplitRequested(QPointF position);
+    void nodeMoveRequested(QPointF position);
     void lineJoinRequested(qint64 secondId, QString classTable);
     void lineJoinMissed();
 
@@ -95,6 +101,7 @@ private:
     bool pointCreationMode_ = false;
     bool lineCreationMode_ = false;
     bool lineSplitMode_ = false;
+    bool nodeMoveMode_ = false;
     bool lineJoinMode_ = false;
     qint64 lineStartNodeId_ = 0;
     qint64 joinFirstLineId_ = 0;

@@ -99,6 +99,11 @@ int main(int argc, char* argv[])
         QStringLiteral(
             "table:first_id:first_version:second_id:second_version"));
     parser.addOption(joinLinesOption);
+    const QCommandLineOption moveNodeOption(
+        QStringLiteral("move-node"),
+        QStringLiteral("Переместить узел: table:id:x:y"),
+        QStringLiteral("table:id:x:y"));
+    parser.addOption(moveNodeOption);
     const QCommandLineOption batchSetOption(
         QStringLiteral("batch-set"),
         QStringLiteral("Изменить одно поле нескольких объектов: table:field:value"),
@@ -163,6 +168,7 @@ int main(int argc, char* argv[])
         || parser.isSet(createLineOption)
         || parser.isSet(splitLineOption)
         || parser.isSet(joinLinesOption)
+        || parser.isSet(moveNodeOption)
         || parser.isSet(batchSetOption)
         || parser.isSet(searchObjectsOption)
         || parser.isSet(searchConditionOption)
@@ -596,6 +602,48 @@ int main(int argc, char* argv[])
                 << QStringLiteral("OK: линия=%1 архивный_узел=%2")
                        .arg(joinResult.joinedLineId)
                        .arg(joinResult.archivedNodeId);
+        }
+
+        if (parser.isSet(moveNodeOption)) {
+            const QStringList parts =
+                parser.value(moveNodeOption).split(':');
+            bool idValid = false;
+            bool versionValid = false;
+            bool xValid = false;
+            bool yValid = false;
+            if (parts.size() != 4 || parts.at(0).isEmpty()
+                || !parser.isSet(expectedVersionOption)) {
+                return 32;
+            }
+            const qint64 id = parts.at(1).toLongLong(&idValid);
+            const double x = parts.at(2).toDouble(&xValid);
+            const double y = parts.at(3).toDouble(&yValid);
+            const qint64 version = parser.value(expectedVersionOption)
+                                       .toLongLong(&versionValid);
+            if (!idValid || !versionValid || !xValid || !yValid) {
+                return 32;
+            }
+            const tgid::repo::MoveNodeResult moveResult =
+                tgid::repo::ObjectRepository().moveNode(
+                    connection.database(), parts.at(0), id, version,
+                    QPointF(x, y));
+            if (moveResult.conflict) {
+                qCritical().noquote()
+                    << QStringLiteral("CONFLICT:") << moveResult.error;
+                return 33;
+            }
+            if (!moveResult.success) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка перемещения:")
+                    << moveResult.error;
+                return 34;
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK: узел=%1 версия=%2 перестроено_линий=%3")
+                       .arg(id)
+                       .arg(moveResult.rowVersion)
+                       .arg(moveResult.connectedLines);
         }
 
         if (parser.isSet(batchSetOption)) {

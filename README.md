@@ -49,6 +49,7 @@
 | 33 | Универсальный типизированный поиск по объектным таблицам | готово — [описание](docs/16-object-search.md) |
 | 34 | Отчёт протяжённости трубопроводов по `net.pipe_section` | готово — [описание](docs/17-pipe-length-report.md) |
 | 35 | Многополевые объектные запросы с 1–8 AND-условиями | готово — [описание](docs/18-multifield-search.md) |
+| 36 | Атомарное перемещение узлов из Qt с перестроением линий | готово — [описание](docs/19-node-move.md), [112](sql/112_node_move.sql), [тест](sql/tests/test_node_move.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -137,6 +138,7 @@ psql -f sql/105_ui_field_catalog.sql    # подписи, единицы и сп
 psql -f sql/106_complete_field_catalog.sql # все поля и типизированные редакторы Qt
 psql -f sql/110_line_split.sql          # атомарное разрезание трубопровода
 psql -f sql/111_line_join.sql           # безопасное соединение двух участков
+psql -f sql/112_node_move.sql           # перемещение узла и аудит геометрии
 ```
 
 Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге
