@@ -1,0 +1,2972 @@
+{
+ "legacy-остаток": [
+  {
+   "table": "airheaters_legacy",
+   "rows": 91,
+   "cols": 11
+  },
+  {
+   "table": "connectnodes_legacy",
+   "rows": 1527,
+   "cols": 3
+  },
+  {
+   "table": "dampers_legacy",
+   "rows": 14868,
+   "cols": 14
+  },
+  {
+   "table": "diaphragms_legacy",
+   "rows": 16718,
+   "cols": 7
+  },
+  {
+   "table": "elevators_legacy",
+   "rows": 2754,
+   "cols": 13
+  },
+  {
+   "table": "generalizedconsumers_legacy",
+   "rows": 29051,
+   "cols": 154
+  },
+  {
+   "table": "heatchambers_legacy",
+   "rows": 91,
+   "cols": 13
+  },
+  {
+   "table": "heatexchangers_legacy",
+   "rows": 232,
+   "cols": 6
+  },
+  {
+   "table": "heatpipesections_legacy",
+   "rows": 98019,
+   "cols": 151
+  },
+  {
+   "table": "heatsources_legacy",
+   "rows": 164,
+   "cols": 210
+  },
+  {
+   "table": "linesobj_legacy",
+   "rows": 126460,
+   "cols": 26
+  },
+  {
+   "table": "localhydroresistances2_legacy",
+   "rows": 2,
+   "cols": 6
+  },
+  {
+   "table": "nodes_legacy",
+   "rows": 91532,
+   "cols": 44
+  },
+  {
+   "table": "pressregulators_legacy",
+   "rows": 509,
+   "cols": 13
+  },
+  {
+   "table": "pumps_legacy",
+   "rows": 286,
+   "cols": 39
+  },
+  {
+   "table": "pumpstations_legacy",
+   "rows": 227,
+   "cols": 11
+  },
+  {
+   "table": "realconsumers_legacy",
+   "rows": 26202,
+   "cols": 160
+  },
+  {
+   "table": "refillnodes_legacy",
+   "rows": 1,
+   "cols": 16
+  },
+  {
+   "table": "systemradiators_legacy",
+   "rows": 622,
+   "cols": 7
+  },
+  {
+   "table": "threewayvalves_legacy",
+   "rows": 14,
+   "cols": 18
+  }
+ ],
+ "пусто": [
+  {
+   "table": "act",
+   "rows": 0,
+   "cols": 18
+  },
+  {
+   "table": "administrativedistricts",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "bridge_crossing",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "brigades",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "calculatedloads",
+   "rows": 0,
+   "cols": 7
+  },
+  {
+   "table": "calculatedloadsfact",
+   "rows": 0,
+   "cols": 7
+  },
+  {
+   "table": "calculation_iznos",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "calculations",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "capital2",
+   "rows": 0,
+   "cols": 19
+  },
+  {
+   "table": "capital2_dokumenty",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "capital2_meropriyatiya",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "channelcoverconstructions",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "channels",
+   "rows": 0,
+   "cols": 19
+  },
+  {
+   "table": "channeltypes",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "defect",
+   "rows": 0,
+   "cols": 85
+  },
+  {
+   "table": "defectchannel",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "defectdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "defectkamera",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "defectmeropr",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "defectopis",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "defectsforshurfy",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "defecttube",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "defekt",
+   "rows": 0,
+   "cols": 144
+  },
+  {
+   "table": "defekt2",
+   "rows": 0,
+   "cols": 19
+  },
+  {
+   "table": "defekt2_dokumenty",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "defekt2_meropriyatiya",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "deployedtempgraphsfact",
+   "rows": 0,
+   "cols": 10
+  },
+  {
+   "table": "dgu",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "dgudocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "districts",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "docdiagosv",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "docdiagvskr",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "docdiagvyr",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "dolzhnosti_es",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "dolzhnosti_korrozia",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "drenazhnyy_kran",
+   "rows": 0,
+   "cols": 33
+  },
+  {
+   "table": "drenazhnyy_truboprovod",
+   "rows": 0,
+   "cols": 26
+  },
+  {
+   "table": "duker",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "edv",
+   "rows": 0,
+   "cols": 12
+  },
+  {
+   "table": "edvdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "electrodocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "electrodocumentsist",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "electrodocumentspr",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "faktory_riska_truboprovoda",
+   "rows": 0,
+   "cols": 85
+  },
+  {
+   "table": "gilza_es",
+   "rows": 0,
+   "cols": 12
+  },
+  {
+   "table": "gilza_esdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "granitsy_vertikalnyh_kompensatorov",
+   "rows": 0,
+   "cols": 7
+  },
+  {
+   "table": "gruzob",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "gruzobdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "heatlosesfact",
+   "rows": 0,
+   "cols": 9
+  },
+  {
+   "table": "heatlosessourcefact",
+   "rows": 0,
+   "cols": 83
+  },
+  {
+   "table": "heatlosessourcelist",
+   "rows": 0,
+   "cols": 1
+  },
+  {
+   "table": "heatlosessourcemonthsfact",
+   "rows": 0,
+   "cols": 26
+  },
+  {
+   "table": "heatpipesectionsharness",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "heatpipesectionsharnessfact",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "heatpoint",
+   "rows": 0,
+   "cols": 17
+  },
+  {
+   "table": "heatsysobjmaterials",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "indikator_korrozii",
+   "rows": 0,
+   "cols": 47
+  },
+  {
+   "table": "indikator_korrozii_po_godam",
+   "rows": 0,
+   "cols": 23
+  },
+  {
+   "table": "internalnodes",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "ispravl",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "istochnik_elektrosnabzheniya",
+   "rows": 0,
+   "cols": 13
+  },
+  {
+   "table": "istochniki_teplosnabzheniya",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "iznos",
+   "rows": 0,
+   "cols": 16
+  },
+  {
+   "table": "kabelnyy_kanal_es",
+   "rows": 0,
+   "cols": 13
+  },
+  {
+   "table": "kabelnyy_kanal_esdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "kamera_opuska_ili_podema",
+   "rows": 0,
+   "cols": 14
+  },
+  {
+   "table": "kanal",
+   "rows": 0,
+   "cols": 33
+  },
+  {
+   "table": "kapremont_elementy",
+   "rows": 0,
+   "cols": 13
+  },
+  {
+   "table": "kapremont_kolodtsy_opory_nadzemnyy",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "kapremont_kolodtsy_opory_nadzemnyy2",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "kapremont_kolodtsy_opory_podzemnyy",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "kapremont_kolodtsy_opory_podzemnyy2",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "kapremont_meropriyatiya",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "kapremont_planiruemye_meropriyatiya_trubopr_izolyatsiya_oborudo",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "kapremont_trubopr_izol",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "kolodtsy",
+   "rows": 0,
+   "cols": 18
+  },
+  {
+   "table": "kompensator",
+   "rows": 0,
+   "cols": 23
+  },
+  {
+   "table": "kontrol_tehnicheskogo_sostoyaniya",
+   "rows": 0,
+   "cols": 24
+  },
+  {
+   "table": "kontrol_tehnicheskogo_sostoyaniya_dokumenty",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "liniya_elektroperedach",
+   "rows": 0,
+   "cols": 20
+  },
+  {
+   "table": "link_elist_diz",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "link_elist_grpod",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "link_elist_trans",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "list_opres_node1",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "list_opres_node2",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "losesbyfillingfact",
+   "rows": 0,
+   "cols": 14
+  },
+  {
+   "table": "materialcharacteristics",
+   "rows": 0,
+   "cols": 17
+  },
+  {
+   "table": "materialcharacteristicsfact",
+   "rows": 0,
+   "cols": 17
+  },
+  {
+   "table": "mufta",
+   "rows": 0,
+   "cols": 14
+  },
+  {
+   "table": "muftadocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "nagruzki_po_elevatoram",
+   "rows": 0,
+   "cols": 9
+  },
+  {
+   "table": "nalichie_vblizi_kommunikacij_for_shurfy",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "nasosnye_stantsii",
+   "rows": 0,
+   "cols": 10
+  },
+  {
+   "table": "opora_es",
+   "rows": 0,
+   "cols": 12
+  },
+  {
+   "table": "opora_esdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "opora_skolzyaschaya",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "opres",
+   "rows": 0,
+   "cols": 63
+  },
+  {
+   "table": "opresacts",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "opresdeployed",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "opresdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "opresmeropr",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "opressovka_otvetstvennye",
+   "rows": 0,
+   "cols": 7
+  },
+  {
+   "table": "opressovka_sektsioniruyuschaya_zadvizhka",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "opressovka_uchastki_remonta",
+   "rows": 0,
+   "cols": 9
+  },
+  {
+   "table": "osmotr",
+   "rows": 0,
+   "cols": 20
+  },
+  {
+   "table": "osmotrdeployed",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "osmotrdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "owners",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "pavilion",
+   "rows": 0,
+   "cols": 43
+  },
+  {
+   "table": "perehlesty_setey",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "peremychki",
+   "rows": 0,
+   "cols": 15
+  },
+  {
+   "table": "pipesections",
+   "rows": 0,
+   "cols": 106
+  },
+  {
+   "table": "plan_remont",
+   "rows": 0,
+   "cols": 28
+  },
+  {
+   "table": "podpis",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "povrezhdennyielementfordefect",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "pribor",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "prichiny_narusheniya_organizacionnye_for_defect",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "prichinypovrezhdeniafordefect",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "priemnik_elektrosnabzheniya",
+   "rows": 0,
+   "cols": 25
+  },
+  {
+   "table": "realconsumerdocuments1",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "realconsumerdocuments2",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "realconsumerdocuments3",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "regulatortypes",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "remont",
+   "rows": 0,
+   "cols": 23
+  },
+  {
+   "table": "remont2",
+   "rows": 0,
+   "cols": 48
+  },
+  {
+   "table": "remont2deployed",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontcapitalchannel",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontcapitalkamera",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontcapitaltube",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontchannel",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "remontinvestchannel",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontinvestkamera",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontinvesttube",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remontkamera",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "remonttube",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "responsibles",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "responsibles_es",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "responsibles_korrozia",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "shield",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "shurf",
+   "rows": 0,
+   "cols": 144
+  },
+  {
+   "table": "shurf2",
+   "rows": 0,
+   "cols": 18
+  },
+  {
+   "table": "shurf2_dokumenty",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "shurf2_meropriyatiya",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "shurfdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "shurfy",
+   "rows": 0,
+   "cols": 65
+  },
+  {
+   "table": "soputstvuiushchieprichinyfordefect",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "sortlinesforuchastok",
+   "rows": 0,
+   "cols": 10
+  },
+  {
+   "table": "sortnodesforuchastok",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "sostkonstruktsiikameryfordefect",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "sostkonstruktsiikanalafordefect",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "spisok_kamer_drenazh",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "standartequipment",
+   "rows": 0,
+   "cols": 2
+  },
+  {
+   "table": "streets",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "sysdiagrams",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "tankbatteries",
+   "rows": 0,
+   "cols": 7
+  },
+  {
+   "table": "temp_line",
+   "rows": 0,
+   "cols": 1
+  },
+  {
+   "table": "temp_node",
+   "rows": 0,
+   "cols": 1
+  },
+  {
+   "table": "tip_kamery",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "tip_otklyucheniya_zapornoy_armatury",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "tip_perekrytiya_kamery",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "tkamera",
+   "rows": 0,
+   "cols": 44
+  },
+  {
+   "table": "tkameradocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "towns",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "transf",
+   "rows": 0,
+   "cols": 13
+  },
+  {
+   "table": "transfdocuments",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "tstrp",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "tubes",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "ulitsy_almaty",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "uzel_kanala",
+   "rows": 0,
+   "cols": 7
+  },
+  {
+   "table": "vertikalnyy_podem_opusk_truprovoda",
+   "rows": 0,
+   "cols": 6
+  },
+  {
+   "table": "vid_ispytani",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "vidy_elementov_for_shurfy",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "visualmetriccontrol",
+   "rows": 0,
+   "cols": 33
+  },
+  {
+   "table": "vladeltsy_es",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "vneshny_vid",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "vozdushnik",
+   "rows": 0,
+   "cols": 33
+  },
+  {
+   "table": "zapornaya_armatura",
+   "rows": 0,
+   "cols": 41
+  }
+ ],
+ "справочник": [
+  {
+   "table": "administrativnyy_rayon",
+   "rows": 9,
+   "cols": 2
+  },
+  {
+   "table": "anticorrmaterials",
+   "rows": 1,
+   "cols": 4
+  },
+  {
+   "table": "armaturetypes",
+   "rows": 10,
+   "cols": 3
+  },
+  {
+   "table": "automdegs",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "axialcompensatortypes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "ballvalvetypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "baza_dannyh_po_adresnym_spravkam",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "breakcomplexities",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "breakconsumvols",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "buildingconstrstates",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "buildingconstructions",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "buildingtypes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "calcferdiametersigns",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "calcheatlosessigns",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "capacity_types",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "channelstates",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "channeltype",
+   "rows": 8,
+   "cols": 3
+  },
+  {
+   "table": "characteristictypes",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "cities",
+   "rows": 109,
+   "cols": 2
+  },
+  {
+   "table": "closesyscalcsigns",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "compensatortypes",
+   "rows": 7,
+   "cols": 4
+  },
+  {
+   "table": "connectionschemes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "connectiontypes",
+   "rows": 11,
+   "cols": 4
+  },
+  {
+   "table": "constructionoverlaptypes",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "constructiontypes",
+   "rows": 60,
+   "cols": 3
+  },
+  {
+   "table": "consumerstates",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "controlconditions",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "controlorganizations",
+   "rows": 2,
+   "cols": 2
+  },
+  {
+   "table": "controlservices",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "controlstages",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "coolanttypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "corrosiondegreesin",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "corrosiondegreesout",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "corrosionprocessmarks",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "da_net_informacii",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "damperarmaturestates",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "defectmeroprtype",
+   "rows": 11,
+   "cols": 4
+  },
+  {
+   "table": "defectopistype",
+   "rows": 12,
+   "cols": 4
+  },
+  {
+   "table": "defectstates",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "defecttypes",
+   "rows": 7,
+   "cols": 4
+  },
+  {
+   "table": "designtypes",
+   "rows": 22,
+   "cols": 3
+  },
+  {
+   "table": "dgupurpose",
+   "rows": 2,
+   "cols": 2
+  },
+  {
+   "table": "directions",
+   "rows": 226,
+   "cols": 4
+  },
+  {
+   "table": "docremonttypes",
+   "rows": 9,
+   "cols": 4
+  },
+  {
+   "table": "documenttypes",
+   "rows": 15,
+   "cols": 2
+  },
+  {
+   "table": "drenageperformances",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "dreniruemyj_truboprovod",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "drivetypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "edvpurpos",
+   "rows": 4,
+   "cols": 2
+  },
+  {
+   "table": "electroprotectdevices",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "erwdifficulties",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "externalmaterials",
+   "rows": 9,
+   "cols": 2
+  },
+  {
+   "table": "externalsignline",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "externalsigns",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "floodingbeforetubes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "floodintensitiesbw",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "floodintensitiesfw",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "floodintensitiesgw",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "floodintensitiestw",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "gidroizolyacionnaya_konstrukciya",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "graphtypes",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "groundhumidities",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "groundwatercauses",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "grupurpose",
+   "rows": 5,
+   "cols": 2
+  },
+  {
+   "table": "gvsparallschemes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "harakter_grunta_shurf",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "heatcarriers",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "heatpointtypes",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "heatsourcetypes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "holes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "hydromodesigns",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "indicatorstates",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "infrastrdamages",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "int_kor",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "isolationtypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "konstrukciya_drenazhnogo_ustrojstva",
+   "rows": 1,
+   "cols": 3
+  },
+  {
+   "table": "konstruktsiya_perekrytiya_kanala",
+   "rows": 2,
+   "cols": 3
+  },
+  {
+   "table": "listptstables",
+   "rows": 12,
+   "cols": 3
+  },
+  {
+   "table": "locations",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "locationtypes",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "lookup1",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "lookup2",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "lookup3",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "lookup4",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "lookup5",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "lookup6",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "material_kamery_opuska_i_pavilonov_setey_teplosnabzh",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "material_obektov_setey_teplosnabzheniya",
+   "rows": 34,
+   "cols": 4
+  },
+  {
+   "table": "materialtypes",
+   "rows": 8,
+   "cols": 3
+  },
+  {
+   "table": "materialy_i_mekhanizmy",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "mestopovrezhdenija",
+   "rows": 7,
+   "cols": 3
+  },
+  {
+   "table": "mikrorayony",
+   "rows": 100,
+   "cols": 2
+  },
+  {
+   "table": "months",
+   "rows": 15,
+   "cols": 2
+  },
+  {
+   "table": "nalichie_korrozii_shurf",
+   "rows": 8,
+   "cols": 3
+  },
+  {
+   "table": "nalichie_vblizi_kommunikacij",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "naznachenie_vskr",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "naznachenie_zapornoy_armatury_setey_teplosnabzheniya",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "netwateraggressivenesses",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "obj_type_faktory_riska",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "object_types",
+   "rows": 10,
+   "cols": 2
+  },
+  {
+   "table": "objecttypes",
+   "rows": 12,
+   "cols": 4
+  },
+  {
+   "table": "objecttypes2",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "objekt_opressovochnogo_nasosa",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "operators",
+   "rows": 4,
+   "cols": 2
+  },
+  {
+   "table": "oporatypes",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "opres_types",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "osmotr_sostoyanie",
+   "rows": 2,
+   "cols": 3
+  },
+  {
+   "table": "overlaptypes",
+   "rows": 135,
+   "cols": 3
+  },
+  {
+   "table": "ownerorganizationtypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "pdvalveinstalllocs",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "pipelinesigns",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "piperemonttypes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "pipesectionsstates",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "populdamages",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "potentialdifflevels",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "poverhnost_nad_trassoj",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "povrezhdennyielement",
+   "rows": 11,
+   "cols": 3
+  },
+  {
+   "table": "pr_ots_lookup",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "prichiny_narusheniya_organizacionnye",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "prichinypovrezhdenia",
+   "rows": 7,
+   "cols": 3
+  },
+  {
+   "table": "prtable",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "purposetypes",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "radialcompensatorforms",
+   "rows": 7,
+   "cols": 4
+  },
+  {
+   "table": "regulatorstates",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "remont_kamery",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "remont_kanala",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "remontcapitalchanneltypes",
+   "rows": 15,
+   "cols": 4
+  },
+  {
+   "table": "remontcapitaltubetypes",
+   "rows": 16,
+   "cols": 4
+  },
+  {
+   "table": "remontcat",
+   "rows": 7,
+   "cols": 4
+  },
+  {
+   "table": "remontchanneltypes",
+   "rows": 8,
+   "cols": 4
+  },
+  {
+   "table": "remontdocumenttypes",
+   "rows": 20,
+   "cols": 4
+  },
+  {
+   "table": "remontinvestchanneltypes",
+   "rows": 15,
+   "cols": 4
+  },
+  {
+   "table": "remontinvesttubetypes",
+   "rows": 16,
+   "cols": 4
+  },
+  {
+   "table": "remontizolkonstruktsii",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "remontkanalkameraspisok",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "remonttruboprovodaspisok",
+   "rows": 10,
+   "cols": 3
+  },
+  {
+   "table": "remonttubetypes",
+   "rows": 29,
+   "cols": 4
+  },
+  {
+   "table": "remonttypes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "roadsurfacetypes",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "rotordiametertypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "schemeconnections",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "sectwaterdumps",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "setloadclosesyscalcsigns",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "shema_gvs",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "shema_nagr",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "shurfstates",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "shutdowntypes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "signnumworks",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "sootv_lookup",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "soputstvuiushchieprichiny",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "sost_konstr",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "sost_lookup",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "sost_oborud",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "sostkonstruktsiikamery",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "sostkonstruktsiikanala",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "sostnaruzhnoipoverkhnosti",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_metalla_truboprovoda",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_naruzhnogo_pokrytiya",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_opres",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_protivokorrozionnogo_pokrytiya_shurf",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_shurfa",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_stroitelnyh_konstrukcij_kanala",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_teplovoj_izolyacii",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostteploizol",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostvnutrenneipoverkhnosti",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "spisokelementov",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "sposob_ispolneniya_obektov_setey_teplosnabzheniya",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "sredstvodiag",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "statedefect",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "stateindicator",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "stateinds",
+   "rows": 2,
+   "cols": 2
+  },
+  {
+   "table": "stateremont2",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "statetu",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "statustypes",
+   "rows": 8,
+   "cols": 3
+  },
+  {
+   "table": "stopvalvetypes",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "stroitelnye_konstrukcii_kanala",
+   "rows": 1,
+   "cols": 3
+  },
+  {
+   "table": "subdivisions",
+   "rows": 15,
+   "cols": 4
+  },
+  {
+   "table": "temperaturechartsigns",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "throtstagesigns",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "tip_armatury_setey_teplosnabzheniya",
+   "rows": 38,
+   "cols": 4
+  },
+  {
+   "table": "tip_kanala_setey_teplosnabzheniya",
+   "rows": 11,
+   "cols": 4
+  },
+  {
+   "table": "tip_kompensatora_setey_teplosnabzheniya",
+   "rows": 7,
+   "cols": 4
+  },
+  {
+   "table": "tip_opory",
+   "rows": 7,
+   "cols": 3
+  },
+  {
+   "table": "tip_opory_setey_teplosnabzheniya",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "tip_soedineniya_truboprovoda_setey_teplosnabzheniya",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "tip_vertikalnogo_povorota_setey_teplosnabzheniya",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "tippoverhnosti",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "tippovrezhdenia",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "transfpurpos",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "transftypes",
+   "rows": 12,
+   "cols": 4
+  },
+  {
+   "table": "tubecharacteristics",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "tubeisolations",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "tubetypes",
+   "rows": 5,
+   "cols": 4
+  },
+  {
+   "table": "tubingpedestrians",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "tubingways",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "typeedv",
+   "rows": 3,
+   "cols": 2
+  },
+  {
+   "table": "typeofwork",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "ustrojstva_vodootvedeniya",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "valvepurpose",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "vid_narusheniya",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "vid_rabot",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "vidy_dokumentov_osmotra",
+   "rows": 1,
+   "cols": 3
+  },
+  {
+   "table": "vidy_dokumentov_shurfa",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "vidy_elementov_shurf",
+   "rows": 18,
+   "cols": 3
+  },
+  {
+   "table": "vnutrennee_sostoyanie_kanala",
+   "rows": 2,
+   "cols": 3
+  },
+  {
+   "table": "wemeteringdevices",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "workattributes",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "yesorno",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "yesorno12",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "yesorno123",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "zanos_kanala_gruntom",
+   "rows": 3,
+   "cols": 3
+  }
+ ],
+ "используется": [
+  {
+   "table": "addresses",
+   "rows": 90399,
+   "cols": 7
+  },
+  {
+   "table": "airgroundmonthtemperatures",
+   "rows": 44,
+   "cols": 49
+  },
+  {
+   "table": "buildingentries",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "bypass",
+   "rows": 0,
+   "cols": 16
+  },
+  {
+   "table": "calcschemes",
+   "rows": 0,
+   "cols": 43
+  },
+  {
+   "table": "calctemperatures",
+   "rows": 73,
+   "cols": 57
+  },
+  {
+   "table": "consumptregulators",
+   "rows": 7,
+   "cols": 13
+  },
+  {
+   "table": "corrosionindicators",
+   "rows": 0,
+   "cols": 23
+  },
+  {
+   "table": "deployeddirections",
+   "rows": 2210,
+   "cols": 3
+  },
+  {
+   "table": "deployedtempgraphs",
+   "rows": 5250,
+   "cols": 10
+  },
+  {
+   "table": "diag",
+   "rows": 0,
+   "cols": 46
+  },
+  {
+   "table": "fragments",
+   "rows": 14,
+   "cols": 156
+  },
+  {
+   "table": "geodz",
+   "rows": 85503,
+   "cols": 2
+  },
+  {
+   "table": "gvsloadgraphs",
+   "rows": 0,
+   "cols": 51
+  },
+  {
+   "table": "heatsystem",
+   "rows": 1,
+   "cols": 162
+  },
+  {
+   "table": "help_old",
+   "rows": 0,
+   "cols": 10
+  },
+  {
+   "table": "hsourceworkmonthgraphs",
+   "rows": 152,
+   "cols": 147
+  },
+  {
+   "table": "kapremont_uchastki_remonta",
+   "rows": 5,
+   "cols": 9
+  },
+  {
+   "table": "localhydroresistances",
+   "rows": 41,
+   "cols": 4
+  },
+  {
+   "table": "lyuki",
+   "rows": 18392,
+   "cols": 20
+  },
+  {
+   "table": "magistrals",
+   "rows": 14,
+   "cols": 13
+  },
+  {
+   "table": "normtemperaturesgraphs",
+   "rows": 10,
+   "cols": 37
+  },
+  {
+   "table": "opora",
+   "rows": 3611,
+   "cols": 22
+  },
+  {
+   "table": "opressovka_defekt",
+   "rows": 1,
+   "cols": 10
+  },
+  {
+   "table": "opressovki_uchastok_ocheredi",
+   "rows": 3,
+   "cols": 27
+  },
+  {
+   "table": "overgroundnodes",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "passports",
+   "rows": 0,
+   "cols": 10
+  },
+  {
+   "table": "passportsdocs",
+   "rows": 0,
+   "cols": 5
+  },
+  {
+   "table": "password",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "pavilions",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "perehod_diametra",
+   "rows": 4,
+   "cols": 17
+  },
+  {
+   "table": "pressdropregulators",
+   "rows": 13,
+   "cols": 13
+  },
+  {
+   "table": "prinadlezhnost",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "qualityregtempgraphs",
+   "rows": 0,
+   "cols": 26
+  },
+  {
+   "table": "rayon_ekspluatatsii",
+   "rows": 10,
+   "cols": 3
+  },
+  {
+   "table": "regularmatures",
+   "rows": 0,
+   "cols": 20
+  },
+  {
+   "table": "reversevalves",
+   "rows": 0,
+   "cols": 15
+  },
+  {
+   "table": "serviceorganizations",
+   "rows": 1,
+   "cols": 4
+  },
+  {
+   "table": "setpressnodes",
+   "rows": 5740,
+   "cols": 9
+  },
+  {
+   "table": "spatial_ref_sys",
+   "rows": 8503,
+   "cols": 5
+  },
+  {
+   "table": "specexpends",
+   "rows": 71,
+   "cols": 19
+  },
+  {
+   "table": "tab",
+   "rows": 1,
+   "cols": 4
+  },
+  {
+   "table": "table",
+   "rows": 73,
+   "cols": 7
+  },
+  {
+   "table": "teplo",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "texts",
+   "rows": 0,
+   "cols": 9
+  },
+  {
+   "table": "trps",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "truby_rekonstruiruemye",
+   "rows": 44,
+   "cols": 24
+  },
+  {
+   "table": "ugol_povorota_truboprovoda",
+   "rows": 25214,
+   "cols": 22
+  },
+  {
+   "table": "undergroundnodes",
+   "rows": 0,
+   "cols": 4
+  },
+  {
+   "table": "uninstallednodes",
+   "rows": 0,
+   "cols": 3
+  },
+  {
+   "table": "varcoefficients",
+   "rows": 79,
+   "cols": 18
+  },
+  {
+   "table": "vvod_v_zdanie",
+   "rows": 5463,
+   "cols": 17
+  },
+  {
+   "table": "vvody_v_zdanie",
+   "rows": 5463,
+   "cols": 7
+  },
+  {
+   "table": "wdodevices",
+   "rows": 3385,
+   "cols": 5
+  },
+  {
+   "table": "zdaniya_2",
+   "rows": 187203,
+   "cols": 23
+  },
+  {
+   "table": "zdaniya_potrebiteley",
+   "rows": 12466,
+   "cols": 8
+  },
+  {
+   "table": "zdaniya_tu",
+   "rows": 5197,
+   "cols": 11
+  }
+ ],
+ "данные": [
+  {
+   "table": "agressivnost_setevoy_vody",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "audit_group_comments",
+   "rows": 568,
+   "cols": 4
+  },
+  {
+   "table": "audit_log",
+   "rows": 35083,
+   "cols": 12
+  },
+  {
+   "table": "changed_object",
+   "rows": 156835,
+   "cols": 7
+  },
+  {
+   "table": "defekt_elementy",
+   "rows": 646,
+   "cols": 13
+  },
+  {
+   "table": "defekt_truby",
+   "rows": 102,
+   "cols": 9
+  },
+  {
+   "table": "dolzhnosti",
+   "rows": 8,
+   "cols": 2
+  },
+  {
+   "table": "energosistemy",
+   "rows": 1,
+   "cols": 3
+  },
+  {
+   "table": "factorymanufacturers",
+   "rows": 1,
+   "cols": 8
+  },
+  {
+   "table": "faktiznos_1_vneshnii_vid",
+   "rows": 2,
+   "cols": 6
+  },
+  {
+   "table": "faktiznos_2_kat_narush",
+   "rows": 4,
+   "cols": 6
+  },
+  {
+   "table": "faktiznos_3_sost_obor",
+   "rows": 5,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_10_stroykonstr",
+   "rows": 5,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_11_vodootvedenie",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_12_slozhnost_otkl",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_13_otkl_potrebiteli",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_14_avar_vosst_raboty",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_15_peshehod",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_16_avto",
+   "rows": 4,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_17_skoplenie_zhit",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_18_uscherb_nas",
+   "rows": 4,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_19_uscherb_infrastr",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_4_elekt",
+   "rows": 5,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_5_transport",
+   "rows": 5,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_6_potencial",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_7_vneshkorroz",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_8_vnutkorroz",
+   "rows": 3,
+   "cols": 6
+  },
+  {
+   "table": "faktriska_9_podtoplenie",
+   "rows": 2,
+   "cols": 6
+  },
+  {
+   "table": "familii_masterov_ao__astana_teplotranzit",
+   "rows": 14,
+   "cols": 11
+  },
+  {
+   "table": "funktsionalnoe_naznachenie_zdaniy_i_sooruzheniy",
+   "rows": 284,
+   "cols": 6
+  },
+  {
+   "table": "harakter_grunta",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "heating_seasons",
+   "rows": 13,
+   "cols": 3
+  },
+  {
+   "table": "heatloses",
+   "rows": 12,
+   "cols": 8
+  },
+  {
+   "table": "heatlosesmain",
+   "rows": 3,
+   "cols": 19
+  },
+  {
+   "table": "heatlosesmainfact",
+   "rows": 1,
+   "cols": 19
+  },
+  {
+   "table": "heatlosessource",
+   "rows": 6,
+   "cols": 83
+  },
+  {
+   "table": "heatlosessourcemonths",
+   "rows": 84,
+   "cols": 26
+  },
+  {
+   "table": "istochniki_tepla",
+   "rows": 99,
+   "cols": 7
+  },
+  {
+   "table": "izolyatsiya_truby",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "kapitalnyy_remont",
+   "rows": 3,
+   "cols": 47
+  },
+  {
+   "table": "kapremont_planiruemye_meropriyatiya_kolodtsy_opory",
+   "rows": 10,
+   "cols": 3
+  },
+  {
+   "table": "kapremont_truboprovod_oborudovanie_izolyatsiya",
+   "rows": 12,
+   "cols": 3
+  },
+  {
+   "table": "kapremont_uchastok_teploprovoda_ishodnyy",
+   "rows": 9,
+   "cols": 140
+  },
+  {
+   "table": "kapremont_uchastok_teploprovoda_posle_remonta",
+   "rows": 9,
+   "cols": 140
+  },
+  {
+   "table": "klapany__ventili__zapornye",
+   "rows": 17731,
+   "cols": 9
+  },
+  {
+   "table": "konstruktsiya_drenazhnogo_ustroystva",
+   "rows": 2,
+   "cols": 3
+  },
+  {
+   "table": "konstruktsiya_pokrovnogo_sloya_izolyatsii",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "kotelnye",
+   "rows": 80,
+   "cols": 11
+  },
+  {
+   "table": "losesbyfilling",
+   "rows": 36,
+   "cols": 14
+  },
+  {
+   "table": "magistrali",
+   "rows": 14,
+   "cols": 13
+  },
+  {
+   "table": "marki_kabeley_es",
+   "rows": 16,
+   "cols": 3
+  },
+  {
+   "table": "marki_transformatorov_es",
+   "rows": 2,
+   "cols": 3
+  },
+  {
+   "table": "material_pokrovnogo_sloya",
+   "rows": 40,
+   "cols": 8
+  },
+  {
+   "table": "material_teploizolyatsionnyy",
+   "rows": 12,
+   "cols": 7
+  },
+  {
+   "table": "nachalniki_uchastkov",
+   "rows": 36,
+   "cols": 7
+  },
+  {
+   "table": "nagruzki",
+   "rows": 30511,
+   "cols": 20
+  },
+  {
+   "table": "namechennye_meropriyatiya_po_elementam",
+   "rows": 20,
+   "cols": 3
+  },
+  {
+   "table": "namechennye_meropriyatiya_po_izolyatsionnoy_konstruktsii",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "namechennye_meropriyatiya_po_kanalu",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "namechennye_meropriyatiya_po_teploprovodu",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "obekty",
+   "rows": 38247,
+   "cols": 4
+  },
+  {
+   "table": "ochered_opressovok",
+   "rows": 2,
+   "cols": 25
+  },
+  {
+   "table": "opressovka_meropriyatiya",
+   "rows": 4,
+   "cols": 5
+  },
+  {
+   "table": "opressovka_meropriyatiya_po_ustraneniyu_povrezhdeniy",
+   "rows": 11,
+   "cols": 3
+  },
+  {
+   "table": "opressovka_povrezhdeniya",
+   "rows": 14,
+   "cols": 3
+  },
+  {
+   "table": "organizatsii",
+   "rows": 30285,
+   "cols": 37
+  },
+  {
+   "table": "organizatsii_obsluzhivayuschie",
+   "rows": 1,
+   "cols": 4
+  },
+  {
+   "table": "organizatsii_podryadchiki",
+   "rows": 1,
+   "cols": 7
+  },
+  {
+   "table": "organizatsii_proektnye",
+   "rows": 45,
+   "cols": 7
+  },
+  {
+   "table": "organizatsii_vladeltsy",
+   "rows": 16579,
+   "cols": 7
+  },
+  {
+   "table": "oshibki_vstavki",
+   "rows": 315,
+   "cols": 129
+  },
+  {
+   "table": "otsenka_korroziynogo_protsessa",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "pasport_uchastka_ms",
+   "rows": 42,
+   "cols": 5
+  },
+  {
+   "table": "pasport_uchastka_rs",
+   "rows": 33,
+   "cols": 5
+  },
+  {
+   "table": "passwords",
+   "rows": 34,
+   "cols": 4
+  },
+  {
+   "table": "perspektivnye_truby",
+   "rows": 26,
+   "cols": 18
+  },
+  {
+   "table": "plity_perekrytiya_teplovyh_kamer",
+   "rows": 9,
+   "cols": 10
+  },
+  {
+   "table": "prichiny_korrozii",
+   "rows": 8,
+   "cols": 3
+  },
+  {
+   "table": "prichiny_razryva_stenki_truby",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "prichiny_razryva_svarnogo_shva",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "prichiny_svischa",
+   "rows": 4,
+   "cols": 3
+  },
+  {
+   "table": "prisoedinennaya_nagruzka_istochnikov",
+   "rows": 773,
+   "cols": 16
+  },
+  {
+   "table": "prisoedinennaya_nagruzka_istochnikov3",
+   "rows": 166,
+   "cols": 11
+  },
+  {
+   "table": "proektnaya_organizatsiya",
+   "rows": 45,
+   "cols": 7
+  },
+  {
+   "table": "rabotniki",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "raspredseti",
+   "rows": 33,
+   "cols": 10
+  },
+  {
+   "table": "remont_izolyatsionnoy_konstruktsii",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "remont_po_vosstanovleniyu_kanala",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "shurf_elementy",
+   "rows": 190,
+   "cols": 13
+  },
+  {
+   "table": "shurf_korroziynaya_aktivnost",
+   "rows": 5,
+   "cols": 49
+  },
+  {
+   "table": "shurf_potentsialy_truba_zemlya",
+   "rows": 5,
+   "cols": 80
+  },
+  {
+   "table": "shurf_truby",
+   "rows": 30,
+   "cols": 9
+  },
+  {
+   "table": "shurf_vlazhnost_grunta",
+   "rows": 5,
+   "cols": 34
+  },
+  {
+   "table": "shurf_vodnaya_vytyazhka",
+   "rows": 5,
+   "cols": 47
+  },
+  {
+   "table": "sostoyanie_izolyatsionnogo_materiala",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_konstruktsii_kanala",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_pokrovnogo_sloya_izolyatsii",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_protivokorrozionnogo_pokrytiya",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "sostoyanie_teploizolyatsionnoy_konstruktsii",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "spisok_ulits",
+   "rows": 903,
+   "cols": 2
+  },
+  {
+   "table": "spisok_ulits_staryy",
+   "rows": 669,
+   "cols": 2
+  },
+  {
+   "table": "spisok_zhilyh_massivov",
+   "rows": 74,
+   "cols": 2
+  },
+  {
+   "table": "sposob_vvoda_v_zdanie",
+   "rows": 3,
+   "cols": 2
+  },
+  {
+   "table": "tablitsa1",
+   "rows": 38247,
+   "cols": 4
+  },
+  {
+   "table": "tehnicheskie_usloviya",
+   "rows": 4775,
+   "cols": 162
+  },
+  {
+   "table": "tip_izolyatsii",
+   "rows": 2,
+   "cols": 3
+  },
+  {
+   "table": "tip_kladbischa",
+   "rows": 3,
+   "cols": 4
+  },
+  {
+   "table": "tip_massiva",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "tip_truboprovoda",
+   "rows": 3,
+   "cols": 3
+  },
+  {
+   "table": "tipy_istochnikov_elektricheskih_setey",
+   "rows": 4,
+   "cols": 4
+  },
+  {
+   "table": "tipy_lep",
+   "rows": 2,
+   "cols": 4
+  },
+  {
+   "table": "tipy_priemnikov_elektricheskih_setey",
+   "rows": 6,
+   "cols": 4
+  },
+  {
+   "table": "tolschinometr",
+   "rows": 6,
+   "cols": 8
+  },
+  {
+   "table": "uchastki_ekspluatatsii",
+   "rows": 41,
+   "cols": 6
+  },
+  {
+   "table": "uchastok_ms",
+   "rows": 60,
+   "cols": 29
+  },
+  {
+   "table": "uchastok_rs",
+   "rows": 34,
+   "cols": 29
+  },
+  {
+   "table": "ulitsy",
+   "rows": 680,
+   "cols": 3
+  },
+  {
+   "table": "vid_korrozii",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "vidy_elementov",
+   "rows": 46,
+   "cols": 3
+  },
+  {
+   "table": "vidy_trub",
+   "rows": 6,
+   "cols": 3
+  },
+  {
+   "table": "vosstanovitelnye_raboty_shurf",
+   "rows": 5,
+   "cols": 3
+  },
+  {
+   "table": "vyd",
+   "rows": 51,
+   "cols": 4
+  },
+  {
+   "table": "zavod_izgotovitel",
+   "rows": 1,
+   "cols": 8
+  },
+  {
+   "table": "zhile",
+   "rows": 7962,
+   "cols": 25
+  },
+  {
+   "table": "zhile1",
+   "rows": 7962,
+   "cols": 10
+  }
+ ]
+}

@@ -1,5 +1,6 @@
 #include "db/DatabaseConfig.h"
 #include "db/DatabaseConnection.h"
+#include "repo/ClosedConsumerRepository.h"
 #include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
@@ -162,6 +163,20 @@ int main(int argc, char* argv[])
         QStringLiteral("Теплопотребление: mode[:fragment_id]"),
         QStringLiteral("mode[:fragment_id]"));
     parser.addOption(heatConsumptionReportOption);
+    const QCommandLineOption closedConsumersOption(
+        QStringLiteral("closed-consumers"),
+        QStringLiteral("Список закрытых потребителей (aZap6)"));
+    parser.addOption(closedConsumersOption);
+    const QCommandLineOption closedConsumerFragmentOption(
+        QStringLiteral("closed-consumer-fragment"),
+        QStringLiteral("Ограничить список закрытых потребителей фрагментом"),
+        QStringLiteral("fragment_id"));
+    parser.addOption(closedConsumerFragmentOption);
+    const QCommandLineOption closedConsumerSearchOption(
+        QStringLiteral("closed-consumer-search"),
+        QStringLiteral("Поиск в списке закрытых потребителей"),
+        QStringLiteral("text"));
+    parser.addOption(closedConsumerSearchOption);
     const QCommandLineOption reportArchivedOption(
         QStringLiteral("report-archived"),
         QStringLiteral("Включить архивные участки в отчёт"));
@@ -192,7 +207,8 @@ int main(int argc, char* argv[])
         || parser.isSet(searchConditionOption)
         || parser.isSet(pipeLengthReportOption)
         || parser.isSet(pipeVolumeReportOption)
-        || parser.isSet(heatConsumptionReportOption)) {
+        || parser.isSet(heatConsumptionReportOption)
+        || parser.isSet(closedConsumersOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -1098,6 +1114,52 @@ int main(int argc, char* argv[])
                        .arg(report.rows.size())
                        .arg(report.resultNodeCount)
                        .arg(report.fragmentCount);
+        }
+
+        if (parser.isSet(closedConsumersOption)) {
+            bool fragmentValid = true;
+            const int fragmentId =
+                parser.isSet(closedConsumerFragmentOption)
+                    ? parser.value(closedConsumerFragmentOption)
+                          .toInt(&fragmentValid)
+                    : 0;
+            if (!fragmentValid || fragmentId < 0) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Некорректный --closed-consumer-fragment");
+                return 42;
+            }
+            tgid::repo::ClosedConsumerCriteria criteria;
+            criteria.fragmentId = fragmentId;
+            criteria.searchText =
+                parser.value(closedConsumerSearchOption).trimmed();
+            criteria.limit = 1000;
+            QString listError;
+            const QList<tgid::repo::ClosedConsumerRow> rows =
+                tgid::repo::ClosedConsumerRepository().load(
+                    connection.database(), criteria, &listError);
+            if (!listError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка списка закрытых потребителей:")
+                    << listError;
+                return 43;
+            }
+            for (const tgid::repo::ClosedConsumerRow& row : rows) {
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "CLOSED: table=%1 id=%2 source_id=%3 fragment=%4 code=%5 node=%6 name=%7")
+                           .arg(row.classTable)
+                           .arg(row.id)
+                           .arg(row.sourceId)
+                           .arg(row.fragmentId)
+                           .arg(row.externalCode,
+                                row.externalNodeName,
+                                row.consumerName);
+            }
+            qInfo().noquote()
+                << QStringLiteral("OK_CLOSED: найдено=%1 лимит=%2")
+                       .arg(rows.size())
+                       .arg(criteria.limit);
         }
         return 0;
     }

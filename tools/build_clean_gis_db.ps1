@@ -188,6 +188,7 @@ Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\113_object_reclass.sql')
 
 Write-Host '10. Результаты расчёта calc'
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\120_calc_schema.sql')
+Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\123_externalcodes_reference.sql')
 
 Write-Host '11. Строгий GIS-аудит'
 & python (Join-Path $root 'tools\check_gis_ready.py') --db $BuildDatabase

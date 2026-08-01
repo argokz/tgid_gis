@@ -117,6 +117,7 @@ SchemaStatus DatabaseConnection::inspectSchema() const
             "       to_regclass('net.v_map_lines') IS NOT NULL,"
             "       to_regclass('meta.object_change_log') IS NOT NULL,"
             "       to_regclass('meta.field_catalog') IS NOT NULL,"
+            "       to_regclass('ref.externalcodes') IS NOT NULL,"
             "       to_regprocedure("
             "           'net.split_line(text,bigint,bigint,double precision,double precision)'"
             "       ) IS NOT NULL,"
@@ -224,6 +225,7 @@ SchemaStatus DatabaseConnection::inspectSchema() const
         QStringLiteral("net.v_map_lines"),
         QStringLiteral("meta.object_change_log"),
         QStringLiteral("meta.field_catalog"),
+        QStringLiteral("ref.externalcodes"),
         QStringLiteral("net.split_line"),
         QStringLiteral("net.join_lines"),
         QStringLiteral("net.move_node"),

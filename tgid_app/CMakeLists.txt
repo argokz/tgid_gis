@@ -21,6 +21,8 @@ qt_add_executable(tgid_app
     src/db/DatabaseConfig.h
     src/db/DatabaseConnection.cpp
     src/db/DatabaseConnection.h
+    src/repo/ClosedConsumerRepository.cpp
+    src/repo/ClosedConsumerRepository.h
     src/repo/FragmentRepository.cpp
     src/repo/FragmentRepository.h
     src/repo/HeatConsumptionReportRepository.cpp
