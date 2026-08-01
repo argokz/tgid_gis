@@ -22,55 +22,56 @@ SELECT * FROM (
            ST_X(geom) * 100.0 AS x, -ST_Y(geom) * 100.0 AS y,
            'PR'::text AS type_txt, displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0 AS removed, id AS id2, geom, 'consumer_real'::text AS class_table
+           0 AS removed, id AS id2, geom, 'consumer_real'::text AS class_table,
+           geomarktoptube, geomarknodearea
       FROM net.consumer_real WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'PO', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'consumer_general'
+           0, id, geom, 'consumer_general', geomarktoptube, geomarknodearea
       FROM net.consumer_general WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'IS', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'heat_source'
+           0, id, geom, 'heat_source', geomarktoptube, geomarknodearea
       FROM net.heat_source WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'HS', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'pump_station'
+           0, id, geom, 'pump_station', geomarktoptube, geomarknodearea
       FROM net.pump_station WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'C3', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'valve_3way'
+           0, id, geom, 'valve_3way', geomarktoptube, geomarknodearea
       FROM net.valve_3way WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'US2', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'connect_node'
+           0, id, geom, 'connect_node', geomarktoptube, geomarknodearea
       FROM net.connect_node WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'US', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'heat_chamber'
+           0, id, geom, 'heat_chamber', geomarktoptube, geomarknodearea
       FROM net.heat_chamber WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'US', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'refill_node'
+           0, id, geom, 'refill_node', geomarktoptube, geomarknodearea
       FROM net.refill_node WHERE removed_at IS NULL
     UNION ALL
     SELECT src_id, fragment_id, ST_X(geom)*100.0, -ST_Y(geom)*100.0,
            'US', displaysign, externalnodename, nodename,
            externalcodeid, internalnodeid, externalsignid,
-           0, id, geom, 'node_plain'
+           0, id, geom, 'node_plain', geomarktoptube, geomarknodearea
       FROM net.node_plain WHERE removed_at IS NULL
 ) u;
 

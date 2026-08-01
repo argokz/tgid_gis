@@ -23,6 +23,27 @@ NODE_CLASS = @NODE_MAP@
 
 LINE_CLASS = @LINE_MAP@
 
+# Эти пять классов создаются поздней продуктовой миграцией
+# sql/130_itp_classes.sql и поэтому намеренно отсутствуют в карте
+# конвертера (исходные 20 строк решено не переносить автоматически).
+# Для sety таблицы всё равно являются нативными источниками, в том числе
+# когда они пусты: запрос не должен откатываться к удалённым legacy-именам.
+LINE_CLASS.update({
+    'bypass': 'bypass',
+    'consumptregulators': 'regulator_consumption',
+    'pressdropregulators': 'regulator_pressdrop',
+    'regularmatures': 'armature_control',
+    'reversevalves': 'valve_reverse',
+})
+
+# Собственные колонки исходных таблиц-подтипов. Они нужны не для
+# создания ещё одного слоя совместимости в БД, а для точной подстановки
+# SELECT прямо в запрос sety: основная строка читается из объектной
+# таблицы, проигравшие варианты/дубли — из net.extra_*.
+NODE_COLUMNS = @NODE_COLUMNS@
+
+LINE_COLUMNS = @LINE_COLUMNS@
+
 _is_net = None
 
 
@@ -72,27 +93,48 @@ def fragment_table(conn):
     return 'net.fragment' if is_net(conn) else 'fragments'
 
 
-# Надтипы и подтипы, которые в net представлены готовыми view.
-# Они живут В СХЕМЕ net и включают строки extra_* — то есть отдают ровно
-# то же, что представления совместимости в public, ради которых их и
-# создавали. Подстановка имени семантику не меняет.
-COMPAT_VIEW = dict(
-    [('nodes', 'net.v_nodes'), ('linesobj', 'net.v_linesobj')]
-    + [(t, 'net.v_' + t) for t in sorted(NODE_CLASS)]
-    + [(t, 'net.v_' + t) for t in sorted(LINE_CLASS)]
-)
+def _subtype_relation(name):
+    """SELECT-источник подтипа без net.v_*.
+
+    Старая модель допускала несколько строк подтипов на один объект.
+    Конвертер хранит выбранный вариант в объектной таблице, остальные —
+    в extra_<source>. Оба источника обязательны для совпадения расчёта.
+    """
+    key = name.lower()
+    if key in NODE_CLASS:
+        target = NODE_CLASS[key]
+        cols = NODE_COLUMNS[key]
+        link = 'nodeid'
+    elif key in LINE_CLASS and key in LINE_COLUMNS:
+        target = LINE_CLASS[key]
+        cols = LINE_COLUMNS[key]
+        link = 'lineid'
+    else:
+        return None
+
+    own = ''.join(', o.%s' % c for c in cols)
+    extra = ''.join(', x.%s' % c for c in cols)
+    return ('(SELECT o.subtype_src_id AS id, o.id AS %s%s '
+            'FROM net.%s o UNION ALL '
+            'SELECT x.id, x.obj_id AS %s%s FROM net.extra_%s x)'
+            % (link, own, target, link, extra, key))
 
 
 def tbl(conn, name):
-    """Имя таблицы для подстановки в запрос.
+    """Источник данных для подстановки в запрос чтения.
 
-    На переведённой БД возвращает объект из net, на старой — исходное
-    имя. Нужна там, где запрос слишком переплетён, чтобы переписывать
-    его целиком, но зависимость от public убрать надо.
+    Общие поля сетевых объектов уже есть в продуктовых тонких слоях
+    карты. Для подтипов строится SELECT напрямую из физической таблицы
+    и extra_*; переходные net.v_nodes/net.v_<subtype> не требуются.
     """
     if not is_net(conn):
         return name
-    return COMPAT_VIEW.get(name.lower(), name)
+    key = name.lower()
+    if key == 'nodes':
+        return 'net.v_map_nodes'
+    if key == 'linesobj':
+        return 'net.v_map_lines'
+    return _subtype_relation(key) or name
 
 
 def tbl_sql(conn, name):
@@ -123,7 +165,38 @@ def tbl_cached(name):
     """
     if _is_net is None:
         return name
-    return COMPAT_VIEW.get(name.lower(), name) if _is_net else name
+    if not _is_net:
+        return name
+    key = name.lower()
+    if key == 'nodes':
+        return 'net.v_map_nodes'
+    if key == 'linesobj':
+        return 'net.v_map_lines'
+    return _subtype_relation(key) or name
+
+
+def consumer_update_targets(name):
+    """Физические цели UPDATE для расчётных полей потребителя.
+
+    Выбранный вариант лежит в объектной таблице, а проигравшие дубли —
+    в extra_*. Старый INSTEAD OF-триггер представления обновлял обе
+    ветви. Движок теперь повторяет это явно и не пишет через compat.
+    Второй элемент пары — колонка связи с каноническим узлом.
+    """
+    if not _is_net:
+        return [(name, 'nodeid')]
+    key = name.lower()
+    targets = {
+        'generalizedconsumers': [
+            ('net.consumer_general', 'id'),
+            ('net.extra_generalizedconsumers', 'obj_id'),
+        ],
+        'realconsumers': [
+            ('net.consumer_real', 'id'),
+            ('net.extra_realconsumers', 'obj_id'),
+        ],
+    }
+    return targets.get(key, [(name, 'nodeid')])
 
 
 def node_query(tn, cols, s_fileID):
@@ -159,6 +232,7 @@ def node_query(tn, cols, s_fileID):
         WHERE NOT r.removed
           AND r.fragment_id IN ({s_fileID})
           AND r.internalnodeid IS NULL
+        ORDER BY 1
     """
 
 
@@ -171,6 +245,11 @@ def line_query(tn, cols, s_fileID):
     cls = LINE_CLASS.get(tn.lower())  # см. примечание в node_query
     if not cls:
         return None
+    # В пяти поздних классах отдельный legacy-nodeid не хранится:
+    # его роль выполняет исходный начальный узел линии. w_data всё ещё
+    # просит o.nodeid у bypass, поэтому даём совместимый столбец прямо
+    # в нативной выборке, не возвращая физическую колонку в модель.
+    cols = cols.replace('o.nodeid', 'o.node_from_src AS nodeid')
     return f"""
         SELECT o.subtype_src_id AS id, o.id AS lineID,
                o.node_from_src AS nodeID1, o.node_to_src AS nodeID2,
@@ -185,6 +264,7 @@ def line_query(tn, cols, s_fileID):
           AND r.fragment_id IN ({s_fileID})
           AND (r0.id IS NULL OR NOT r0.removed)
           AND rc.id IS NULL
+        ORDER BY o.subtype_src_id
     """
 
 
@@ -214,6 +294,7 @@ def pt_node_query(tn, cols, s_fileID):
         JOIN net.node_reg r ON r.id = x.obj_id
         WHERE NOT r.removed
           AND r.fragment_id IN ({s_fileID})
+        ORDER BY 1
     """
 
 
@@ -333,6 +414,10 @@ def main():
 
     node_map = {e['source']: e['target'] for e in m['class_node']}
     line_map = {e['source']: e['target'] for e in m['class_line']}
+    node_columns = {e['source']: e.get('columns', [])
+                    for e in m['class_node']}
+    line_columns = {e['source']: e.get('columns', [])
+                    for e in m['class_line']}
 
     def fmt(d):
         return '{\n' + ''.join("    '%s': '%s',\n" % kv
@@ -341,7 +426,9 @@ def main():
     # Простая подстановка, а не format: тело модуля содержит
     # f-строки с фигурными скобками, и format их ломает.
     src = (HEADER.replace('@NODE_MAP@', fmt(node_map))
-                 .replace('@LINE_MAP@', fmt(line_map)))
+                 .replace('@LINE_MAP@', fmt(line_map))
+                 .replace('@NODE_COLUMNS@', repr(node_columns))
+                 .replace('@LINE_COLUMNS@', repr(line_columns)))
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     with open(args.out, 'w', encoding='utf-8') as f:
         f.write(src)

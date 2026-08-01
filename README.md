@@ -58,6 +58,9 @@
 | 42 | Запрос `onPotrOtkl`: отключённые потребители по результатам расчёта | готово — [описание](docs/25-disconnected-consumers.md), [тест](sql/tests/test_disconnected_consumers.sql) |
 | 43 | Запрос `onUtZakr`: закрытые участки трубопровода | готово — [описание](docs/26-closed-pipe-sections.md), [тест](sql/tests/test_closed_pipe_sections.sql) |
 | 44 | Запрос `onUtZakrAll`: отключённые участки без результата `UT_OUT` | готово — [описание](docs/27-disconnected-pipe-sections.md), [тест](sql/tests/test_disconnected_pipe_sections.sql) |
+| 45–47 | Полный перевод чтения/записи на `net`, снятие публичного compat | готово — [полная переписка](docs/11-full-rewrite.md) |
+| 48 | Чистые типизированные GIS-слои и воспроизводимая продуктовая сборка | готово — [170](sql/170_gis_geometry_cleanup.sql) |
+| 49 | `sety` на чистой БД без `net.v_*`, детерминированная регрессия расчёта | готово — [описание](docs/28-clean-calc-engine.md), [тест](sql/tests/test_calc_product_inputs.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -68,8 +71,8 @@
 3. **Сходимость на фр. 1** — крупные Δ температур у виртуальных узлов; не structural.
 4. **Функциональная матрица** — утвердить обязательные команды из
    [инвентаризации](docs/12-legacy-function-inventory.md).
-5. **Чистый расчётный контур** — схема `calc`, запись результатов без
-   legacy-таблиц `public.*_out` и запуск из нового Qt-клиента.
+5. **Запуск расчёта из Qt** — сам контур `sety` уже работает на чистых
+   `net`/`ref`/`calc`; осталось встроить запуск, прогресс и диагностику в клиент.
 
 Инвентаризация старого интерфейса и SQL воспроизводится командой:
 

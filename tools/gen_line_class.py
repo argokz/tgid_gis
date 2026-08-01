@@ -103,8 +103,13 @@ def main():
     ]
 
     for src, cls in sorted(CLASSES.items()):
+        # Нельзя отбрасывать колонку только потому, что одноимённое поле
+        # есть в таблице-образце. В CREATE ниже из образца берутся лишь
+        # HEAD/TAIL; старое условие `r[0] not in tmpl` поэтому потеряло
+        # relatleakage, diametercondit, name и ещё несколько полей.
+        common = set(HEAD + TAIL)
         own = [r for r in cols_of(cur, 'public', src)
-               if r[0] not in SKIP_OWN and r[0] not in tmpl]
+               if r[0] not in SKIP_OWN and r[0] not in common]
         def decl(row):
             # DEFAULT и NOT NULL берутся из образца: без них id новых
             # объектов не получал бы значение из net.obj_id_seq, и
@@ -127,36 +132,61 @@ def main():
             ',\n'.join(lines),
             ');',
             '',
+        ]
+
+        # CREATE TABLE IF NOT EXISTS не добавляет новые колонки в уже
+        # собранную БД. Отдельные ADD делают исправление генератора
+        # идемпотентной миграцией, без удаления даже пустой таблицы.
+        out += [
+            'ALTER TABLE net.%s ADD COLUMN IF NOT EXISTS %s;'
+            % (cls, decl(r).strip()) for r in own
+        ]
+
+        out += [
+            '',
+            'ALTER TABLE net.%s DROP CONSTRAINT IF EXISTS %s_pkey;'
+            % (cls, cls),
             'ALTER TABLE net.%s' % cls,
             '    ADD CONSTRAINT %s_pkey PRIMARY KEY (id);' % cls,
+            'ALTER TABLE net.%s DROP CONSTRAINT IF EXISTS %s_fragment_id_fkey;'
+            % (cls, cls),
             'ALTER TABLE net.%s' % cls,
             '    ADD CONSTRAINT %s_fragment_id_fkey' % cls,
             '    FOREIGN KEY (fragment_id) REFERENCES net.fragment(id);',
+            'ALTER TABLE net.%s DROP CONSTRAINT IF EXISTS %s_node_from_fkey;'
+            % (cls, cls),
             'ALTER TABLE net.%s' % cls,
             '    ADD CONSTRAINT %s_node_from_fkey' % cls,
             '    FOREIGN KEY (node_from) REFERENCES net.node_reg(id)'
             ' ON DELETE RESTRICT;',
+            'ALTER TABLE net.%s DROP CONSTRAINT IF EXISTS %s_node_to_fkey;'
+            % (cls, cls),
             'ALTER TABLE net.%s' % cls,
             '    ADD CONSTRAINT %s_node_to_fkey' % cls,
             '    FOREIGN KEY (node_to) REFERENCES net.node_reg(id)'
             ' ON DELETE RESTRICT;',
             '',
-            'CREATE INDEX %s_geom_idx ON net.%s USING gist (geom);'
+            'CREATE INDEX IF NOT EXISTS %s_geom_idx ON net.%s USING gist (geom);'
             % (cls, cls),
-            'CREATE INDEX %s_fragment_id_idx ON net.%s (fragment_id);'
+            'CREATE INDEX IF NOT EXISTS %s_fragment_id_idx ON net.%s (fragment_id);'
             % (cls, cls),
             '',
+            'DROP TRIGGER IF EXISTS %s_reg ON net.%s;' % (cls, cls),
             "CREATE TRIGGER %s_reg AFTER INSERT OR DELETE ON net.%s"
             % (cls, cls),
             "    FOR EACH ROW EXECUTE FUNCTION net.reg_line_sync('%s');" % cls,
+            'DROP TRIGGER IF EXISTS object_touch ON net.%s;' % cls,
             'CREATE TRIGGER object_touch BEFORE UPDATE ON net.%s' % cls,
             '    FOR EACH ROW EXECUTE FUNCTION net.touch_object_row();',
+            'DROP TRIGGER IF EXISTS object_insert_log ON net.%s;' % cls,
             'CREATE TRIGGER object_insert_log AFTER INSERT ON net.%s' % cls,
             '    FOR EACH ROW EXECUTE FUNCTION net.log_object_insert();',
+            'DROP TRIGGER IF EXISTS line_topology ON net.%s;' % cls,
             'CREATE TRIGGER line_topology BEFORE INSERT OR UPDATE OF'
             ' node_from, node_to, fragment_id, geom, removed_at',
             '    ON net.%s FOR EACH ROW' % cls,
             '    EXECUTE FUNCTION net.validate_line_topology();',
+            'DROP TRIGGER IF EXISTS geometry_change_audit ON net.%s;' % cls,
             'CREATE TRIGGER geometry_change_audit AFTER UPDATE OF geom'
             ' ON net.%s' % cls,
             '    FOR EACH ROW EXECUTE FUNCTION net.annotate_geometry_change();',

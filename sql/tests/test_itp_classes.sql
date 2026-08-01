@@ -10,6 +10,37 @@ BEGIN;
 
 DO $$
 DECLARE
+    missing text;
+BEGIN
+    WITH required(table_name, column_name) AS (
+        VALUES
+            ('regulator_consumption', 'relatleakage'),
+            ('regulator_consumption', 'opc'),
+            ('armature_control', 'diametercondit'),
+            ('armature_control', 'name'),
+            ('armature_control', 'gatecontrol'),
+            ('armature_control', 'clue'),
+            ('armature_control', 'thrustcollar'),
+            ('armature_control', 'opc'),
+            ('armature_control', 'damperarmaturestateid'),
+            ('valve_reverse', 'relatleakage')
+    )
+    SELECT string_agg(format('net.%I.%I', r.table_name, r.column_name), ', ')
+    INTO missing
+    FROM required r
+    LEFT JOIN information_schema.columns c
+      ON c.table_schema = 'net'
+     AND c.table_name = r.table_name
+     AND c.column_name = r.column_name
+    WHERE c.column_name IS NULL;
+
+    IF missing IS NOT NULL THEN
+        RAISE EXCEPTION 'генератор классов потерял колонки: %', missing;
+    END IF;
+END $$;
+
+DO $$
+DECLARE
     cls        text;
     frag       int;
     n_from     bigint;
