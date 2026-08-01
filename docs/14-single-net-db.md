@@ -30,7 +30,7 @@ python tools/sety_tables.py --db tgid_gis
 | Группа | Имена | Куда |
 |---|---|---|
 | результаты | `us_out`, `ut_out`, `pt_out`, `dr_out`, `ns_out`, `rs_out`, `bp_out`, `ok_out`, `any_out`, `any2_out`, `zd_out`, `calculation` | `calc` |
-| справочники | `externalcodes`, `deployedtempgraphs` | `ref` |
+| справочники | `externalcodes` (перенесён), `deployedtempgraphs` | `ref` |
 | объекты | `nodes`, `linesobj`, `heatsources`, `realconsumers`, `generalizedconsumers`, `connectnodes`, `setpressnodes`, `fragments` | классы `net` уже есть |
 
 **Оговорка:** сканер видит только литеральные имена. Типы, которые
@@ -84,8 +84,9 @@ PostgreSQL хранит зависимости по OID, а не по имени
 
 ## Что дальше
 
-1. **`ref`** — `externalcodes`, `deployedtempgraphs` и остальные
-   справочники; частично уже переносит `098_core_references.sql`.
+1. **`ref`** — `externalcodes` уже переносит
+   `123_externalcodes_reference.sql`; дальше `deployedtempgraphs` и остальные
+   справочники, не покрытые `098_core_references.sql`.
 2. **Пять типов без класса в `net`** — `reversevalves`, `bypass`,
    `consumptregulators`, `pressdropregulators`, `regularmatures`.
 3. **Оставшиеся чтения через представления совместимости** —
@@ -146,7 +147,7 @@ python tools/public_inventory.py --db tgid_gis --json docs/schema/public_map.jso
 построчно (`EXCEPT` в обе стороны даёт 0), и ни один внешний ключ на
 `public`-копии не ссылается.
 
-[`sql/123_ref_single_copy.sql`](../sql/123_ref_single_copy.sql) удаляет
+[`sql/124_ref_single_copy.sql`](../sql/124_ref_single_copy.sql) удаляет
 дубли из `public`, повторяя сверку уже внутри транзакции: если хоть одна
 таблица разошлась, она пропускается с предупреждением, а не сносится.
 `DROP` без `CASCADE` намеренно — скрипт обязан упасть, если на таблицу

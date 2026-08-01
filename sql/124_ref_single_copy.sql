@@ -21,8 +21,15 @@
 BEGIN;
 
 -- Порядок поиска — свойство БД, а не отдельного клиента: так его видят
--- и движок sety, и Qt-клиент, и psql, и старое приложение.
-ALTER DATABASE tgid_gis SET search_path = public, net, ref, calc;
+-- и движок sety, и Qt-клиент, и psql, и старое приложение. Имя берём
+-- динамически: в чистой сборке база называется иначе.
+DO $configure_database$
+BEGIN
+    EXECUTE format(
+        'ALTER DATABASE %I SET search_path = public, net, ref, calc',
+        current_database());
+END
+$configure_database$;
 
 DO $$
 DECLARE

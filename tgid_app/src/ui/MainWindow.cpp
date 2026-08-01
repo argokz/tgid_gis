@@ -807,6 +807,72 @@ void MainWindow::buildInterface()
     heatLayout->addWidget(heatConsumptionReportTable_, 1);
     tabs->addTab(heatTab, QStringLiteral("Теплопотребление"));
 
+    auto* closedConsumersTab = new QWidget(tabs);
+    auto* closedConsumersLayout = new QVBoxLayout(closedConsumersTab);
+    auto* closedConsumersToolbar = new QHBoxLayout();
+    closedConsumersToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), closedConsumersTab));
+    closedConsumerFragmentCombo_ = new QComboBox(closedConsumersTab);
+    closedConsumerFragmentCombo_->setMinimumWidth(240);
+    closedConsumerFragmentCombo_->setEnabled(false);
+    closedConsumersToolbar->addWidget(closedConsumerFragmentCombo_, 1);
+    closedConsumersToolbar->addWidget(
+        new QLabel(QStringLiteral("Фильтр:"), closedConsumersTab));
+    closedConsumerSearchEdit_ = new QLineEdit(closedConsumersTab);
+    closedConsumerSearchEdit_->setClearButtonEnabled(true);
+    closedConsumerSearchEdit_->setPlaceholderText(
+        QStringLiteral("Код, имя узла, потребитель или исходный ID"));
+    closedConsumersToolbar->addWidget(closedConsumerSearchEdit_, 1);
+    refreshClosedConsumersButton_ = new QPushButton(
+        QStringLiteral("Найти"), closedConsumersTab);
+    refreshClosedConsumersButton_->setEnabled(false);
+    connect(refreshClosedConsumersButton_, &QPushButton::clicked,
+            this, &MainWindow::refreshClosedConsumers);
+    connect(closedConsumerSearchEdit_, &QLineEdit::returnPressed,
+            this, &MainWindow::refreshClosedConsumers);
+    closedConsumersToolbar->addWidget(refreshClosedConsumersButton_);
+    exportClosedConsumersButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), closedConsumersTab);
+    exportClosedConsumersButton_->setEnabled(false);
+    connect(exportClosedConsumersButton_, &QPushButton::clicked,
+            this, &MainWindow::exportClosedConsumers);
+    closedConsumersToolbar->addWidget(exportClosedConsumersButton_);
+    closedConsumersLayout->addLayout(closedConsumersToolbar);
+    closedConsumersStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Закрытый потребитель: consumerstateid = 2. "
+            "Двойной щелчок открывает карточку."),
+        closedConsumersTab);
+    closedConsumersStatusLabel_->setWordWrap(true);
+    closedConsumersLayout->addWidget(closedConsumersStatusLabel_);
+    closedConsumersTable_ = new QTableWidget(closedConsumersTab);
+    closedConsumersTable_->setColumnCount(7);
+    closedConsumersTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Класс"),
+        QStringLiteral("ID"),
+        QStringLiteral("Исходный ID"),
+        QStringLiteral("Внешний код"),
+        QStringLiteral("Внешнее имя узла"),
+        QStringLiteral("Потребитель"),
+        QStringLiteral("Фрагмент"),
+    });
+    closedConsumersTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    closedConsumersTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    closedConsumersTable_->setSelectionMode(
+        QAbstractItemView::SingleSelection);
+    closedConsumersTable_->setAlternatingRowColors(true);
+    closedConsumersTable_->setSortingEnabled(true);
+    closedConsumersTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    closedConsumersTable_->horizontalHeader()->setStretchLastSection(true);
+    connect(closedConsumersTable_, &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openClosedConsumer);
+    closedConsumersLayout->addWidget(closedConsumersTable_, 1);
+    tabs->addTab(
+        closedConsumersTab, QStringLiteral("Закрытые потребители"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -999,6 +1065,14 @@ void MainWindow::showError(const QString& message)
     exportHeatConsumptionReportButton_->setEnabled(false);
     heatConsumptionReportStatusLabel_->setText(
         QStringLiteral("Отчёт недоступен"));
+    closedConsumersTable_->setRowCount(0);
+    closedConsumerRows_.clear();
+    closedConsumerFragmentCombo_->clear();
+    closedConsumerFragmentCombo_->setEnabled(false);
+    refreshClosedConsumersButton_->setEnabled(false);
+    exportClosedConsumersButton_->setEnabled(false);
+    closedConsumersStatusLabel_->setText(
+        QStringLiteral("Список недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
     mapStatusLabel_->setText(QStringLiteral("Карта недоступна"));
@@ -1542,12 +1616,15 @@ void MainWindow::populateReportFragments(
     reportFragmentCombo_->clear();
     volumeFragmentCombo_->clear();
     heatFragmentCombo_->clear();
+    closedConsumerFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     volumeFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     heatFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты с расчётами"), 0);
+    closedConsumerFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
         if (!fragment.settlement.trimmed().isEmpty()) {
@@ -1561,6 +1638,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         heatFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        closedConsumerFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1595,6 +1675,16 @@ void MainWindow::populateReportFragments(
     heatConsumptionReportStatusLabel_->setStyleSheet({});
     heatConsumptionReportStatusLabel_->setText(
         QStringLiteral("Выберите режим и сформируйте отчёт"));
+    closedConsumerFragmentCombo_->setEnabled(
+        closedConsumerFragmentCombo_->count() > 0);
+    refreshClosedConsumersButton_->setEnabled(
+        closedConsumerFragmentCombo_->count() > 0);
+    exportClosedConsumersButton_->setEnabled(false);
+    closedConsumerRows_.clear();
+    closedConsumersTable_->setRowCount(0);
+    closedConsumersStatusLabel_->setStyleSheet({});
+    closedConsumersStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и нажмите «Найти»"));
 }
 
 void MainWindow::executePipeLengthReport()
@@ -2094,6 +2184,140 @@ void MainWindow::exportHeatConsumptionReport()
         stream << csvCell(row.metricLabel) << ';'
                << QString::number(row.heatLoad, 'f', 9) << ';'
                << QString::number(row.massFlow, 'f', 9) << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::refreshClosedConsumers()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::ClosedConsumerCriteria criteria;
+    criteria.fragmentId =
+        closedConsumerFragmentCombo_->currentData().toInt();
+    criteria.searchText = closedConsumerSearchEdit_->text().trimmed();
+    criteria.limit = 1000;
+
+    refreshClosedConsumersButton_->setEnabled(false);
+    exportClosedConsumersButton_->setEnabled(false);
+    closedConsumersStatusLabel_->setStyleSheet({});
+    closedConsumersStatusLabel_->setText(
+        QStringLiteral("Загрузка закрытых потребителей…"));
+    QApplication::processEvents();
+
+    QString error;
+    closedConsumerRows_ = closedConsumerRepository_.load(
+        connection_.database(), criteria, &error);
+    refreshClosedConsumersButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        closedConsumerRows_.clear();
+        closedConsumersTable_->setRowCount(0);
+        closedConsumersStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        closedConsumersStatusLabel_->setText(
+            QStringLiteral("Ошибка списка: %1").arg(error));
+        return;
+    }
+
+    closedConsumersTable_->setSortingEnabled(false);
+    closedConsumersTable_->setRowCount(closedConsumerRows_.size());
+    for (qsizetype rowIndex = 0;
+         rowIndex < closedConsumerRows_.size(); ++rowIndex) {
+        const repo::ClosedConsumerRow& row =
+            closedConsumerRows_.at(rowIndex);
+        const QString classLabel =
+            row.classTable == QStringLiteral("consumer_real")
+                ? QStringLiteral("Реальный")
+                : QStringLiteral("Обобщённый");
+        QTableWidgetItem* classItem = readOnlyItem(classLabel);
+        classItem->setData(Qt::UserRole, row.id);
+        classItem->setData(Qt::UserRole + 1, row.classTable);
+        closedConsumersTable_->setItem(rowIndex, 0, classItem);
+        closedConsumersTable_->setItem(
+            rowIndex, 1, readOnlyItem(QString::number(row.id)));
+        closedConsumersTable_->setItem(
+            rowIndex, 2, readOnlyItem(QString::number(row.sourceId)));
+        closedConsumersTable_->setItem(
+            rowIndex, 3, readOnlyItem(row.externalCode));
+        closedConsumersTable_->setItem(
+            rowIndex, 4, readOnlyItem(row.externalNodeName));
+        closedConsumersTable_->setItem(
+            rowIndex, 5, readOnlyItem(row.consumerName));
+        closedConsumersTable_->setItem(
+            rowIndex, 6, readOnlyItem(QString::number(row.fragmentId)));
+    }
+    closedConsumersTable_->setSortingEnabled(true);
+    exportClosedConsumersButton_->setEnabled(
+        !closedConsumerRows_.isEmpty());
+    closedConsumersStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    closedConsumersStatusLabel_->setText(
+        closedConsumerRows_.size() == criteria.limit
+            ? QStringLiteral(
+                  "Показаны первые %1 строк — уточните фильтр")
+                  .arg(criteria.limit)
+            : QStringLiteral("Найдено закрытых потребителей: %1")
+                  .arg(closedConsumerRows_.size()));
+}
+
+void MainWindow::openClosedConsumer(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = closedConsumersTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    showObjectDetails(
+        item->data(Qt::UserRole).toLongLong(),
+        item->data(Qt::UserRole + 1).toString(),
+        true);
+}
+
+void MainWindow::exportClosedConsumers()
+{
+    if (closedConsumerRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт закрытых потребителей"),
+        QStringLiteral("tgid_closed_consumers.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("Класс")) << ';'
+           << csvCell(QStringLiteral("ID")) << ';'
+           << csvCell(QStringLiteral("Исходный ID")) << ';'
+           << csvCell(QStringLiteral("Фрагмент")) << ';'
+           << csvCell(QStringLiteral("Внешний код")) << ';'
+           << csvCell(QStringLiteral("Внешнее имя узла")) << ';'
+           << csvCell(QStringLiteral("Потребитель")) << '\n';
+    for (const repo::ClosedConsumerRow& row : closedConsumerRows_) {
+        stream << csvCell(row.classTable) << ';'
+               << row.id << ';'
+               << row.sourceId << ';'
+               << row.fragmentId << ';'
+               << csvCell(row.externalCode) << ';'
+               << csvCell(row.externalNodeName) << ';'
+               << csvCell(row.consumerName) << '\n';
     }
     stream.flush();
     if (!file.commit()) {

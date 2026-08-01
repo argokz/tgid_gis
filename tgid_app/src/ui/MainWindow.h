@@ -2,6 +2,7 @@
 
 #include "db/DatabaseConfig.h"
 #include "db/DatabaseConnection.h"
+#include "repo/ClosedConsumerRepository.h"
 #include "repo/FragmentRepository.h"
 #include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
@@ -73,6 +74,9 @@ private slots:
     void exportPipeVolumeReport();
     void executeHeatConsumptionReport();
     void exportHeatConsumptionReport();
+    void refreshClosedConsumers();
+    void exportClosedConsumers();
+    void openClosedConsumer(int row, int column);
 
 private:
     void buildInterface();
@@ -95,6 +99,7 @@ private:
 
     db::DatabaseConfig config_;
     db::DatabaseConnection connection_;
+    repo::ClosedConsumerRepository closedConsumerRepository_;
     repo::FragmentRepository fragmentRepository_;
     repo::HeatConsumptionReportRepository heatConsumptionReportRepository_;
     repo::LayerCatalogRepository layerRepository_;
@@ -155,6 +160,12 @@ private:
     QPushButton* exportHeatConsumptionReportButton_ = nullptr;
     QLabel* heatConsumptionReportStatusLabel_ = nullptr;
     QTableWidget* heatConsumptionReportTable_ = nullptr;
+    QComboBox* closedConsumerFragmentCombo_ = nullptr;
+    QLineEdit* closedConsumerSearchEdit_ = nullptr;
+    QPushButton* refreshClosedConsumersButton_ = nullptr;
+    QPushButton* exportClosedConsumersButton_ = nullptr;
+    QLabel* closedConsumersStatusLabel_ = nullptr;
+    QTableWidget* closedConsumersTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -172,6 +183,7 @@ private:
     QList<repo::PipeLengthReportRow> pipeLengthReportRows_;
     QList<repo::PipeVolumeReportRow> pipeVolumeReportRows_;
     repo::HeatConsumptionReportResult heatConsumptionReport_;
+    QList<repo::ClosedConsumerRow> closedConsumerRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;

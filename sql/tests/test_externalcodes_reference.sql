@@ -10,10 +10,14 @@ DECLARE
     missing_fk integer;
     old_count integer;
     new_count integer;
+    source_code_count integer;
 BEGIN
-    IF (SELECT count(*) FROM ref.externalcodes)
-       <> (SELECT count(*) FROM public.externalcodes) THEN
-        RAISE EXCEPTION 'Не все externalcodes перенесены в ref';
+    IF to_regclass('public.externalcodes') IS NOT NULL THEN
+        EXECUTE 'SELECT count(*) FROM public.externalcodes'
+           INTO source_code_count;
+        IF (SELECT count(*) FROM ref.externalcodes) <> source_code_count THEN
+            RAISE EXCEPTION 'Не все externalcodes перенесены в ref';
+        END IF;
     END IF;
 
     SELECT count(*)
@@ -54,7 +58,7 @@ BEGIN
         SELECT node.id, code.name AS code_name,
                node.externalnodename, consumer.name
           FROM public.nodes node
-          JOIN public.externalcodes code ON code.id = node.externalcodeid
+          JOIN externalcodes code ON code.id = node.externalcodeid
           JOIN (
               SELECT nodeid, name
                 FROM public.generalizedconsumers
@@ -95,7 +99,7 @@ BEGIN
             SELECT node.id, code.name AS code_name,
                    node.externalnodename, consumer.name
               FROM public.nodes node
-              JOIN public.externalcodes code
+              JOIN externalcodes code
                 ON code.id = node.externalcodeid
               JOIN (
                   SELECT nodeid, name
