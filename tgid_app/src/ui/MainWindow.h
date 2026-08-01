@@ -7,6 +7,7 @@
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
 #include "repo/PipeLengthReportRepository.h"
+#include "repo/PipeVolumeReportRepository.h"
 #include "repo/SearchRepository.h"
 
 #include <QElapsedTimer>
@@ -67,6 +68,8 @@ private slots:
     void openSearchResult(int row, int column);
     void executePipeLengthReport();
     void exportPipeLengthReport();
+    void executePipeVolumeReport();
+    void exportPipeVolumeReport();
 
 private:
     void buildInterface();
@@ -93,6 +96,7 @@ private:
     repo::LayerCatalogRepository layerRepository_;
     repo::ObjectRepository objectRepository_;
     repo::PipeLengthReportRepository pipeLengthReportRepository_;
+    repo::PipeVolumeReportRepository pipeVolumeReportRepository_;
     repo::SearchRepository searchRepository_;
 
     QLabel* connectionLabel_ = nullptr;
@@ -133,6 +137,14 @@ private:
     QPushButton* exportPipeLengthReportButton_ = nullptr;
     QLabel* pipeLengthReportStatusLabel_ = nullptr;
     QTableWidget* pipeLengthReportTable_ = nullptr;
+    QComboBox* volumeFragmentCombo_ = nullptr;
+    QComboBox* volumeGroupingCombo_ = nullptr;
+    QCheckBox* volumeArchivedCheck_ = nullptr;
+    QCheckBox* volumeSelectedCheck_ = nullptr;
+    QPushButton* runPipeVolumeReportButton_ = nullptr;
+    QPushButton* exportPipeVolumeReportButton_ = nullptr;
+    QLabel* pipeVolumeReportStatusLabel_ = nullptr;
+    QTableWidget* pipeVolumeReportTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -148,6 +160,7 @@ private:
     QList<repo::SearchField> searchFields_;
     QList<repo::SearchCondition> searchConditions_;
     QList<repo::PipeLengthReportRow> pipeLengthReportRows_;
+    QList<repo::PipeVolumeReportRow> pipeVolumeReportRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;

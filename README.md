@@ -51,6 +51,7 @@
 | 35 | Многополевые объектные запросы с 1–8 AND-условиями | готово — [описание](docs/18-multifield-search.md) |
 | 36 | Атомарное перемещение узлов из Qt с перестроением линий | готово — [описание](docs/19-node-move.md), [112](sql/112_node_move.sql), [тест](sql/tests/test_node_move.sql) |
 | 37 | Безопасная смена класса узлов и линий без потери данных | готово — [описание](docs/20-object-reclass.md), [113](sql/113_object_reclass.sql), [тест](sql/tests/test_object_reclass.sql) |
+| 38 | Запрос `aZap1`: объём воды в сети и выделенных трубопроводах | готово — [описание](docs/21-network-volume.md) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше

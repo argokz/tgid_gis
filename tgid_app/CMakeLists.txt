@@ -31,6 +31,8 @@ qt_add_executable(tgid_app
     src/repo/ObjectRepository.h
     src/repo/PipeLengthReportRepository.cpp
     src/repo/PipeLengthReportRepository.h
+    src/repo/PipeVolumeReportRepository.cpp
+    src/repo/PipeVolumeReportRepository.h
     src/repo/SearchRepository.cpp
     src/repo/SearchRepository.h
     src/ui/MapView.cpp

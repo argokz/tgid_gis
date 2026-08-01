@@ -4,6 +4,7 @@
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
 #include "repo/PipeLengthReportRepository.h"
+#include "repo/PipeVolumeReportRepository.h"
 #include "repo/SearchRepository.h"
 #include "ui/MainWindow.h"
 
@@ -150,6 +151,11 @@ int main(int argc, char* argv[])
         QStringLiteral("Отчёт протяжённости: grouping[:fragment_id]"),
         QStringLiteral("grouping[:fragment_id]"));
     parser.addOption(pipeLengthReportOption);
+    const QCommandLineOption pipeVolumeReportOption(
+        QStringLiteral("pipe-volume-report"),
+        QStringLiteral("Отчёт объёма сети: grouping[:fragment_id]"),
+        QStringLiteral("grouping[:fragment_id]"));
+    parser.addOption(pipeVolumeReportOption);
     const QCommandLineOption reportArchivedOption(
         QStringLiteral("report-archived"),
         QStringLiteral("Включить архивные участки в отчёт"));
@@ -178,7 +184,8 @@ int main(int argc, char* argv[])
         || parser.isSet(batchSetOption)
         || parser.isSet(searchObjectsOption)
         || parser.isSet(searchConditionOption)
-        || parser.isSet(pipeLengthReportOption)) {
+        || parser.isSet(pipeLengthReportOption)
+        || parser.isSet(pipeVolumeReportOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -953,6 +960,89 @@ int main(int argc, char* argv[])
                        .arg(totalGeometry, 0, 'f', 2)
                        .arg(totalEffective, 0, 'f', 2)
                        .arg(totalMissing);
+        }
+
+        if (parser.isSet(pipeVolumeReportOption)) {
+            const QStringList parts =
+                parser.value(pipeVolumeReportOption).split(':');
+            bool fragmentValid = true;
+            const int fragmentId =
+                parts.size() == 2
+                    ? parts.at(1).toInt(&fragmentValid)
+                    : 0;
+            if (parts.isEmpty() || parts.size() > 2
+                || parts.at(0).isEmpty() || !fragmentValid
+                || fragmentId < 0) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ожидается --pipe-volume-report grouping[:fragment_id]");
+                return 38;
+            }
+            tgid::repo::PipeVolumeReportCriteria criteria;
+            criteria.grouping = parts.at(0);
+            criteria.fragmentId = fragmentId;
+            criteria.includeArchived = parser.isSet(reportArchivedOption);
+            if (parser.isSet(reportPipeIdsOption)) {
+                const QStringList ids = parser.value(reportPipeIdsOption)
+                                            .split(',', Qt::SkipEmptyParts);
+                bool idsValid = !ids.isEmpty();
+                for (const QString& idText : ids) {
+                    bool idValid = false;
+                    const qint64 id = idText.toLongLong(&idValid);
+                    if (!idValid || id <= 0) {
+                        idsValid = false;
+                        break;
+                    }
+                    criteria.pipeIds.append(id);
+                }
+                if (!idsValid) {
+                    return 38;
+                }
+            }
+            QString reportError;
+            const QList<tgid::repo::PipeVolumeReportRow> rows =
+                tgid::repo::PipeVolumeReportRepository().load(
+                    connection.database(), criteria, &reportError);
+            if (!reportError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка отчёта объёма:")
+                    << reportError;
+                return 39;
+            }
+            qint64 totalCount = 0;
+            qint64 totalCalculated = 0;
+            qint64 totalMissingDiameter = 0;
+            qint64 totalMissingLength = 0;
+            double totalLength = 0.0;
+            double totalVolume = 0.0;
+            for (const tgid::repo::PipeVolumeReportRow& row : rows) {
+                totalCount += row.pipeCount;
+                totalCalculated += row.calculatedCount;
+                totalMissingDiameter += row.missingDiameterCount;
+                totalMissingLength += row.missingLengthCount;
+                totalLength += row.passportLength;
+                totalVolume += row.volume;
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "ROW_VOLUME: %1 count=%2 calculated=%3 length=%4 volume=%5 missing_diameter=%6 missing_length=%7")
+                           .arg(row.groupLabel)
+                           .arg(row.pipeCount)
+                           .arg(row.calculatedCount)
+                           .arg(row.passportLength, 0, 'f', 2)
+                           .arg(row.volume, 0, 'f', 6)
+                           .arg(row.missingDiameterCount)
+                           .arg(row.missingLengthCount);
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK_VOLUME: групп=%1 участков=%2 рассчитано=%3 длина=%4 объём=%5 без_диаметра=%6 без_длины=%7")
+                       .arg(rows.size())
+                       .arg(totalCount)
+                       .arg(totalCalculated)
+                       .arg(totalLength, 0, 'f', 2)
+                       .arg(totalVolume, 0, 'f', 6)
+                       .arg(totalMissingDiameter)
+                       .arg(totalMissingLength);
         }
         return 0;
     }

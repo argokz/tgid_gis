@@ -672,6 +672,81 @@ void MainWindow::buildInterface()
     reportLayout->addWidget(pipeLengthReportTable_, 1);
     tabs->addTab(reportTab, QStringLiteral("Протяжённость"));
 
+    auto* volumeTab = new QWidget(tabs);
+    auto* volumeLayout = new QVBoxLayout(volumeTab);
+    auto* volumeToolbar = new QHBoxLayout();
+    volumeToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), volumeTab));
+    volumeFragmentCombo_ = new QComboBox(volumeTab);
+    volumeFragmentCombo_->setMinimumWidth(240);
+    volumeFragmentCombo_->setEnabled(false);
+    volumeToolbar->addWidget(volumeFragmentCombo_, 1);
+    volumeToolbar->addWidget(
+        new QLabel(QStringLiteral("Группировка:"), volumeTab));
+    volumeGroupingCombo_ = new QComboBox(volumeTab);
+    volumeGroupingCombo_->addItem(
+        QStringLiteral("Без группировки"), QStringLiteral("none"));
+    volumeGroupingCombo_->addItem(
+        QStringLiteral("Внутренний диаметр"), QStringLiteral("diameter"));
+    volumeGroupingCombo_->addItem(
+        QStringLiteral("Контур трубопровода"), QStringLiteral("scheme"));
+    volumeGroupingCombo_->addItem(
+        QStringLiteral("Фрагмент"), QStringLiteral("fragment"));
+    volumeToolbar->addWidget(volumeGroupingCombo_);
+    volumeArchivedCheck_ = new QCheckBox(
+        QStringLiteral("Включая архив"), volumeTab);
+    volumeToolbar->addWidget(volumeArchivedCheck_);
+    volumeSelectedCheck_ = new QCheckBox(
+        QStringLiteral("Только выбранные на карте"), volumeTab);
+    volumeSelectedCheck_->setToolTip(
+        QStringLiteral(
+            "На карте должны быть выбраны участки pipe_section"));
+    connect(volumeSelectedCheck_, &QCheckBox::toggled,
+            volumeFragmentCombo_, &QComboBox::setDisabled);
+    volumeToolbar->addWidget(volumeSelectedCheck_);
+    runPipeVolumeReportButton_ = new QPushButton(
+        QStringLiteral("Рассчитать"), volumeTab);
+    runPipeVolumeReportButton_->setEnabled(false);
+    connect(runPipeVolumeReportButton_, &QPushButton::clicked,
+            this, &MainWindow::executePipeVolumeReport);
+    volumeToolbar->addWidget(runPipeVolumeReportButton_);
+    exportPipeVolumeReportButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), volumeTab);
+    exportPipeVolumeReportButton_->setEnabled(false);
+    connect(exportPipeVolumeReportButton_, &QPushButton::clicked,
+            this, &MainWindow::exportPipeVolumeReport);
+    volumeToolbar->addWidget(exportPipeVolumeReportButton_);
+    volumeLayout->addLayout(volumeToolbar);
+    pipeVolumeReportStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Формула: π/4 × (внутренний диаметр / 1000)² × "
+            "паспортная длина × число труб контура"),
+        volumeTab);
+    pipeVolumeReportStatusLabel_->setWordWrap(true);
+    volumeLayout->addWidget(pipeVolumeReportStatusLabel_);
+    pipeVolumeReportTable_ = new QTableWidget(volumeTab);
+    pipeVolumeReportTable_->setColumnCount(7);
+    pipeVolumeReportTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Группа"),
+        QStringLiteral("Участков"),
+        QStringLiteral("Рассчитано"),
+        QStringLiteral("Паспортная длина, м"),
+        QStringLiteral("Объём, м³"),
+        QStringLiteral("Без внутреннего диаметра"),
+        QStringLiteral("Без паспортной длины"),
+    });
+    pipeVolumeReportTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    pipeVolumeReportTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    pipeVolumeReportTable_->setAlternatingRowColors(true);
+    pipeVolumeReportTable_->setSortingEnabled(true);
+    pipeVolumeReportTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    pipeVolumeReportTable_->horizontalHeader()->setStretchLastSection(true);
+    volumeLayout->addWidget(pipeVolumeReportTable_, 1);
+    tabs->addTab(volumeTab, QStringLiteral("Объём сети"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -847,6 +922,14 @@ void MainWindow::showError(const QString& message)
     runPipeLengthReportButton_->setEnabled(false);
     exportPipeLengthReportButton_->setEnabled(false);
     pipeLengthReportStatusLabel_->setText(
+        QStringLiteral("Отчёт недоступен"));
+    pipeVolumeReportTable_->setRowCount(0);
+    pipeVolumeReportRows_.clear();
+    volumeFragmentCombo_->clear();
+    volumeFragmentCombo_->setEnabled(false);
+    runPipeVolumeReportButton_->setEnabled(false);
+    exportPipeVolumeReportButton_->setEnabled(false);
+    pipeVolumeReportStatusLabel_->setText(
         QStringLiteral("Отчёт недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
@@ -1389,7 +1472,10 @@ void MainWindow::populateReportFragments(
     const QList<repo::FragmentInfo>& fragments)
 {
     reportFragmentCombo_->clear();
+    volumeFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
+    volumeFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
@@ -1398,6 +1484,9 @@ void MainWindow::populateReportFragments(
                         .arg(fragment.settlement.trimmed(), fragment.name);
         }
         reportFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        volumeFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1412,6 +1501,17 @@ void MainWindow::populateReportFragments(
     pipeLengthReportStatusLabel_->setStyleSheet({});
     pipeLengthReportStatusLabel_->setText(
         QStringLiteral("Выберите параметры и сформируйте отчёт"));
+    volumeFragmentCombo_->setEnabled(
+        volumeFragmentCombo_->count() > 0
+        && !volumeSelectedCheck_->isChecked());
+    runPipeVolumeReportButton_->setEnabled(
+        volumeFragmentCombo_->count() > 0);
+    exportPipeVolumeReportButton_->setEnabled(false);
+    pipeVolumeReportRows_.clear();
+    pipeVolumeReportTable_->setRowCount(0);
+    pipeVolumeReportStatusLabel_->setStyleSheet({});
+    pipeVolumeReportStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и рассчитайте объём"));
 }
 
 void MainWindow::executePipeLengthReport()
@@ -1600,6 +1700,211 @@ void MainWindow::exportPipeLengthReport()
                << QString::number(totalEffective, 'f', 2) << ';'
                << QString::number(totalPassport - totalGeometry, 'f', 2)
                << ';' << totalMissing << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::executePipeVolumeReport()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::PipeVolumeReportCriteria criteria;
+    criteria.fragmentId = volumeSelectedCheck_->isChecked()
+                              ? 0
+                              : volumeFragmentCombo_->currentData().toInt();
+    criteria.grouping = volumeGroupingCombo_->currentData().toString();
+    criteria.includeArchived = volumeArchivedCheck_->isChecked();
+    if (volumeSelectedCheck_->isChecked()) {
+        const QList<SelectedMapObject> selected = mapView_->selectedObjects();
+        for (const SelectedMapObject& object : selected) {
+            if (object.isNode
+                || object.classTable != QStringLiteral("pipe_section")) {
+                QMessageBox::warning(
+                    this,
+                    QStringLiteral("Объём сети"),
+                    QStringLiteral(
+                        "Для расчёта должны быть выбраны только pipe_section"));
+                return;
+            }
+            criteria.pipeIds.append(object.id);
+        }
+        if (criteria.pipeIds.isEmpty()) {
+            QMessageBox::warning(
+                this,
+                QStringLiteral("Объём сети"),
+                QStringLiteral(
+                    "Сначала выберите участки pipe_section на карте"));
+            return;
+        }
+    }
+
+    runPipeVolumeReportButton_->setEnabled(false);
+    exportPipeVolumeReportButton_->setEnabled(false);
+    pipeVolumeReportStatusLabel_->setStyleSheet({});
+    pipeVolumeReportStatusLabel_->setText(
+        QStringLiteral("Расчёт объёма сети…"));
+    QApplication::processEvents();
+
+    QString error;
+    pipeVolumeReportRows_ = pipeVolumeReportRepository_.load(
+        connection_.database(), criteria, &error);
+    runPipeVolumeReportButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        pipeVolumeReportRows_.clear();
+        pipeVolumeReportTable_->setRowCount(0);
+        pipeVolumeReportStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        pipeVolumeReportStatusLabel_->setText(
+            QStringLiteral("Ошибка отчёта: %1").arg(error));
+        return;
+    }
+
+    qint64 totalCount = 0;
+    qint64 totalCalculated = 0;
+    qint64 totalMissingDiameter = 0;
+    qint64 totalMissingLength = 0;
+    double totalLength = 0.0;
+    double totalVolume = 0.0;
+    for (const repo::PipeVolumeReportRow& row : pipeVolumeReportRows_) {
+        totalCount += row.pipeCount;
+        totalCalculated += row.calculatedCount;
+        totalMissingDiameter += row.missingDiameterCount;
+        totalMissingLength += row.missingLengthCount;
+        totalLength += row.passportLength;
+        totalVolume += row.volume;
+    }
+    const bool addTotalRow = pipeVolumeReportRows_.size() > 1;
+    pipeVolumeReportTable_->setSortingEnabled(false);
+    pipeVolumeReportTable_->setRowCount(
+        pipeVolumeReportRows_.size() + (addTotalRow ? 1 : 0));
+    const auto putRow = [this](
+                            qsizetype tableRow,
+                            const QString& label,
+                            qint64 count,
+                            qint64 calculated,
+                            double length,
+                            double volume,
+                            qint64 missingDiameter,
+                            qint64 missingLength,
+                            bool bold) {
+        const QStringList values = {
+            label,
+            QString::number(count),
+            QString::number(calculated),
+            QString::number(length, 'f', 2),
+            QString::number(volume, 'f', 3),
+            QString::number(missingDiameter),
+            QString::number(missingLength),
+        };
+        for (qsizetype column = 0; column < values.size(); ++column) {
+            QTableWidgetItem* item = readOnlyItem(values.at(column));
+            if (bold) {
+                QFont font = item->font();
+                font.setBold(true);
+                item->setFont(font);
+                item->setBackground(QColor(QStringLiteral("#e2e8f0")));
+            }
+            if (column > 0) {
+                item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            }
+            pipeVolumeReportTable_->setItem(tableRow, column, item);
+        }
+    };
+    for (qsizetype rowIndex = 0;
+         rowIndex < pipeVolumeReportRows_.size(); ++rowIndex) {
+        const repo::PipeVolumeReportRow& row =
+            pipeVolumeReportRows_.at(rowIndex);
+        putRow(rowIndex, row.groupLabel, row.pipeCount,
+               row.calculatedCount, row.passportLength, row.volume,
+               row.missingDiameterCount, row.missingLengthCount, false);
+    }
+    if (addTotalRow) {
+        putRow(pipeVolumeReportRows_.size(), QStringLiteral("ИТОГО"),
+               totalCount, totalCalculated, totalLength, totalVolume,
+               totalMissingDiameter, totalMissingLength, true);
+    }
+    pipeVolumeReportTable_->setSortingEnabled(true);
+    exportPipeVolumeReportButton_->setEnabled(
+        !pipeVolumeReportRows_.isEmpty());
+    pipeVolumeReportStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    pipeVolumeReportStatusLabel_->setText(
+        QStringLiteral(
+            "Участков: %1 · рассчитано: %2 · объём: %3 м³ · "
+            "без диаметра: %4 · без длины: %5")
+            .arg(totalCount)
+            .arg(totalCalculated)
+            .arg(totalVolume, 0, 'f', 3)
+            .arg(totalMissingDiameter)
+            .arg(totalMissingLength));
+}
+
+void MainWindow::exportPipeVolumeReport()
+{
+    if (pipeVolumeReportRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт объёма сети"),
+        QStringLiteral("tgid_pipe_volume.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("Группа")) << ';'
+           << csvCell(QStringLiteral("Участков")) << ';'
+           << csvCell(QStringLiteral("Рассчитано")) << ';'
+           << csvCell(QStringLiteral("Паспортная длина, м")) << ';'
+           << csvCell(QStringLiteral("Объём, м³")) << ';'
+           << csvCell(QStringLiteral("Без внутреннего диаметра")) << ';'
+           << csvCell(QStringLiteral("Без паспортной длины")) << '\n';
+    qint64 totalCount = 0;
+    qint64 totalCalculated = 0;
+    qint64 totalMissingDiameter = 0;
+    qint64 totalMissingLength = 0;
+    double totalLength = 0.0;
+    double totalVolume = 0.0;
+    for (const repo::PipeVolumeReportRow& row : pipeVolumeReportRows_) {
+        stream << csvCell(row.groupLabel) << ';'
+               << row.pipeCount << ';'
+               << row.calculatedCount << ';'
+               << QString::number(row.passportLength, 'f', 2) << ';'
+               << QString::number(row.volume, 'f', 6) << ';'
+               << row.missingDiameterCount << ';'
+               << row.missingLengthCount << '\n';
+        totalCount += row.pipeCount;
+        totalCalculated += row.calculatedCount;
+        totalMissingDiameter += row.missingDiameterCount;
+        totalMissingLength += row.missingLengthCount;
+        totalLength += row.passportLength;
+        totalVolume += row.volume;
+    }
+    if (pipeVolumeReportRows_.size() > 1) {
+        stream << csvCell(QStringLiteral("ИТОГО")) << ';'
+               << totalCount << ';'
+               << totalCalculated << ';'
+               << QString::number(totalLength, 'f', 2) << ';'
+               << QString::number(totalVolume, 'f', 6) << ';'
+               << totalMissingDiameter << ';'
+               << totalMissingLength << '\n';
     }
     stream.flush();
     if (!file.commit()) {

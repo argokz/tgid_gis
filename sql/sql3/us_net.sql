@@ -658,12 +658,12 @@ FROM net.node_plain node_plain
 WHERE node_plain.removed_at IS NULL
 ) n
 LEFT JOIN (
-    SELECT c.fileid, max(c.id) AS cid FROM public.calculation c GROUP BY c.fileid
-) calc ON calc.fileid = n.fileid
-LEFT JOIN public.us_out usp ON usp.nodeid = n.id AND usp.externalsign = 1
-                           AND usp.calculationid = calc.cid
-LEFT JOIN public.us_out uso ON uso.nodeid = n.id AND uso.externalsign = 2
-                           AND uso.calculationid = calc.cid
-LEFT JOIN public.pt_out  ON pt_out.nodeid = n.id AND pt_out.calculationid = calc.cid
-LEFT JOIN public.dr_out  ON dr_out.nodeid = n.id AND dr_out.calculationid = calc.cid
+    SELECT c.fileid, max(c.id) AS cid FROM calc.calculation c GROUP BY c.fileid
+) lastcalc ON lastcalc.fileid = n.fileid
+LEFT JOIN calc.us_out usp ON usp.nodeid = n.id AND usp.externalsign = 1
+                           AND usp.calculationid = lastcalc.cid
+LEFT JOIN calc.us_out uso ON uso.nodeid = n.id AND uso.externalsign = 2
+                           AND uso.calculationid = lastcalc.cid
+LEFT JOIN calc.pt_out  ON pt_out.nodeid = n.id AND pt_out.calculationid = lastcalc.cid
+LEFT JOIN calc.dr_out  ON dr_out.nodeid = n.id AND dr_out.calculationid = lastcalc.cid
 WHERE n.removed = 0

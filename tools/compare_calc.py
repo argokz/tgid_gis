@@ -54,17 +54,39 @@ def connect(db, a):
                             user=a.user, password=a.password)
 
 
+def schema_of(cur, table):
+    """В какой схеме лежит таблица результатов.
+
+    В переведённой БД они переехали в calc, в старой остаются в public.
+    Сверять надо и ту и другую, поэтому схема определяется по факту, а
+    не подставляется константой.
+    """
+    cur.execute("""
+        SELECT table_schema FROM information_schema.tables
+        WHERE table_name = %s AND table_schema IN ('calc', 'public')
+        ORDER BY (table_schema = 'calc') DESC
+        LIMIT 1""", (table,))
+    r = cur.fetchone()
+    if not r:
+        raise KeyError(table)
+    return r[0]
+
+
+def qname(cur, table):
+    return '%s.%s' % (schema_of(cur, table), table)
+
+
 def last_calc(cur, fragment):
-    cur.execute('SELECT max(id) FROM public.calculation WHERE fileid = %s',
-                (fragment,))
+    cur.execute('SELECT max(id) FROM %s WHERE fileid = %%s'
+                % qname(cur, 'calculation'), (fragment,))
     return cur.fetchone()[0]
 
 
 def numeric_cols(cur, table):
     cur.execute("""
         SELECT column_name, data_type FROM information_schema.columns
-        WHERE table_schema = 'public' AND table_name = %s
-        ORDER BY ordinal_position""", (table,))
+        WHERE table_schema = %s AND table_name = %s
+        ORDER BY ordinal_position""", (schema_of(cur, table), table))
     return cur.fetchall()
 
 
@@ -85,11 +107,11 @@ def is_virtual(k):
 
 
 def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
-    qa.execute('SELECT count(*) FROM public.%s WHERE calculationid = %%s'
-               % table, (ida,))
+    qa.execute('SELECT count(*) FROM %s WHERE calculationid = %%s'
+               % qname(qa, table), (ida,))
     na = qa.fetchone()[0]
-    qb.execute('SELECT count(*) FROM public.%s WHERE calculationid = %%s'
-               % table, (idb,))
+    qb.execute('SELECT count(*) FROM %s WHERE calculationid = %%s'
+               % qname(qb, table), (idb,))
     nb = qb.fetchone()[0]
 
     info = {
@@ -118,10 +140,10 @@ def compare_table(qa, qb, table, key, ida, idb, atol, rtol):
     first = True
     for c in cols:
         qa.execute(
-            'SELECT %s, %s FROM public.%s WHERE calculationid = %%s' % (', '.join(key), c, table), (ida,))
+            'SELECT %s, %s FROM %s WHERE calculationid = %%s' % (', '.join(key), c, qname(qa, table)), (ida,))
         rows_a = {r[:-1]: r[-1] for r in qa.fetchall()}
         qb.execute(
-            'SELECT %s, %s FROM public.%s WHERE calculationid = %%s' % (', '.join(key), c, table), (idb,))
+            'SELECT %s, %s FROM %s WHERE calculationid = %%s' % (', '.join(key), c, qname(qb, table)), (idb,))
         rows_b = {r[:-1]: r[-1] for r in qb.fetchall()}
         keys = set(rows_a) | set(rows_b)
         for k in keys:
