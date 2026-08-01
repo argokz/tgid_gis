@@ -524,6 +524,12 @@ void MainWindow::buildInterface()
         QStringLiteral("Верхняя граница"));
     searchSecondValueEdit_->setVisible(false);
     searchConditionRow->addWidget(searchSecondValueEdit_, 1);
+    addSearchConditionButton_ = new QPushButton(
+        QStringLiteral("Добавить условие"), searchTab);
+    addSearchConditionButton_->setEnabled(false);
+    connect(addSearchConditionButton_, &QPushButton::clicked,
+            this, &MainWindow::addSearchCondition);
+    searchConditionRow->addWidget(addSearchConditionButton_);
     searchButton_ = new QPushButton(QStringLiteral("Найти"), searchTab);
     searchButton_->setEnabled(false);
     connect(searchButton_, &QPushButton::clicked,
@@ -534,6 +540,30 @@ void MainWindow::buildInterface()
             searchButton_, &QPushButton::click);
     searchConditionRow->addWidget(searchButton_);
     searchLayout->addLayout(searchConditionRow);
+
+    auto* savedConditionsRow = new QHBoxLayout();
+    searchConditionsTable_ = new QTableWidget(searchTab);
+    searchConditionsTable_->setColumnCount(3);
+    searchConditionsTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Поле"),
+        QStringLiteral("Операция"),
+        QStringLiteral("Значение"),
+    });
+    searchConditionsTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    searchConditionsTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    searchConditionsTable_->setSelectionMode(QAbstractItemView::SingleSelection);
+    searchConditionsTable_->setMaximumHeight(145);
+    searchConditionsTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    searchConditionsTable_->horizontalHeader()->setStretchLastSection(true);
+    savedConditionsRow->addWidget(searchConditionsTable_, 1);
+    removeSearchConditionButton_ = new QPushButton(
+        QStringLiteral("Удалить условие"), searchTab);
+    removeSearchConditionButton_->setEnabled(false);
+    connect(removeSearchConditionButton_, &QPushButton::clicked,
+            this, &MainWindow::removeSearchCondition);
+    savedConditionsRow->addWidget(removeSearchConditionButton_);
+    searchLayout->addLayout(savedConditionsRow);
     searchStatusLabel_ = new QLabel(
         QStringLiteral("Выберите класс и условие поиска"), searchTab);
     searchStatusLabel_->setWordWrap(true);
@@ -934,12 +964,15 @@ void MainWindow::populateSearchClasses(
 void MainWindow::refreshSearchFields()
 {
     searchFields_.clear();
+    searchConditions_.clear();
+    renderSearchConditions();
     searchFieldCombo_->blockSignals(true);
     searchFieldCombo_->clear();
     searchFieldCombo_->blockSignals(false);
     searchOperatorCombo_->clear();
     searchTable_->setRowCount(0);
     searchButton_->setEnabled(false);
+    addSearchConditionButton_->setEnabled(false);
     const QString classTable = searchClassCombo_->currentData().toString();
     if (!connection_.isOpen() || classTable.isEmpty()) {
         searchFieldCombo_->setEnabled(false);
@@ -989,6 +1022,7 @@ void MainWindow::refreshSearchEditor()
         searchOperatorCombo_->blockSignals(false);
         searchOperatorCombo_->setEnabled(false);
         searchButton_->setEnabled(false);
+        addSearchConditionButton_->setEnabled(false);
         return;
     }
     const repo::SearchField& field = searchFields_.at(fieldIndex);
@@ -1068,7 +1102,8 @@ void MainWindow::refreshSearchValueInputs()
     const qsizetype fieldIndex =
         searchFieldCombo_->currentData().toLongLong();
     if (fieldIndex < 0 || fieldIndex >= searchFields_.size()) {
-        searchButton_->setEnabled(false);
+        searchButton_->setEnabled(!searchConditions_.isEmpty());
+        addSearchConditionButton_->setEnabled(false);
         return;
     }
     const repo::SearchField& field = searchFields_.at(fieldIndex);
@@ -1084,28 +1119,31 @@ void MainWindow::refreshSearchValueInputs()
     searchValueCombo_->setVisible(choiceValue);
     searchSecondValueEdit_->setVisible(
         comparison == QStringLiteral("between"));
-    searchButton_->setEnabled(!comparison.isEmpty());
+    addSearchConditionButton_->setEnabled(
+        !comparison.isEmpty() && searchConditions_.size() < 8);
+    searchButton_->setEnabled(
+        !comparison.isEmpty() || !searchConditions_.isEmpty());
 }
 
-void MainWindow::executeSearch()
+bool MainWindow::currentSearchCondition(
+    repo::SearchCondition* condition,
+    QString* displayValue)
 {
     const qsizetype fieldIndex =
         searchFieldCombo_->currentData().toLongLong();
-    if (!connection_.isOpen()
-        || fieldIndex < 0 || fieldIndex >= searchFields_.size()) {
-        return;
+    if (condition == nullptr || fieldIndex < 0
+        || fieldIndex >= searchFields_.size()) {
+        return false;
     }
     const repo::SearchField& field = searchFields_.at(fieldIndex);
-    repo::SearchCriteria criteria;
-    criteria.classTable = searchClassCombo_->currentData().toString();
-    criteria.fieldName = field.name;
-    criteria.comparison = searchOperatorCombo_->currentData().toString();
-    criteria.includeArchived = searchArchivedCheck_->isChecked();
-    criteria.limit = 200;
-    const bool noValue = criteria.comparison == QStringLiteral("is_null")
-                         || criteria.comparison == QStringLiteral("not_null");
+    condition->fieldName = field.name;
+    condition->comparison = searchOperatorCombo_->currentData().toString();
+    condition->value.clear();
+    condition->secondValue.clear();
+    const bool noValue = condition->comparison == QStringLiteral("is_null")
+                         || condition->comparison == QStringLiteral("not_null");
     const bool choiceValue = !noValue
-        && criteria.comparison == QStringLiteral("equals")
+        && condition->comparison == QStringLiteral("equals")
         && (field.editorKind == QStringLiteral("lookup")
             || field.editorKind == QStringLiteral("boolean"));
     if (choiceValue) {
@@ -1113,26 +1151,147 @@ void MainWindow::executeSearch()
             QMessageBox::warning(
                 this, QStringLiteral("Поиск"),
                 QStringLiteral("Выберите значение из списка"));
-            return;
+            return false;
         }
-        criteria.value = searchValueCombo_->currentData().toString();
+        condition->value = searchValueCombo_->currentData().toString();
+        if (displayValue != nullptr) {
+            *displayValue = searchValueCombo_->currentText();
+        }
     } else if (!noValue) {
-        criteria.value = searchValueEdit_->text().trimmed();
-        if (criteria.value.isEmpty()) {
+        condition->value = searchValueEdit_->text().trimmed();
+        if (condition->value.isEmpty()) {
             QMessageBox::warning(
                 this, QStringLiteral("Поиск"),
                 QStringLiteral("Введите значение поиска"));
-            return;
+            return false;
         }
+        if (displayValue != nullptr) {
+            *displayValue = condition->value;
+        }
+    } else if (displayValue != nullptr) {
+        *displayValue = QStringLiteral("—");
     }
-    if (criteria.comparison == QStringLiteral("between")) {
-        criteria.secondValue = searchSecondValueEdit_->text().trimmed();
-        if (criteria.secondValue.isEmpty()) {
+    if (condition->comparison == QStringLiteral("between")) {
+        condition->secondValue = searchSecondValueEdit_->text().trimmed();
+        if (condition->secondValue.isEmpty()) {
             QMessageBox::warning(
                 this, QStringLiteral("Поиск"),
                 QStringLiteral("Введите обе границы диапазона"));
+            return false;
+        }
+        if (displayValue != nullptr) {
+            *displayValue = QStringLiteral("%1 … %2")
+                                .arg(condition->value,
+                                     condition->secondValue);
+        }
+    }
+    return true;
+}
+
+void MainWindow::renderSearchConditions()
+{
+    if (searchConditionsTable_ == nullptr) {
+        return;
+    }
+    static const QHash<QString, QString> operations = {
+        {QStringLiteral("equals"), QStringLiteral("равно")},
+        {QStringLiteral("contains"), QStringLiteral("содержит")},
+        {QStringLiteral("greater"), QStringLiteral("больше")},
+        {QStringLiteral("less"), QStringLiteral("меньше")},
+        {QStringLiteral("between"), QStringLiteral("между")},
+        {QStringLiteral("is_null"), QStringLiteral("не заполнено")},
+        {QStringLiteral("not_null"), QStringLiteral("заполнено")},
+    };
+    searchConditionsTable_->setRowCount(searchConditions_.size());
+    for (qsizetype row = 0; row < searchConditions_.size(); ++row) {
+        const repo::SearchCondition& condition = searchConditions_.at(row);
+        QString fieldLabel = condition.fieldName;
+        for (const repo::SearchField& field : std::as_const(searchFields_)) {
+            if (field.name == condition.fieldName) {
+                fieldLabel = field.displayName;
+                break;
+            }
+        }
+        QString value = condition.value;
+        if (condition.comparison == QStringLiteral("between")) {
+            value = QStringLiteral("%1 … %2")
+                        .arg(condition.value, condition.secondValue);
+        } else if (condition.comparison == QStringLiteral("is_null")
+                   || condition.comparison == QStringLiteral("not_null")) {
+            value = QStringLiteral("—");
+        }
+        searchConditionsTable_->setItem(
+            row, 0, readOnlyItem(fieldLabel));
+        searchConditionsTable_->setItem(
+            row, 1, readOnlyItem(operations.value(
+                        condition.comparison, condition.comparison)));
+        searchConditionsTable_->setItem(row, 2, readOnlyItem(value));
+    }
+    removeSearchConditionButton_->setEnabled(!searchConditions_.isEmpty());
+    addSearchConditionButton_->setEnabled(
+        searchOperatorCombo_->currentIndex() >= 0
+        && searchConditions_.size() < 8);
+    searchButton_->setEnabled(
+        !searchConditions_.isEmpty()
+        || searchOperatorCombo_->currentIndex() >= 0);
+}
+
+void MainWindow::addSearchCondition()
+{
+    if (searchConditions_.size() >= 8) {
+        QMessageBox::information(
+            this, QStringLiteral("Поиск"),
+            QStringLiteral("Можно задать не более восьми условий"));
+        return;
+    }
+    repo::SearchCondition condition;
+    QString displayValue;
+    if (!currentSearchCondition(&condition, &displayValue)) {
+        return;
+    }
+    searchConditions_.append(std::move(condition));
+    renderSearchConditions();
+    searchStatusLabel_->setStyleSheet({});
+    searchStatusLabel_->setText(
+        QStringLiteral("Условий AND: %1 из 8").arg(searchConditions_.size()));
+}
+
+void MainWindow::removeSearchCondition()
+{
+    if (searchConditions_.isEmpty()) {
+        return;
+    }
+    int row = searchConditionsTable_->currentRow();
+    if (row < 0 || row >= searchConditions_.size()) {
+        row = searchConditions_.size() - 1;
+    }
+    searchConditions_.removeAt(row);
+    renderSearchConditions();
+    searchStatusLabel_->setStyleSheet({});
+    searchStatusLabel_->setText(
+        searchConditions_.isEmpty()
+            ? QStringLiteral("Добавьте условия или выполните текущее")
+            : QStringLiteral("Условий AND: %1 из 8")
+                  .arg(searchConditions_.size()));
+}
+
+void MainWindow::executeSearch()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::SearchCriteria criteria;
+    criteria.classTable = searchClassCombo_->currentData().toString();
+    criteria.conditions = searchConditions_;
+    criteria.includeArchived = searchArchivedCheck_->isChecked();
+    criteria.limit = 200;
+    if (criteria.conditions.isEmpty()) {
+        repo::SearchCondition condition;
+        QString displayValue;
+        if (!currentSearchCondition(&condition, &displayValue)) {
             return;
         }
+        criteria.conditions.append(std::move(condition));
     }
 
     searchButton_->setEnabled(false);
@@ -1142,7 +1301,7 @@ void MainWindow::executeSearch()
     QString error;
     const QList<repo::SearchResult> results =
         searchRepository_.search(connection_.database(), criteria, &error);
-    searchButton_->setEnabled(true);
+    renderSearchConditions();
     if (!error.isEmpty()) {
         searchTable_->setRowCount(0);
         searchStatusLabel_->setStyleSheet(QStringLiteral("color: #b42318;"));
@@ -1154,6 +1313,20 @@ void MainWindow::executeSearch()
     searchTable_->setRowCount(results.size());
     const bool isNode = searchClassCombo_->currentData(
         Qt::UserRole + 1).toBool();
+    QStringList searchedFieldLabels;
+    for (const repo::SearchCondition& condition :
+         std::as_const(criteria.conditions)) {
+        QString label = condition.fieldName;
+        for (const repo::SearchField& field : std::as_const(searchFields_)) {
+            if (field.name == condition.fieldName) {
+                label = field.displayName;
+                break;
+            }
+        }
+        if (!searchedFieldLabels.contains(label)) {
+            searchedFieldLabels.append(label);
+        }
+    }
     for (qsizetype row = 0; row < results.size(); ++row) {
         const repo::SearchResult& result = results.at(row);
         auto* idItem = readOnlyItem(QString::number(result.id));
@@ -1162,7 +1335,8 @@ void MainWindow::executeSearch()
         idItem->setData(Qt::UserRole + 2, isNode);
         searchTable_->setItem(row, 0, idItem);
         searchTable_->setItem(row, 1, readOnlyItem(result.fragmentId));
-        searchTable_->setItem(row, 2, readOnlyItem(field.displayName));
+        searchTable_->setItem(
+            row, 2, readOnlyItem(searchedFieldLabels.join(", ")));
         searchTable_->setItem(row, 3, readOnlyItem(result.value));
         searchTable_->setItem(
             row, 4, readOnlyItem(QString::number(result.rowVersion)));

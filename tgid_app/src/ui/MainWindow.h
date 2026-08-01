@@ -58,6 +58,8 @@ private slots:
     void refreshSearchFields();
     void refreshSearchEditor();
     void refreshSearchValueInputs();
+    void addSearchCondition();
+    void removeSearchCondition();
     void executeSearch();
     void openSearchResult(int row, int column);
     void executePipeLengthReport();
@@ -73,6 +75,10 @@ private:
     void populateFragments(const QList<repo::FragmentInfo>& fragments);
     void populateSearchClasses(const QList<repo::LayerInfo>& layers);
     void populateReportFragments(const QList<repo::FragmentInfo>& fragments);
+    bool currentSearchCondition(
+        repo::SearchCondition* condition,
+        QString* displayValue);
+    void renderSearchConditions();
     void showError(const QString& message);
     void showLayers(
         const QList<repo::LayerInfo>& layers,
@@ -109,8 +115,11 @@ private:
     QLineEdit* searchSecondValueEdit_ = nullptr;
     QComboBox* searchValueCombo_ = nullptr;
     QCheckBox* searchArchivedCheck_ = nullptr;
+    QPushButton* addSearchConditionButton_ = nullptr;
+    QPushButton* removeSearchConditionButton_ = nullptr;
     QPushButton* searchButton_ = nullptr;
     QLabel* searchStatusLabel_ = nullptr;
+    QTableWidget* searchConditionsTable_ = nullptr;
     QTableWidget* searchTable_ = nullptr;
     QComboBox* reportFragmentCombo_ = nullptr;
     QComboBox* reportGroupingCombo_ = nullptr;
@@ -132,6 +141,7 @@ private:
     QElapsedTimer mapLoadTimer_;
     repo::ObjectDetails currentObjectDetails_;
     QList<repo::SearchField> searchFields_;
+    QList<repo::SearchCondition> searchConditions_;
     QList<repo::PipeLengthReportRow> pipeLengthReportRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;

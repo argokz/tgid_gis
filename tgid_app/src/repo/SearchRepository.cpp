@@ -216,9 +216,16 @@ QList<SearchResult> SearchRepository::search(
     if (error != nullptr) {
         error->clear();
     }
+    QList<SearchCondition> requestedConditions = criteria.conditions;
+    if (requestedConditions.isEmpty() && !criteria.fieldName.isEmpty()) {
+        requestedConditions.append({criteria.fieldName,
+                                    criteria.comparison,
+                                    criteria.value,
+                                    criteria.secondValue});
+    }
     if (!database.isOpen()
         || !safeIdentifier().match(criteria.classTable).hasMatch()
-        || !safeIdentifier().match(criteria.fieldName).hasMatch()
+        || requestedConditions.isEmpty() || requestedConditions.size() > 8
         || criteria.limit < 1 || criteria.limit > 1000) {
         if (error != nullptr) {
             *error = QStringLiteral("Некорректные параметры поиска");
@@ -226,8 +233,7 @@ QList<SearchResult> SearchRepository::search(
         return result;
     }
 
-    QSqlQuery metadata(database);
-    metadata.prepare(QStringLiteral(
+    static const QString metadataSql = QStringLiteral(
         "SELECT t.typname"
         "  FROM meta.layer_catalog layer"
         "  JOIN pg_namespace n ON n.nspname = layer.schema_name"
@@ -244,108 +250,132 @@ QList<SearchResult> SearchRepository::search(
         "   AND a.attname = :field_name"
         "   AND a.attnum > 0 AND NOT a.attisdropped"
         "   AND a.attname <> 'geom'"
-        "   AND coalesce(fc.is_visible, true)"));
-    metadata.bindValue(QStringLiteral(":table_name"), criteria.classTable);
-    metadata.bindValue(QStringLiteral(":field_name"), criteria.fieldName);
-    if (!metadata.exec() || !metadata.next()) {
-        if (error != nullptr) {
-            *error = metadata.lastError().text().isEmpty()
-                         ? QStringLiteral("Поле поиска недоступно")
-                         : metadata.lastError().text();
-        }
-        return result;
-    }
-    const QString databaseType = metadata.value(0).toString();
-    const QString cast = castForDatabaseType(databaseType);
-    if (cast.isEmpty()) {
-        if (error != nullptr) {
-            *error = QStringLiteral("Тип поля не поддерживается поиском");
-        }
-        return result;
-    }
+        "   AND coalesce(fc.is_visible, true)");
 
     static const QSet<QString> comparisons = {
         QStringLiteral("equals"), QStringLiteral("contains"),
         QStringLiteral("greater"), QStringLiteral("less"),
         QStringLiteral("between"), QStringLiteral("is_null"),
         QStringLiteral("not_null")};
-    if (!comparisons.contains(criteria.comparison)) {
-        if (error != nullptr) {
-            *error = QStringLiteral("Недопустимая операция сравнения");
-        }
-        return result;
-    }
-    const QSet<QString> orderedTypes = {
+    static const QSet<QString> orderedTypes = {
         QStringLiteral("int2"), QStringLiteral("int4"),
         QStringLiteral("int8"), QStringLiteral("float4"),
         QStringLiteral("float8"), QStringLiteral("numeric"),
         QStringLiteral("date"), QStringLiteral("timestamp"),
         QStringLiteral("timestamptz"), QStringLiteral("time"),
         QStringLiteral("timetz")};
-    if ((criteria.comparison == QStringLiteral("greater")
-         || criteria.comparison == QStringLiteral("less")
-         || criteria.comparison == QStringLiteral("between"))
-        && !orderedTypes.contains(databaseType)) {
-        if (error != nullptr) {
-            *error = QStringLiteral("Тип поля не поддерживает сравнение порядка");
-        }
-        return result;
-    }
-
     const QSqlDriver* driver = database.driver();
     const QString table = driver->escapeIdentifier(
         criteria.classTable, QSqlDriver::TableName);
-    const QString field = driver->escapeIdentifier(
-        criteria.fieldName, QSqlDriver::FieldName);
-    QString condition;
+    QStringList sqlConditions;
+    QStringList displayFields;
+    QSet<QString> displayedNames;
     QList<QVariant> values;
-    if (criteria.comparison == QStringLiteral("is_null")) {
-        condition = QStringLiteral("t.%1 IS NULL").arg(field);
-    } else if (criteria.comparison == QStringLiteral("not_null")) {
-        condition = QStringLiteral("t.%1 IS NOT NULL").arg(field);
-    } else if (criteria.comparison == QStringLiteral("contains")) {
-        condition = QStringLiteral(
-            "CAST(t.%1 AS text) ILIKE '%' || CAST(? AS text) || '%'")
-                        .arg(field);
-        values.append(criteria.value);
-    } else if (criteria.comparison == QStringLiteral("between")) {
-        condition = QStringLiteral(
-            "t.%1 BETWEEN CAST(? AS %2) AND CAST(? AS %2)")
-                        .arg(field, cast);
-        values.append(normalizedValue(databaseType, criteria.value));
-        values.append(normalizedValue(databaseType, criteria.secondValue));
-    } else {
-        const QString operation =
-            criteria.comparison == QStringLiteral("greater")
-                ? QStringLiteral(">")
-                : criteria.comparison == QStringLiteral("less")
-                      ? QStringLiteral("<")
-                      : QStringLiteral("=");
-        condition = databaseType == QStringLiteral("json")
-                        ? QStringLiteral(
-                              "CAST(t.%1 AS text) %2 CAST(? AS text)")
-                              .arg(field, operation)
-                        : QStringLiteral("t.%1 %2 CAST(? AS %3)")
-                              .arg(field, operation, cast);
-        values.append(normalizedValue(databaseType, criteria.value));
+    for (const SearchCondition& requested : std::as_const(requestedConditions)) {
+        if (!safeIdentifier().match(requested.fieldName).hasMatch()
+            || !comparisons.contains(requested.comparison)) {
+            if (error != nullptr) {
+                *error = QStringLiteral("Некорректное условие поиска");
+            }
+            return result;
+        }
+
+        QSqlQuery metadata(database);
+        metadata.prepare(metadataSql);
+        metadata.bindValue(QStringLiteral(":table_name"), criteria.classTable);
+        metadata.bindValue(QStringLiteral(":field_name"), requested.fieldName);
+        if (!metadata.exec() || !metadata.next()) {
+            if (error != nullptr) {
+                *error = metadata.lastError().text().isEmpty()
+                             ? QStringLiteral("Поле поиска недоступно: %1")
+                                   .arg(requested.fieldName)
+                             : metadata.lastError().text();
+            }
+            return result;
+        }
+        const QString databaseType = metadata.value(0).toString();
+        const QString cast = castForDatabaseType(databaseType);
+        if (cast.isEmpty()) {
+            if (error != nullptr) {
+                *error = QStringLiteral("Тип поля %1 не поддерживается поиском")
+                             .arg(requested.fieldName);
+            }
+            return result;
+        }
+        if ((requested.comparison == QStringLiteral("greater")
+             || requested.comparison == QStringLiteral("less")
+             || requested.comparison == QStringLiteral("between"))
+            && !orderedTypes.contains(databaseType)) {
+            if (error != nullptr) {
+                *error = QStringLiteral(
+                    "Поле %1 не поддерживает сравнение порядка")
+                             .arg(requested.fieldName);
+            }
+            return result;
+        }
+
+        const QString field = driver->escapeIdentifier(
+            requested.fieldName, QSqlDriver::FieldName);
+        QString sqlCondition;
+        if (requested.comparison == QStringLiteral("is_null")) {
+            sqlCondition = QStringLiteral("t.%1 IS NULL").arg(field);
+        } else if (requested.comparison == QStringLiteral("not_null")) {
+            sqlCondition = QStringLiteral("t.%1 IS NOT NULL").arg(field);
+        } else if (requested.comparison == QStringLiteral("contains")) {
+            sqlCondition = QStringLiteral(
+                "CAST(t.%1 AS text) ILIKE '%' || CAST(? AS text) || '%'")
+                               .arg(field);
+            values.append(requested.value);
+        } else if (requested.comparison == QStringLiteral("between")) {
+            sqlCondition = QStringLiteral(
+                "t.%1 BETWEEN CAST(? AS %2) AND CAST(? AS %2)")
+                               .arg(field, cast);
+            values.append(normalizedValue(databaseType, requested.value));
+            values.append(
+                normalizedValue(databaseType, requested.secondValue));
+        } else {
+            const QString operation =
+                requested.comparison == QStringLiteral("greater")
+                    ? QStringLiteral(">")
+                    : requested.comparison == QStringLiteral("less")
+                          ? QStringLiteral("<")
+                          : QStringLiteral("=");
+            sqlCondition = databaseType == QStringLiteral("json")
+                               ? QStringLiteral(
+                                     "CAST(t.%1 AS text) %2 CAST(? AS text)")
+                                     .arg(field, operation)
+                               : QStringLiteral("t.%1 %2 CAST(? AS %3)")
+                                     .arg(field, operation, cast);
+            values.append(normalizedValue(databaseType, requested.value));
+        }
+        sqlConditions.append(QStringLiteral("(%1)").arg(sqlCondition));
+        if (!displayedNames.contains(requested.fieldName)) {
+            displayedNames.insert(requested.fieldName);
+            displayFields.append(
+                QStringLiteral("'%1', to_jsonb(t.%2)")
+                    .arg(requested.fieldName, field));
+        }
     }
+
+    const QString displayExpression = QStringLiteral(
+        "jsonb_build_object(%1)::text").arg(displayFields.join(", "));
 
     QSqlQuery query(database);
     query.prepare(
         QStringLiteral(
             "SELECT t.id,"
             "       coalesce(to_jsonb(t)->>'fragment_id', ''),"
-            "       coalesce(CAST(t.%1 AS text), 'NULL'),"
+            "       %1,"
             "       t.row_version, t.removed_at IS NOT NULL"
             "  FROM net.%2 AS t"
             " WHERE %3 AND (%4)"
             " ORDER BY t.id LIMIT CAST(? AS integer)")
-            .arg(field,
+            .arg(displayExpression,
                  table,
                  criteria.includeArchived
                      ? QStringLiteral("TRUE")
                      : QStringLiteral("t.removed_at IS NULL"),
-                 condition));
+                 sqlConditions.join(QStringLiteral(" AND "))));
     for (const QVariant& value : std::as_const(values)) {
         query.addBindValue(value);
     }

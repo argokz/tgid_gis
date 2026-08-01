@@ -111,9 +111,16 @@ int main(int argc, char* argv[])
     parser.addOption(batchObjectsOption);
     const QCommandLineOption searchObjectsOption(
         QStringLiteral("search-objects"),
-        QStringLiteral("Поиск объектов: table:field:comparison"),
-        QStringLiteral("table:field:comparison"));
+        QStringLiteral(
+            "Поиск объектов: table или table:field:comparison"),
+        QStringLiteral("table[:field:comparison]"));
     parser.addOption(searchObjectsOption);
+    const QCommandLineOption searchConditionOption(
+        QStringLiteral("search-condition"),
+        QStringLiteral(
+            "Повторяемое AND-условие: field|comparison[|value[|second]]"),
+        QStringLiteral("condition"));
+    parser.addOption(searchConditionOption);
     const QCommandLineOption searchValueOption(
         QStringLiteral("search-value"),
         QStringLiteral("Первое значение поиска"),
@@ -158,6 +165,7 @@ int main(int argc, char* argv[])
         || parser.isSet(joinLinesOption)
         || parser.isSet(batchSetOption)
         || parser.isSet(searchObjectsOption)
+        || parser.isSet(searchConditionOption)
         || parser.isSet(pipeLengthReportOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
@@ -678,31 +686,75 @@ int main(int argc, char* argv[])
                        .arg(batchResult.updatedCount);
         }
 
-        if (parser.isSet(searchObjectsOption)) {
+        if (parser.isSet(searchObjectsOption)
+            || parser.isSet(searchConditionOption)) {
             const QStringList parts =
                 parser.value(searchObjectsOption).split(':');
-            if (parts.size() != 3 || parts.at(0).isEmpty()
-                || parts.at(1).isEmpty() || parts.at(2).isEmpty()) {
+            const bool legacyCondition = parts.size() == 3;
+            if (!parser.isSet(searchObjectsOption)
+                || (parts.size() != 1 && !legacyCondition)
+                || parts.at(0).isEmpty()
+                || (legacyCondition
+                    && (parts.at(1).isEmpty() || parts.at(2).isEmpty()))) {
                 qCritical().noquote()
                     << QStringLiteral(
-                           "Ожидается --search-objects table:field:comparison");
+                           "Ожидается --search-objects table[:field:comparison]");
                 return 28;
             }
             tgid::repo::SearchCriteria criteria;
             criteria.classTable = parts.at(0);
-            criteria.fieldName = parts.at(1);
-            criteria.comparison = parts.at(2);
-            criteria.value = parser.value(searchValueOption);
-            criteria.secondValue = parser.value(searchSecondValueOption);
             criteria.includeArchived = parser.isSet(searchArchivedOption);
             criteria.limit = 20;
-            if (criteria.comparison != QStringLiteral("is_null")
-                && criteria.comparison != QStringLiteral("not_null")
-                && !parser.isSet(searchValueOption)) {
-                return 28;
+            if (legacyCondition) {
+                tgid::repo::SearchCondition condition;
+                condition.fieldName = parts.at(1);
+                condition.comparison = parts.at(2);
+                condition.value = parser.value(searchValueOption);
+                condition.secondValue = parser.value(searchSecondValueOption);
+                if (condition.comparison != QStringLiteral("is_null")
+                    && condition.comparison != QStringLiteral("not_null")
+                    && !parser.isSet(searchValueOption)) {
+                    return 28;
+                }
+                if (condition.comparison == QStringLiteral("between")
+                    && !parser.isSet(searchSecondValueOption)) {
+                    return 28;
+                }
+                criteria.conditions.append(condition);
             }
-            if (criteria.comparison == QStringLiteral("between")
-                && !parser.isSet(searchSecondValueOption)) {
+            for (const QString& encoded :
+                 parser.values(searchConditionOption)) {
+                const QStringList conditionParts =
+                    encoded.split('|', Qt::KeepEmptyParts);
+                if (conditionParts.size() < 2
+                    || conditionParts.size() > 4
+                    || conditionParts.at(0).isEmpty()
+                    || conditionParts.at(1).isEmpty()) {
+                    return 28;
+                }
+                tgid::repo::SearchCondition condition;
+                condition.fieldName = conditionParts.at(0);
+                condition.comparison = conditionParts.at(1);
+                if (conditionParts.size() >= 3) {
+                    condition.value = conditionParts.at(2);
+                }
+                if (conditionParts.size() == 4) {
+                    condition.secondValue = conditionParts.at(3);
+                }
+                const bool noValue =
+                    condition.comparison == QStringLiteral("is_null")
+                    || condition.comparison == QStringLiteral("not_null");
+                if ((!noValue && conditionParts.size() < 3)
+                    || (condition.comparison == QStringLiteral("between")
+                        && conditionParts.size() < 4)) {
+                    return 28;
+                }
+                criteria.conditions.append(condition);
+            }
+            if (criteria.conditions.isEmpty()
+                || criteria.conditions.size() > 8) {
+                qCritical().noquote()
+                    << QStringLiteral("Ожидается от 1 до 8 условий поиска");
                 return 28;
             }
             QString searchError;

@@ -17,8 +17,17 @@ struct SearchField final {
     QList<ObjectFieldOption> options;
 };
 
+struct SearchCondition final {
+    QString fieldName;
+    QString comparison;
+    QString value;
+    QString secondValue;
+};
+
 struct SearchCriteria final {
     QString classTable;
+    QList<SearchCondition> conditions;
+    // Legacy single-condition fields retained for CLI/API compatibility.
     QString fieldName;
     QString comparison;
     QString value;
