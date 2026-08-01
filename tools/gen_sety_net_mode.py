@@ -63,6 +63,32 @@ def fragment_table(conn):
     return 'net.fragment' if is_net(conn) else 'fragments'
 
 
+# Надтипы и подтипы, которые в net представлены готовыми view.
+# Они живут В СХЕМЕ net и включают строки extra_* — то есть отдают ровно
+# то же, что представления совместимости в public, ради которых их и
+# создавали. Подстановка имени семантику не меняет.
+COMPAT_VIEW = {
+    'nodes': 'net.v_nodes',
+    'linesobj': 'net.v_linesobj',
+    'heatsources': 'net.v_heatsources',
+    'realconsumers': 'net.v_realconsumers',
+    'generalizedconsumers': 'net.v_generalizedconsumers',
+    'connectnodes': 'net.v_connectnodes',
+}
+
+
+def tbl(conn, name):
+    """Имя таблицы для подстановки в запрос.
+
+    На переведённой БД возвращает объект из net, на старой — исходное
+    имя. Нужна там, где запрос слишком переплетён, чтобы переписывать
+    его целиком, но зависимость от public убрать надо.
+    """
+    if not is_net(conn):
+        return name
+    return COMPAT_VIEW.get(name.lower(), name)
+
+
 def node_query(tn, cols, s_fileID):
     """Замена запроса read_node2.
 
@@ -152,6 +178,47 @@ def pt_node_query(tn, cols, s_fileID):
         WHERE NOT r.removed
           AND r.fragment_id IN ({s_fileID})
     """
+
+
+def zn0_query(fileID):
+    """Замена запроса read_zn0 — источник для узлов с заданным напором.
+
+    Второй по стоимости оператор чтения: два соединения с представлением
+    nodes, одно из них внутри подзапроса. Оба переведены на реестр
+    net.node_reg.
+
+    Фильтр по removed НЕ добавлен намеренно: в исходном запросе его нет,
+    и добавить его — значит изменить результат, а не ускорить запрос.
+
+    LEFT JOIN fragments в подзапросе выбора последнего расчёта убран:
+    колонки fr в его выборке не участвуют.
+    """
+    return f"""
+select distinct
+ec.id, max(usP.ist)
+
+FROM net.node_press_setting zn
+
+JOIN net.node_reg n ON n.id = zn.node_id
+JOIN externalCodes ec ON ec.id = n.externalcodeid
+
+JOIN (
+    SELECT n0.id, ec0.name AS kod, n0.externalnodename AS name,
+           n0.fragment_id AS fileID
+    FROM net.node_reg n0
+    JOIN externalCodes ec0 ON ec0.id = n0.externalcodeid
+) n0 ON n0.kod = ec.name AND n0.name = n.externalnodename
+
+LEFT JOIN (
+    SELECT c.fileID, max(c.id) AS cid
+    FROM CALCULATION c
+    GROUP BY c.fileID
+) calc ON calc.fileID = n0.fileid
+JOIN US_OUT usP ON usP.nodeID = n0.id AND usP.externalSign = 1
+                AND usP.calculationid = cid
+WHERE n.fragment_id = {fileID}
+GROUP BY ec.id
+"""
 
 
 def zn_query(s_fileID):
