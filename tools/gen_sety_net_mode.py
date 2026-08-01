@@ -35,9 +35,17 @@ def is_net(conn):
     даёт неполный результат БЕЗ ошибки: расчёт отрабатывает, пишет
     меньше строк и сообщает «во фрагменте нет источников тепла».
 
-    Признак настоящего перевода — public.nodes стал представлением
-    (применён 040_switch_to_net.sql). Пока это базовая таблица, данные
-    живут в public, и читать надо оттуда.
+    Признак настоящего перевода — public.nodes НЕ является базовой
+    таблицей. Три состояния:
+
+      * базовая таблица  — данные живут в public, БД не переведена;
+      * представление    — переходная БД со слоем совместимости;
+      * нет вовсе        — продуктовая БД, слой совместимости снят.
+
+    Проверять «стало представлением» нельзя: как только слой
+    совместимости удаляют, признак исчезает, и движок откатывается на
+    старые запросы к таблицам, которых уже нет. Ровно это и случилось
+    при снятии compat.
     """
     global _is_net
     if _is_net is None:
@@ -45,11 +53,12 @@ def is_net(conn):
         cur.execute("SELECT count(*) FROM information_schema.tables "
                     "WHERE table_schema = 'net' AND table_name = 'node_reg'")
         has_net = cur.fetchone()[0] > 0
-        cur.execute("SELECT count(*) FROM information_schema.views "
-                    "WHERE table_schema = 'public' AND table_name = 'nodes'")
-        switched = cur.fetchone()[0] > 0
+        cur.execute("SELECT count(*) FROM information_schema.tables "
+                    "WHERE table_schema = 'public' AND table_name = 'nodes' "
+                    "AND table_type = 'BASE TABLE'")
+        legacy_table = cur.fetchone()[0] > 0
         cur.close()
-        _is_net = has_net and switched
+        _is_net = has_net and not legacy_table
     return _is_net
 
 
@@ -67,14 +76,11 @@ def fragment_table(conn):
 # Они живут В СХЕМЕ net и включают строки extra_* — то есть отдают ровно
 # то же, что представления совместимости в public, ради которых их и
 # создавали. Подстановка имени семантику не меняет.
-COMPAT_VIEW = {
-    'nodes': 'net.v_nodes',
-    'linesobj': 'net.v_linesobj',
-    'heatsources': 'net.v_heatsources',
-    'realconsumers': 'net.v_realconsumers',
-    'generalizedconsumers': 'net.v_generalizedconsumers',
-    'connectnodes': 'net.v_connectnodes',
-}
+COMPAT_VIEW = dict(
+    [('nodes', 'net.v_nodes'), ('linesobj', 'net.v_linesobj')]
+    + [(t, 'net.v_' + t) for t in sorted(NODE_CLASS)]
+    + [(t, 'net.v_' + t) for t in sorted(LINE_CLASS)]
+)
 
 
 def tbl(conn, name):
@@ -87,6 +93,20 @@ def tbl(conn, name):
     if not is_net(conn):
         return name
     return COMPAT_VIEW.get(name.lower(), name)
+
+
+def tbl_sql(conn, name):
+    """Имя таблицы для подстановки туда, где раньше стояло br_text(tn).
+
+    Для перенесённых типов возвращает объект net, для остальных —
+    исходное имя в кавычках и нижнем регистре, как делал br_text.
+    Нужна в read_db, где имя таблицы приходит параметром: замена по
+    образцу FROM/JOIN такие места не видит.
+    """
+    t = tbl(conn, name)
+    if t != name:
+        return t
+    return '"%s"' % name.lower()
 
 
 def tbl_cached(name):
