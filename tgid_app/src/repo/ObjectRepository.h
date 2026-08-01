@@ -54,6 +54,18 @@ struct UpdateResult final {
     QString error;
 };
 
+struct ObjectVersion final {
+    qint64 id = 0;
+    qint64 rowVersion = 0;
+};
+
+struct BatchUpdateResult final {
+    bool success = false;
+    bool conflict = false;
+    qsizetype updatedCount = 0;
+    QString error;
+};
+
 struct ObjectHistoryEntry final {
     qint64 rowVersion = 0;
     QString operation;
@@ -111,6 +123,18 @@ public:
         qint64 id,
         qint64 expectedVersion,
         const QList<AttributeChange>& changes) const;
+
+    [[nodiscard]] QList<ObjectVersion> loadVersions(
+        const QSqlDatabase& database,
+        const QString& classTable,
+        const QList<qint64>& ids,
+        QString* error) const;
+
+    [[nodiscard]] BatchUpdateResult batchUpdate(
+        QSqlDatabase database,
+        const QString& classTable,
+        const QList<ObjectVersion>& objects,
+        const AttributeChange& change) const;
 
     [[nodiscard]] UpdateResult setArchived(
         QSqlDatabase database,

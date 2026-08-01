@@ -49,6 +49,8 @@ private slots:
     void splitLineAt(QPointF position);
     void toggleLineJoin(bool enabled);
     void joinWithLine(qint64 secondId, QString classTable);
+    void showMultipleSelection(int count, QString classTable, bool isNode);
+    void batchEditSelectedObjects();
 
 private:
     void buildInterface();
@@ -80,6 +82,7 @@ private:
     QPushButton* createLineButton_ = nullptr;
     QPushButton* splitLineButton_ = nullptr;
     QPushButton* joinLinesButton_ = nullptr;
+    QPushButton* batchEditButton_ = nullptr;
     QTreeWidget* fragmentTree_ = nullptr;
     QTableWidget* layerTable_ = nullptr;
     QTableWidget* archiveTable_ = nullptr;

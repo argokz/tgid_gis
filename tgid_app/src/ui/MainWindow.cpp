@@ -5,6 +5,7 @@
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QCompleter>
 #include <QDate>
 #include <QDateEdit>
@@ -393,6 +394,15 @@ void MainWindow::buildInterface()
     connect(joinLinesButton_, &QPushButton::toggled,
             this, &MainWindow::toggleLineJoin);
     mapToolbar->addWidget(joinLinesButton_);
+    batchEditButton_ =
+        new QPushButton(QStringLiteral("Массово изменить"), mapPanel);
+    batchEditButton_->setEnabled(false);
+    batchEditButton_->setToolTip(
+        QStringLiteral(
+            "Выберите Ctrl+щелчком несколько объектов одного класса"));
+    connect(batchEditButton_, &QPushButton::clicked,
+            this, &MainWindow::batchEditSelectedObjects);
+    mapToolbar->addWidget(batchEditButton_);
     fitMapButton_ = new QPushButton(QStringLiteral("Показать целиком"), mapPanel);
     fitMapButton_->setEnabled(false);
     mapToolbar->addWidget(fitMapButton_);
@@ -404,6 +414,12 @@ void MainWindow::buildInterface()
             this, &MainWindow::showObjectDetails);
     connect(mapView_, &MapView::objectSelectionCleared,
             this, &MainWindow::clearObjectDetails);
+    connect(mapView_, &MapView::multipleObjectsSelected,
+            this, &MainWindow::showMultipleSelection);
+    connect(mapView_, &MapView::selectionLimitReached, this, [this]() {
+        statusBar()->showMessage(
+            QStringLiteral("За один раз можно выбрать не более 500 объектов"));
+    });
     connect(mapView_, &MapView::pointPlacementRequested,
             this, &MainWindow::createPointAt);
     connect(mapView_, &MapView::lineStartSelected,
@@ -739,6 +755,7 @@ void MainWindow::loadSelectedFragment()
     if (joinLinesButton_->isChecked()) {
         joinLinesButton_->setChecked(false);
     }
+    batchEditButton_->setEnabled(false);
     fragmentTree_->setEnabled(false);
     refreshButton_->setEnabled(false);
     fitMapButton_->setEnabled(false);
@@ -828,6 +845,8 @@ void MainWindow::togglePointCreation(bool enabled)
     }
 
     mapView_->setPointCreationMode(enabled);
+    batchEditButton_->setEnabled(
+        !enabled && mapView_->selectedObjects().size() >= 2);
     createPointButton_->setText(
         enabled ? QStringLiteral("Отмена")
                 : QStringLiteral("Создать точку"));
@@ -911,6 +930,8 @@ void MainWindow::toggleLineCreation(bool enabled)
     }
 
     mapView_->setLineCreationMode(enabled);
+    batchEditButton_->setEnabled(
+        !enabled && mapView_->selectedObjects().size() >= 2);
     createLineButton_->setText(
         enabled ? QStringLiteral("Отмена")
                 : QStringLiteral("Создать линию"));
@@ -1008,6 +1029,7 @@ void MainWindow::toggleLineSplit(bool enabled)
     }
 
     mapView_->setLineSplitMode(enabled);
+    batchEditButton_->setEnabled(false);
     splitLineButton_->setText(
         enabled ? QStringLiteral("Отмена разрезания")
                 : QStringLiteral("Разрезать линию"));
@@ -1120,6 +1142,7 @@ void MainWindow::toggleLineJoin(bool enabled)
         enabled,
         currentObjectDetails_.id,
         currentObjectDetails_.classTable);
+    batchEditButton_->setEnabled(false);
     joinLinesButton_->setText(
         enabled ? QStringLiteral("Отмена соединения")
                 : QStringLiteral("Соединить линии"));
@@ -1228,6 +1251,292 @@ void MainWindow::joinWithLine(qint64 secondId, QString classTable)
     loadSelectedFragment();
 }
 
+void MainWindow::showMultipleSelection(
+    int count, QString classTable, bool isNode)
+{
+    clearObjectDetails();
+    if (count < 2) {
+        return;
+    }
+    batchEditButton_->setEnabled(true);
+    objectTitleLabel_->setText(
+        QStringLiteral(
+            "<b>Выбрано объектов: %1</b><br>%2 · %3<br>"
+            "Ctrl+щелчок добавляет или исключает объект")
+            .arg(count)
+            .arg(classTable)
+            .arg(isNode ? QStringLiteral("точечный класс")
+                        : QStringLiteral("линейный класс")));
+    objectDock_->show();
+    objectDock_->raise();
+    statusBar()->showMessage(
+        QStringLiteral("Выбрано %1 объектов %2")
+            .arg(count)
+            .arg(classTable));
+}
+
+void MainWindow::batchEditSelectedObjects()
+{
+    const QList<SelectedMapObject> selected = mapView_->selectedObjects();
+    if (!connection_.isOpen() || selected.size() < 2) {
+        batchEditButton_->setEnabled(false);
+        return;
+    }
+    const QString classTable = selected.first().classTable;
+    const repo::ObjectDetails templateDetails = objectRepository_.load(
+        connection_.database(), classTable, selected.first().id);
+    if (!templateDetails.isValid() || templateDetails.archived) {
+        QMessageBox::critical(
+            this, QStringLiteral("Массовое изменение"),
+            templateDetails.isValid()
+                ? QStringLiteral("Выбран архивный объект")
+                : templateDetails.error);
+        return;
+    }
+
+    QList<repo::ObjectAttribute> editableAttributes;
+    for (const repo::ObjectAttribute& attribute
+         : templateDetails.attributes) {
+        if (attribute.editable) {
+            editableAttributes.append(attribute);
+        }
+    }
+    if (editableAttributes.isEmpty()) {
+        QMessageBox::information(
+            this, QStringLiteral("Массовое изменение"),
+            QStringLiteral("У этого класса нет редактируемых полей"));
+        return;
+    }
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(QStringLiteral("Массовое изменение"));
+    dialog.setMinimumWidth(470);
+    auto* layout = new QVBoxLayout(&dialog);
+    auto* explanation = new QLabel(
+        QStringLiteral(
+            "Класс: <b>%1</b><br>Объектов: <b>%2</b><br>"
+            "Одно значение будет записано во все выбранные строки.")
+            .arg(classTable)
+            .arg(selected.size()),
+        &dialog);
+    explanation->setWordWrap(true);
+    layout->addWidget(explanation);
+    layout->addWidget(new QLabel(QStringLiteral("Поле:"), &dialog));
+    auto* fieldCombo = new QComboBox(&dialog);
+    for (qsizetype index = 0; index < editableAttributes.size(); ++index) {
+        const repo::ObjectAttribute& attribute =
+            editableAttributes.at(index);
+        fieldCombo->addItem(
+            attribute.unit.isEmpty()
+                ? attribute.displayName
+                : QStringLiteral("%1, %2")
+                      .arg(attribute.displayName, attribute.unit),
+            index);
+    }
+    layout->addWidget(fieldCombo);
+    layout->addWidget(new QLabel(QStringLiteral("Новое значение:"), &dialog));
+    auto* valueEdit = new QLineEdit(&dialog);
+    auto* valueText = new QPlainTextEdit(&dialog);
+    valueText->setMaximumHeight(100);
+    auto* valueCombo = new QComboBox(&dialog);
+    valueCombo->setEditable(false);
+    layout->addWidget(valueEdit);
+    layout->addWidget(valueText);
+    layout->addWidget(valueCombo);
+    auto* nullCheck = new QCheckBox(
+        QStringLiteral("Установить NULL (очистить поле)"), &dialog);
+    layout->addWidget(nullCheck);
+    auto* fieldHint = new QLabel(&dialog);
+    fieldHint->setWordWrap(true);
+    layout->addWidget(fieldHint);
+
+    const auto updateEditor = [=, &editableAttributes](int comboIndex) {
+        if (comboIndex < 0) {
+            return;
+        }
+        const qsizetype attributeIndex =
+            fieldCombo->itemData(comboIndex).toLongLong();
+        const repo::ObjectAttribute& attribute =
+            editableAttributes.at(attributeIndex);
+        const bool choiceEditor =
+            attribute.editorKind == QStringLiteral("lookup")
+            || attribute.editorKind == QStringLiteral("boolean");
+        const bool multiline =
+            attribute.editorKind == QStringLiteral("multiline");
+        valueEdit->setVisible(!choiceEditor && !multiline);
+        valueText->setVisible(multiline);
+        valueCombo->setVisible(choiceEditor);
+        valueEdit->clear();
+        valueText->clear();
+        valueCombo->clear();
+        valueEdit->setValidator(nullptr);
+        if (attribute.editorKind == QStringLiteral("integer")
+            || attribute.editorKind == QStringLiteral("decimal")) {
+            const QString pattern =
+                attribute.editorKind == QStringLiteral("integer")
+                    ? QStringLiteral("^-?[0-9]*$")
+                    : QStringLiteral(
+                          "^-?[0-9]*([\\.,][0-9]*)?"
+                          "([eE][+-]?[0-9]*)?$");
+            valueEdit->setValidator(new QRegularExpressionValidator(
+                QRegularExpression(pattern), valueEdit));
+            valueEdit->setAlignment(Qt::AlignRight);
+        } else {
+            valueEdit->setAlignment(Qt::AlignLeft);
+        }
+        if (attribute.editorKind == QStringLiteral("boolean")) {
+            valueCombo->addItem(
+                QStringLiteral("Да"), QStringLiteral("да"));
+            valueCombo->addItem(
+                QStringLiteral("Нет"), QStringLiteral("нет"));
+        } else if (attribute.editorKind == QStringLiteral("lookup")) {
+            for (const repo::ObjectFieldOption& option : attribute.options) {
+                valueCombo->addItem(option.label, option.value);
+            }
+        }
+        fieldHint->setText(
+            QStringLiteral("Системное имя: %1 · тип: %2")
+                .arg(attribute.name, attribute.dataType));
+    };
+    connect(fieldCombo, &QComboBox::currentIndexChanged,
+            &dialog, updateEditor);
+    connect(nullCheck, &QCheckBox::toggled, &dialog,
+            [=](bool checked) {
+                valueEdit->setEnabled(!checked);
+                valueText->setEnabled(!checked);
+                valueCombo->setEnabled(!checked);
+            });
+    updateEditor(fieldCombo->currentIndex());
+
+    auto* buttons = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    connect(buttons, &QDialogButtonBox::accepted,
+            &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected,
+            &dialog, &QDialog::reject);
+    layout->addWidget(buttons);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    const qsizetype attributeIndex =
+        fieldCombo->currentData().toLongLong();
+    const repo::ObjectAttribute& attribute =
+        editableAttributes.at(attributeIndex);
+    repo::AttributeChange change;
+    change.name = attribute.name;
+    change.databaseType = attribute.databaseType;
+    change.setNull = nullCheck->isChecked();
+    QString displayValue = QStringLiteral("NULL");
+    if (!change.setNull) {
+        if (attribute.editorKind == QStringLiteral("lookup")
+            || attribute.editorKind == QStringLiteral("boolean")) {
+            if (valueCombo->currentIndex() < 0) {
+                QMessageBox::warning(
+                    this, QStringLiteral("Массовое изменение"),
+                    QStringLiteral("Выберите значение из списка"));
+                return;
+            }
+            change.value = valueCombo->currentData().toString();
+            displayValue = valueCombo->currentText();
+        } else if (attribute.editorKind == QStringLiteral("multiline")) {
+            change.value = valueText->toPlainText();
+            displayValue = change.value;
+        } else {
+            change.value = valueEdit->text();
+            if (attribute.editorKind == QStringLiteral("integer")
+                || attribute.editorKind == QStringLiteral("decimal")) {
+                change.value = change.value.trimmed();
+                change.value.replace(',', '.');
+                const QRegularExpression completeNumber(
+                    attribute.editorKind == QStringLiteral("integer")
+                        ? QStringLiteral("^-?[0-9]+$")
+                        : QStringLiteral(
+                              "^-?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)"
+                              "([eE][+-]?[0-9]+)?$"));
+                if (!completeNumber.match(change.value).hasMatch()) {
+                    QMessageBox::warning(
+                        this, QStringLiteral("Массовое изменение"),
+                        QStringLiteral("Введите корректное числовое значение"));
+                    return;
+                }
+            } else if (attribute.editorKind == QStringLiteral("date")
+                       && !QDate::fromString(
+                               change.value, Qt::ISODate).isValid()) {
+                QMessageBox::warning(
+                    this, QStringLiteral("Массовое изменение"),
+                    QStringLiteral("Введите дату в формате ГГГГ-ММ-ДД"));
+                return;
+            } else if (attribute.editorKind == QStringLiteral("datetime")
+                       && !QDateTime::fromString(
+                               change.value, Qt::ISODate).isValid()) {
+                QMessageBox::warning(
+                    this, QStringLiteral("Массовое изменение"),
+                    QStringLiteral(
+                        "Введите дату и время в формате ГГГГ-ММ-ДД ЧЧ:ММ:СС"));
+                return;
+            }
+            displayValue = change.value;
+        }
+    }
+
+    QList<qint64> ids;
+    ids.reserve(selected.size());
+    for (const SelectedMapObject& object : selected) {
+        ids.append(object.id);
+    }
+    QString versionError;
+    const QList<repo::ObjectVersion> versions =
+        objectRepository_.loadVersions(
+            connection_.database(), classTable, ids, &versionError);
+    if (!versionError.isEmpty()) {
+        QMessageBox::warning(
+            this, QStringLiteral("Массовое изменение"), versionError);
+        loadSelectedFragment();
+        return;
+    }
+    if (displayValue.size() > 120) {
+        displayValue = displayValue.left(117) + QStringLiteral("…");
+    }
+    if (QMessageBox::question(
+            this,
+            QStringLiteral("Подтверждение массового изменения"),
+            QStringLiteral(
+                "Изменить поле «%1» у %2 объектов?\n\nНовое значение: %3\n\n"
+                "При конфликте хотя бы одной версии не изменится ни одна строка.")
+                .arg(attribute.displayName)
+                .arg(selected.size())
+                .arg(displayValue))
+        != QMessageBox::Yes) {
+        return;
+    }
+
+    batchEditButton_->setEnabled(false);
+    const repo::BatchUpdateResult result = objectRepository_.batchUpdate(
+        connection_.database(), classTable, versions, change);
+    if (result.conflict) {
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Конфликт массового изменения"),
+            QStringLiteral(
+                "Один из объектов был изменён другим пользователем. "
+                "Вся операция отменена, карта будет перезагружена."));
+        loadSelectedFragment();
+        return;
+    }
+    if (!result.success) {
+        batchEditButton_->setEnabled(true);
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка массового изменения"), result.error);
+        return;
+    }
+    QMessageBox::information(
+        this,
+        QStringLiteral("Массовое изменение завершено"),
+        QStringLiteral("Обновлено объектов: %1").arg(result.updatedCount));
+    loadSelectedFragment();
+}
+
 void MainWindow::showObjectDetails(
     qint64 id,
     QString classTable,
@@ -1266,6 +1575,7 @@ void MainWindow::displayObjectDetails(
 {
     currentObjectDetails_ = details;
     currentObjectIsNode_ = isNode;
+    batchEditButton_->setEnabled(false);
 
     objectTitleLabel_->setStyleSheet({});
     objectTitleLabel_->setText(
@@ -1685,6 +1995,7 @@ void MainWindow::clearObjectDetails()
     splitLineButton_->setEnabled(false);
     joinLinesButton_->setChecked(false);
     joinLinesButton_->setEnabled(false);
+    batchEditButton_->setEnabled(false);
     currentObjectDetails_ = {};
     currentObjectIsNode_ = false;
 }

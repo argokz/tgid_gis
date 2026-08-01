@@ -92,6 +92,8 @@ void MapView::setMapData(repo::MapData mapData)
     selectedId_ = 0;
     selectedClassTable_.clear();
     selectedIsNode_ = false;
+    selectedObjects_.clear();
+    selectedObjectIds_.clear();
     rebuildGeometry();
     fitToData();
 }
@@ -105,6 +107,8 @@ void MapView::clearMap()
     selectedId_ = 0;
     selectedClassTable_.clear();
     selectedIsNode_ = false;
+    selectedObjects_.clear();
+    selectedObjectIds_.clear();
     pointCreationMode_ = false;
     lineCreationMode_ = false;
     lineSplitMode_ = false;
@@ -189,8 +193,14 @@ void MapView::setLineJoinMode(
 
 bool MapView::hasSelectedLine(qint64 id, const QString& classTable) const
 {
-    return selectedId_ == id && selectedClassTable_ == classTable
+    return selectedObjects_.size() == 1
+           && selectedId_ == id && selectedClassTable_ == classTable
            && !selectedIsNode_;
+}
+
+QList<SelectedMapObject> MapView::selectedObjects() const
+{
+    return selectedObjects_;
 }
 
 void MapView::fitToData()
@@ -241,27 +251,23 @@ void MapView::paintEvent(QPaintEvent*)
         painter.drawPath(it.value());
     }
 
-    if (selectedId_ != 0 && !selectedIsNode_) {
-        for (const repo::MapLine& line : data_.lines) {
-            if (line.id != selectedId_
-                || line.classTable != selectedClassTable_
-                || line.points.isEmpty()) {
-                continue;
-            }
-            QPainterPath selectedPath(line.points.first());
-            for (qsizetype pointIndex = 1;
-                 pointIndex < line.points.size();
-                 ++pointIndex) {
-                selectedPath.lineTo(line.points.at(pointIndex));
-            }
-            QPen selectionPen(QColor(QStringLiteral("#facc15")), 4.0);
-            selectionPen.setCosmetic(true);
-            selectionPen.setCapStyle(Qt::RoundCap);
-            selectionPen.setJoinStyle(Qt::RoundJoin);
-            painter.setPen(selectionPen);
-            painter.drawPath(selectedPath);
-            break;
+    for (const repo::MapLine& line : data_.lines) {
+        if (line.points.isEmpty()
+            || !isObjectSelected(line.id, line.classTable, false)) {
+            continue;
         }
+        QPainterPath selectedPath(line.points.first());
+        for (qsizetype pointIndex = 1;
+             pointIndex < line.points.size();
+             ++pointIndex) {
+            selectedPath.lineTo(line.points.at(pointIndex));
+        }
+        QPen selectionPen(QColor(QStringLiteral("#facc15")), 4.0);
+        selectionPen.setCosmetic(true);
+        selectionPen.setCapStyle(Qt::RoundCap);
+        selectionPen.setJoinStyle(Qt::RoundJoin);
+        painter.setPen(selectionPen);
+        painter.drawPath(selectedPath);
     }
 
     painter.resetTransform();
@@ -272,18 +278,14 @@ void MapView::paintEvent(QPaintEvent*)
         painter.drawEllipse(screenPoint, 3.2, 3.2);
     }
 
-    if (selectedId_ != 0 && selectedIsNode_) {
-        for (const repo::MapNode& node : data_.nodes) {
-            if (node.id != selectedId_
-                || node.classTable != selectedClassTable_) {
-                continue;
-            }
-            const QPointF screenPoint = worldToScreen(node.position);
-            painter.setBrush(Qt::NoBrush);
-            painter.setPen(QPen(QColor(QStringLiteral("#facc15")), 3.0));
-            painter.drawEllipse(screenPoint, 7.0, 7.0);
-            break;
+    for (const repo::MapNode& node : data_.nodes) {
+        if (!isObjectSelected(node.id, node.classTable, true)) {
+            continue;
         }
+        const QPointF screenPoint = worldToScreen(node.position);
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(QPen(QColor(QStringLiteral("#facc15")), 3.0));
+        painter.drawEllipse(screenPoint, 7.0, 7.0);
     }
 
     if (lineCreationMode_ && lineStartNodeId_ != 0) {
@@ -409,7 +411,7 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
         dragging_ = false;
         setCursor(Qt::OpenHandCursor);
         if (!wasDragging) {
-            selectObjectAt(event->position());
+            selectObjectAt(event->position(), event->modifiers());
         }
         event->accept();
         return;
@@ -583,7 +585,9 @@ void MapView::rebuildGeometry()
     }
 }
 
-void MapView::selectObjectAt(const QPointF& screenPosition)
+void MapView::selectObjectAt(
+    const QPointF& screenPosition,
+    Qt::KeyboardModifiers modifiers)
 {
     constexpr double nodeToleranceSquared = 9.0 * 9.0;
     constexpr double lineToleranceSquared = 7.0 * 7.0;
@@ -601,12 +605,11 @@ void MapView::selectObjectAt(const QPointF& screenPosition)
     }
 
     if (nearestNode != nullptr) {
-        selectedId_ = nearestNode->id;
-        selectedClassTable_ = nearestNode->classTable;
-        selectedIsNode_ = true;
-        update();
-        emit objectSelected(
-            selectedId_, selectedClassTable_, selectedIsNode_);
+        updateObjectSelection(
+            nearestNode->id,
+            nearestNode->classTable,
+            true,
+            modifiers.testFlag(Qt::ControlModifier));
         return;
     }
 
@@ -628,20 +631,92 @@ void MapView::selectObjectAt(const QPointF& screenPosition)
     }
 
     if (nearestLine != nullptr) {
-        selectedId_ = nearestLine->id;
-        selectedClassTable_ = nearestLine->classTable;
-        selectedIsNode_ = false;
-        update();
-        emit objectSelected(
-            selectedId_, selectedClassTable_, selectedIsNode_);
+        updateObjectSelection(
+            nearestLine->id,
+            nearestLine->classTable,
+            false,
+            modifiers.testFlag(Qt::ControlModifier));
         return;
     }
 
+    if (modifiers.testFlag(Qt::ControlModifier)) {
+        return;
+    }
+
+    selectedObjects_.clear();
+    selectedObjectIds_.clear();
     selectedId_ = 0;
     selectedClassTable_.clear();
     selectedIsNode_ = false;
     update();
     emit objectSelectionCleared();
+}
+
+void MapView::updateObjectSelection(
+    qint64 id,
+    const QString& classTable,
+    bool isNode,
+    bool extend)
+{
+    if (!extend || (!selectedObjects_.isEmpty()
+                    && (selectedObjects_.first().classTable != classTable
+                        || selectedObjects_.first().isNode != isNode))) {
+        selectedObjects_.clear();
+        selectedObjectIds_.clear();
+    }
+
+    const bool alreadySelected = selectedObjectIds_.contains(id);
+    if (extend && !alreadySelected && selectedObjects_.size() >= 500) {
+        emit selectionLimitReached();
+        return;
+    }
+    qsizetype existingIndex = -1;
+    if (alreadySelected) {
+        for (qsizetype index = 0; index < selectedObjects_.size(); ++index) {
+            if (selectedObjects_.at(index).id == id) {
+                existingIndex = index;
+                break;
+            }
+        }
+    }
+    if (extend && existingIndex >= 0) {
+        selectedObjects_.removeAt(existingIndex);
+        selectedObjectIds_.remove(id);
+    } else {
+        selectedObjects_.append({id, classTable, isNode});
+        selectedObjectIds_.insert(id);
+    }
+
+    if (selectedObjects_.size() == 1) {
+        const SelectedMapObject& selected = selectedObjects_.first();
+        selectedId_ = selected.id;
+        selectedClassTable_ = selected.classTable;
+        selectedIsNode_ = selected.isNode;
+        emit objectSelected(
+            selectedId_, selectedClassTable_, selectedIsNode_);
+    } else {
+        selectedId_ = 0;
+        selectedClassTable_.clear();
+        selectedIsNode_ = false;
+        if (selectedObjects_.isEmpty()) {
+            emit objectSelectionCleared();
+        } else {
+            emit multipleObjectsSelected(
+                static_cast<int>(selectedObjects_.size()),
+                selectedObjects_.first().classTable,
+                selectedObjects_.first().isNode);
+        }
+    }
+    update();
+}
+
+bool MapView::isObjectSelected(
+    qint64 id, const QString& classTable, bool isNode) const
+{
+    return !selectedObjects_.isEmpty()
+           && selectedObjects_.first().classTable == classTable
+           && selectedObjects_.first().isNode == isNode
+           && selectedObjectIds_.contains(id);
 }
 
 }  // namespace tgid::ui

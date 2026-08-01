@@ -97,6 +97,16 @@ int main(int argc, char* argv[])
         QStringLiteral(
             "table:first_id:first_version:second_id:second_version"));
     parser.addOption(joinLinesOption);
+    const QCommandLineOption batchSetOption(
+        QStringLiteral("batch-set"),
+        QStringLiteral("Изменить одно поле нескольких объектов: table:field:value"),
+        QStringLiteral("table:field:value"));
+    parser.addOption(batchSetOption);
+    const QCommandLineOption batchObjectsOption(
+        QStringLiteral("batch-objects"),
+        QStringLiteral("ID и версии объектов: id:version,id:version"),
+        QStringLiteral("id:version,..."));
+    parser.addOption(batchObjectsOption);
     parser.process(application);
 
     if (parser.isSet(checkDatabaseOption)
@@ -110,7 +120,8 @@ int main(int argc, char* argv[])
         || parser.isSet(createPointOption)
         || parser.isSet(createLineOption)
         || parser.isSet(splitLineOption)
-        || parser.isSet(joinLinesOption)) {
+        || parser.isSet(joinLinesOption)
+        || parser.isSet(batchSetOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -540,6 +551,94 @@ int main(int argc, char* argv[])
                 << QStringLiteral("OK: линия=%1 архивный_узел=%2")
                        .arg(joinResult.joinedLineId)
                        .arg(joinResult.archivedNodeId);
+        }
+
+        if (parser.isSet(batchSetOption)) {
+            const QString reference = parser.value(batchSetOption);
+            const qsizetype first = reference.indexOf(':');
+            const qsizetype second = reference.indexOf(':', first + 1);
+            const QString classTable = reference.left(first);
+            const QString fieldName =
+                reference.mid(first + 1, second - first - 1);
+            const QString value = reference.mid(second + 1);
+            if (first <= 0 || second <= first + 1
+                || classTable.isEmpty() || fieldName.isEmpty()
+                || !parser.isSet(batchObjectsOption)) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ожидаются --batch-set table:field:value "
+                           "--batch-objects id:version,id:version");
+                return 25;
+            }
+
+            QList<tgid::repo::ObjectVersion> objects;
+            const QStringList objectReferences =
+                parser.value(batchObjectsOption).split(
+                    ',', Qt::SkipEmptyParts);
+            for (const QString& objectReference : objectReferences) {
+                const qsizetype separator = objectReference.indexOf(':');
+                bool idValid = false;
+                bool versionValid = false;
+                const qint64 id = objectReference.left(separator)
+                                      .toLongLong(&idValid);
+                const qint64 version = objectReference.mid(separator + 1)
+                                           .toLongLong(&versionValid);
+                if (separator <= 0 || !idValid || !versionValid
+                    || id <= 0 || version <= 0) {
+                    return 25;
+                }
+                objects.append({id, version});
+            }
+            if (objects.size() < 2) {
+                return 25;
+            }
+
+            const tgid::repo::ObjectDetails details =
+                tgid::repo::ObjectRepository().load(
+                    connection.database(), classTable, objects.first().id);
+            if (!details.isValid()) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка карточки объекта:")
+                    << details.error;
+                return 27;
+            }
+            tgid::repo::AttributeChange change;
+            bool editableFieldFound = false;
+            for (const tgid::repo::ObjectAttribute& attribute
+                 : details.attributes) {
+                if (attribute.name == fieldName && attribute.editable) {
+                    change.name = attribute.name;
+                    change.databaseType = attribute.databaseType;
+                    change.value = value;
+                    change.setNull = value == QStringLiteral("NULL");
+                    editableFieldFound = true;
+                    break;
+                }
+            }
+            if (!editableFieldFound) {
+                qCritical().noquote()
+                    << QStringLiteral("Поле нельзя редактировать:")
+                    << fieldName;
+                return 25;
+            }
+
+            const tgid::repo::BatchUpdateResult batchResult =
+                tgid::repo::ObjectRepository().batchUpdate(
+                    connection.database(), classTable, objects, change);
+            if (batchResult.conflict) {
+                qCritical().noquote()
+                    << QStringLiteral("CONFLICT:") << batchResult.error;
+                return 26;
+            }
+            if (!batchResult.success) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка массового изменения:")
+                    << batchResult.error;
+                return 27;
+            }
+            qInfo().noquote()
+                << QStringLiteral("OK: массово обновлено=%1")
+                       .arg(batchResult.updatedCount);
         }
         return 0;
     }

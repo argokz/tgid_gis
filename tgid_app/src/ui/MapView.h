@@ -5,6 +5,7 @@
 #include <QHash>
 #include <QPainterPath>
 #include <QPoint>
+#include <QSet>
 #include <QWidget>
 
 class QMouseEvent;
@@ -13,6 +14,12 @@ class QResizeEvent;
 class QWheelEvent;
 
 namespace tgid::ui {
+
+struct SelectedMapObject final {
+    qint64 id = 0;
+    QString classTable;
+    bool isNode = false;
+};
 
 class MapView final : public QWidget {
     Q_OBJECT
@@ -30,6 +37,7 @@ public:
         const QString& firstClassTable = {});
     [[nodiscard]] bool hasSelectedLine(
         qint64 id, const QString& classTable) const;
+    [[nodiscard]] QList<SelectedMapObject> selectedObjects() const;
 
 public slots:
     void fitToData();
@@ -37,6 +45,8 @@ public slots:
 signals:
     void objectSelected(qint64 id, QString classTable, bool isNode);
     void objectSelectionCleared();
+    void multipleObjectsSelected(int count, QString classTable, bool isNode);
+    void selectionLimitReached();
     void pointPlacementRequested(QPointF position);
     void lineStartSelected(qint64 id);
     void linePlacementRequested(qint64 nodeFrom, qint64 nodeTo);
@@ -57,9 +67,15 @@ private:
     [[nodiscard]] QPointF worldToScreen(const QPointF& point) const;
     [[nodiscard]] QPointF screenToWorld(const QPointF& point) const;
     void rebuildGeometry();
-    void selectObjectAt(const QPointF& screenPosition);
+    void selectObjectAt(
+        const QPointF& screenPosition,
+        Qt::KeyboardModifiers modifiers);
     void selectLineEndpointAt(const QPointF& screenPosition);
     void selectJoinLineAt(const QPointF& screenPosition);
+    void updateObjectSelection(
+        qint64 id, const QString& classTable, bool isNode, bool extend);
+    [[nodiscard]] bool isObjectSelected(
+        qint64 id, const QString& classTable, bool isNode) const;
 
     repo::MapData data_;
     QHash<QString, QPainterPath> linePaths_;
@@ -74,6 +90,8 @@ private:
     qint64 selectedId_ = 0;
     QString selectedClassTable_;
     bool selectedIsNode_ = false;
+    QList<SelectedMapObject> selectedObjects_;
+    QSet<qint64> selectedObjectIds_;
     bool pointCreationMode_ = false;
     bool lineCreationMode_ = false;
     bool lineSplitMode_ = false;
