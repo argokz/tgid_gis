@@ -108,7 +108,10 @@ void MapView::clearMap()
     pointCreationMode_ = false;
     lineCreationMode_ = false;
     lineSplitMode_ = false;
+    lineJoinMode_ = false;
     lineStartNodeId_ = 0;
+    joinFirstLineId_ = 0;
+    joinFirstClassTable_.clear();
     setCursor(Qt::OpenHandCursor);
     update();
 }
@@ -119,6 +122,7 @@ void MapView::setPointCreationMode(bool enabled)
     if (pointCreationMode_) {
         lineCreationMode_ = false;
         lineSplitMode_ = false;
+        lineJoinMode_ = false;
         lineStartNodeId_ = 0;
     }
     panning_ = false;
@@ -133,6 +137,7 @@ void MapView::setLineCreationMode(bool enabled)
     if (lineCreationMode_) {
         pointCreationMode_ = false;
         lineSplitMode_ = false;
+        lineJoinMode_ = false;
     }
     lineStartNodeId_ = 0;
     panning_ = false;
@@ -148,11 +153,37 @@ void MapView::setLineSplitMode(bool enabled)
     if (lineSplitMode_) {
         pointCreationMode_ = false;
         lineCreationMode_ = false;
+        lineJoinMode_ = false;
         lineStartNodeId_ = 0;
     }
     panning_ = false;
     dragging_ = false;
     setCursor(lineSplitMode_ ? Qt::CrossCursor : Qt::OpenHandCursor);
+    update();
+}
+
+void MapView::setLineJoinMode(
+    bool enabled, qint64 firstId,
+    const QString& firstClassTable)
+{
+    lineJoinMode_ = enabled && hasGeometry_
+                    && selectedId_ == firstId && firstId != 0
+                    && !selectedIsNode_
+                    && selectedClassTable_ == firstClassTable;
+    if (lineJoinMode_) {
+        pointCreationMode_ = false;
+        lineCreationMode_ = false;
+        lineSplitMode_ = false;
+        lineStartNodeId_ = 0;
+        joinFirstLineId_ = firstId;
+        joinFirstClassTable_ = firstClassTable;
+    } else {
+        joinFirstLineId_ = 0;
+        joinFirstClassTable_.clear();
+    }
+    panning_ = false;
+    dragging_ = false;
+    setCursor(lineJoinMode_ ? Qt::CrossCursor : Qt::OpenHandCursor);
     update();
 }
 
@@ -299,13 +330,21 @@ void MapView::paintEvent(QPaintEvent*)
             Qt::AlignLeft | Qt::AlignVCenter,
             QStringLiteral(
                 "РАЗРЕЗАНИЕ: укажите точку на выбранной линии"));
+    } else if (lineJoinMode_) {
+        painter.setPen(QColor(QStringLiteral("#b42318")));
+        painter.drawText(
+            QRect(12, 36, width() - 24, 24),
+            Qt::AlignLeft | Qt::AlignVCenter,
+            QStringLiteral(
+                "СОЕДИНЕНИЕ: выберите второй участок"));
     }
 }
 
 void MapView::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton
-        && (pointCreationMode_ || lineCreationMode_ || lineSplitMode_)) {
+        && (pointCreationMode_ || lineCreationMode_ || lineSplitMode_
+            || lineJoinMode_)) {
         event->accept();
         return;
     }
@@ -359,6 +398,11 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
         event->accept();
         return;
     }
+    if (event->button() == Qt::LeftButton && lineJoinMode_) {
+        selectJoinLineAt(event->position());
+        event->accept();
+        return;
+    }
     if (event->button() == Qt::LeftButton && panning_) {
         const bool wasDragging = dragging_;
         panning_ = false;
@@ -375,7 +419,8 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
 
 void MapView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    if (pointCreationMode_ || lineCreationMode_ || lineSplitMode_) {
+    if (pointCreationMode_ || lineCreationMode_ || lineSplitMode_
+        || lineJoinMode_) {
         event->accept();
         return;
     }
@@ -422,6 +467,36 @@ void MapView::selectLineEndpointAt(const QPointF& screenPosition)
     lineStartNodeId_ = 0;
     update();
     emit linePlacementRequested(nodeFrom, nodeTo);
+}
+
+void MapView::selectJoinLineAt(const QPointF& screenPosition)
+{
+    constexpr double lineToleranceSquared = 7.0 * 7.0;
+    const repo::MapLine* nearestLine = nullptr;
+    double nearestDistance = lineToleranceSquared;
+    for (const repo::MapLine& line : data_.lines) {
+        if ((line.id == joinFirstLineId_
+             && line.classTable == joinFirstClassTable_)
+            || line.points.size() < 2) {
+            continue;
+        }
+        for (qsizetype pointIndex = 1;
+             pointIndex < line.points.size(); ++pointIndex) {
+            const double distance = squaredDistanceToSegment(
+                screenPosition,
+                worldToScreen(line.points.at(pointIndex - 1)),
+                worldToScreen(line.points.at(pointIndex)));
+            if (distance <= nearestDistance) {
+                nearestDistance = distance;
+                nearestLine = &line;
+            }
+        }
+    }
+    if (nearestLine == nullptr) {
+        emit lineJoinMissed();
+        return;
+    }
+    emit lineJoinRequested(nearestLine->id, nearestLine->classTable);
 }
 
 void MapView::wheelEvent(QWheelEvent* event)

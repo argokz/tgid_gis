@@ -89,6 +89,14 @@ int main(int argc, char* argv[])
             "Разрезать линию: table:id:x:y"),
         QStringLiteral("table:id:x:y"));
     parser.addOption(splitLineOption);
+    const QCommandLineOption joinLinesOption(
+        QStringLiteral("join-lines"),
+        QStringLiteral(
+            "Соединить участки: table:first_id:first_version:"
+            "second_id:second_version"),
+        QStringLiteral(
+            "table:first_id:first_version:second_id:second_version"));
+    parser.addOption(joinLinesOption);
     parser.process(application);
 
     if (parser.isSet(checkDatabaseOption)
@@ -101,7 +109,8 @@ int main(int argc, char* argv[])
         || parser.isSet(checkArchiveOption)
         || parser.isSet(createPointOption)
         || parser.isSet(createLineOption)
-        || parser.isSet(splitLineOption)) {
+        || parser.isSet(splitLineOption)
+        || parser.isSet(joinLinesOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -484,6 +493,53 @@ int main(int argc, char* argv[])
                        .arg(splitResult.firstLineId)
                        .arg(splitResult.secondLineId)
                        .arg(splitResult.splitFraction, 0, 'f', 6);
+        }
+
+        if (parser.isSet(joinLinesOption)) {
+            const QStringList parts =
+                parser.value(joinLinesOption).split(':');
+            bool firstIdValid = false;
+            bool firstVersionValid = false;
+            bool secondIdValid = false;
+            bool secondVersionValid = false;
+            if (parts.size() != 5 || parts.at(0).isEmpty()) {
+                return 22;
+            }
+            const qint64 firstId =
+                parts.at(1).toLongLong(&firstIdValid);
+            const qint64 firstVersion =
+                parts.at(2).toLongLong(&firstVersionValid);
+            const qint64 secondId =
+                parts.at(3).toLongLong(&secondIdValid);
+            const qint64 secondVersion =
+                parts.at(4).toLongLong(&secondVersionValid);
+            if (!firstIdValid || !firstVersionValid
+                || !secondIdValid || !secondVersionValid) {
+                return 22;
+            }
+            const tgid::repo::JoinLinesResult joinResult =
+                tgid::repo::ObjectRepository().joinLines(
+                    connection.database(),
+                    parts.at(0),
+                    firstId,
+                    firstVersion,
+                    secondId,
+                    secondVersion);
+            if (joinResult.conflict) {
+                qCritical().noquote()
+                    << QStringLiteral("CONFLICT:") << joinResult.error;
+                return 23;
+            }
+            if (!joinResult.success) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка соединения:")
+                    << joinResult.error;
+                return 24;
+            }
+            qInfo().noquote()
+                << QStringLiteral("OK: линия=%1 архивный_узел=%2")
+                       .arg(joinResult.joinedLineId)
+                       .arg(joinResult.archivedNodeId);
         }
         return 0;
     }

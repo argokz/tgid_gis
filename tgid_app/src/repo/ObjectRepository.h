@@ -33,6 +33,7 @@ struct ObjectDetails final {
     bool archived = false;
     bool canArchive = false;
     bool canSplit = false;
+    bool canJoin = false;
     QList<ObjectAttribute> attributes;
     QString error;
 
@@ -89,6 +90,14 @@ struct SplitLineResult final {
     QString error;
 };
 
+struct JoinLinesResult final {
+    bool success = false;
+    bool conflict = false;
+    qint64 joinedLineId = 0;
+    qint64 archivedNodeId = 0;
+    QString error;
+};
+
 class ObjectRepository final {
 public:
     [[nodiscard]] ObjectDetails load(
@@ -139,6 +148,14 @@ public:
         qint64 id,
         qint64 expectedVersion,
         const QPointF& position) const;
+
+    [[nodiscard]] JoinLinesResult joinLines(
+        QSqlDatabase database,
+        const QString& classTable,
+        qint64 firstId,
+        qint64 firstExpectedVersion,
+        qint64 secondId,
+        qint64 secondExpectedVersion) const;
 };
 
 }  // namespace tgid::repo

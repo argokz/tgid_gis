@@ -386,6 +386,13 @@ void MainWindow::buildInterface()
     connect(splitLineButton_, &QPushButton::toggled,
             this, &MainWindow::toggleLineSplit);
     mapToolbar->addWidget(splitLineButton_);
+    joinLinesButton_ =
+        new QPushButton(QStringLiteral("Соединить линии"), mapPanel);
+    joinLinesButton_->setCheckable(true);
+    joinLinesButton_->setEnabled(false);
+    connect(joinLinesButton_, &QPushButton::toggled,
+            this, &MainWindow::toggleLineJoin);
+    mapToolbar->addWidget(joinLinesButton_);
     fitMapButton_ = new QPushButton(QStringLiteral("Показать целиком"), mapPanel);
     fitMapButton_->setEnabled(false);
     mapToolbar->addWidget(fitMapButton_);
@@ -410,6 +417,13 @@ void MainWindow::buildInterface()
     });
     connect(mapView_, &MapView::lineSplitRequested,
             this, &MainWindow::splitLineAt);
+    connect(mapView_, &MapView::lineJoinRequested,
+            this, &MainWindow::joinWithLine);
+    connect(mapView_, &MapView::lineJoinMissed, this, [this]() {
+        statusBar()->showMessage(
+            QStringLiteral(
+                "Щелчок должен попадать по второму линейному участку"));
+    });
     mapLayout->addWidget(mapView_, 1);
     splitter->addWidget(mapPanel);
     splitter->setStretchFactor(0, 0);
@@ -604,6 +618,8 @@ void MainWindow::showError(const QString& message)
     createLineButton_->setEnabled(false);
     splitLineButton_->setChecked(false);
     splitLineButton_->setEnabled(false);
+    joinLinesButton_->setChecked(false);
+    joinLinesButton_->setEnabled(false);
     lineClassCombo_->clear();
     lineClassCombo_->setEnabled(false);
     statusLabel_->setStyleSheet(QStringLiteral("color: #b42318;"));
@@ -720,6 +736,9 @@ void MainWindow::loadSelectedFragment()
     if (splitLineButton_->isChecked()) {
         splitLineButton_->setChecked(false);
     }
+    if (joinLinesButton_->isChecked()) {
+        joinLinesButton_->setChecked(false);
+    }
     fragmentTree_->setEnabled(false);
     refreshButton_->setEnabled(false);
     fitMapButton_->setEnabled(false);
@@ -795,6 +814,9 @@ void MainWindow::togglePointCreation(bool enabled)
         }
         if (splitLineButton_->isChecked()) {
             splitLineButton_->setChecked(false);
+        }
+        if (joinLinesButton_->isChecked()) {
+            joinLinesButton_->setChecked(false);
         }
         QTreeWidgetItem* item = fragmentTree_->currentItem();
         if (item == nullptr
@@ -875,6 +897,9 @@ void MainWindow::toggleLineCreation(bool enabled)
         }
         if (splitLineButton_->isChecked()) {
             splitLineButton_->setChecked(false);
+        }
+        if (joinLinesButton_->isChecked()) {
+            joinLinesButton_->setChecked(false);
         }
         QTreeWidgetItem* item = fragmentTree_->currentItem();
         if (item == nullptr
@@ -977,6 +1002,9 @@ void MainWindow::toggleLineSplit(bool enabled)
         if (createLineButton_->isChecked()) {
             createLineButton_->setChecked(false);
         }
+        if (joinLinesButton_->isChecked()) {
+            joinLinesButton_->setChecked(false);
+        }
     }
 
     mapView_->setLineSplitMode(enabled);
@@ -1065,6 +1093,141 @@ void MainWindow::splitLineAt(QPointF position)
     loadSelectedFragment();
 }
 
+void MainWindow::toggleLineJoin(bool enabled)
+{
+    if (enabled) {
+        if (currentObjectDetails_.classTable.isEmpty()
+            || currentObjectIsNode_ || currentObjectDetails_.archived
+            || !currentObjectDetails_.canJoin
+            || !mapView_->hasSelectedLine(
+                currentObjectDetails_.id,
+                currentObjectDetails_.classTable)) {
+            joinLinesButton_->setChecked(false);
+            return;
+        }
+        if (createPointButton_->isChecked()) {
+            createPointButton_->setChecked(false);
+        }
+        if (createLineButton_->isChecked()) {
+            createLineButton_->setChecked(false);
+        }
+        if (splitLineButton_->isChecked()) {
+            splitLineButton_->setChecked(false);
+        }
+    }
+
+    mapView_->setLineJoinMode(
+        enabled,
+        currentObjectDetails_.id,
+        currentObjectDetails_.classTable);
+    joinLinesButton_->setText(
+        enabled ? QStringLiteral("Отмена соединения")
+                : QStringLiteral("Соединить линии"));
+    pointClassCombo_->setEnabled(
+        !enabled && !createPointButton_->isChecked()
+        && pointClassCombo_->count() > 0);
+    lineClassCombo_->setEnabled(
+        !enabled && !createLineButton_->isChecked()
+        && lineClassCombo_->count() > 0);
+    fragmentTree_->setEnabled(!enabled && !mapWatcher_->isRunning());
+    statusBar()->showMessage(
+        enabled
+            ? QStringLiteral("Выберите второй участок на карте")
+            : QStringLiteral("Режим соединения выключен"));
+}
+
+void MainWindow::joinWithLine(qint64 secondId, QString classTable)
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()
+        || currentObjectIsNode_ || currentObjectDetails_.archived) {
+        return;
+    }
+    if (classTable != currentObjectDetails_.classTable) {
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Соединение линий"),
+            QStringLiteral(
+                "Участки должны принадлежать одному классу. "
+                "Выбран %1, ожидается %2.")
+                .arg(classTable, currentObjectDetails_.classTable));
+        return;
+    }
+
+    const repo::ObjectDetails secondDetails =
+        objectRepository_.load(
+            connection_.database(), classTable, secondId);
+    if (!secondDetails.isValid() || secondDetails.archived
+        || !secondDetails.canJoin) {
+        QMessageBox::critical(
+            this,
+            QStringLiteral("Ошибка соединения"),
+            secondDetails.isValid()
+                ? QStringLiteral("Выбранный участок нельзя соединить")
+                : secondDetails.error);
+        return;
+    }
+    if (QMessageBox::question(
+            this,
+            QStringLiteral("Соединение линий"),
+            QStringLiteral(
+                "Соединить %1 #%2 и #%3 через их общий узел?\n\n"
+                "Оба исходных участка и общий соединительный узел "
+                "будут помещены в архив. Будет создан один новый "
+                "участок. Операция разрешена только при одинаковых "
+                "атрибутах и отсутствии других линий в общем узле.")
+                .arg(classTable)
+                .arg(currentObjectDetails_.id)
+                .arg(secondId))
+        != QMessageBox::Yes) {
+        statusBar()->showMessage(
+            QStringLiteral("Выберите другой второй участок"));
+        return;
+    }
+
+    joinLinesButton_->setChecked(false);
+    joinLinesButton_->setEnabled(false);
+    const qint64 firstId = currentObjectDetails_.id;
+    const qint64 firstVersion = currentObjectDetails_.rowVersion;
+    const repo::JoinLinesResult result = objectRepository_.joinLines(
+        connection_.database(),
+        classTable,
+        firstId,
+        firstVersion,
+        secondId,
+        secondDetails.rowVersion);
+    if (result.conflict) {
+        reloadObjectDetails();
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Конфликт редактирования"),
+            QStringLiteral(
+                "Один из участков уже изменён другим пользователем. "
+                "Карточка перезагружена."));
+        return;
+    }
+    if (!result.success) {
+        joinLinesButton_->setEnabled(
+            currentObjectDetails_.canJoin
+            && mapView_->hasSelectedLine(firstId, classTable));
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка соединения"), result.error);
+        return;
+    }
+
+    QMessageBox::information(
+        this,
+        QStringLiteral("Линии соединены"),
+        QStringLiteral(
+            "Создан участок #%1. Общий узел #%2 помещён в архив.")
+            .arg(result.joinedLineId)
+            .arg(result.archivedNodeId));
+    pendingObjectId_ = result.joinedLineId;
+    pendingObjectClassTable_ = classTable;
+    pendingObjectIsNode_ = false;
+    loadSelectedFragment();
+}
+
 void MainWindow::showObjectDetails(
     qint64 id,
     QString classTable,
@@ -1088,6 +1251,8 @@ void MainWindow::showObjectDetails(
         historyObjectButton_->setEnabled(false);
         splitLineButton_->setChecked(false);
         splitLineButton_->setEnabled(false);
+        joinLinesButton_->setChecked(false);
+        joinLinesButton_->setEnabled(false);
         currentObjectDetails_ = {};
         return;
     }
@@ -1211,6 +1376,9 @@ void MainWindow::displayObjectDetails(
     historyObjectButton_->setEnabled(true);
     splitLineButton_->setEnabled(
         !isNode && !details.archived && details.canSplit
+        && mapView_->hasSelectedLine(details.id, details.classTable));
+    joinLinesButton_->setEnabled(
+        !isNode && !details.archived && details.canJoin
         && mapView_->hasSelectedLine(details.id, details.classTable));
     objectDock_->show();
     objectDock_->raise();
@@ -1515,6 +1683,8 @@ void MainWindow::clearObjectDetails()
     historyObjectButton_->setEnabled(false);
     splitLineButton_->setChecked(false);
     splitLineButton_->setEnabled(false);
+    joinLinesButton_->setChecked(false);
+    joinLinesButton_->setEnabled(false);
     currentObjectDetails_ = {};
     currentObjectIsNode_ = false;
 }

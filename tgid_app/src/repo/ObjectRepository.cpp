@@ -195,7 +195,7 @@ ObjectDetails ObjectRepository::load(
 
     QSqlQuery capabilityQuery(database);
     capabilityQuery.prepare(QStringLiteral(
-        "SELECT can_split"
+        "SELECT can_split, can_join"
         "  FROM meta.layer_catalog"
         " WHERE schema_name = 'net' AND table_name = :table_name"));
     capabilityQuery.bindValue(QStringLiteral(":table_name"), classTable);
@@ -204,6 +204,7 @@ ObjectDetails ObjectRepository::load(
         return result;
     }
     result.canSplit = capabilityQuery.value(0).toBool();
+    result.canJoin = capabilityQuery.value(1).toBool();
 
     const QString escapedTable = database.driver()->escapeIdentifier(
         classTable, QSqlDriver::TableName);
@@ -979,6 +980,74 @@ SplitLineResult ObjectRepository::splitLine(
         || result.secondLineId <= 0) {
         result.error = QStringLiteral(
             "Сервер не вернул созданные объекты разрезания");
+        database.rollback();
+        return result;
+    }
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        return result;
+    }
+
+    result.success = true;
+    return result;
+}
+
+JoinLinesResult ObjectRepository::joinLines(
+    QSqlDatabase database,
+    const QString& classTable,
+    qint64 firstId,
+    qint64 firstExpectedVersion,
+    qint64 secondId,
+    qint64 secondExpectedVersion) const
+{
+    JoinLinesResult result;
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (firstId <= 0 || secondId <= 0 || firstId == secondId
+        || firstExpectedVersion <= 0 || secondExpectedVersion <= 0) {
+        result.error = QStringLiteral("Некорректные параметры соединения");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT joined_line_id, archived_node_id"
+        "  FROM net.join_lines("
+        "      CAST(? AS text), CAST(? AS bigint), CAST(? AS bigint),"
+        "      CAST(? AS bigint), CAST(? AS bigint)"
+        "  )"));
+    query.addBindValue(classTable);
+    query.addBindValue(firstId);
+    query.addBindValue(firstExpectedVersion);
+    query.addBindValue(secondId);
+    query.addBindValue(secondExpectedVersion);
+    if (!query.exec() || !query.next()) {
+        result.error = query.lastError().text();
+        result.conflict = result.error.contains(
+            QStringLiteral("CONFLICT:"), Qt::CaseInsensitive);
+        database.rollback();
+        return result;
+    }
+
+    result.joinedLineId = query.value(0).toLongLong();
+    result.archivedNodeId = query.value(1).toLongLong();
+    if (result.joinedLineId <= 0 || result.archivedNodeId <= 0) {
+        result.error = QStringLiteral(
+            "Сервер не вернул результат соединения участков");
         database.rollback();
         return result;
     }

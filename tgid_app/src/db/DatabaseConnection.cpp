@@ -120,6 +120,9 @@ SchemaStatus DatabaseConnection::inspectSchema() const
             "       to_regprocedure("
             "           'net.split_line(text,bigint,bigint,double precision,double precision)'"
             "       ) IS NOT NULL,"
+            "       to_regprocedure("
+            "           'net.join_lines(text,bigint,bigint,bigint,bigint)'"
+            "       ) IS NOT NULL,"
             "       NOT EXISTS ("
             "           SELECT 1"
             "             FROM meta.layer_catalog layer"
@@ -216,6 +219,7 @@ SchemaStatus DatabaseConnection::inspectSchema() const
         QStringLiteral("meta.object_change_log"),
         QStringLiteral("meta.field_catalog"),
         QStringLiteral("net.split_line"),
+        QStringLiteral("net.join_lines"),
         QStringLiteral("meta.field_catalog coverage"),
         QStringLiteral("meta.field_catalog lookup targets"),
         QStringLiteral("SRID 9998"),

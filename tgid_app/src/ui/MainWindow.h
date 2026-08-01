@@ -47,6 +47,8 @@ private slots:
     void showLineStart(qint64 nodeId);
     void toggleLineSplit(bool enabled);
     void splitLineAt(QPointF position);
+    void toggleLineJoin(bool enabled);
+    void joinWithLine(qint64 secondId, QString classTable);
 
 private:
     void buildInterface();
@@ -77,6 +79,7 @@ private:
     QComboBox* lineClassCombo_ = nullptr;
     QPushButton* createLineButton_ = nullptr;
     QPushButton* splitLineButton_ = nullptr;
+    QPushButton* joinLinesButton_ = nullptr;
     QTreeWidget* fragmentTree_ = nullptr;
     QTableWidget* layerTable_ = nullptr;
     QTableWidget* archiveTable_ = nullptr;

@@ -25,6 +25,9 @@ public:
     void setPointCreationMode(bool enabled);
     void setLineCreationMode(bool enabled);
     void setLineSplitMode(bool enabled);
+    void setLineJoinMode(
+        bool enabled, qint64 firstId = 0,
+        const QString& firstClassTable = {});
     [[nodiscard]] bool hasSelectedLine(
         qint64 id, const QString& classTable) const;
 
@@ -39,6 +42,8 @@ signals:
     void linePlacementRequested(qint64 nodeFrom, qint64 nodeTo);
     void lineEndpointMissed();
     void lineSplitRequested(QPointF position);
+    void lineJoinRequested(qint64 secondId, QString classTable);
+    void lineJoinMissed();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -54,6 +59,7 @@ private:
     void rebuildGeometry();
     void selectObjectAt(const QPointF& screenPosition);
     void selectLineEndpointAt(const QPointF& screenPosition);
+    void selectJoinLineAt(const QPointF& screenPosition);
 
     repo::MapData data_;
     QHash<QString, QPainterPath> linePaths_;
@@ -71,7 +77,10 @@ private:
     bool pointCreationMode_ = false;
     bool lineCreationMode_ = false;
     bool lineSplitMode_ = false;
+    bool lineJoinMode_ = false;
     qint64 lineStartNodeId_ = 0;
+    qint64 joinFirstLineId_ = 0;
+    QString joinFirstClassTable_;
 };
 
 }  // namespace tgid::ui
