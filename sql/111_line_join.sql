@@ -160,7 +160,9 @@ BEGIN
     END IF;
 
     SELECT tbl INTO shared_table
-      FROM net.node_reg WHERE id = shared_node;
+      FROM net.node_reg
+     WHERE id = shared_node
+     FOR UPDATE;
     IF shared_table IS DISTINCT FROM 'connect_node' THEN
         RAISE EXCEPTION
             'Общий узел % должен иметь класс connect_node', shared_node;

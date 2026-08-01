@@ -44,6 +44,7 @@
 | 28 | Справочники `ref` и метаданные карточек Qt | готово — [098](sql/098_core_references.sql), [105](sql/105_ui_field_catalog.sql) |
 | 29 | Полный каталог полей и типизированные редакторы Qt | готово — [106](sql/106_complete_field_catalog.sql) |
 | 30 | Атомарное разрезание трубопровода из Qt | готово — [описание](docs/13-line-split.md), [110](sql/110_line_split.sql), [тест](sql/tests/test_line_split.sql) |
+| 31 | Безопасное соединение двух трубопроводных участков из Qt | готово — [описание](docs/14-line-join.md), [111](sql/111_line_join.sql), [тест](sql/tests/test_line_join.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -131,6 +132,7 @@ psql -f sql/100_gis_catalog.sql        # каталог слоёв QGIS/Qt и в
 psql -f sql/105_ui_field_catalog.sql    # подписи, единицы и справочные редакторы Qt
 psql -f sql/106_complete_field_catalog.sql # все поля и типизированные редакторы Qt
 psql -f sql/110_line_split.sql          # атомарное разрезание трубопровода
+psql -f sql/111_line_join.sql           # безопасное соединение двух участков
 ```
 
 Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге
