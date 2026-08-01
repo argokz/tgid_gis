@@ -199,7 +199,20 @@ foreach ($name in @(
     '129_attic_empty.sql',
     '130_itp_classes.sql',
     '140_subsystems.sql',
-    '150_fragment_split.sql'
+    '145_legacy_audit.sql',
+    '150_fragment_split.sql',
+    '170_gis_geometry_cleanup.sql',
+    '013_subtype_src_id.sql',
+    '080_concurrency.sql',
+    '090_object_history.sql',
+    '095_object_insert_history.sql',
+    '100_gis_catalog.sql',
+    '105_ui_field_catalog.sql',
+    '106_complete_field_catalog.sql',
+    '110_line_split.sql',
+    '111_line_join.sql',
+    '112_node_move.sql',
+    '113_object_reclass.sql'
 )) {
     Invoke-PsqlFile $BuildDatabase (Join-Path $root "sql\$name")
 }
@@ -230,7 +243,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM meta.spatial_ref_system WHERE srid = 9998
     ) THEN
-        RAISE EXCEPTION 'SRID 9998 отсутствует в public.spatial_ref_sys';
+        RAISE EXCEPTION 'SRID 9998 is missing from public.spatial_ref_sys';
     END IF;
 END
 $body$;

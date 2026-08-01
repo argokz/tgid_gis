@@ -421,6 +421,29 @@ class Converter:
                 allowed = ', '.join("'%s'" % t for t in source_types)
                 where.append('GeometryType(s.shape) IN (%s)' % allowed)
 
+            # ST_MakeValid может превратить вырожденный полигон только в
+            # линию. ST_CollectionExtract(..., 3) тогда возвращает EMPTY:
+            # такую строку не публикуем, но сохраняем исходник в отчёте.
+            if transform:
+                reject_where = list(where)
+                reject_where.append('ST_IsEmpty(%s)' % geom)
+                self.run(cur, """
+                    INSERT INTO net.conversion_reject
+                        (src_table, src_id, reason, detail)
+                    SELECT '{src}', s.id,
+                           'геометрия после нормализации стала пустой',
+                           (to_jsonb(s) - 'shape') || jsonb_build_object(
+                               'geometry_ewkt', ST_AsEWKT(s.shape),
+                               'geometry_type', GeometryType(s.shape),
+                               'target', '{target}')
+                    FROM {src_full} s
+                    WHERE {reject_where}
+                """.format(
+                    src=e['source'], target=e['target'],
+                    src_full=self.sub(e['source']),
+                    reject_where=' AND '.join(reject_where)))
+                where.append('NOT ST_IsEmpty(%s)' % geom)
+
             self.run(cur, """
                 INSERT INTO net.{t} (geom, src_id{extra})
                 SELECT {geom}, s.id{vals}

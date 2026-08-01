@@ -13,8 +13,8 @@
   * всё, что читает движок расчёта или SQL репозитория (fragments,
     setpressnodes, heatsystem, температурные графики, потери и т.п.):
     их место определится, когда расчётный контур доведут до net;
-  * changed_object и audit_log — журнал изменений, у него свой
-    механизм в 090_object_history.sql, трогать отдельно.
+  * changed_object и audit_log — исходный журнал изменений; он переносится
+    отдельно вместе с функциями в 145_legacy_audit.sql.
 
     python tools/gen_subsystems.py --db tgid_gis --out sql/140_subsystems.sql
 """
@@ -72,7 +72,7 @@ RULES = [
 # Не переносим ни при каких условиях.
 KEEP = {
     'spatial_ref_sys',          # PostGIS
-    'changed_object', 'audit_log',   # журнал изменений, свой механизм
+    'changed_object', 'audit_log',   # отдельно переносит 145_legacy_audit.sql
     # читает движок расчёта или SQL репозитория:
     'fragments', 'setpressnodes', 'heatsystem', 'deployeddirections',
     'hsourceworkmonthgraphs', 'varcoefficients', 'calctemperatures',
