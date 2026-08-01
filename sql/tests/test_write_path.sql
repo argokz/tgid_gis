@@ -1,17 +1,25 @@
--- Проверка пути записи через слой совместимости.
--- Запросы намеренно записаны так же, как их формирует приложение:
---   gidview/gidr_del.cpp:21   UPDATE nodes SET removed=1, ...
---   gidview/gidr_add.cpp:115  INSERT INTO nodes (...)
--- и адресуются к public.nodes, то есть к представлению поверх net.
+-- Проверка пути записи через каноническое представление net.v_nodes.
+-- Представления public снимаются после полного перехода, поэтому тест
+-- проверяет тот же INSTEAD OF-механизм непосредственно в схеме net.
 \set ON_ERROR_STOP on
 
 BEGIN;
 
 -- 1. Перемещение узла: приложение пишет x/y, геометрия обязана пересчитаться.
 CREATE TEMP TABLE _n AS
-SELECT id, x, y FROM public.nodes WHERE removed = 0 ORDER BY id LIMIT 1;
+SELECT node.id, node.x, node.y
+  FROM net.v_nodes node
+ WHERE node.removed = 0
+   AND NOT EXISTS (
+       SELECT 1
+         FROM net.v_linesobj line
+        WHERE line.removed = 0
+          AND (line.nodeid1 = node.id OR line.nodeid2 = node.id)
+   )
+ ORDER BY node.id
+ LIMIT 1;
 
-UPDATE public.nodes
+UPDATE net.v_nodes
 SET x = (SELECT x FROM _n) + 5000,
     y = (SELECT y FROM _n) + 7000
 WHERE id = (SELECT id FROM _n);
@@ -34,7 +42,7 @@ END $$;
 DO $$
 DECLARE vx double precision; ex double precision;
 BEGIN
-    SELECT n.x INTO vx FROM public.nodes n WHERE n.id = (SELECT id FROM _n);
+    SELECT n.x INTO vx FROM net.v_nodes n WHERE n.id = (SELECT id FROM _n);
     SELECT x + 5000 INTO ex FROM _n;
     IF abs(vx - ex) > 0.01 THEN
         RAISE EXCEPTION 'ПРОВАЛ: чтение вернуло x=% вместо %', vx, ex;
@@ -42,12 +50,12 @@ BEGIN
 END $$;
 
 -- 2. Удаление так, как это делает приложение: removed=1, а не DELETE.
-UPDATE public.nodes SET removed = 1 WHERE id = (SELECT id FROM _n);
+UPDATE net.v_nodes SET removed = 1 WHERE id = (SELECT id FROM _n);
 
 DO $$
 DECLARE n int;
 BEGIN
-    SELECT count(*) INTO n FROM public.nodes
+    SELECT count(*) INTO n FROM net.v_nodes
     WHERE id = (SELECT id FROM _n) AND removed = 1;
     IF n <> 1 THEN
         RAISE EXCEPTION 'ПРОВАЛ: пометка removed=1 не сохранилась';
@@ -55,12 +63,12 @@ BEGIN
 END $$;
 
 -- 3. Восстановление: приложение снимает пометку (cxema/undo_gid.cpp:262).
-UPDATE public.nodes SET removed = 0 WHERE id = (SELECT id FROM _n);
+UPDATE net.v_nodes SET removed = 0 WHERE id = (SELECT id FROM _n);
 
 DO $$
 DECLARE n int;
 BEGIN
-    SELECT count(*) INTO n FROM public.nodes
+    SELECT count(*) INTO n FROM net.v_nodes
     WHERE id = (SELECT id FROM _n) AND removed = 0;
     IF n <> 1 THEN
         RAISE EXCEPTION 'ПРОВАЛ: снятие пометки removed не сработало';
@@ -68,14 +76,14 @@ BEGIN
 END $$;
 
 -- 4. Создание нового узла через представление.
-INSERT INTO public.nodes (fileid, externalnodename, x, y, externalsignid, removed)
+INSERT INTO net.v_nodes (fileid, externalnodename, x, y, externalsignid, removed)
 VALUES ((SELECT min(id) FROM net.fragment), 'проверочный узел',
         -242611, 103623, 1, 0);
 
 DO $$
 DECLARE nid bigint; k text;
 BEGIN
-    SELECT id INTO nid FROM public.nodes
+    SELECT id INTO nid FROM net.v_nodes
     WHERE externalnodename = 'проверочный узел';
     IF nid IS NULL THEN
         RAISE EXCEPTION 'ПРОВАЛ: вставка не создала узел';

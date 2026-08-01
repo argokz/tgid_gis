@@ -85,7 +85,7 @@ DO $$
 DECLARE n int;
 BEGIN
     SELECT count(*) INTO n FROM net.consumer_general c
-    JOIN public.nodes_legacy o ON o.id = c.src_id
+    JOIN attic.nodes_legacy o ON o.id = c.src_id
     WHERE c.id = (SELECT obj_id FROM _t)
       AND abs(ST_X(c.geom) - o.x / 100.0) < 0.001
       AND abs(ST_Y(c.geom) + o.y / 100.0) < 0.001;

@@ -231,7 +231,12 @@ BEGIN
 END $$;
 
 -- Порядок поиска — свойство БД: его видят все клиенты.
-ALTER DATABASE tgid_gis SET search_path = public, net, ref, calc, addr, doc, el, ops, org;
+DO $$
+BEGIN
+    EXECUTE format(
+        'ALTER DATABASE %I SET search_path = public, net, ref, calc, addr, doc, el, ops, org',
+        current_database());
+END $$;
 
 COMMIT;
 

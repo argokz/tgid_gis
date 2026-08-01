@@ -1,4 +1,4 @@
--- Сверка разложения фрагмента: каждое значение из public.fragments
+-- Сверка разложения фрагмента: каждое значение из attic.fragments
 -- обязано найтись в net.fragment / fragment_system / fragment_month.
 --
 -- Проверяются ВСЕ 132 параметра каждого фрагмента, а не выборка:
@@ -21,7 +21,7 @@ BEGIN
     LOOP
         FOR i IN 1..5 LOOP
             EXECUTE format($q$
-                SELECT count(*) FROM public.fragments s
+                SELECT count(*) FROM attic.fragments s
                 JOIN net.fragment f ON f.id = s.id
                 JOIN net.fragment_system y
                   ON y.fragment_id = f.id AND y.sys_no = %s
@@ -42,7 +42,7 @@ BEGIN
     LOOP
         FOR i IN 1..12 LOOP
             EXECUTE format($q$
-                SELECT count(*) FROM public.fragments s
+                SELECT count(*) FROM attic.fragments s
                 JOIN net.fragment f ON f.id = s.id
                 JOIN net.fragment_month m
                   ON m.fragment_id = f.id AND m.month = %s
@@ -66,7 +66,7 @@ BEGIN
                              'phone_manager', 'id_old']
     LOOP
         EXECUTE format($q$
-            SELECT count(*) FROM public.fragments s
+            SELECT count(*) FROM attic.fragments s
             JOIN net.fragment f ON f.id = s.id
             WHERE s.%I IS DISTINCT FROM f.%I
         $q$, g, g) INTO bad;

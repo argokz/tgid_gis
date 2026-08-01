@@ -57,15 +57,15 @@ BEGIN
     WITH old_rows AS (
         SELECT node.id, code.name AS code_name,
                node.externalnodename, consumer.name
-          FROM public.nodes node
+          FROM attic.nodes_legacy node
           JOIN externalcodes code ON code.id = node.externalcodeid
           JOIN (
               SELECT nodeid, name
-                FROM public.generalizedconsumers
+                FROM attic.generalizedconsumers_legacy
                WHERE consumerstateid = 2
               UNION
               SELECT nodeid, name
-                FROM public.realconsumers
+                FROM attic.realconsumers_legacy
                WHERE consumerstateid = 2
           ) consumer ON consumer.nodeid = node.id
          WHERE node.removed = 0
@@ -98,16 +98,16 @@ BEGIN
         WITH old_rows AS (
             SELECT node.id, code.name AS code_name,
                    node.externalnodename, consumer.name
-              FROM public.nodes node
+              FROM attic.nodes_legacy node
               JOIN externalcodes code
                 ON code.id = node.externalcodeid
               JOIN (
                   SELECT nodeid, name
-                    FROM public.generalizedconsumers
+                    FROM attic.generalizedconsumers_legacy
                    WHERE consumerstateid = 2
                   UNION
                   SELECT nodeid, name
-                    FROM public.realconsumers
+                    FROM attic.realconsumers_legacy
                    WHERE consumerstateid = 2
               ) consumer ON consumer.nodeid = node.id
              WHERE node.removed = 0

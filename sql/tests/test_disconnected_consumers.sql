@@ -12,26 +12,24 @@ BEGIN
     WITH old_rows AS (
         SELECT node.id, code.name AS code_name,
                node.externalnodename, consumer.name
-          FROM public.nodes node
+          FROM attic.nodes_legacy node
           JOIN externalcodes code ON code.id = node.externalcodeid
           JOIN (
               SELECT item.nodeid, item.consumerstateid, item.name
-                FROM public.generalizedconsumers item
+                FROM attic.generalizedconsumers_legacy item
               UNION
               SELECT item.nodeid, item.consumerstateid, item.name
-                FROM public.realconsumers item
+                FROM attic.realconsumers_legacy item
           ) consumer ON consumer.nodeid = node.id
           LEFT JOIN (
               SELECT calculated_node.id
-                FROM public.nodes calculated_node
+                FROM attic.nodes_legacy calculated_node
                 JOIN calc.pt_out output
                   ON output.nodeid = calculated_node.id
                 JOIN (
                     SELECT calculation.fileid,
                            max(calculation.id) AS calculation_id
                       FROM calc.calculation calculation
-                      LEFT JOIN public.fragments fragment
-                        ON fragment.id = calculation.fileid
                      GROUP BY calculation.fileid
                 ) latest
                   ON latest.fileid = calculated_node.fileid
@@ -83,26 +81,24 @@ BEGIN
         WITH old_rows AS (
             SELECT node.id, code.name AS code_name,
                    node.externalnodename, consumer.name
-              FROM public.nodes node
+              FROM attic.nodes_legacy node
               JOIN externalcodes code ON code.id = node.externalcodeid
               JOIN (
                   SELECT item.nodeid, item.consumerstateid, item.name
-                    FROM public.generalizedconsumers item
+                    FROM attic.generalizedconsumers_legacy item
                   UNION
                   SELECT item.nodeid, item.consumerstateid, item.name
-                    FROM public.realconsumers item
+                    FROM attic.realconsumers_legacy item
               ) consumer ON consumer.nodeid = node.id
               LEFT JOIN (
                   SELECT calculated_node.id
-                    FROM public.nodes calculated_node
+                    FROM attic.nodes_legacy calculated_node
                     JOIN calc.pt_out output
                       ON output.nodeid = calculated_node.id
                     JOIN (
                         SELECT calculation.fileid,
                                max(calculation.id) AS calculation_id
                           FROM calc.calculation calculation
-                          LEFT JOIN public.fragments fragment
-                            ON fragment.id = calculation.fileid
                          GROUP BY calculation.fileid
                     ) latest
                       ON latest.fileid = calculated_node.fileid

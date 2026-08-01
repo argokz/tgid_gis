@@ -40,26 +40,32 @@ VALUES ((SELECT l1 FROM _ids), (SELECT frag FROM _ids), (SELECT n1 FROM _ids), (
 
 -- 3. Ссылка на несуществующий узел должна быть отвергнута.
 DO $$
+DECLARE rejected boolean := false;
 BEGIN
     BEGIN
         INSERT INTO net.pipe_section (id, fragment_id, node_from, node_to, geom)
         VALUES ((SELECT l1 FROM _ids) + 500000, (SELECT frag FROM _ids), (SELECT n1 FROM _ids), 999999999,
                 ST_SetSRID(ST_MakeLine(ST_Point(0, 0), ST_Point(1, 1)), 9998));
-        RAISE EXCEPTION 'ПРОВАЛ: принята линия с несуществующим узлом';
-    EXCEPTION WHEN foreign_key_violation THEN
-        NULL;  -- ожидаемо
+    EXCEPTION WHEN foreign_key_violation OR raise_exception THEN
+        rejected := true;  -- FK либо более ранняя проверка топологии
     END;
+    IF NOT rejected THEN
+        RAISE EXCEPTION 'ПРОВАЛ: принята линия с несуществующим узлом';
+    END IF;
 END $$;
 
 -- 4. Удаление узла, на котором висит линия, должно быть запрещено.
 DO $$
+DECLARE rejected boolean := false;
 BEGIN
     BEGIN
         DELETE FROM net.heat_chamber WHERE id = (SELECT n1 FROM _ids);
-        RAISE EXCEPTION 'ПРОВАЛ: удалён узел, используемый линией';
-    EXCEPTION WHEN foreign_key_violation THEN
-        NULL;  -- ожидаемо
+    EXCEPTION WHEN foreign_key_violation OR raise_exception THEN
+        rejected := true;  -- FK либо защитный триггер архива/топологии
     END;
+    IF NOT rejected THEN
+        RAISE EXCEPTION 'ПРОВАЛ: удалён узел, используемый линией';
+    END IF;
 END $$;
 
 -- 5. После удаления линии узел удаляется, реестр чистится триггером.

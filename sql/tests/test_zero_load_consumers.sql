@@ -12,11 +12,11 @@ BEGIN
     WITH old_rows AS (
         SELECT node.id, code.name AS code_name,
                node.externalnodename, consumer.name
-          FROM public.nodes node
+          FROM attic.nodes_legacy node
           JOIN externalcodes code ON code.id = node.externalcodeid
           JOIN (
               SELECT item.nodeid, item.consumerstateid, item.name
-                FROM public.generalizedconsumers item
+                FROM attic.generalizedconsumers_legacy item
                WHERE coalesce(item.calchldep, 0) = 0
                  AND coalesce(item.calchlindep, 0) = 0
                  AND coalesce(item.calchlparall, 0) = 0
@@ -25,7 +25,7 @@ BEGIN
                  AND coalesce(item.calchlpreon, 0) = 0
               UNION
               SELECT item.nodeid, item.consumerstateid, item.name
-                FROM public.realconsumers item
+                FROM attic.realconsumers_legacy item
                WHERE coalesce(item.calchldep, 0) = 0
                  AND coalesce(item.calchlindep, 0) = 0
           ) consumer ON consumer.nodeid = node.id
@@ -67,11 +67,11 @@ BEGIN
         WITH old_rows AS (
             SELECT node.id, code.name AS code_name,
                    node.externalnodename, consumer.name
-              FROM public.nodes node
+              FROM attic.nodes_legacy node
               JOIN externalcodes code ON code.id = node.externalcodeid
               JOIN (
                   SELECT item.nodeid, item.consumerstateid, item.name
-                    FROM public.generalizedconsumers item
+                    FROM attic.generalizedconsumers_legacy item
                    WHERE coalesce(item.calchldep, 0) = 0
                      AND coalesce(item.calchlindep, 0) = 0
                      AND coalesce(item.calchlparall, 0) = 0
@@ -80,7 +80,7 @@ BEGIN
                      AND coalesce(item.calchlpreon, 0) = 0
                   UNION
                   SELECT item.nodeid, item.consumerstateid, item.name
-                    FROM public.realconsumers item
+                    FROM attic.realconsumers_legacy item
                    WHERE coalesce(item.calchldep, 0) = 0
                      AND coalesce(item.calchlindep, 0) = 0
               ) consumer ON consumer.nodeid = node.id

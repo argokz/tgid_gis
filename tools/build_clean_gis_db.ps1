@@ -2,7 +2,8 @@
 #
 # Сборка двухступенчатая:
 #   1. Во временной БД восстанавливается public и выполняется конвертация.
-#   2. В продуктовую БД переносятся только net + ref + meta + calc.
+#   2. В продуктовую БД переносятся объектные, расчётные, справочные
+#      и прикладные схемы; public остаётся только для объектов PostGIS.
 #
 # Это позволяет получить действительно чистый продукт, не удаляя объекты
 # PostGIS из public и не оставляя 600+ исходных таблиц рядом с net.
@@ -192,7 +193,18 @@ Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\123_externalcodes_reference
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\124_ref_single_copy.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\125_ref_move.sql')
 
-Write-Host '11. Строгий GIS-аудит'
+Write-Host '11. Текущая продуктовая структура'
+foreach ($name in @(
+    '127_attic.sql',
+    '129_attic_empty.sql',
+    '130_itp_classes.sql',
+    '140_subsystems.sql',
+    '150_fragment_split.sql'
+)) {
+    Invoke-PsqlFile $BuildDatabase (Join-Path $root "sql\$name")
+}
+
+Write-Host '12. Строгий GIS-аудит'
 & python (Join-Path $root 'tools\check_gis_ready.py') --db $BuildDatabase
 if ($LASTEXITCODE -ne 0) {
     throw 'GIS-аудит не пройден: продуктовая БД не будет создана'
@@ -224,14 +236,17 @@ END
 $body$;
 '@
 
-Write-Host "12. Дамп только net + ref + meta + calc"
+Write-Host '13. Дамп продуктовых схем'
 & pg_dump.exe -h $DbHost -p $Port -U $User -d $BuildDatabase `
-    -Fc --schema=net --schema=ref --schema=meta --schema=calc -f $ProductDump
+    -Fc `
+    --schema=net --schema=ref --schema=meta --schema=calc `
+    --schema=addr --schema=doc --schema=el --schema=ops --schema=org `
+    -f $ProductDump
 if ($LASTEXITCODE -ne 0) {
     throw "Не удалось создать продуктовый дамп $ProductDump"
 }
 
-Write-Host "13. Чистая продуктовая БД $Target"
+Write-Host "14. Чистая продуктовая БД $Target"
 Assert-CanCreateDatabase $Target
 New-PostgisDatabase $Target
 $productRestoreOutput = & pg_restore.exe -h $DbHost -p $Port -U $User `
@@ -255,13 +270,15 @@ ON CONFLICT (srid) DO UPDATE SET
     proj4text = EXCLUDED.proj4text;
 '@
 
+Invoke-PsqlCmd $Target "ALTER DATABASE `"$Target`" SET search_path = public, net, ref, calc, addr, doc, el, ops, org"
+
 & python (Join-Path $root 'tools\check_gis_ready.py') --db $Target
 if ($LASTEXITCODE -ne 0) {
     throw 'Финальная продуктовая БД не прошла GIS-аудит'
 }
 
 if (-not $KeepBuildDatabase) {
-    Write-Host "14. Удаление временной БД $BuildDatabase"
+    Write-Host "15. Удаление временной БД $BuildDatabase"
     Remove-Database $BuildDatabase
 }
 
@@ -272,5 +289,6 @@ Write-Host @"
   ref.*              — справочники с PK/индексами и собственными sequence
   calc.*             — результаты последних и архивных расчётов
   meta.layer_catalog — каталог слоёв
-  public             — только объекты расширения PostGIS, legacy-таблиц нет
+  addr/doc/el/ops/org — прикладные подсистемы одной продуктовой БД
+  public              — только объекты расширения PostGIS, legacy-таблиц нет
 "@

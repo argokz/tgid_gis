@@ -15,13 +15,13 @@ BEGIN
                code_to.name AS code_to,
                node_to.externalnodename AS node_to,
                pipe.pipesectlength, pipe.diameterinternal
-          FROM public.linesobj line
-          JOIN public.heatpipesections pipe ON pipe.lineid = line.id
-          JOIN public.nodes node_from
+          FROM attic.linesobj_legacy line
+          JOIN attic.heatpipesections_legacy pipe ON pipe.lineid = line.id
+          JOIN attic.nodes_legacy node_from
             ON node_from.id = line.nodeid1 AND node_from.removed = 0
           JOIN externalcodes code_from
             ON code_from.id = node_from.externalcodeid
-          JOIN public.nodes node_to
+          JOIN attic.nodes_legacy node_to
             ON node_to.id = line.nodeid2 AND node_to.removed = 0
           JOIN externalcodes code_to
             ON code_to.id = node_to.externalcodeid
@@ -67,13 +67,13 @@ BEGIN
                    code_to.name AS code_to,
                    node_to.externalnodename AS node_to,
                    pipe.pipesectlength, pipe.diameterinternal
-              FROM public.linesobj line
-              JOIN public.heatpipesections pipe ON pipe.lineid = line.id
-              JOIN public.nodes node_from
+              FROM attic.linesobj_legacy line
+              JOIN attic.heatpipesections_legacy pipe ON pipe.lineid = line.id
+              JOIN attic.nodes_legacy node_from
                 ON node_from.id = line.nodeid1 AND node_from.removed = 0
               JOIN externalcodes code_from
                 ON code_from.id = node_from.externalcodeid
-              JOIN public.nodes node_to
+              JOIN attic.nodes_legacy node_to
                 ON node_to.id = line.nodeid2 AND node_to.removed = 0
               JOIN externalcodes code_to
                 ON code_to.id = node_to.externalcodeid
