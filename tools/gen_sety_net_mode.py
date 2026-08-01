@@ -113,6 +113,67 @@ def line_query(tn, cols, s_fileID):
           AND (r0.id IS NULL OR NOT r0.removed)
           AND rc.id IS NULL
     """
+
+
+def zn_query(s_fileID):
+    """Замена запроса read_zn — узлы с заданным напором.
+
+    Исходный запрос дважды соединяется с представлением nodes: один раз
+    для самого узла, второй — внутри подзапроса результатов предыдущего
+    расчёта. На переведённой БД nodes — представление над net из десяти
+    ветвей, и оба соединения стоят дорого: 857 мс из 3.8 с фазы чтения.
+
+    Реестр net.node_reg содержит те же поля (fragment_id вместо fileID)
+    обычной таблицей с индексами.
+    """
+    return f"""
+SELECT
+n.id,
+sp.pressflow, sp.pressret,
+us2.pihP, us2.pihO,
+us2.t1P, us2.t1O,
+us2.t2P, us2.t2O,
+ec.name AS kod, n.externalnodename AS name,
+us2.id AS id_m,
+sp.kod_m, sp.uzel_m,
+fr.name AS fr_name,
+us2.ist,
+sp.fragment_resultid
+
+FROM net.node_press_setting sp
+JOIN net.node_reg n ON n.id = sp.node_id AND NOT n.removed
+JOIN externalCodes ec ON ec.id = n.externalcodeid
+
+LEFT JOIN
+(
+    SELECT
+    n2.id,
+    n2.fragment_id AS fileID,
+    ec2.name AS kod, n2.externalnodename AS name,
+    usP.pih AS pihP, usP.t AS t1P, usP.t2 AS t2P,
+    usO.pih AS pihO, usO.t AS t1O, usO.t2 AS t2O,
+    usP.ist
+
+    FROM net.node_reg n2
+    JOIN externalCodes ec2 ON ec2.id = n2.externalcodeid
+    JOIN US_OUT usP ON usP.nodeID = n2.id AND usP.externalSign = 1
+    JOIN US_OUT usO ON usO.nodeID = n2.id AND usO.externalSign = 2
+
+    JOIN
+    (
+        SELECT c.fileID, max(c.id) AS cid
+        FROM CALCULATION c
+        LEFT JOIN fragments fr ON fr.id = c.fileID
+        GROUP BY c.fileID
+    ) calc ON n2.fragment_id = calc.fileID
+          AND usP.calculationID = calc.cid AND usO.calculationID = calc.cid
+
+) us2 ON us2.kod = sp.kod_m AND us2.name = sp.uzel_m
+     AND us2.fileID = sp.fragment_resultid
+LEFT JOIN fragments fr ON fr.id = sp.fragment_resultid
+
+WHERE n.fragment_id IN ({s_fileID})
+"""
 '''
 
 

@@ -471,6 +471,86 @@ void MainWindow::buildInterface()
     catalogLayout->addWidget(layerTable_, 1);
     tabs->addTab(catalogTab, QStringLiteral("GIS-слои"));
 
+    auto* searchTab = new QWidget(tabs);
+    auto* searchLayout = new QVBoxLayout(searchTab);
+    auto* searchClassRow = new QHBoxLayout();
+    searchClassRow->addWidget(new QLabel(QStringLiteral("Класс:"), searchTab));
+    searchClassCombo_ = new QComboBox(searchTab);
+    searchClassCombo_->setMinimumWidth(220);
+    searchClassCombo_->setEnabled(false);
+    connect(searchClassCombo_, &QComboBox::currentIndexChanged,
+            this, &MainWindow::refreshSearchFields);
+    searchClassRow->addWidget(searchClassCombo_);
+    searchClassRow->addWidget(new QLabel(QStringLiteral("Поле:"), searchTab));
+    searchFieldCombo_ = new QComboBox(searchTab);
+    searchFieldCombo_->setMinimumWidth(220);
+    searchFieldCombo_->setEnabled(false);
+    connect(searchFieldCombo_, &QComboBox::currentIndexChanged,
+            this, &MainWindow::refreshSearchEditor);
+    searchClassRow->addWidget(searchFieldCombo_, 1);
+    searchArchivedCheck_ = new QCheckBox(
+        QStringLiteral("Включая архив"), searchTab);
+    searchClassRow->addWidget(searchArchivedCheck_);
+    searchLayout->addLayout(searchClassRow);
+
+    auto* searchConditionRow = new QHBoxLayout();
+    searchOperatorCombo_ = new QComboBox(searchTab);
+    searchOperatorCombo_->setMinimumWidth(145);
+    searchOperatorCombo_->setEnabled(false);
+    connect(searchOperatorCombo_, &QComboBox::currentIndexChanged,
+            this, &MainWindow::refreshSearchValueInputs);
+    searchConditionRow->addWidget(searchOperatorCombo_);
+    searchValueEdit_ = new QLineEdit(searchTab);
+    searchValueEdit_->setClearButtonEnabled(true);
+    searchConditionRow->addWidget(searchValueEdit_, 1);
+    searchValueCombo_ = new QComboBox(searchTab);
+    searchValueCombo_->setMinimumWidth(240);
+    searchValueCombo_->setMaxVisibleItems(25);
+    searchValueCombo_->setVisible(false);
+    searchConditionRow->addWidget(searchValueCombo_, 1);
+    searchSecondValueEdit_ = new QLineEdit(searchTab);
+    searchSecondValueEdit_->setClearButtonEnabled(true);
+    searchSecondValueEdit_->setPlaceholderText(
+        QStringLiteral("Верхняя граница"));
+    searchSecondValueEdit_->setVisible(false);
+    searchConditionRow->addWidget(searchSecondValueEdit_, 1);
+    searchButton_ = new QPushButton(QStringLiteral("Найти"), searchTab);
+    searchButton_->setEnabled(false);
+    connect(searchButton_, &QPushButton::clicked,
+            this, &MainWindow::executeSearch);
+    connect(searchValueEdit_, &QLineEdit::returnPressed,
+            searchButton_, &QPushButton::click);
+    connect(searchSecondValueEdit_, &QLineEdit::returnPressed,
+            searchButton_, &QPushButton::click);
+    searchConditionRow->addWidget(searchButton_);
+    searchLayout->addLayout(searchConditionRow);
+    searchStatusLabel_ = new QLabel(
+        QStringLiteral("Выберите класс и условие поиска"), searchTab);
+    searchStatusLabel_->setWordWrap(true);
+    searchLayout->addWidget(searchStatusLabel_);
+    searchTable_ = new QTableWidget(searchTab);
+    searchTable_->setColumnCount(6);
+    searchTable_->setHorizontalHeaderLabels({
+        QStringLiteral("ID"),
+        QStringLiteral("Фрагмент"),
+        QStringLiteral("Поле"),
+        QStringLiteral("Значение"),
+        QStringLiteral("Версия"),
+        QStringLiteral("Состояние"),
+    });
+    searchTable_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    searchTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    searchTable_->setSelectionMode(QAbstractItemView::SingleSelection);
+    searchTable_->setAlternatingRowColors(true);
+    searchTable_->setSortingEnabled(true);
+    searchTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    searchTable_->horizontalHeader()->setStretchLastSection(true);
+    connect(searchTable_, &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openSearchResult);
+    searchLayout->addWidget(searchTable_, 1);
+    tabs->addTab(searchTab, QStringLiteral("Поиск"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -610,6 +690,7 @@ void MainWindow::connectAndRefresh()
     showLayers(layers, schemaStatus);
     populatePointClasses(layers);
     populateLineClasses(layers);
+    populateSearchClasses(layers);
     populateFragments(fragments);
     refreshArchive();
     statusLabel_->setText(
@@ -622,6 +703,15 @@ void MainWindow::showError(const QString& message)
     fragmentTree_->clear();
     layerTable_->setRowCount(0);
     archiveTable_->setRowCount(0);
+    searchTable_->setRowCount(0);
+    searchClassCombo_->clear();
+    searchClassCombo_->setEnabled(false);
+    searchFieldCombo_->clear();
+    searchFieldCombo_->setEnabled(false);
+    searchOperatorCombo_->clear();
+    searchOperatorCombo_->setEnabled(false);
+    searchButton_->setEnabled(false);
+    searchStatusLabel_->setText(QStringLiteral("Поиск недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
     mapStatusLabel_->setText(QStringLiteral("Карта недоступна"));
@@ -725,6 +815,292 @@ void MainWindow::populateLineClasses(
             layer.tableName);
     }
     lineClassCombo_->setEnabled(lineClassCombo_->count() > 0);
+}
+
+void MainWindow::populateSearchClasses(
+    const QList<repo::LayerInfo>& layers)
+{
+    searchClassCombo_->blockSignals(true);
+    searchClassCombo_->clear();
+    for (const repo::LayerInfo& layer : layers) {
+        if (layer.schemaName != QStringLiteral("net")) {
+            continue;
+        }
+        searchClassCombo_->addItem(
+            QStringLiteral("%1 (%2)")
+                .arg(layer.displayName, layer.tableName),
+            layer.tableName);
+        searchClassCombo_->setItemData(
+            searchClassCombo_->count() - 1,
+            layer.geometryType.toUpper().contains(QStringLiteral("POINT")),
+            Qt::UserRole + 1);
+    }
+    searchClassCombo_->blockSignals(false);
+    searchClassCombo_->setEnabled(searchClassCombo_->count() > 0);
+    refreshSearchFields();
+}
+
+void MainWindow::refreshSearchFields()
+{
+    searchFields_.clear();
+    searchFieldCombo_->blockSignals(true);
+    searchFieldCombo_->clear();
+    searchFieldCombo_->blockSignals(false);
+    searchOperatorCombo_->clear();
+    searchTable_->setRowCount(0);
+    searchButton_->setEnabled(false);
+    const QString classTable = searchClassCombo_->currentData().toString();
+    if (!connection_.isOpen() || classTable.isEmpty()) {
+        searchFieldCombo_->setEnabled(false);
+        return;
+    }
+
+    QString error;
+    searchFields_ = searchRepository_.loadFields(
+        connection_.database(), classTable, &error);
+    if (!error.isEmpty()) {
+        searchFieldCombo_->setEnabled(false);
+        searchStatusLabel_->setStyleSheet(QStringLiteral("color: #b42318;"));
+        searchStatusLabel_->setText(
+            QStringLiteral("Ошибка полей поиска: %1").arg(error));
+        return;
+    }
+    searchFieldCombo_->blockSignals(true);
+    for (qsizetype index = 0; index < searchFields_.size(); ++index) {
+        const repo::SearchField& field = searchFields_.at(index);
+        searchFieldCombo_->addItem(
+            field.unit.isEmpty()
+                ? field.displayName
+                : QStringLiteral("%1, %2").arg(field.displayName, field.unit),
+            index);
+    }
+    searchFieldCombo_->blockSignals(false);
+    searchFieldCombo_->setEnabled(!searchFields_.isEmpty());
+    searchStatusLabel_->setStyleSheet({});
+    searchStatusLabel_->setText(
+        QStringLiteral("Доступно полей: %1").arg(searchFields_.size()));
+    refreshSearchEditor();
+}
+
+void MainWindow::refreshSearchEditor()
+{
+    searchOperatorCombo_->blockSignals(true);
+    searchOperatorCombo_->clear();
+    searchValueCombo_->clear();
+    searchValueCombo_->setEditable(false);
+    searchValueEdit_->clear();
+    searchSecondValueEdit_->clear();
+    searchValueEdit_->setValidator(nullptr);
+    searchSecondValueEdit_->setValidator(nullptr);
+    const qsizetype fieldIndex =
+        searchFieldCombo_->currentData().toLongLong();
+    if (fieldIndex < 0 || fieldIndex >= searchFields_.size()) {
+        searchOperatorCombo_->blockSignals(false);
+        searchOperatorCombo_->setEnabled(false);
+        searchButton_->setEnabled(false);
+        return;
+    }
+    const repo::SearchField& field = searchFields_.at(fieldIndex);
+    const bool textField =
+        field.editorKind == QStringLiteral("text")
+        || field.editorKind == QStringLiteral("multiline");
+    const bool orderedField =
+        field.editorKind == QStringLiteral("integer")
+        || field.editorKind == QStringLiteral("decimal")
+        || field.editorKind == QStringLiteral("date")
+        || field.editorKind == QStringLiteral("datetime");
+    if (textField) {
+        searchOperatorCombo_->addItem(
+            QStringLiteral("содержит"), QStringLiteral("contains"));
+    }
+    searchOperatorCombo_->addItem(
+        QStringLiteral("равно"), QStringLiteral("equals"));
+    if (orderedField) {
+        searchOperatorCombo_->addItem(
+            QStringLiteral("больше"), QStringLiteral("greater"));
+        searchOperatorCombo_->addItem(
+            QStringLiteral("меньше"), QStringLiteral("less"));
+        searchOperatorCombo_->addItem(
+            QStringLiteral("между"), QStringLiteral("between"));
+    }
+    searchOperatorCombo_->addItem(
+        QStringLiteral("не заполнено"), QStringLiteral("is_null"));
+    searchOperatorCombo_->addItem(
+        QStringLiteral("заполнено"), QStringLiteral("not_null"));
+    searchOperatorCombo_->blockSignals(false);
+    searchOperatorCombo_->setEnabled(true);
+
+    if (field.editorKind == QStringLiteral("boolean")) {
+        searchValueCombo_->addItem(
+            QStringLiteral("Да"), QStringLiteral("да"));
+        searchValueCombo_->addItem(
+            QStringLiteral("Нет"), QStringLiteral("нет"));
+    } else if (field.editorKind == QStringLiteral("lookup")) {
+        searchValueCombo_->setEditable(true);
+        searchValueCombo_->setInsertPolicy(QComboBox::NoInsert);
+        searchValueCombo_->completer()->setCaseSensitivity(
+            Qt::CaseInsensitive);
+        searchValueCombo_->completer()->setFilterMode(Qt::MatchContains);
+        searchValueCombo_->completer()->setCompletionMode(
+            QCompleter::PopupCompletion);
+        for (const repo::ObjectFieldOption& option : field.options) {
+            searchValueCombo_->addItem(option.label, option.value);
+        }
+    }
+    if (field.editorKind == QStringLiteral("integer")
+        || field.editorKind == QStringLiteral("decimal")) {
+        const QString pattern =
+            field.editorKind == QStringLiteral("integer")
+                ? QStringLiteral("^-?[0-9]*$")
+                : QStringLiteral(
+                      "^-?[0-9]*([\\.,][0-9]*)?"
+                      "([eE][+-]?[0-9]*)?$");
+        searchValueEdit_->setValidator(new QRegularExpressionValidator(
+            QRegularExpression(pattern), searchValueEdit_));
+        searchSecondValueEdit_->setValidator(
+            new QRegularExpressionValidator(
+                QRegularExpression(pattern), searchSecondValueEdit_));
+    }
+    if (field.editorKind == QStringLiteral("date")) {
+        searchValueEdit_->setPlaceholderText(QStringLiteral("ГГГГ-ММ-ДД"));
+    } else if (field.editorKind == QStringLiteral("datetime")) {
+        searchValueEdit_->setPlaceholderText(
+            QStringLiteral("ГГГГ-ММ-ДД ЧЧ:ММ:СС"));
+    } else {
+        searchValueEdit_->setPlaceholderText(QStringLiteral("Значение"));
+    }
+    refreshSearchValueInputs();
+}
+
+void MainWindow::refreshSearchValueInputs()
+{
+    const qsizetype fieldIndex =
+        searchFieldCombo_->currentData().toLongLong();
+    if (fieldIndex < 0 || fieldIndex >= searchFields_.size()) {
+        searchButton_->setEnabled(false);
+        return;
+    }
+    const repo::SearchField& field = searchFields_.at(fieldIndex);
+    const QString comparison =
+        searchOperatorCombo_->currentData().toString();
+    const bool noValue = comparison == QStringLiteral("is_null")
+                         || comparison == QStringLiteral("not_null");
+    const bool choiceValue = !noValue
+        && comparison == QStringLiteral("equals")
+        && (field.editorKind == QStringLiteral("lookup")
+            || field.editorKind == QStringLiteral("boolean"));
+    searchValueEdit_->setVisible(!noValue && !choiceValue);
+    searchValueCombo_->setVisible(choiceValue);
+    searchSecondValueEdit_->setVisible(
+        comparison == QStringLiteral("between"));
+    searchButton_->setEnabled(!comparison.isEmpty());
+}
+
+void MainWindow::executeSearch()
+{
+    const qsizetype fieldIndex =
+        searchFieldCombo_->currentData().toLongLong();
+    if (!connection_.isOpen()
+        || fieldIndex < 0 || fieldIndex >= searchFields_.size()) {
+        return;
+    }
+    const repo::SearchField& field = searchFields_.at(fieldIndex);
+    repo::SearchCriteria criteria;
+    criteria.classTable = searchClassCombo_->currentData().toString();
+    criteria.fieldName = field.name;
+    criteria.comparison = searchOperatorCombo_->currentData().toString();
+    criteria.includeArchived = searchArchivedCheck_->isChecked();
+    criteria.limit = 200;
+    const bool noValue = criteria.comparison == QStringLiteral("is_null")
+                         || criteria.comparison == QStringLiteral("not_null");
+    const bool choiceValue = !noValue
+        && criteria.comparison == QStringLiteral("equals")
+        && (field.editorKind == QStringLiteral("lookup")
+            || field.editorKind == QStringLiteral("boolean"));
+    if (choiceValue) {
+        if (searchValueCombo_->currentIndex() < 0) {
+            QMessageBox::warning(
+                this, QStringLiteral("Поиск"),
+                QStringLiteral("Выберите значение из списка"));
+            return;
+        }
+        criteria.value = searchValueCombo_->currentData().toString();
+    } else if (!noValue) {
+        criteria.value = searchValueEdit_->text().trimmed();
+        if (criteria.value.isEmpty()) {
+            QMessageBox::warning(
+                this, QStringLiteral("Поиск"),
+                QStringLiteral("Введите значение поиска"));
+            return;
+        }
+    }
+    if (criteria.comparison == QStringLiteral("between")) {
+        criteria.secondValue = searchSecondValueEdit_->text().trimmed();
+        if (criteria.secondValue.isEmpty()) {
+            QMessageBox::warning(
+                this, QStringLiteral("Поиск"),
+                QStringLiteral("Введите обе границы диапазона"));
+            return;
+        }
+    }
+
+    searchButton_->setEnabled(false);
+    searchStatusLabel_->setStyleSheet({});
+    searchStatusLabel_->setText(QStringLiteral("Выполняется запрос…"));
+    QApplication::processEvents();
+    QString error;
+    const QList<repo::SearchResult> results =
+        searchRepository_.search(connection_.database(), criteria, &error);
+    searchButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        searchTable_->setRowCount(0);
+        searchStatusLabel_->setStyleSheet(QStringLiteral("color: #b42318;"));
+        searchStatusLabel_->setText(QStringLiteral("Ошибка поиска: %1").arg(error));
+        return;
+    }
+
+    searchTable_->setSortingEnabled(false);
+    searchTable_->setRowCount(results.size());
+    const bool isNode = searchClassCombo_->currentData(
+        Qt::UserRole + 1).toBool();
+    for (qsizetype row = 0; row < results.size(); ++row) {
+        const repo::SearchResult& result = results.at(row);
+        auto* idItem = readOnlyItem(QString::number(result.id));
+        idItem->setData(Qt::UserRole, result.id);
+        idItem->setData(Qt::UserRole + 1, criteria.classTable);
+        idItem->setData(Qt::UserRole + 2, isNode);
+        searchTable_->setItem(row, 0, idItem);
+        searchTable_->setItem(row, 1, readOnlyItem(result.fragmentId));
+        searchTable_->setItem(row, 2, readOnlyItem(field.displayName));
+        searchTable_->setItem(row, 3, readOnlyItem(result.value));
+        searchTable_->setItem(
+            row, 4, readOnlyItem(QString::number(result.rowVersion)));
+        searchTable_->setItem(
+            row, 5,
+            readOnlyItem(result.archived ? QStringLiteral("архив")
+                                         : QStringLiteral("активен")));
+    }
+    searchTable_->setSortingEnabled(true);
+    searchStatusLabel_->setStyleSheet(QStringLiteral("color: #067647;"));
+    searchStatusLabel_->setText(
+        results.size() == criteria.limit
+            ? QStringLiteral(
+                  "Показаны первые %1 результатов. Уточните условие поиска.")
+                  .arg(criteria.limit)
+            : QStringLiteral("Найдено объектов: %1").arg(results.size()));
+}
+
+void MainWindow::openSearchResult(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = searchTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    showObjectDetails(
+        item->data(Qt::UserRole).toLongLong(),
+        item->data(Qt::UserRole + 1).toString(),
+        item->data(Qt::UserRole + 2).toBool());
 }
 
 void MainWindow::loadSelectedFragment()

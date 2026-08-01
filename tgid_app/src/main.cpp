@@ -3,6 +3,7 @@
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
+#include "repo/SearchRepository.h"
 #include "ui/MainWindow.h"
 
 #include <QApplication>
@@ -107,6 +108,25 @@ int main(int argc, char* argv[])
         QStringLiteral("ID и версии объектов: id:version,id:version"),
         QStringLiteral("id:version,..."));
     parser.addOption(batchObjectsOption);
+    const QCommandLineOption searchObjectsOption(
+        QStringLiteral("search-objects"),
+        QStringLiteral("Поиск объектов: table:field:comparison"),
+        QStringLiteral("table:field:comparison"));
+    parser.addOption(searchObjectsOption);
+    const QCommandLineOption searchValueOption(
+        QStringLiteral("search-value"),
+        QStringLiteral("Первое значение поиска"),
+        QStringLiteral("value"));
+    parser.addOption(searchValueOption);
+    const QCommandLineOption searchSecondValueOption(
+        QStringLiteral("search-second-value"),
+        QStringLiteral("Второе значение диапазона"),
+        QStringLiteral("value"));
+    parser.addOption(searchSecondValueOption);
+    const QCommandLineOption searchArchivedOption(
+        QStringLiteral("search-archived"),
+        QStringLiteral("Включить архивные строки в поиск"));
+    parser.addOption(searchArchivedOption);
     parser.process(application);
 
     if (parser.isSet(checkDatabaseOption)
@@ -121,7 +141,8 @@ int main(int argc, char* argv[])
         || parser.isSet(createLineOption)
         || parser.isSet(splitLineOption)
         || parser.isSet(joinLinesOption)
-        || parser.isSet(batchSetOption)) {
+        || parser.isSet(batchSetOption)
+        || parser.isSet(searchObjectsOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -639,6 +660,58 @@ int main(int argc, char* argv[])
             qInfo().noquote()
                 << QStringLiteral("OK: массово обновлено=%1")
                        .arg(batchResult.updatedCount);
+        }
+
+        if (parser.isSet(searchObjectsOption)) {
+            const QStringList parts =
+                parser.value(searchObjectsOption).split(':');
+            if (parts.size() != 3 || parts.at(0).isEmpty()
+                || parts.at(1).isEmpty() || parts.at(2).isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ожидается --search-objects table:field:comparison");
+                return 28;
+            }
+            tgid::repo::SearchCriteria criteria;
+            criteria.classTable = parts.at(0);
+            criteria.fieldName = parts.at(1);
+            criteria.comparison = parts.at(2);
+            criteria.value = parser.value(searchValueOption);
+            criteria.secondValue = parser.value(searchSecondValueOption);
+            criteria.includeArchived = parser.isSet(searchArchivedOption);
+            criteria.limit = 20;
+            if (criteria.comparison != QStringLiteral("is_null")
+                && criteria.comparison != QStringLiteral("not_null")
+                && !parser.isSet(searchValueOption)) {
+                return 28;
+            }
+            if (criteria.comparison == QStringLiteral("between")
+                && !parser.isSet(searchSecondValueOption)) {
+                return 28;
+            }
+            QString searchError;
+            const QList<tgid::repo::SearchResult> results =
+                tgid::repo::SearchRepository().search(
+                    connection.database(), criteria, &searchError);
+            if (!searchError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка поиска:") << searchError;
+                return 29;
+            }
+            for (const tgid::repo::SearchResult& result : results) {
+                qInfo().noquote()
+                    << QStringLiteral("FOUND: id=%1 fragment=%2 value=%3 version=%4 archive=%5")
+                           .arg(result.id)
+                           .arg(result.fragmentId, result.value)
+                           .arg(result.rowVersion)
+                           .arg(result.archived
+                                    ? QStringLiteral("да")
+                                    : QStringLiteral("нет"));
+            }
+            qInfo().noquote()
+                << QStringLiteral("OK: найдено=%1 лимит=%2")
+                       .arg(results.size())
+                       .arg(criteria.limit);
         }
         return 0;
     }

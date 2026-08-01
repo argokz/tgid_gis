@@ -6,6 +6,7 @@
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
+#include "repo/SearchRepository.h"
 
 #include <QElapsedTimer>
 #include <QFutureWatcher>
@@ -14,6 +15,8 @@
 class QLabel;
 class QDockWidget;
 class QComboBox;
+class QCheckBox;
+class QLineEdit;
 class QPushButton;
 class QTableWidget;
 class QTreeWidget;
@@ -51,6 +54,11 @@ private slots:
     void joinWithLine(qint64 secondId, QString classTable);
     void showMultipleSelection(int count, QString classTable, bool isNode);
     void batchEditSelectedObjects();
+    void refreshSearchFields();
+    void refreshSearchEditor();
+    void refreshSearchValueInputs();
+    void executeSearch();
+    void openSearchResult(int row, int column);
 
 private:
     void buildInterface();
@@ -60,6 +68,7 @@ private:
     void populatePointClasses(const QList<repo::LayerInfo>& layers);
     void populateLineClasses(const QList<repo::LayerInfo>& layers);
     void populateFragments(const QList<repo::FragmentInfo>& fragments);
+    void populateSearchClasses(const QList<repo::LayerInfo>& layers);
     void showError(const QString& message);
     void showLayers(
         const QList<repo::LayerInfo>& layers,
@@ -70,6 +79,7 @@ private:
     repo::FragmentRepository fragmentRepository_;
     repo::LayerCatalogRepository layerRepository_;
     repo::ObjectRepository objectRepository_;
+    repo::SearchRepository searchRepository_;
 
     QLabel* connectionLabel_ = nullptr;
     QLabel* statusLabel_ = nullptr;
@@ -87,6 +97,16 @@ private:
     QTableWidget* layerTable_ = nullptr;
     QTableWidget* archiveTable_ = nullptr;
     QPushButton* refreshArchiveButton_ = nullptr;
+    QComboBox* searchClassCombo_ = nullptr;
+    QComboBox* searchFieldCombo_ = nullptr;
+    QComboBox* searchOperatorCombo_ = nullptr;
+    QLineEdit* searchValueEdit_ = nullptr;
+    QLineEdit* searchSecondValueEdit_ = nullptr;
+    QComboBox* searchValueCombo_ = nullptr;
+    QCheckBox* searchArchivedCheck_ = nullptr;
+    QPushButton* searchButton_ = nullptr;
+    QLabel* searchStatusLabel_ = nullptr;
+    QTableWidget* searchTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -98,6 +118,7 @@ private:
     QFutureWatcher<repo::MapData>* mapWatcher_ = nullptr;
     QElapsedTimer mapLoadTimer_;
     repo::ObjectDetails currentObjectDetails_;
+    QList<repo::SearchField> searchFields_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;
