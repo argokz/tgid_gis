@@ -24,6 +24,9 @@ public:
     void clearMap();
     void setPointCreationMode(bool enabled);
     void setLineCreationMode(bool enabled);
+    void setLineSplitMode(bool enabled);
+    [[nodiscard]] bool hasSelectedLine(
+        qint64 id, const QString& classTable) const;
 
 public slots:
     void fitToData();
@@ -35,6 +38,7 @@ signals:
     void lineStartSelected(qint64 id);
     void linePlacementRequested(qint64 nodeFrom, qint64 nodeTo);
     void lineEndpointMissed();
+    void lineSplitRequested(QPointF position);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -66,6 +70,7 @@ private:
     bool selectedIsNode_ = false;
     bool pointCreationMode_ = false;
     bool lineCreationMode_ = false;
+    bool lineSplitMode_ = false;
     qint64 lineStartNodeId_ = 0;
 };
 

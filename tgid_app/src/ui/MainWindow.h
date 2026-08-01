@@ -45,6 +45,8 @@ private slots:
     void toggleLineCreation(bool enabled);
     void createLineBetween(qint64 nodeFrom, qint64 nodeTo);
     void showLineStart(qint64 nodeId);
+    void toggleLineSplit(bool enabled);
+    void splitLineAt(QPointF position);
 
 private:
     void buildInterface();
@@ -74,6 +76,7 @@ private:
     QPushButton* createPointButton_ = nullptr;
     QComboBox* lineClassCombo_ = nullptr;
     QPushButton* createLineButton_ = nullptr;
+    QPushButton* splitLineButton_ = nullptr;
     QTreeWidget* fragmentTree_ = nullptr;
     QTableWidget* layerTable_ = nullptr;
     QTableWidget* archiveTable_ = nullptr;

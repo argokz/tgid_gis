@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     const QCommandLineOption expectedVersionOption(
         QStringLiteral("expect-version"),
         QStringLiteral(
-            "Ожидаемая row_version для --set-object"),
+            "Ожидаемая row_version изменяемого объекта"),
         QStringLiteral("version"));
     parser.addOption(expectedVersionOption);
     const QCommandLineOption archiveObjectOption(
@@ -83,6 +83,12 @@ int main(int argc, char* argv[])
             "Создать линию: table:fragment_id:node_from:node_to"),
         QStringLiteral("table:fragment_id:node_from:node_to"));
     parser.addOption(createLineOption);
+    const QCommandLineOption splitLineOption(
+        QStringLiteral("split-line"),
+        QStringLiteral(
+            "Разрезать линию: table:id:x:y"),
+        QStringLiteral("table:id:x:y"));
+    parser.addOption(splitLineOption);
     parser.process(application);
 
     if (parser.isSet(checkDatabaseOption)
@@ -94,7 +100,8 @@ int main(int argc, char* argv[])
         || parser.isSet(checkHistoryOption)
         || parser.isSet(checkArchiveOption)
         || parser.isSet(createPointOption)
-        || parser.isSet(createLineOption)) {
+        || parser.isSet(createLineOption)
+        || parser.isSet(splitLineOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -427,6 +434,56 @@ int main(int argc, char* argv[])
                        .arg(parts.at(0))
                        .arg(createResult.id)
                        .arg(createResult.rowVersion);
+        }
+
+        if (parser.isSet(splitLineOption)) {
+            const QStringList parts =
+                parser.value(splitLineOption).split(':');
+            bool idIsValid = false;
+            bool xIsValid = false;
+            bool yIsValid = false;
+            bool versionIsValid = false;
+            if (parts.size() != 4 || !parser.isSet(expectedVersionOption)) {
+                return 19;
+            }
+            const qint64 id = parts.at(1).toLongLong(&idIsValid);
+            const double x = parts.at(2).toDouble(&xIsValid);
+            const double y = parts.at(3).toDouble(&yIsValid);
+            const qint64 expectedVersion =
+                parser.value(expectedVersionOption)
+                    .toLongLong(&versionIsValid);
+            if (parts.at(0).isEmpty() || !idIsValid
+                || !xIsValid || !yIsValid || !versionIsValid) {
+                return 19;
+            }
+            const tgid::repo::SplitLineResult splitResult =
+                tgid::repo::ObjectRepository().splitLine(
+                    connection.database(),
+                    parts.at(0),
+                    id,
+                    expectedVersion,
+                    QPointF(x, y));
+            if (splitResult.conflict) {
+                qCritical().noquote()
+                    << QStringLiteral("CONFLICT:") << splitResult.error;
+                return 20;
+            }
+            if (!splitResult.success) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка разрезания:")
+                    << splitResult.error;
+                return 21;
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK: узел=%1 новый_узел=%2 линии=%3,%4 доля=%5")
+                       .arg(splitResult.nodeId)
+                       .arg(splitResult.nodeCreated
+                                ? QStringLiteral("да")
+                                : QStringLiteral("нет"))
+                       .arg(splitResult.firstLineId)
+                       .arg(splitResult.secondLineId)
+                       .arg(splitResult.splitFraction, 0, 'f', 6);
         }
         return 0;
     }

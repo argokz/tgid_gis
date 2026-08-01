@@ -17,7 +17,7 @@ struct SchemaStatus final {
 
 class DatabaseConnection final {
 public:
-    static constexpr int MinimumSchemaVersion = 8;
+    static constexpr int MinimumSchemaVersion = 9;
 
     DatabaseConnection();
     ~DatabaseConnection();

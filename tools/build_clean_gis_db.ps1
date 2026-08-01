@@ -181,6 +181,7 @@ Write-Host '9. Каталог GIS'
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\100_gis_catalog.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\105_ui_field_catalog.sql')
 Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\106_complete_field_catalog.sql')
+Invoke-PsqlFile $BuildDatabase (Join-Path $root 'sql\110_line_split.sql')
 
 Write-Host '10. Строгий GIS-аудит'
 & python (Join-Path $root 'tools\check_gis_ready.py') --db $BuildDatabase

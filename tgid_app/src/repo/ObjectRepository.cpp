@@ -193,6 +193,18 @@ ObjectDetails ObjectRepository::load(
         return result;
     }
 
+    QSqlQuery capabilityQuery(database);
+    capabilityQuery.prepare(QStringLiteral(
+        "SELECT can_split"
+        "  FROM meta.layer_catalog"
+        " WHERE schema_name = 'net' AND table_name = :table_name"));
+    capabilityQuery.bindValue(QStringLiteral(":table_name"), classTable);
+    if (!capabilityQuery.exec() || !capabilityQuery.next()) {
+        result.error = capabilityQuery.lastError().text();
+        return result;
+    }
+    result.canSplit = capabilityQuery.value(0).toBool();
+
     const QString escapedTable = database.driver()->escapeIdentifier(
         classTable, QSqlDriver::TableName);
     QSqlQuery objectQuery(database);
@@ -903,6 +915,79 @@ CreateObjectResult ObjectRepository::createLine(
         result.id = 0;
         return result;
     }
+    result.success = true;
+    return result;
+}
+
+SplitLineResult ObjectRepository::splitLine(
+    QSqlDatabase database,
+    const QString& classTable,
+    qint64 id,
+    qint64 expectedVersion,
+    const QPointF& position) const
+{
+    SplitLineResult result;
+    if (!database.isOpen()) {
+        result.error = QStringLiteral("Соединение с БД не открыто");
+        return result;
+    }
+    if (!safeIdentifier().match(classTable).hasMatch()) {
+        result.error = QStringLiteral("Недопустимое имя таблицы");
+        return result;
+    }
+    if (id <= 0 || expectedVersion <= 0
+        || !std::isfinite(position.x())
+        || !std::isfinite(position.y())) {
+        result.error = QStringLiteral("Некорректные параметры разрезания");
+        return result;
+    }
+    if (!tableIsPublished(database, classTable, &result.error)) {
+        return result;
+    }
+    if (!database.transaction()) {
+        result.error = database.lastError().text();
+        return result;
+    }
+
+    QSqlQuery query(database);
+    query.prepare(QStringLiteral(
+        "SELECT node_id, node_created, first_line_id, second_line_id,"
+        "       split_fraction"
+        "  FROM net.split_line("
+        "      CAST(? AS text), CAST(? AS bigint), CAST(? AS bigint),"
+        "      CAST(? AS double precision), CAST(? AS double precision)"
+        "  )"));
+    query.addBindValue(classTable);
+    query.addBindValue(id);
+    query.addBindValue(expectedVersion);
+    query.addBindValue(position.x());
+    query.addBindValue(position.y());
+    if (!query.exec() || !query.next()) {
+        result.error = query.lastError().text();
+        result.conflict = result.error.contains(
+            QStringLiteral("CONFLICT:"), Qt::CaseInsensitive);
+        database.rollback();
+        return result;
+    }
+
+    result.nodeId = query.value(0).toLongLong();
+    result.nodeCreated = query.value(1).toBool();
+    result.firstLineId = query.value(2).toLongLong();
+    result.secondLineId = query.value(3).toLongLong();
+    result.splitFraction = query.value(4).toDouble();
+    if (result.nodeId <= 0 || result.firstLineId <= 0
+        || result.secondLineId <= 0) {
+        result.error = QStringLiteral(
+            "Сервер не вернул созданные объекты разрезания");
+        database.rollback();
+        return result;
+    }
+    if (!database.commit()) {
+        result.error = database.lastError().text();
+        database.rollback();
+        return result;
+    }
+
     result.success = true;
     return result;
 }

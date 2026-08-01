@@ -107,6 +107,7 @@ void MapView::clearMap()
     selectedIsNode_ = false;
     pointCreationMode_ = false;
     lineCreationMode_ = false;
+    lineSplitMode_ = false;
     lineStartNodeId_ = 0;
     setCursor(Qt::OpenHandCursor);
     update();
@@ -117,6 +118,7 @@ void MapView::setPointCreationMode(bool enabled)
     pointCreationMode_ = enabled && hasGeometry_;
     if (pointCreationMode_) {
         lineCreationMode_ = false;
+        lineSplitMode_ = false;
         lineStartNodeId_ = 0;
     }
     panning_ = false;
@@ -130,12 +132,34 @@ void MapView::setLineCreationMode(bool enabled)
     lineCreationMode_ = enabled && hasGeometry_;
     if (lineCreationMode_) {
         pointCreationMode_ = false;
+        lineSplitMode_ = false;
     }
     lineStartNodeId_ = 0;
     panning_ = false;
     dragging_ = false;
     setCursor(lineCreationMode_ ? Qt::CrossCursor : Qt::OpenHandCursor);
     update();
+}
+
+void MapView::setLineSplitMode(bool enabled)
+{
+    lineSplitMode_ = enabled && hasGeometry_
+                     && selectedId_ != 0 && !selectedIsNode_;
+    if (lineSplitMode_) {
+        pointCreationMode_ = false;
+        lineCreationMode_ = false;
+        lineStartNodeId_ = 0;
+    }
+    panning_ = false;
+    dragging_ = false;
+    setCursor(lineSplitMode_ ? Qt::CrossCursor : Qt::OpenHandCursor);
+    update();
+}
+
+bool MapView::hasSelectedLine(qint64 id, const QString& classTable) const
+{
+    return selectedId_ == id && selectedClassTable_ == classTable
+           && !selectedIsNode_;
 }
 
 void MapView::fitToData()
@@ -268,13 +292,20 @@ void MapView::paintEvent(QPaintEvent*)
                       "СОЗДАНИЕ ЛИНИИ: выберите начальный узел")
                 : QStringLiteral(
                       "СОЗДАНИЕ ЛИНИИ: выберите конечный узел"));
+    } else if (lineSplitMode_) {
+        painter.setPen(QColor(QStringLiteral("#b42318")));
+        painter.drawText(
+            QRect(12, 36, width() - 24, 24),
+            Qt::AlignLeft | Qt::AlignVCenter,
+            QStringLiteral(
+                "РАЗРЕЗАНИЕ: укажите точку на выбранной линии"));
     }
 }
 
 void MapView::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton
-        && (pointCreationMode_ || lineCreationMode_)) {
+        && (pointCreationMode_ || lineCreationMode_ || lineSplitMode_)) {
         event->accept();
         return;
     }
@@ -323,6 +354,11 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
         event->accept();
         return;
     }
+    if (event->button() == Qt::LeftButton && lineSplitMode_) {
+        emit lineSplitRequested(screenToWorld(event->position()));
+        event->accept();
+        return;
+    }
     if (event->button() == Qt::LeftButton && panning_) {
         const bool wasDragging = dragging_;
         panning_ = false;
@@ -339,7 +375,7 @@ void MapView::mouseReleaseEvent(QMouseEvent* event)
 
 void MapView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    if (pointCreationMode_ || lineCreationMode_) {
+    if (pointCreationMode_ || lineCreationMode_ || lineSplitMode_) {
         event->accept();
         return;
     }

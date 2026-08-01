@@ -379,6 +379,13 @@ void MainWindow::buildInterface()
     connect(createLineButton_, &QPushButton::toggled,
             this, &MainWindow::toggleLineCreation);
     mapToolbar->addWidget(createLineButton_);
+    splitLineButton_ =
+        new QPushButton(QStringLiteral("Разрезать линию"), mapPanel);
+    splitLineButton_->setCheckable(true);
+    splitLineButton_->setEnabled(false);
+    connect(splitLineButton_, &QPushButton::toggled,
+            this, &MainWindow::toggleLineSplit);
+    mapToolbar->addWidget(splitLineButton_);
     fitMapButton_ = new QPushButton(QStringLiteral("Показать целиком"), mapPanel);
     fitMapButton_->setEnabled(false);
     mapToolbar->addWidget(fitMapButton_);
@@ -401,6 +408,8 @@ void MainWindow::buildInterface()
             QStringLiteral(
                 "Выберите другой узел: щелчок должен попадать по точке"));
     });
+    connect(mapView_, &MapView::lineSplitRequested,
+            this, &MainWindow::splitLineAt);
     mapLayout->addWidget(mapView_, 1);
     splitter->addWidget(mapPanel);
     splitter->setStretchFactor(0, 0);
@@ -593,6 +602,8 @@ void MainWindow::showError(const QString& message)
     pointClassCombo_->setEnabled(false);
     createLineButton_->setChecked(false);
     createLineButton_->setEnabled(false);
+    splitLineButton_->setChecked(false);
+    splitLineButton_->setEnabled(false);
     lineClassCombo_->clear();
     lineClassCombo_->setEnabled(false);
     statusLabel_->setStyleSheet(QStringLiteral("color: #b42318;"));
@@ -706,6 +717,9 @@ void MainWindow::loadSelectedFragment()
     if (createLineButton_->isChecked()) {
         createLineButton_->setChecked(false);
     }
+    if (splitLineButton_->isChecked()) {
+        splitLineButton_->setChecked(false);
+    }
     fragmentTree_->setEnabled(false);
     refreshButton_->setEnabled(false);
     fitMapButton_->setEnabled(false);
@@ -767,7 +781,7 @@ void MainWindow::finishMapLoad()
         pendingObjectIsNode_ = false;
         showObjectDetails(objectId, classTable, isNode);
         statusBar()->showMessage(
-            QStringLiteral("Создан объект %1 #%2")
+            QStringLiteral("Открыт объект %1 #%2")
                 .arg(classTable)
                 .arg(objectId));
     }
@@ -778,6 +792,9 @@ void MainWindow::togglePointCreation(bool enabled)
     if (enabled) {
         if (createLineButton_->isChecked()) {
             createLineButton_->setChecked(false);
+        }
+        if (splitLineButton_->isChecked()) {
+            splitLineButton_->setChecked(false);
         }
         QTreeWidgetItem* item = fragmentTree_->currentItem();
         if (item == nullptr
@@ -855,6 +872,9 @@ void MainWindow::toggleLineCreation(bool enabled)
     if (enabled) {
         if (createPointButton_->isChecked()) {
             createPointButton_->setChecked(false);
+        }
+        if (splitLineButton_->isChecked()) {
+            splitLineButton_->setChecked(false);
         }
         QTreeWidgetItem* item = fragmentTree_->currentItem();
         if (item == nullptr
@@ -939,6 +959,112 @@ void MainWindow::createLineBetween(qint64 nodeFrom, qint64 nodeTo)
     loadSelectedFragment();
 }
 
+void MainWindow::toggleLineSplit(bool enabled)
+{
+    if (enabled) {
+        if (currentObjectDetails_.classTable.isEmpty()
+            || currentObjectIsNode_ || currentObjectDetails_.archived
+            || !currentObjectDetails_.canSplit
+            || !mapView_->hasSelectedLine(
+                currentObjectDetails_.id,
+                currentObjectDetails_.classTable)) {
+            splitLineButton_->setChecked(false);
+            return;
+        }
+        if (createPointButton_->isChecked()) {
+            createPointButton_->setChecked(false);
+        }
+        if (createLineButton_->isChecked()) {
+            createLineButton_->setChecked(false);
+        }
+    }
+
+    mapView_->setLineSplitMode(enabled);
+    splitLineButton_->setText(
+        enabled ? QStringLiteral("Отмена разрезания")
+                : QStringLiteral("Разрезать линию"));
+    pointClassCombo_->setEnabled(
+        !enabled && !createPointButton_->isChecked()
+        && pointClassCombo_->count() > 0);
+    lineClassCombo_->setEnabled(
+        !enabled && !createLineButton_->isChecked()
+        && lineClassCombo_->count() > 0);
+    fragmentTree_->setEnabled(!enabled && !mapWatcher_->isRunning());
+    statusBar()->showMessage(
+        enabled
+            ? QStringLiteral("Укажите место разрезания выбранной линии")
+            : QStringLiteral("Режим разрезания выключен"));
+}
+
+void MainWindow::splitLineAt(QPointF position)
+{
+    if (!connection_.isOpen()
+        || currentObjectDetails_.classTable.isEmpty()
+        || currentObjectIsNode_ || currentObjectDetails_.archived) {
+        return;
+    }
+
+    if (QMessageBox::question(
+            this,
+            QStringLiteral("Разрезание линии"),
+            QStringLiteral(
+                "Разрезать %1 #%2 в ближайшей к указанной точке позиции?\n"
+                "X = %3\nY = %4\n\n"
+                "Исходная линия будет помещена в архив, а её атрибуты "
+                "перенесены в два новых участка.")
+                .arg(currentObjectDetails_.classTable)
+                .arg(currentObjectDetails_.id)
+                .arg(position.x(), 0, 'f', 3)
+                .arg(position.y(), 0, 'f', 3))
+        != QMessageBox::Yes) {
+        statusBar()->showMessage(
+            QStringLiteral("Укажите другое место разрезания"));
+        return;
+    }
+
+    splitLineButton_->setChecked(false);
+    splitLineButton_->setEnabled(false);
+    const QString classTable = currentObjectDetails_.classTable;
+    const repo::SplitLineResult result = objectRepository_.splitLine(
+        connection_.database(),
+        classTable,
+        currentObjectDetails_.id,
+        currentObjectDetails_.rowVersion,
+        position);
+    if (result.conflict) {
+        reloadObjectDetails();
+        QMessageBox::warning(
+            this,
+            QStringLiteral("Конфликт редактирования"),
+            QStringLiteral(
+                "Линия уже изменена другим пользователем. "
+                "Карточка перезагружена."));
+        return;
+    }
+    if (!result.success) {
+        splitLineButton_->setEnabled(true);
+        QMessageBox::critical(
+            this, QStringLiteral("Ошибка разрезания"), result.error);
+        return;
+    }
+
+    QMessageBox::information(
+        this,
+        QStringLiteral("Линия разрезана"),
+        QStringLiteral(
+            "%1 узел #%2 и участки #%3, #%4.")
+            .arg(result.nodeCreated
+                     ? QStringLiteral("Создан")
+                     : QStringLiteral("Использован существующий"))
+            .arg(result.nodeId)
+            .arg(result.firstLineId)
+            .arg(result.secondLineId));
+    pendingObjectId_ = result.firstLineId;
+    pendingObjectClassTable_ = classTable;
+    pendingObjectIsNode_ = false;
+    loadSelectedFragment();
+}
+
 void MainWindow::showObjectDetails(
     qint64 id,
     QString classTable,
@@ -960,6 +1086,8 @@ void MainWindow::showObjectDetails(
         reloadObjectButton_->setEnabled(false);
         archiveObjectButton_->setEnabled(false);
         historyObjectButton_->setEnabled(false);
+        splitLineButton_->setChecked(false);
+        splitLineButton_->setEnabled(false);
         currentObjectDetails_ = {};
         return;
     }
@@ -1081,6 +1209,9 @@ void MainWindow::displayObjectDetails(
         details.archived ? QStringLiteral("Восстановить")
                          : QStringLiteral("В архив"));
     historyObjectButton_->setEnabled(true);
+    splitLineButton_->setEnabled(
+        !isNode && !details.archived && details.canSplit
+        && mapView_->hasSelectedLine(details.id, details.classTable));
     objectDock_->show();
     objectDock_->raise();
     statusBar()->showMessage(
@@ -1382,6 +1513,8 @@ void MainWindow::clearObjectDetails()
     reloadObjectButton_->setEnabled(false);
     archiveObjectButton_->setEnabled(false);
     historyObjectButton_->setEnabled(false);
+    splitLineButton_->setChecked(false);
+    splitLineButton_->setEnabled(false);
     currentObjectDetails_ = {};
     currentObjectIsNode_ = false;
 }

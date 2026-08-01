@@ -32,6 +32,7 @@ struct ObjectDetails final {
     QString classTable;
     bool archived = false;
     bool canArchive = false;
+    bool canSplit = false;
     QList<ObjectAttribute> attributes;
     QString error;
 
@@ -74,6 +75,17 @@ struct CreateObjectResult final {
     bool success = false;
     qint64 id = 0;
     qint64 rowVersion = 0;
+    QString error;
+};
+
+struct SplitLineResult final {
+    bool success = false;
+    bool conflict = false;
+    bool nodeCreated = false;
+    qint64 nodeId = 0;
+    qint64 firstLineId = 0;
+    qint64 secondLineId = 0;
+    double splitFraction = 0.0;
     QString error;
 };
 
@@ -120,6 +132,13 @@ public:
         int fragmentId,
         qint64 nodeFrom,
         qint64 nodeTo) const;
+
+    [[nodiscard]] SplitLineResult splitLine(
+        QSqlDatabase database,
+        const QString& classTable,
+        qint64 id,
+        qint64 expectedVersion,
+        const QPointF& position) const;
 };
 
 }  // namespace tgid::repo
