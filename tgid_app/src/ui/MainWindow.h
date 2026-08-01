@@ -3,6 +3,7 @@
 #include "db/DatabaseConfig.h"
 #include "db/DatabaseConnection.h"
 #include "repo/FragmentRepository.h"
+#include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
@@ -70,6 +71,8 @@ private slots:
     void exportPipeLengthReport();
     void executePipeVolumeReport();
     void exportPipeVolumeReport();
+    void executeHeatConsumptionReport();
+    void exportHeatConsumptionReport();
 
 private:
     void buildInterface();
@@ -93,6 +96,7 @@ private:
     db::DatabaseConfig config_;
     db::DatabaseConnection connection_;
     repo::FragmentRepository fragmentRepository_;
+    repo::HeatConsumptionReportRepository heatConsumptionReportRepository_;
     repo::LayerCatalogRepository layerRepository_;
     repo::ObjectRepository objectRepository_;
     repo::PipeLengthReportRepository pipeLengthReportRepository_;
@@ -145,6 +149,12 @@ private:
     QPushButton* exportPipeVolumeReportButton_ = nullptr;
     QLabel* pipeVolumeReportStatusLabel_ = nullptr;
     QTableWidget* pipeVolumeReportTable_ = nullptr;
+    QComboBox* heatFragmentCombo_ = nullptr;
+    QComboBox* heatModeCombo_ = nullptr;
+    QPushButton* runHeatConsumptionReportButton_ = nullptr;
+    QPushButton* exportHeatConsumptionReportButton_ = nullptr;
+    QLabel* heatConsumptionReportStatusLabel_ = nullptr;
+    QTableWidget* heatConsumptionReportTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -161,6 +171,7 @@ private:
     QList<repo::SearchCondition> searchConditions_;
     QList<repo::PipeLengthReportRow> pipeLengthReportRows_;
     QList<repo::PipeVolumeReportRow> pipeVolumeReportRows_;
+    repo::HeatConsumptionReportResult heatConsumptionReport_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;

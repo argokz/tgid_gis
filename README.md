@@ -52,6 +52,7 @@
 | 36 | Атомарное перемещение узлов из Qt с перестроением линий | готово — [описание](docs/19-node-move.md), [112](sql/112_node_move.sql), [тест](sql/tests/test_node_move.sql) |
 | 37 | Безопасная смена класса узлов и линий без потери данных | готово — [описание](docs/20-object-reclass.md), [113](sql/113_object_reclass.sql), [тест](sql/tests/test_object_reclass.sql) |
 | 38 | Запрос `aZap1`: объём воды в сети и выделенных трубопроводах | готово — [описание](docs/21-network-volume.md) |
+| 39 | Запросы `aZap3–aZap5`: теплопотребление последнего расчёта | готово — [описание](docs/22-heat-consumption-report.md) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
@@ -142,6 +143,7 @@ psql -f sql/110_line_split.sql          # атомарное разрезани�
 psql -f sql/111_line_join.sql           # безопасное соединение двух участков
 psql -f sql/112_node_move.sql           # перемещение узла и аудит геометрии
 psql -f sql/113_object_reclass.sql      # смена класса узла или линии
+psql -f sql/120_calc_schema.sql         # результаты расчётов в схему calc
 ```
 
 Откат: `DROP SCHEMA net CASCADE;` — схема `public` не изменяется ни на одном шаге

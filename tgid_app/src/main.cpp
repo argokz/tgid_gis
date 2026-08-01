@@ -1,5 +1,6 @@
 #include "db/DatabaseConfig.h"
 #include "db/DatabaseConnection.h"
+#include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
 #include "repo/ObjectRepository.h"
@@ -156,6 +157,11 @@ int main(int argc, char* argv[])
         QStringLiteral("Отчёт объёма сети: grouping[:fragment_id]"),
         QStringLiteral("grouping[:fragment_id]"));
     parser.addOption(pipeVolumeReportOption);
+    const QCommandLineOption heatConsumptionReportOption(
+        QStringLiteral("heat-consumption-report"),
+        QStringLiteral("Теплопотребление: mode[:fragment_id]"),
+        QStringLiteral("mode[:fragment_id]"));
+    parser.addOption(heatConsumptionReportOption);
     const QCommandLineOption reportArchivedOption(
         QStringLiteral("report-archived"),
         QStringLiteral("Включить архивные участки в отчёт"));
@@ -185,7 +191,8 @@ int main(int argc, char* argv[])
         || parser.isSet(searchObjectsOption)
         || parser.isSet(searchConditionOption)
         || parser.isSet(pipeLengthReportOption)
-        || parser.isSet(pipeVolumeReportOption)) {
+        || parser.isSet(pipeVolumeReportOption)
+        || parser.isSet(heatConsumptionReportOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -1043,6 +1050,54 @@ int main(int argc, char* argv[])
                        .arg(totalVolume, 0, 'f', 6)
                        .arg(totalMissingDiameter)
                        .arg(totalMissingLength);
+        }
+
+        if (parser.isSet(heatConsumptionReportOption)) {
+            const QStringList parts =
+                parser.value(heatConsumptionReportOption).split(':');
+            bool fragmentValid = true;
+            const int fragmentId =
+                parts.size() == 2
+                    ? parts.at(1).toInt(&fragmentValid)
+                    : 0;
+            if (parts.isEmpty() || parts.size() > 2
+                || parts.at(0).isEmpty() || !fragmentValid
+                || fragmentId < 0
+                || (parts.at(0) != QStringLiteral("all")
+                    && parts.at(0) != QStringLiteral("closed")
+                    && parts.at(0) != QStringLiteral("open"))) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ожидается --heat-consumption-report mode[:fragment_id]");
+                return 40;
+            }
+            tgid::repo::HeatConsumptionReportCriteria criteria;
+            criteria.mode = parts.at(0);
+            criteria.fragmentId = fragmentId;
+            const tgid::repo::HeatConsumptionReportResult report =
+                tgid::repo::HeatConsumptionReportRepository().load(
+                    connection.database(), criteria);
+            if (!report.error.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral("Ошибка отчёта теплопотребления:")
+                    << report.error;
+                return 41;
+            }
+            for (const tgid::repo::HeatConsumptionReportRow& row
+                 : report.rows) {
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "ROW_HEAT: %1 heat=%2 flow=%3")
+                           .arg(row.metricKey)
+                           .arg(row.heatLoad, 0, 'f', 9)
+                           .arg(row.massFlow, 0, 'f', 9);
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK_HEAT: показателей=%1 узлов=%2 фрагментов=%3")
+                       .arg(report.rows.size())
+                       .arg(report.resultNodeCount)
+                       .arg(report.fragmentCount);
         }
         return 0;
     }

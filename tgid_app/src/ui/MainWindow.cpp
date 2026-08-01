@@ -747,6 +747,66 @@ void MainWindow::buildInterface()
     volumeLayout->addWidget(pipeVolumeReportTable_, 1);
     tabs->addTab(volumeTab, QStringLiteral("Объём сети"));
 
+    auto* heatTab = new QWidget(tabs);
+    auto* heatLayout = new QVBoxLayout(heatTab);
+    auto* heatToolbar = new QHBoxLayout();
+    heatToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), heatTab));
+    heatFragmentCombo_ = new QComboBox(heatTab);
+    heatFragmentCombo_->setMinimumWidth(240);
+    heatFragmentCombo_->setEnabled(false);
+    heatToolbar->addWidget(heatFragmentCombo_, 1);
+    heatToolbar->addWidget(
+        new QLabel(QStringLiteral("Режим:"), heatTab));
+    heatModeCombo_ = new QComboBox(heatTab);
+    heatModeCombo_->addItem(
+        QStringLiteral("Все системы (aZap3)"), QStringLiteral("all"));
+    heatModeCombo_->addItem(
+        QStringLiteral("Закрытые системы (aZap4)"),
+        QStringLiteral("closed"));
+    heatModeCombo_->addItem(
+        QStringLiteral("Открытые системы (aZap5)"),
+        QStringLiteral("open"));
+    heatToolbar->addWidget(heatModeCombo_);
+    runHeatConsumptionReportButton_ = new QPushButton(
+        QStringLiteral("Сформировать"), heatTab);
+    runHeatConsumptionReportButton_->setEnabled(false);
+    connect(runHeatConsumptionReportButton_, &QPushButton::clicked,
+            this, &MainWindow::executeHeatConsumptionReport);
+    heatToolbar->addWidget(runHeatConsumptionReportButton_);
+    exportHeatConsumptionReportButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), heatTab);
+    exportHeatConsumptionReportButton_->setEnabled(false);
+    connect(exportHeatConsumptionReportButton_, &QPushButton::clicked,
+            this, &MainWindow::exportHeatConsumptionReport);
+    heatToolbar->addWidget(exportHeatConsumptionReportButton_);
+    heatLayout->addLayout(heatToolbar);
+    heatConsumptionReportStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Используются результаты последнего расчёта каждого фрагмента"),
+        heatTab);
+    heatConsumptionReportStatusLabel_->setWordWrap(true);
+    heatLayout->addWidget(heatConsumptionReportStatusLabel_);
+    heatConsumptionReportTable_ = new QTableWidget(heatTab);
+    heatConsumptionReportTable_->setColumnCount(3);
+    heatConsumptionReportTable_->setHorizontalHeaderLabels({
+        QStringLiteral("Показатель"),
+        QStringLiteral("Теплопотребление, Гкал/ч"),
+        QStringLiteral("Расход, т/ч"),
+    });
+    heatConsumptionReportTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    heatConsumptionReportTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    heatConsumptionReportTable_->setAlternatingRowColors(true);
+    heatConsumptionReportTable_->setSortingEnabled(false);
+    heatConsumptionReportTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    heatConsumptionReportTable_->horizontalHeader()->setStretchLastSection(
+        true);
+    heatLayout->addWidget(heatConsumptionReportTable_, 1);
+    tabs->addTab(heatTab, QStringLiteral("Теплопотребление"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -930,6 +990,14 @@ void MainWindow::showError(const QString& message)
     runPipeVolumeReportButton_->setEnabled(false);
     exportPipeVolumeReportButton_->setEnabled(false);
     pipeVolumeReportStatusLabel_->setText(
+        QStringLiteral("Отчёт недоступен"));
+    heatConsumptionReportTable_->setRowCount(0);
+    heatConsumptionReport_ = {};
+    heatFragmentCombo_->clear();
+    heatFragmentCombo_->setEnabled(false);
+    runHeatConsumptionReportButton_->setEnabled(false);
+    exportHeatConsumptionReportButton_->setEnabled(false);
+    heatConsumptionReportStatusLabel_->setText(
         QStringLiteral("Отчёт недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
@@ -1473,10 +1541,13 @@ void MainWindow::populateReportFragments(
 {
     reportFragmentCombo_->clear();
     volumeFragmentCombo_->clear();
+    heatFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     volumeFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
+    heatFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты с расчётами"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
         if (!fragment.settlement.trimmed().isEmpty()) {
@@ -1487,6 +1558,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         volumeFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        heatFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1512,6 +1586,15 @@ void MainWindow::populateReportFragments(
     pipeVolumeReportStatusLabel_->setStyleSheet({});
     pipeVolumeReportStatusLabel_->setText(
         QStringLiteral("Выберите параметры и рассчитайте объём"));
+    heatFragmentCombo_->setEnabled(heatFragmentCombo_->count() > 0);
+    runHeatConsumptionReportButton_->setEnabled(
+        heatFragmentCombo_->count() > 0);
+    exportHeatConsumptionReportButton_->setEnabled(false);
+    heatConsumptionReport_ = {};
+    heatConsumptionReportTable_->setRowCount(0);
+    heatConsumptionReportStatusLabel_->setStyleSheet({});
+    heatConsumptionReportStatusLabel_->setText(
+        QStringLiteral("Выберите режим и сформируйте отчёт"));
 }
 
 void MainWindow::executePipeLengthReport()
@@ -1905,6 +1988,112 @@ void MainWindow::exportPipeVolumeReport()
                << QString::number(totalVolume, 'f', 6) << ';'
                << totalMissingDiameter << ';'
                << totalMissingLength << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::executeHeatConsumptionReport()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::HeatConsumptionReportCriteria criteria;
+    criteria.fragmentId = heatFragmentCombo_->currentData().toInt();
+    criteria.mode = heatModeCombo_->currentData().toString();
+
+    runHeatConsumptionReportButton_->setEnabled(false);
+    exportHeatConsumptionReportButton_->setEnabled(false);
+    heatConsumptionReportStatusLabel_->setStyleSheet({});
+    heatConsumptionReportStatusLabel_->setText(
+        QStringLiteral("Чтение результатов последнего расчёта…"));
+    QApplication::processEvents();
+
+    heatConsumptionReport_ = heatConsumptionReportRepository_.load(
+        connection_.database(), criteria);
+    runHeatConsumptionReportButton_->setEnabled(true);
+    if (!heatConsumptionReport_.error.isEmpty()) {
+        heatConsumptionReportTable_->setRowCount(0);
+        heatConsumptionReportStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        heatConsumptionReportStatusLabel_->setText(
+            QStringLiteral("Ошибка отчёта: %1")
+                .arg(heatConsumptionReport_.error));
+        return;
+    }
+    if (heatConsumptionReport_.rows.isEmpty()) {
+        heatConsumptionReportTable_->setRowCount(0);
+        heatConsumptionReportStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b54708;"));
+        heatConsumptionReportStatusLabel_->setText(
+            QStringLiteral(
+                "Для выбранного фрагмента нет результатов расчёта"));
+        return;
+    }
+
+    heatConsumptionReportTable_->setRowCount(
+        heatConsumptionReport_.rows.size());
+    for (qsizetype rowIndex = 0;
+         rowIndex < heatConsumptionReport_.rows.size(); ++rowIndex) {
+        const repo::HeatConsumptionReportRow& row =
+            heatConsumptionReport_.rows.at(rowIndex);
+        heatConsumptionReportTable_->setItem(
+            rowIndex, 0, readOnlyItem(row.metricLabel));
+        QTableWidgetItem* heatItem =
+            readOnlyItem(QString::number(row.heatLoad, 'f', 6));
+        heatItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        heatConsumptionReportTable_->setItem(rowIndex, 1, heatItem);
+        QTableWidgetItem* flowItem =
+            readOnlyItem(QString::number(row.massFlow, 'f', 6));
+        flowItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        heatConsumptionReportTable_->setItem(rowIndex, 2, flowItem);
+    }
+    exportHeatConsumptionReportButton_->setEnabled(true);
+    heatConsumptionReportStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    heatConsumptionReportStatusLabel_->setText(
+        QStringLiteral(
+            "Последние расчёты: фрагментов %1 · узлов с результатами %2")
+            .arg(heatConsumptionReport_.fragmentCount)
+            .arg(heatConsumptionReport_.resultNodeCount));
+}
+
+void MainWindow::exportHeatConsumptionReport()
+{
+    if (heatConsumptionReport_.rows.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт теплопотребления"),
+        QStringLiteral("tgid_heat_consumption.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("Показатель")) << ';'
+           << csvCell(QStringLiteral("Теплопотребление, Гкал/ч")) << ';'
+           << csvCell(QStringLiteral("Расход, т/ч")) << '\n';
+    for (const repo::HeatConsumptionReportRow& row
+         : heatConsumptionReport_.rows) {
+        stream << csvCell(row.metricLabel) << ';'
+               << QString::number(row.heatLoad, 'f', 9) << ';'
+               << QString::number(row.massFlow, 'f', 9) << '\n';
     }
     stream.flush();
     if (!file.commit()) {
