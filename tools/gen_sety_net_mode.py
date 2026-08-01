@@ -27,14 +27,29 @@ _is_net = None
 
 
 def is_net(conn):
-    """Есть ли схема net. Результат кэшируется на процесс."""
+    """Обслуживается ли БД схемой net. Результат кэшируется на процесс.
+
+    Проверять существование схемы net недостаточно. В исходной БД после
+    пробной конвертации схема net остаётся рядом с настоящими таблицами
+    public, и данные в ней устаревают. Чтение из неё в таком состоянии
+    даёт неполный результат БЕЗ ошибки: расчёт отрабатывает, пишет
+    меньше строк и сообщает «во фрагменте нет источников тепла».
+
+    Признак настоящего перевода — public.nodes стал представлением
+    (применён 040_switch_to_net.sql). Пока это базовая таблица, данные
+    живут в public, и читать надо оттуда.
+    """
     global _is_net
     if _is_net is None:
         cur = conn.cursor()
         cur.execute("SELECT count(*) FROM information_schema.tables "
                     "WHERE table_schema = 'net' AND table_name = 'node_reg'")
-        _is_net = cur.fetchone()[0] > 0
+        has_net = cur.fetchone()[0] > 0
+        cur.execute("SELECT count(*) FROM information_schema.views "
+                    "WHERE table_schema = 'public' AND table_name = 'nodes'")
+        switched = cur.fetchone()[0] > 0
         cur.close()
+        _is_net = has_net and switched
     return _is_net
 
 
@@ -46,7 +61,11 @@ def node_query(tn, cols, s_fileID):
     отнесённые к другому классу), лежат в extra_* и добавляются UNION —
     без них ядро увидит меньше объектов, чем на исходной БД.
     """
-    cls = NODE_CLASS.get(tn)
+    # Ключи отображения в нижнем регистре, а ядро передаёт имя таблицы
+    # как в исходнике — 'realConsumers', 'heatChambers'. Без приведения
+    # регистра .get не находил класс, возвращал None, и чтение молча
+    # уходило на старый запрос к представлениям совместимости.
+    cls = NODE_CLASS.get(tn.lower())
     if not cls:
         return None
     own = cols.replace('o.', 'o.')
@@ -76,7 +95,7 @@ def line_query(tn, cols, s_fileID):
     Соединение идёт с реестром net.node_reg — обычной таблицей с индексом,
     а не с представлением nodes из десяти ветвей.
     """
-    cls = LINE_CLASS.get(tn)
+    cls = LINE_CLASS.get(tn.lower())  # см. примечание в node_query
     if not cls:
         return None
     return f"""
