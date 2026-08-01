@@ -57,6 +57,7 @@
 | 41 | Запрос `onPotNagr0`: потребители с нулевой нагрузкой | готово — [описание](docs/24-zero-load-consumers.md), [тест](sql/tests/test_zero_load_consumers.sql) |
 | 42 | Запрос `onPotrOtkl`: отключённые потребители по результатам расчёта | готово — [описание](docs/25-disconnected-consumers.md), [тест](sql/tests/test_disconnected_consumers.sql) |
 | 43 | Запрос `onUtZakr`: закрытые участки трубопровода | готово — [описание](docs/26-closed-pipe-sections.md), [тест](sql/tests/test_closed_pipe_sections.sql) |
+| 44 | Запрос `onUtZakrAll`: отключённые участки без результата `UT_OUT` | готово — [описание](docs/27-disconnected-pipe-sections.md), [тест](sql/tests/test_disconnected_pipe_sections.sql) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше

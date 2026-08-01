@@ -1073,6 +1073,79 @@ void MainWindow::buildInterface()
     closedPipeLayout->addWidget(closedPipeSectionsTable_, 1);
     tabs->addTab(closedPipeTab, QStringLiteral("Закрытые участки"));
 
+    auto* disconnectedPipeTab = new QWidget(tabs);
+    auto* disconnectedPipeLayout = new QVBoxLayout(disconnectedPipeTab);
+    auto* disconnectedPipeToolbar = new QHBoxLayout();
+    disconnectedPipeToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), disconnectedPipeTab));
+    disconnectedPipeFragmentCombo_ = new QComboBox(disconnectedPipeTab);
+    disconnectedPipeFragmentCombo_->setMinimumWidth(240);
+    disconnectedPipeFragmentCombo_->setEnabled(false);
+    disconnectedPipeToolbar->addWidget(disconnectedPipeFragmentCombo_, 1);
+    disconnectedPipeToolbar->addWidget(
+        new QLabel(QStringLiteral("Фильтр:"), disconnectedPipeTab));
+    disconnectedPipeSearchEdit_ = new QLineEdit(disconnectedPipeTab);
+    disconnectedPipeSearchEdit_->setClearButtonEnabled(true);
+    disconnectedPipeSearchEdit_->setPlaceholderText(
+        QStringLiteral("Код/имя узла или исходный ID участка"));
+    disconnectedPipeToolbar->addWidget(disconnectedPipeSearchEdit_, 1);
+    refreshDisconnectedPipeSectionsButton_ = new QPushButton(
+        QStringLiteral("Найти"), disconnectedPipeTab);
+    refreshDisconnectedPipeSectionsButton_->setEnabled(false);
+    connect(refreshDisconnectedPipeSectionsButton_, &QPushButton::clicked,
+            this, &MainWindow::refreshDisconnectedPipeSections);
+    connect(disconnectedPipeSearchEdit_, &QLineEdit::returnPressed,
+            this, &MainWindow::refreshDisconnectedPipeSections);
+    disconnectedPipeToolbar->addWidget(
+        refreshDisconnectedPipeSectionsButton_);
+    exportDisconnectedPipeSectionsButton_ = new QPushButton(
+        QStringLiteral("Экспорт CSV"), disconnectedPipeTab);
+    exportDisconnectedPipeSectionsButton_->setEnabled(false);
+    connect(exportDisconnectedPipeSectionsButton_, &QPushButton::clicked,
+            this, &MainWindow::exportDisconnectedPipeSections);
+    disconnectedPipeToolbar->addWidget(
+        exportDisconnectedPipeSectionsButton_);
+    disconnectedPipeLayout->addLayout(disconnectedPipeToolbar);
+    disconnectedPipeSectionsStatusLabel_ = new QLabel(
+        QStringLiteral(
+            "Отключённый участок: для него отсутствует результат UT_OUT. "
+            "Двойной щелчок открывает карточку."),
+        disconnectedPipeTab);
+    disconnectedPipeSectionsStatusLabel_->setWordWrap(true);
+    disconnectedPipeLayout->addWidget(
+        disconnectedPipeSectionsStatusLabel_);
+    disconnectedPipeSectionsTable_ = new QTableWidget(disconnectedPipeTab);
+    disconnectedPipeSectionsTable_->setColumnCount(9);
+    disconnectedPipeSectionsTable_->setHorizontalHeaderLabels({
+        QStringLiteral("ID"),
+        QStringLiteral("Исходный ID"),
+        QStringLiteral("Код начала"),
+        QStringLiteral("Узел начала"),
+        QStringLiteral("Код конца"),
+        QStringLiteral("Узел конца"),
+        QStringLiteral("Длина, м"),
+        QStringLiteral("Внутр. диаметр, мм"),
+        QStringLiteral("Фрагмент"),
+    });
+    disconnectedPipeSectionsTable_->setEditTriggers(
+        QAbstractItemView::NoEditTriggers);
+    disconnectedPipeSectionsTable_->setSelectionBehavior(
+        QAbstractItemView::SelectRows);
+    disconnectedPipeSectionsTable_->setSelectionMode(
+        QAbstractItemView::SingleSelection);
+    disconnectedPipeSectionsTable_->setAlternatingRowColors(true);
+    disconnectedPipeSectionsTable_->setSortingEnabled(true);
+    disconnectedPipeSectionsTable_->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::ResizeToContents);
+    disconnectedPipeSectionsTable_->horizontalHeader()->setStretchLastSection(
+        true);
+    connect(disconnectedPipeSectionsTable_,
+            &QTableWidget::cellDoubleClicked,
+            this, &MainWindow::openDisconnectedPipeSection);
+    disconnectedPipeLayout->addWidget(disconnectedPipeSectionsTable_, 1);
+    tabs->addTab(
+        disconnectedPipeTab, QStringLiteral("Отключённые участки"));
+
     auto* archiveTab = new QWidget(tabs);
     auto* archiveLayout = new QVBoxLayout(archiveTab);
     auto* archiveToolbar = new QHBoxLayout();
@@ -1296,6 +1369,14 @@ void MainWindow::showError(const QString& message)
     refreshClosedPipeSectionsButton_->setEnabled(false);
     exportClosedPipeSectionsButton_->setEnabled(false);
     closedPipeSectionsStatusLabel_->setText(
+        QStringLiteral("Список недоступен"));
+    disconnectedPipeSectionsTable_->setRowCount(0);
+    disconnectedPipeSectionRows_.clear();
+    disconnectedPipeFragmentCombo_->clear();
+    disconnectedPipeFragmentCombo_->setEnabled(false);
+    refreshDisconnectedPipeSectionsButton_->setEnabled(false);
+    exportDisconnectedPipeSectionsButton_->setEnabled(false);
+    disconnectedPipeSectionsStatusLabel_->setText(
         QStringLiteral("Список недоступен"));
     mapView_->clearMap();
     clearObjectDetails();
@@ -1844,6 +1925,7 @@ void MainWindow::populateReportFragments(
     zeroLoadConsumerFragmentCombo_->clear();
     disconnectedConsumerFragmentCombo_->clear();
     closedPipeFragmentCombo_->clear();
+    disconnectedPipeFragmentCombo_->clear();
     reportFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     volumeFragmentCombo_->addItem(
@@ -1857,6 +1939,8 @@ void MainWindow::populateReportFragments(
     disconnectedConsumerFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     closedPipeFragmentCombo_->addItem(
+        QStringLiteral("Все фрагменты"), 0);
+    disconnectedPipeFragmentCombo_->addItem(
         QStringLiteral("Все фрагменты"), 0);
     for (const repo::FragmentInfo& fragment : fragments) {
         QString label = fragment.name;
@@ -1883,6 +1967,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         closedPipeFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        disconnectedPipeFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
     }
@@ -1956,6 +2043,16 @@ void MainWindow::populateReportFragments(
     closedPipeSectionsTable_->setRowCount(0);
     closedPipeSectionsStatusLabel_->setStyleSheet({});
     closedPipeSectionsStatusLabel_->setText(
+        QStringLiteral("Выберите параметры и нажмите «Найти»"));
+    disconnectedPipeFragmentCombo_->setEnabled(
+        disconnectedPipeFragmentCombo_->count() > 0);
+    refreshDisconnectedPipeSectionsButton_->setEnabled(
+        disconnectedPipeFragmentCombo_->count() > 0);
+    exportDisconnectedPipeSectionsButton_->setEnabled(false);
+    disconnectedPipeSectionRows_.clear();
+    disconnectedPipeSectionsTable_->setRowCount(0);
+    disconnectedPipeSectionsStatusLabel_->setStyleSheet({});
+    disconnectedPipeSectionsStatusLabel_->setText(
         QStringLiteral("Выберите параметры и нажмите «Найти»"));
 }
 
@@ -3083,6 +3180,158 @@ void MainWindow::exportClosedPipeSections()
            << csvCell(QStringLiteral("Внутренний диаметр")) << ';'
            << csvCell(QStringLiteral("Фрагмент")) << '\n';
     for (const repo::ClosedPipeSectionRow& row : closedPipeSectionRows_) {
+        stream << row.id << ';' << row.sourceId << ';'
+               << csvCell(row.nodeFromCode) << ';'
+               << csvCell(row.nodeFromName) << ';'
+               << csvCell(row.nodeToCode) << ';'
+               << csvCell(row.nodeToName) << ';';
+        if (!row.pipeLengthIsNull) {
+            stream << QString::number(row.pipeLength, 'f', 3);
+        }
+        stream << ';';
+        if (!row.internalDiameterIsNull) {
+            stream << QString::number(row.internalDiameter, 'f', 3);
+        }
+        stream << ';' << row.fragmentId << '\n';
+    }
+    stream.flush();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(
+        QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::refreshDisconnectedPipeSections()
+{
+    if (!connection_.isOpen()) {
+        return;
+    }
+    repo::DisconnectedPipeSectionCriteria criteria;
+    criteria.fragmentId =
+        disconnectedPipeFragmentCombo_->currentData().toInt();
+    criteria.searchText = disconnectedPipeSearchEdit_->text().trimmed();
+    criteria.limit = 5000;
+
+    refreshDisconnectedPipeSectionsButton_->setEnabled(false);
+    exportDisconnectedPipeSectionsButton_->setEnabled(false);
+    disconnectedPipeSectionsStatusLabel_->setStyleSheet({});
+    disconnectedPipeSectionsStatusLabel_->setText(
+        QStringLiteral("Загрузка отключённых участков…"));
+    QApplication::processEvents();
+
+    QString error;
+    disconnectedPipeSectionRows_ = disconnectedPipeSectionRepository_.load(
+        connection_.database(), criteria, &error);
+    refreshDisconnectedPipeSectionsButton_->setEnabled(true);
+    if (!error.isEmpty()) {
+        disconnectedPipeSectionRows_.clear();
+        disconnectedPipeSectionsTable_->setRowCount(0);
+        disconnectedPipeSectionsStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        disconnectedPipeSectionsStatusLabel_->setText(
+            QStringLiteral("Ошибка списка: %1").arg(error));
+        return;
+    }
+
+    disconnectedPipeSectionsTable_->setSortingEnabled(false);
+    disconnectedPipeSectionsTable_->setRowCount(
+        disconnectedPipeSectionRows_.size());
+    for (qsizetype rowIndex = 0;
+         rowIndex < disconnectedPipeSectionRows_.size(); ++rowIndex) {
+        const repo::DisconnectedPipeSectionRow& row =
+            disconnectedPipeSectionRows_.at(rowIndex);
+        QTableWidgetItem* idItem = readOnlyItem(QString::number(row.id));
+        idItem->setData(Qt::UserRole, row.id);
+        disconnectedPipeSectionsTable_->setItem(rowIndex, 0, idItem);
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 1, readOnlyItem(QString::number(row.sourceId)));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 2, readOnlyItem(row.nodeFromCode));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 3, readOnlyItem(row.nodeFromName));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 4, readOnlyItem(row.nodeToCode));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 5, readOnlyItem(row.nodeToName));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 6,
+            readOnlyItem(row.pipeLengthIsNull
+                             ? QString()
+                             : QString::number(row.pipeLength, 'f', 3)));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 7,
+            readOnlyItem(row.internalDiameterIsNull
+                             ? QString()
+                             : QString::number(row.internalDiameter, 'f', 3)));
+        disconnectedPipeSectionsTable_->setItem(
+            rowIndex, 8, readOnlyItem(QString::number(row.fragmentId)));
+    }
+    disconnectedPipeSectionsTable_->setSortingEnabled(true);
+    exportDisconnectedPipeSectionsButton_->setEnabled(
+        !disconnectedPipeSectionRows_.isEmpty());
+    disconnectedPipeSectionsStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #067647;"));
+    if (disconnectedPipeSectionRows_.size() == criteria.limit) {
+        disconnectedPipeSectionsStatusLabel_->setText(
+            QStringLiteral(
+                "Показаны первые %1 строк — выберите фрагмент или задайте фильтр")
+                .arg(criteria.limit));
+    } else {
+        disconnectedPipeSectionsStatusLabel_->setText(
+            QStringLiteral("Найдено отключённых участков: %1")
+                .arg(disconnectedPipeSectionRows_.size()));
+    }
+}
+
+void MainWindow::openDisconnectedPipeSection(int row, int column)
+{
+    Q_UNUSED(column);
+    QTableWidgetItem* item = disconnectedPipeSectionsTable_->item(row, 0);
+    if (item == nullptr) {
+        return;
+    }
+    const qint64 objectId = item->data(Qt::UserRole).toLongLong();
+    if (objectId > 0) {
+        showObjectDetails(objectId, QStringLiteral("pipe_section"), false);
+    }
+}
+
+void MainWindow::exportDisconnectedPipeSections()
+{
+    if (disconnectedPipeSectionRows_.isEmpty()) {
+        return;
+    }
+    const QString fileName = QFileDialog::getSaveFileName(
+        this,
+        QStringLiteral("Экспорт отключённых участков"),
+        QStringLiteral("tgid_disconnected_pipe_sections.csv"),
+        QStringLiteral("CSV (*.csv)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Экспорт CSV"), file.errorString());
+        return;
+    }
+    file.write("\xEF\xBB\xBF");
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << csvCell(QStringLiteral("ID")) << ';'
+           << csvCell(QStringLiteral("Исходный ID")) << ';'
+           << csvCell(QStringLiteral("Код начала")) << ';'
+           << csvCell(QStringLiteral("Имя начала")) << ';'
+           << csvCell(QStringLiteral("Код конца")) << ';'
+           << csvCell(QStringLiteral("Имя конца")) << ';'
+           << csvCell(QStringLiteral("Длина, м")) << ';'
+           << csvCell(QStringLiteral("Внутренний диаметр")) << ';'
+           << csvCell(QStringLiteral("Фрагмент")) << '\n';
+    for (const repo::DisconnectedPipeSectionRow& row
+         : disconnectedPipeSectionRows_) {
         stream << row.id << ';' << row.sourceId << ';'
                << csvCell(row.nodeFromCode) << ';'
                << csvCell(row.nodeFromName) << ';'

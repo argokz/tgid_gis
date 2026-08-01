@@ -5,6 +5,7 @@
 #include "repo/ClosedConsumerRepository.h"
 #include "repo/ClosedPipeSectionRepository.h"
 #include "repo/DisconnectedConsumerRepository.h"
+#include "repo/DisconnectedPipeSectionRepository.h"
 #include "repo/FragmentRepository.h"
 #include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
@@ -89,6 +90,9 @@ private slots:
     void refreshClosedPipeSections();
     void exportClosedPipeSections();
     void openClosedPipeSection(int row, int column);
+    void refreshDisconnectedPipeSections();
+    void exportDisconnectedPipeSections();
+    void openDisconnectedPipeSection(int row, int column);
 
 private:
     void buildInterface();
@@ -114,6 +118,7 @@ private:
     repo::ClosedConsumerRepository closedConsumerRepository_;
     repo::ClosedPipeSectionRepository closedPipeSectionRepository_;
     repo::DisconnectedConsumerRepository disconnectedConsumerRepository_;
+    repo::DisconnectedPipeSectionRepository disconnectedPipeSectionRepository_;
     repo::FragmentRepository fragmentRepository_;
     repo::HeatConsumptionReportRepository heatConsumptionReportRepository_;
     repo::LayerCatalogRepository layerRepository_;
@@ -199,6 +204,12 @@ private:
     QPushButton* exportClosedPipeSectionsButton_ = nullptr;
     QLabel* closedPipeSectionsStatusLabel_ = nullptr;
     QTableWidget* closedPipeSectionsTable_ = nullptr;
+    QComboBox* disconnectedPipeFragmentCombo_ = nullptr;
+    QLineEdit* disconnectedPipeSearchEdit_ = nullptr;
+    QPushButton* refreshDisconnectedPipeSectionsButton_ = nullptr;
+    QPushButton* exportDisconnectedPipeSectionsButton_ = nullptr;
+    QLabel* disconnectedPipeSectionsStatusLabel_ = nullptr;
+    QTableWidget* disconnectedPipeSectionsTable_ = nullptr;
     QDockWidget* objectDock_ = nullptr;
     QLabel* objectTitleLabel_ = nullptr;
     QTableWidget* objectTable_ = nullptr;
@@ -220,6 +231,7 @@ private:
     QList<repo::ZeroLoadConsumerRow> zeroLoadConsumerRows_;
     QList<repo::DisconnectedConsumerRow> disconnectedConsumerRows_;
     QList<repo::ClosedPipeSectionRow> closedPipeSectionRows_;
+    QList<repo::DisconnectedPipeSectionRow> disconnectedPipeSectionRows_;
     bool currentObjectIsNode_ = false;
     bool preserveObjectAfterMapLoad_ = false;
     qint64 pendingObjectId_ = 0;

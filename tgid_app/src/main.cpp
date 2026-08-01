@@ -3,6 +3,7 @@
 #include "repo/ClosedConsumerRepository.h"
 #include "repo/ClosedPipeSectionRepository.h"
 #include "repo/DisconnectedConsumerRepository.h"
+#include "repo/DisconnectedPipeSectionRepository.h"
 #include "repo/HeatConsumptionReportRepository.h"
 #include "repo/LayerCatalogRepository.h"
 #include "repo/MapRepository.h"
@@ -222,6 +223,20 @@ int main(int argc, char* argv[])
         QStringLiteral("Поиск в списке закрытых участков"),
         QStringLiteral("text"));
     parser.addOption(closedPipeSearchOption);
+    const QCommandLineOption disconnectedPipeSectionsOption(
+        QStringLiteral("disconnected-pipe-sections"),
+        QStringLiteral("Отключённые участки (onUtZakrAll)"));
+    parser.addOption(disconnectedPipeSectionsOption);
+    const QCommandLineOption disconnectedPipeFragmentOption(
+        QStringLiteral("disconnected-pipe-fragment"),
+        QStringLiteral("Ограничить отключённые участки фрагментом"),
+        QStringLiteral("fragment_id"));
+    parser.addOption(disconnectedPipeFragmentOption);
+    const QCommandLineOption disconnectedPipeSearchOption(
+        QStringLiteral("disconnected-pipe-search"),
+        QStringLiteral("Поиск в списке отключённых участков"),
+        QStringLiteral("text"));
+    parser.addOption(disconnectedPipeSearchOption);
     const QCommandLineOption reportArchivedOption(
         QStringLiteral("report-archived"),
         QStringLiteral("Включить архивные участки в отчёт"));
@@ -256,7 +271,8 @@ int main(int argc, char* argv[])
         || parser.isSet(closedConsumersOption)
         || parser.isSet(zeroLoadConsumersOption)
         || parser.isSet(disconnectedConsumersOption)
-        || parser.isSet(closedPipeSectionsOption)) {
+        || parser.isSet(closedPipeSectionsOption)
+        || parser.isSet(disconnectedPipeSectionsOption)) {
         const tgid::db::DatabaseConfig config =
             tgid::db::DatabaseConfig::fromEnvironment();
         tgid::db::DatabaseConnection connection;
@@ -1349,6 +1365,56 @@ int main(int argc, char* argv[])
             }
             qInfo().noquote()
                 << QStringLiteral("OK_CLOSED_PIPE: найдено=%1 лимит=%2")
+                       .arg(rows.size())
+                       .arg(criteria.limit);
+        }
+
+        if (parser.isSet(disconnectedPipeSectionsOption)) {
+            bool fragmentValid = true;
+            const int fragmentId =
+                parser.isSet(disconnectedPipeFragmentOption)
+                    ? parser.value(disconnectedPipeFragmentOption)
+                          .toInt(&fragmentValid)
+                    : 0;
+            if (!fragmentValid || fragmentId < 0) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Некорректный --disconnected-pipe-fragment");
+                return 50;
+            }
+            tgid::repo::DisconnectedPipeSectionCriteria criteria;
+            criteria.fragmentId = fragmentId;
+            criteria.searchText =
+                parser.value(disconnectedPipeSearchOption).trimmed();
+            criteria.limit = 5000;
+            QString listError;
+            const QList<tgid::repo::DisconnectedPipeSectionRow> rows =
+                tgid::repo::DisconnectedPipeSectionRepository().load(
+                    connection.database(), criteria, &listError);
+            if (!listError.isEmpty()) {
+                qCritical().noquote()
+                    << QStringLiteral(
+                           "Ошибка списка отключённых участков:")
+                    << listError;
+                return 51;
+            }
+            for (const tgid::repo::DisconnectedPipeSectionRow& row : rows) {
+                qInfo().noquote()
+                    << QStringLiteral(
+                           "DISCONNECTED_PIPE: id=%1 source_id=%2 fragment=%3 from=%4/%5 to=%6/%7 length=%8 diameter=%9")
+                           .arg(row.id)
+                           .arg(row.sourceId)
+                           .arg(row.fragmentId)
+                           .arg(row.nodeFromCode,
+                                row.nodeFromName,
+                                row.nodeToCode,
+                                row.nodeToName)
+                           .arg(row.pipeLength)
+                           .arg(row.internalDiameter);
+            }
+            qInfo().noquote()
+                << QStringLiteral(
+                       "OK_DISCONNECTED_PIPE: найдено=%1 лимит=%2")
                        .arg(rows.size())
                        .arg(criteria.limit);
         }
