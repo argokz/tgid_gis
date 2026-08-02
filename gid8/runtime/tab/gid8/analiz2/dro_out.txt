@@ -1,0 +1,13 @@
+Основные
+    sos
+    calculationID
+    lineID
+    externalSignLineID
+    a8
+    ras
+    a10
+    a11
+    a12
+    a13
+    a14
+    a15

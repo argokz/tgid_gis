@@ -1,0 +1,70 @@
+customHeaderList = {
+    row_1: [
+      {
+        text: "Id",
+        rowspan: 3,
+        colspan: 1,
+        class: "custom-th",
+      },
+      {
+        text: "Условный проход трубопровода, мм",
+        rowspan: 3,
+        colspan: 1,
+        class: "custom-th pt-5 pb-5",
+      },
+      {
+        text: "Средняя температура теплоносителя, °C",
+        rowspan: 1,
+        colspan: 3,
+        class: "custom-th pt-5 pb-5",
+      },
+       {
+        text: "Действия",
+        rowspan: 3,
+        colspan: 1,
+        class: "custom-th",
+      },
+      
+    ],
+    row_2: [
+      {
+        text: "$data1$",
+        rowspan: 1,
+        colspan: 1,
+        class: "custom-th pt-5 pb-5",
+        key: 'h_col_1',
+            value: '$data1$',
+            name: 't1',
+            type: 'number'
+      },
+       {
+        text: "$data2$",
+        rowspan: 1,
+        colspan: 1,
+        class: "custom-th",
+        key: 'h_col_2',
+            value: '$data2$',
+            name: 't2',
+            type: 'number'
+      },
+       {
+        text: "$data3$",
+        rowspan: 1,
+        colspan: 1,
+        class: "custom-th",
+        key: 'h_col_3',
+            value: '$data3$',
+            name: 't3',
+            type: 'number'
+      }
+    ],
+    row_3: [
+     {
+        text: "Нормы линейной плотности теплового потока, ккал/(м . ч)",
+        rowspan: 1,
+        colspan: 3,
+        class: "custom-th pt-5 pb-5",
+      },
+   
+    ],
+  };

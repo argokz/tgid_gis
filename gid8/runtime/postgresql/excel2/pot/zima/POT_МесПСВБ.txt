@@ -1,0 +1,28 @@
+#
+SELECT 
+  MON,
+  VenP,
+  VdrP,
+  VbpP,
+  VmgP,
+
+  VdrP+VbpP+VmgP,
+  VuP,
+
+  VpprP,
+  VpbpP,
+  VpP,
+  VpP+VuP
+
+FROM
+(
+#include ../POT_ÌåñÏÑÂÁ.sql
+)  
+WHERE 
+  period = 1
+
+
+#
+xls/tgid.xls
+13 8
+G1

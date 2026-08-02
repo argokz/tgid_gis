@@ -1,0 +1,6 @@
+Основные
+    calculationID
+    lineID
+    externalSignLineID
+    sost
+    ras

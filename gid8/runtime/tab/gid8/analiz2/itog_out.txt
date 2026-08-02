@@ -1,0 +1,24 @@
+Основные
+    kodrs
+    n_otz
+    n_otn
+    n_vn
+    n_kn
+    n_txz
+    n_txop
+    n_txoo
+    n_gvop
+    n_gvoo
+    n_rez
+    n_gvz
+    q_otz
+    q_otn
+    q_vn
+    q_kn
+    q_txz
+    q_txop
+    q_txoo
+    q_gvop
+    q_gvoo
+    q_rez
+    q_gvz

@@ -1,0 +1,16 @@
+Основные
+    choke_state
+    input_node_calculation_code
+    input_node_name
+    output_node_calculation_code
+    output_node_name
+    choke_type
+    adjustable_head_or_flow
+    allowable_deviation_head_or_flow
+    length
+    internal_diameter
+    sum_of_local_resistance_coefficients
+    pipe_material
+    pipe_surface_condition
+    hydraulic_resistance
+    diaphragm_installation_location

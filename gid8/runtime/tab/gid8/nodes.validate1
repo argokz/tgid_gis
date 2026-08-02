@@ -1,0 +1,4 @@
+--externalNodeName NotNull
+--externalCodeID NotNull
+externalNodeName NotNull noNodeDuble
+externalCodeID NotNull noNodeDuble

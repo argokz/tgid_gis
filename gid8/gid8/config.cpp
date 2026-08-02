@@ -46,8 +46,27 @@ bool init_config()
     QByteArray key = QCryptographicHash::hash("my_secret_key", QCryptographicHash::Sha256);
 
     QString fn = QString("%1kls/config.ini").arg(argpath());
+
+    // Без локального config.ini приложение должно оставаться рабочим:
+    // показываем прежний диалог подключения с безопасными значениями.
+    ini.cs.rdbms = 1;
+    ini.cs.host = qEnvironmentVariable("TGID_HOST", "localhost");
+    ini.cs.port = qEnvironmentVariableIntValue("TGID_PORT");
+    if (ini.cs.port <= 0) ini.cs.port = 5432;
+    ini.cs.user = qEnvironmentVariable("TGID_USER", "postgres");
+    ini.cs.password = qEnvironmentVariable("PGPASSWORD", "");
+    ini.cs.baza = qEnvironmentVariable("TGID_DB", "tgid_gis");
+    ini.cs.geo = ini.cs.baza;
+    ini.ok = true;
+    ini.enable_rdbms = true;
+    ini.enable_host = true;
+    ini.enable_port = true;
+    ini.enable_user = true;
+    ini.enable_password = true;
+    ini.enable_baza = true;
+    ini.enable_geo = true;
+
     bool enable = true;
-    bool ok = false;
 
     if (QFile::exists(fn)) {
         QString fn2 = fn;
@@ -102,7 +121,6 @@ bool init_config()
             if (!ini.enable_baza) settings.setValue("cs/gid9", ini.cs.gid9);
         }
     }
-    return false;
+    return ini.ok;
 }
-
 

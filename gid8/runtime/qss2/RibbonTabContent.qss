@@ -1,0 +1,85 @@
+QGridLayout {
+/*    border: 5px solid green;*/
+}
+
+
+QWidget[class='RibbonTabContent'] {
+    background-color: #f7f3f7;
+}
+
+
+QFrame[class='nest2'] {
+    border: 0.5px solid #4EB8FF;
+    border-radius: 4px; 
+}
+
+QFrame[class='nest3'] {
+    border: none;
+}
+
+QFrame[class='nest4'] {
+}
+
+QFrame[class='nest4'] QFrame[class='nest2'] {
+    border: 0.5px solid #4EB8FF;
+    border-radius: 4px; 
+}
+
+WToolButton {
+    background-color: #f7f3f7;
+    font-size: 12px;
+    border-radius: 5px;
+    padding: 0px;
+}
+
+WToolButton[class='b1'] {
+    font-size: 10px;
+}
+
+WToolButton[class='b1_min'] {
+    font-size: 10px;
+}
+
+WToolButton[class='b1_small'] {
+    font-size: 9px;
+}
+
+WToolButton[class='b2_small'] {
+    font-size: 9px;
+}
+
+WToolButton[class='b3_small'] {
+    font-size: 9px;
+}
+
+
+WToolButton::disabled {
+    opacity: 0.5; /* Полупрозрачность */
+}
+
+
+
+QToolButton::menu-indicator {
+    image: url(/chevron-down-svgrepo-com.svg); 
+    subcontrol-origin: padding;
+    subcontrol-position: right center; /* Располагаем индикатор справа, по центру */
+    width: 20px;
+    height: 20px;
+}
+
+
+
+WToolButton:hover {
+    background-color: #cdebff;
+}
+
+WToolButton:checked  {
+/*    fill: #fff; */
+    
+/*    background-color: #cdebff; */
+    background-color: #c0e4fc;   
+    
+
+/*    border: 1px solid #000;*/
+}
+

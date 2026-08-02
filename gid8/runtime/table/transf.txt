@@ -1,0 +1,37 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+List
+    id
+    objID
+    purposeID
+    transfTypeID
+--    description
+    kol
+    pow
+    voltageHi
+    voltageLo
+    Ukz
+    Ixx
+    god
+    primechanie
+    id
+
+
+defaut table $ps$ transf
+
+
+t 0 14 Документы
+view_documents 14 transfDocuments remontDocumentTypes Документы
+
+
+
+w 1 0
+
+--w 4 400
+
+
+--w 1 0
+--w 4 400

@@ -1,0 +1,14 @@
+Основные
+    regulator_state
+    input_node_calculation_code
+    input_node_name
+    output_node_calculation_code
+    output_node_name
+    regulated_node_calculation_code
+    regulated_node_name
+    adjustable_head
+    allowable_deviation_from_set_head
+    valve_capacity_KV_t_per_hour
+    relative_leakage_percent_of_KV
+    hydraulic_resistance_valve_open_state
+    hydraulic_resistance_valve_closed_state

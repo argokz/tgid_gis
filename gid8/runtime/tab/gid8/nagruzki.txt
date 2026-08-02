@@ -1,0 +1,20 @@
+Нагрузки
+    city
+    mkr
+    street
+    house
+    house2
+    addr
+    adm_rayon
+    rayon
+    ist
+    tg
+    uchastok
+    otop
+    gvs
+    vent
+    par
+    dogovor
+    numb
+    owner
+    name

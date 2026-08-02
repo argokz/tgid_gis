@@ -1,0 +1,219 @@
+
+"WaterConsumers","consumer_status","Состояние aбонента"
+"WaterConsumers","calculation_code","Код расчетной схемы"
+"WaterConsumers","water_network_attachment_node","Узел присоединения на водопров. сети"
+"WaterConsumers","geodetic_axis_elevation","Геодезич. отметка оси труб на вводе, м."
+"WaterConsumers","highest_building_floor","Этажность наиболее высокого здания"
+"WaterConsumers","floor_height","Расчетная высота этажа, м."
+"WaterConsumers","summer_daily_water_consumption_code","Код летнего суточного графика водопотребления"
+"WaterConsumers","winter_daily_water_consumption_code","Код зимнего суточного графика водопотребления"
+"WaterConsumers","calculated_flow_rate","Расчетный расход, м3/ч"
+"WaterConsumers","max_flow_rate","Максимальный расход, м3/ч"
+"WaterConsumers","required_headroom","Требуемый свободный напор, м"
+"WaterConsumers","coefficient_variation_group_code","Код группы коэффициентов вариации"
+"WaterConsumers","dominant_point_membership","Принадлежность к диктующей точке"
+"WaterConsumers","subscriber_name","Наименование абонента"
+"WaterConsumers","subscriber_type","Признак абонента"
+"WaterConsumers","calculated_head_loss_up_to_dominant_point","Расчетные потери напора до диктующей точки ответвления, м."
+
+
+
+"BoundaryNodes","calculation_code","Код расчетной схемы"
+"BoundaryNodes","node_name","Наименование узла"
+"BoundaryNodes","measured_headroom","Измеренный свободный напор, м."
+"BoundaryNodes","concentrated_equivalent_flow_rate","Сосредоточенный эквивалентный расход, м3/ч."
+
+
+
+"CoefficientsOfVariation","coefficient_group_code","Код группы коэффициентов вариации"
+"CoefficientsOfVariation","KV_for_summer_calculated_flow","КВ для расчетного расхода летом"
+"CoefficientsOfVariation","KV_for_winter_calculated_flow","КВ для расчетного расхода зимой"
+"CoefficientsOfVariation","KV_for_summer_max_flow","КВ для максимального расхода летом"
+"CoefficientsOfVariation","KV_for_winter_max_flow","КВ для максимального расхода зимой"
+"CoefficientsOfVariation","KV_for_relative_water_consumption","КВ для относительного водоразбора"
+
+
+
+
+"Pumps","pump_state","Состояние насоса"
+"Pumps","input_node_calculation_code","Код расчетной схемы узла на входе насоса"
+"Pumps","input_node_name","Наименование узла на входе насоса"
+"Pumps","output_node_calculation_code","Код расчетной схемы узла на выходе насоса"
+"Pumps","output_node_name","Наименование узла на выходе насоса"
+"Pumps","required_headroom_pump_station","Заданный рабочий напор насосной станции, м."
+"Pumps","approximation_coefficient_R0","Коэффициент аппроксимации характеристики насосной станции R0, м."
+"Pumps","approximation_coefficient_R1","Коэффициент аппроксимации характеристики насосной станции R1, м*ч/м3."
+"Pumps","approximation_coefficient_R2","Коэффициент аппроксимации характерист. насосн. станции R2, м*ч2/(м3)^2."
+"Pumps","pump_station_characteristic_1st_point_head","Рабочая зона характеристики насосной станции 1-ая точка - напор, м."
+"Pumps","pump_station_characteristic_1st_point_flow","Рабочая зона характеристики насосной станции 1-ая точка - расход, м3/ч."
+"Pumps","pump_station_characteristic_2nd_point_head","Рабочая зона характеристики насосной станции 2-ая точка - напор, м."
+"Pumps","pump_station_characteristic_2nd_point_flow","Рабочая зона характеристики насосной станции 2-ая точка - расход, м3/ч."
+"Pumps","number_of_pumps","Количество насосов"
+"Pumps","pump_type_code","Тип насосов"
+
+
+
+
+
+
+"PressureRegulators","regulator_state","Состояние"
+--- РДпробел - открытподключен), Н - открытнеактивен), * - закрытотключен))"
+"PressureRegulators","input_node_calculation_code","Код расчетной схемы узла на входе регулятора"
+"PressureRegulators","input_node_name","Наименование узла на входе регулятора"
+"PressureRegulators","output_node_calculation_code","Код расчетной схемы узла на выходе регулятора"
+"PressureRegulators","output_node_name","Наименование узла на выходе регулятора"
+"PressureRegulators","regulated_node_calculation_code","Код расчетной схемы узла с регулируемым напором"
+"PressureRegulators","regulated_node_name","Наименование узла с регулируемым напором"
+"PressureRegulators","adjustable_head","Значение регулируемого напора, м."
+"PressureRegulators","allowable_deviation_from_set_head","Допустимое отклонение текущего значения напора от заданного, м."
+"PressureRegulators","valve_capacity_KV_t_per_hour","Пропускная способность клапана регулятораKV), т/ч."
+"PressureRegulators","relative_leakage_percent_of_KV","Относительная протечка в % от KV"
+"PressureRegulators","hydraulic_resistance_valve_open_state","Гидравлическое сопротивление клапана в открытом состоянии"
+"PressureRegulators","hydraulic_resistance_valve_closed_state","Гидравлическое сопротивление клапана в закрытом состоянии"
+
+
+
+
+
+"RegulatingTanks","calculation_code","Код расчетной схемы"
+"RegulatingTanks","node_name","Наименование узла"
+"RegulatingTanks","geodetic_bottom_elevation","Геодезическая отметка дна емкости, м."
+"RegulatingTanks","tank_diameter","Диаметр емкости, м."
+"RegulatingTanks","water_surface_area","Площадь зеркала воды в емкости, м2."
+"RegulatingTanks","initial_water_level","Начальный уровень воды в емкости, м."
+"RegulatingTanks","max_allowed_water_level","Максимально допустимый уровень воды в емкости, м."
+"RegulatingTanks","operating_duration_hours","Продолжительность режима работы, ч."
+"RegulatingTanks","tank_purpose","Наименование и назначение  емкости"
+"RegulatingTanks","tank_state","Состояние регулирующей емкости"
+
+
+
+
+
+"FlowRegulators","regulator_state","Состояние"
+-- РРпробел - открыт, Н - открытнеактивен), * - закрытотключен))"
+"FlowRegulators","input_node_calculation_code","Код расчетной схемы узла на входе регулятора"
+"FlowRegulators","input_node_name","Наименование узла на входе регулятора"
+"FlowRegulators","output_node_calculation_code","Код расчетной схемы узла на выходе регулятора"
+"FlowRegulators","output_node_name","Наименование узла на выходе регулятора"
+"FlowRegulators","adjustable_flow_rate_m3_per_hour","Значение регулируемого расхода, м3/ч"
+"FlowRegulators","allowable_deviation_from_set_value","Допустимое отклонение значения расхода от заданного значения, м3/ч"
+"FlowRegulators","valve_capacity_KV_m3_per_hour","Пропускная способность клапана регулятораKV), м3/ч"
+"FlowRegulators","relative_leakage_percent_of_KV","Относительная протечка в % от KV"
+"FlowRegulators","hydraulic_resistance_valve_open_state","Гидравлическое сопротивление клапана в открытом состоянии"
+"FlowRegulators","hydraulic_resistance_valve_closed_state","Гидравлическое сопротивление клапана в закрытом состоянии"
+
+
+
+
+
+"WaterSupplySystemSchemes","system_name","Наименование системы водоснабжения"
+"WaterSupplySystemSchemes","operational_district_name","Наименование районного эксплуатационного цеха"
+"WaterSupplySystemSchemes","network_fragment_name","Наименование фрагмента районной сети"
+"WaterSupplySystemSchemes","calculation_scheme_code","Код расчетной схемы"
+"WaterSupplySystemSchemes","calendar_year_water_season","Календарный год сезона водопотребления"
+"WaterSupplySystemSchemes","data_administrator","Администратор данных"
+
+
+
+
+
+
+"DailyWaterConsumptionSchedule","schedule_code","Код суточного графика водопотребления"
+"DailyWaterConsumptionSchedule","interval_0_1","Относительное водопотребление на 1-ом интервалес 0 до 1 ч.)"
+"DailyWaterConsumptionSchedule","interval_1_2","Относительное водопотребление на 2-ом интервалес 1 до 2 ч.)"
+"DailyWaterConsumptionSchedule","interval_2_3","Относительное водопотребление на 3-ом интервалес 2 до 3 ч.)"
+"DailyWaterConsumptionSchedule","interval_3_4","Относительное водопотребление на 4-ом интервалес 3 до 4 ч.)"
+"DailyWaterConsumptionSchedule","interval_4_5","Относительное водопотребление на 5-ом интервалес 4 до 5 ч.)"
+"DailyWaterConsumptionSchedule","interval_5_6","Относительное водопотребление на 6-ом интервалес 5 до 6 ч.)"
+"DailyWaterConsumptionSchedule","interval_6_7","Относительное водопотребление на 7-ом интервалес 6 до 7 ч.)"
+"DailyWaterConsumptionSchedule","interval_7_8","Относительное водопотребление на 8-ом интервалес 7 до 8 ч.)"
+"DailyWaterConsumptionSchedule","interval_8_9","Относительное водопотребление на 9-ом интервалес 8 до 9 ч.)"
+"DailyWaterConsumptionSchedule","interval_9_10","Относительное водопотребление на 10-ом интервалес 9 до 10 ч.)"
+"DailyWaterConsumptionSchedule","interval_10_11","Относительное водопотребление на 11-ом интервалес 10 до 11 ч.)"
+"DailyWaterConsumptionSchedule","interval_11_12","Относительное водопотребление на 12-ом интервалес 11 до 12 ч.)"
+"DailyWaterConsumptionSchedule","interval_12_13","Относительное водопотребление на 13-ом интервалес 12 до 13 ч.)"
+"DailyWaterConsumptionSchedule","interval_13_14","Относительное водопотребление на 14-ом интервалес 13 до 14 ч.)"
+"DailyWaterConsumptionSchedule","interval_14_15","Относительное водопотребление на 15-ом интервалес 14 до 15 ч.)"
+"DailyWaterConsumptionSchedule","interval_15_16","Относительное водопотребление на 16-ом интервалес 15 до 16 ч.)"
+"DailyWaterConsumptionSchedule","interval_16_17","Относительное водопотребление на 17-ом интервалес 16 до 17 ч.)"
+"DailyWaterConsumptionSchedule","interval_17_18","Относительное водопотребление на 18-ом интервалес 17 до 18 ч.)"
+"DailyWaterConsumptionSchedule","interval_18_19","Относительное водопотребление на 19-ом интервалес 18 до 19 ч.)"
+"DailyWaterConsumptionSchedule","interval_19_20","Относительное водопотребление на 20-ом интервалес 19 до 20 ч.)"
+"DailyWaterConsumptionSchedule","interval_20_21","Относительное водопотребление на 21-ом интервалес 20 до 21 ч.)"
+"DailyWaterConsumptionSchedule","interval_21_22","Относительное водопотребление на 22-ом интервалес 21 до 22 ч.)"
+"DailyWaterConsumptionSchedule","interval_22_23","Относительное водопотребление на 23-ом интервалес 22 до 23 ч.)"
+"DailyWaterConsumptionSchedule","interval_23_24","Относительное водопотребление на 24-ом интервалес 23 до 24 ч.)"
+
+
+
+
+"TransitNodes","calculation_code","Код расчетной схемы"
+"TransitNodes","node_name","Наименование узла"
+"TransitNodes","terrain_elevation","Геодезическая отметка местности, м."
+"TransitNodes","dominant_point_membership","Принадлежность к диктующей точке"
+"TransitNodes","node_description","Содержательное наименование узла"
+
+
+
+
+"EmergencyPipelineSections","section_status_from_start_node","Состояние участка от начального узла"
+"EmergencyPipelineSections","section_status_from_end_node","Состояние участка от конечного узла"
+"EmergencyPipelineSections","input_node_calculation_code","Код расчетной схемы начального узла"
+"EmergencyPipelineSections","input_node_name","Имя начального узла"
+"EmergencyPipelineSections","output_node_calculation_code","Код расчетной схемы конечного узла"
+"EmergencyPipelineSections","output_node_name","Имя конечного узла"
+"EmergencyPipelineSections","section_length","Длина участка, м."
+"EmergencyPipelineSections","pipe_diameter","Внутренний диаметр трубопровода, мм."
+"EmergencyPipelineSections","sum_of_local_resistance_coefficients","Сумма коэфф. местных сопротивлений"
+"EmergencyPipelineSections","pipe_material","Материал трубы"
+"EmergencyPipelineSections","pipe_surface_condition","Состояние поверхности трубы"
+"EmergencyPipelineSections","hydraulic_resistance_section","Гидравл.сопротивл. участка"
+"EmergencyPipelineSections","distance_from_start_node_to_breakage","Расстояние аварийного разрыва тр-да от начального узла, м."
+"EmergencyPipelineSections","node_name_at_breakage","Наименование узла в точке разрыва трубопровода"
+"EmergencyPipelineSections","terrain_elevation_at_node","Геодезическая отметка местности узла, м."
+"EmergencyPipelineSections","breakage_hole_diameter_percent","Диаметр отверстия аварийного разрыва, %."
+
+
+
+
+
+
+"PipelineSegments","segment_status","Состояние участка"
+"PipelineSegments","input_node_calculation_code","Код расчетной схемы начального узла"
+"PipelineSegments","input_node_name","Имя начального узла"
+"PipelineSegments","output_node_calculation_code","Код расчетной схемы конечного узла"
+"PipelineSegments","output_node_name","Имя конечного узла"
+"PipelineSegments","segment_length","Длина участка, м."
+"PipelineSegments","pipe_diameter","Внутренний диаметр трубопровода, мм."
+"PipelineSegments","sum_of_local_resistance_coefficients","Сумма коэффициентов местных сопротивлений"
+"PipelineSegments","pipe_material","Материал трубы"
+"PipelineSegments","pipe_surface_condition","Состояние поверхности трубы"
+"PipelineSegments","hydraulic_resistance_segment","Гидравлическое сопротивление участка"
+
+
+
+"ExternalChokes","choke_state","Состояние внешнего дросселя"
+"ExternalChokes","input_node_calculation_code","Код расчетной схемы начального узла внешнего дросселя"
+"ExternalChokes","input_node_name","Наименование начального узла внешнего дросселя"
+"ExternalChokes","output_node_calculation_code","Код расчетной схемы конечного узла внешнего дросселя"
+"ExternalChokes","output_node_name","Наименование конечного узла внешнего дросселя"
+"ExternalChokes","choke_type","Признак дросселирования"
+"ExternalChokes","adjustable_head_or_flow","Значение регулируемого напора, м. или расхода т/час"
+"ExternalChokes","allowable_deviation_head_or_flow","Допустимое отклонение напора или расхода от требуемого"
+"ExternalChokes","length","Длина"
+"ExternalChokes","internal_diameter","Внутренний диаметр"
+"ExternalChokes","sum_of_local_resistance_coefficients","Сумма коэффициентов местных сопротивлений"
+"ExternalChokes","pipe_material","Материал трубы -- ENUM('Чугун', 'Сталь', 'Асбест', 'Пластмасса', 'Стекло', 'Железобетон'),"
+"ExternalChokes","pipe_surface_condition","Состояние поверхности трубы -- ENUM('Новая', 'НеноваяСтарая)', 'Шероховатая', 'Гладкая'),"
+"ExternalChokes","hydraulic_resistance_mantissa","Гидравлическое сопротивление внешнего дросселя - мантисса"
+"ExternalChokes","hydraulic_resistance_order","Гидравлическое сопротивление внешнего дросселя - порядок"
+"ExternalChokes","diaphragm_installation_location","Место установки дроссельной диафрагмы на трубопроводе"
+
+
+
+
+"NodesWithSpecifiedHead","calculation_scheme_code","Код расчетной схемы"
+"NodesWithSpecifiedHead","node_name","Наименование узла расчетной схемы"
+"NodesWithSpecifiedHead","total_head","Полный напор, м."
+

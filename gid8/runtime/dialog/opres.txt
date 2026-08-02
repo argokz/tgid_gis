@@ -1,0 +1,10 @@
+Опрессовка
+    istochnik_tepla L "$main$","heatSources","id","name" Источник тепла
+    opisaniye_kontura M Описание контура
+    granitsa_razdela M Границы раздела
+    vid_ispytani L Вид испытаний по контуру
+    date D Дата испытаний 
+    otchet M Результат испытаний (отчет)
+    subdivisionID L Подразделение производившего диагностику
+    responsibleID L Ответственный за испытание
+    primechanie M Примечание

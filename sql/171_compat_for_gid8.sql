@@ -30,7 +30,7 @@ COMMENT ON SCHEMA compat IS
     'базы не входит: продуктовый контур работает с net/ref/calc напрямую.';
 
 
-CREATE VIEW compat.airheaters AS
+CREATE OR REPLACE VIEW compat.airheaters AS
  SELECT id,
     lineid,
     faninstall,
@@ -44,13 +44,13 @@ CREATE VIEW compat.airheaters AS
     location
    FROM v_airheaters;
 
-CREATE VIEW compat.connectnodes AS
+CREATE OR REPLACE VIEW compat.connectnodes AS
  SELECT id,
     nodeid,
     connectid
    FROM v_connectnodes;
 
-CREATE VIEW compat.dampers AS
+CREATE OR REPLACE VIEW compat.dampers AS
  SELECT id,
     lineid,
     dispatcherswitch,
@@ -67,7 +67,7 @@ CREATE VIEW compat.dampers AS
     damperarmaturestateid
    FROM v_dampers;
 
-CREATE VIEW compat.diaphragms AS
+CREATE OR REPLACE VIEW compat.diaphragms AS
  SELECT id,
     lineid,
     throtdiaphloc,
@@ -77,7 +77,7 @@ CREATE VIEW compat.diaphragms AS
     stateid
    FROM v_diaphragms;
 
-CREATE VIEW compat.elevators AS
+CREATE OR REPLACE VIEW compat.elevators AS
  SELECT id,
     lineid,
     elevatortype,
@@ -93,7 +93,7 @@ CREATE VIEW compat.elevators AS
     stateid
    FROM v_elevators;
 
-CREATE VIEW compat.generalizedconsumers AS
+CREATE OR REPLACE VIEW compat.generalizedconsumers AS
  SELECT id,
     nodeid,
     quarter,
@@ -250,7 +250,7 @@ CREATE VIEW compat.generalizedconsumers AS
     name
    FROM v_generalizedconsumers;
 
-CREATE VIEW compat.heatchambers AS
+CREATE OR REPLACE VIEW compat.heatchambers AS
  SELECT id,
     nodeid,
     name,
@@ -266,7 +266,7 @@ CREATE VIEW compat.heatchambers AS
     airventscount
    FROM v_heatchambers;
 
-CREATE VIEW compat.heatexchangers AS
+CREATE OR REPLACE VIEW compat.heatexchangers AS
  SELECT id,
     lineid,
     heatexchtype,
@@ -275,7 +275,7 @@ CREATE VIEW compat.heatexchangers AS
     stateid
    FROM v_heatexchangers;
 
-CREATE VIEW compat.heatpipesections AS
+CREATE OR REPLACE VIEW compat.heatpipesections AS
  SELECT id,
     lineid,
     pipesectionid,
@@ -429,7 +429,7 @@ CREATE VIEW compat.heatpipesections AS
     mestn
    FROM v_heatpipesections;
 
-CREATE VIEW compat.heatsources AS
+CREATE OR REPLACE VIEW compat.heatsources AS
  SELECT id,
     nodeid,
     sourcename,
@@ -642,7 +642,7 @@ CREATE VIEW compat.heatsources AS
     id_old
    FROM v_heatsources;
 
-CREATE VIEW compat.linesobj AS
+CREATE OR REPLACE VIEW compat.linesobj AS
  SELECT id,
     nodeid1,
     nodeid2,
@@ -671,7 +671,7 @@ CREATE VIEW compat.linesobj AS
     id_old
    FROM v_linesobj;
 
-CREATE VIEW compat.localhydroresistances2 AS
+CREATE OR REPLACE VIEW compat.localhydroresistances2 AS
  SELECT id,
     lineid,
     name_mest,
@@ -680,7 +680,15 @@ CREATE VIEW compat.localhydroresistances2 AS
     sum_mest
    FROM v_localhydroresistances2;
 
-CREATE VIEW compat.nodes AS
+-- Эксплуатационный справочник перенесён в attic после раскладки его
+-- значений по объектным таблицам, но старый DockPTS всё ещё показывает и
+-- редактирует его отдельным экраном. Простое представление остаётся
+-- автоматически обновляемым.
+CREATE OR REPLACE VIEW compat.magistrali AS
+ SELECT *
+ FROM attic.magistrali;
+
+CREATE OR REPLACE VIEW compat.nodes AS
  SELECT id,
     internalnodeid,
     externalcodeid,
@@ -727,7 +735,7 @@ CREATE VIEW compat.nodes AS
     id_old
    FROM v_nodes;
 
-CREATE VIEW compat.pressregulators AS
+CREATE OR REPLACE VIEW compat.pressregulators AS
  SELECT id,
     lineid,
     nodeid,
@@ -743,7 +751,7 @@ CREATE VIEW compat.pressregulators AS
     pipelinesignid
    FROM v_pressregulators;
 
-CREATE VIEW compat.pumps AS
+CREATE OR REPLACE VIEW compat.pumps AS
  SELECT id,
     lineid,
     offreason,
@@ -785,7 +793,7 @@ CREATE VIEW compat.pumps AS
     stateid
    FROM v_pumps;
 
-CREATE VIEW compat.pumpstations AS
+CREATE OR REPLACE VIEW compat.pumpstations AS
  SELECT id,
     nodeid,
     name,
@@ -799,7 +807,7 @@ CREATE VIEW compat.pumpstations AS
     heightareamark
    FROM v_pumpstations;
 
-CREATE VIEW compat.realconsumers AS
+CREATE OR REPLACE VIEW compat.realconsumers AS
  SELECT id,
     nodeid,
     name,
@@ -962,7 +970,7 @@ CREATE VIEW compat.realconsumers AS
     diameternozzle
    FROM v_realconsumers;
 
-CREATE VIEW compat.refillnodes AS
+CREATE OR REPLACE VIEW compat.refillnodes AS
  SELECT id,
     nodeid,
     externalsignid,
@@ -981,7 +989,7 @@ CREATE VIEW compat.refillnodes AS
     setpressret
    FROM v_refillnodes;
 
-CREATE VIEW compat.systemradiators AS
+CREATE OR REPLACE VIEW compat.systemradiators AS
  SELECT id,
     lineid,
     name,
@@ -991,7 +999,7 @@ CREATE VIEW compat.systemradiators AS
     stateid
    FROM v_systemradiators;
 
-CREATE VIEW compat.threewayvalves AS
+CREATE OR REPLACE VIEW compat.threewayvalves AS
  SELECT id,
     nodeid,
     structure,

@@ -1,0 +1,46 @@
+
+
+/* style the sort indicator */
+QHeaderView::down-arrow {
+    image: url(/down_arrow.png);
+}
+
+QHeaderView::up-arrow {
+    image: url(/up_arrow.png);
+}
+
+
+QHeaderView
+{
+    /* draw the hole hor top & bottom line for the header */
+
+    font-weight: 500;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    color: #000;
+}
+
+
+QTableView {
+    color: #000;
+}
+
+
+QHeaderView::section {
+    font-weight: 500;
+    color: #000;    
+    background-color: #fff;
+}
+
+QTableView::item:focus{
+    color: black;
+    font-weight: 500;
+}
+
+
+QTableView::item:hover{
+    font-weight: 500;
+    background-color: rgb(255, 254, 229);
+    color: #000;
+}

@@ -50,14 +50,14 @@ CLogin2Dialog::CLogin2Dialog(QSqlDatabase &db, QWidget *parent)
 
     cs.host = "45.132.85.23";
     cs.user = "Lifan";
-    cs.password = "Danil228";
+    cs.password = "";
     cs.port = 1433;
     cs.baza = "AstanaGID";
     cs.geo = "Astana";
 
     cs.host = "localhost";
     cs.user = "tgid";
-    cs.password = "123456";
+    cs.password = "";
 
     QSettings settings;
 
@@ -155,5 +155,4 @@ void CLogin2Dialog::okClicked()
         }
     }
 }
-
 

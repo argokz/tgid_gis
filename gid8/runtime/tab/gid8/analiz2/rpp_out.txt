@@ -1,0 +1,5 @@
+Основные
+    calculationID
+    lineID
+    sopr
+    polozhenie

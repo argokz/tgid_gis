@@ -1,0 +1,26 @@
+{
+    "table": {
+        "rows": [
+            {
+                "cells": [
+                    { "text": "Id", "colspan": 1, "rowspan": 3, "index": 0 },
+                    { "text": "Наружный диаметр труб, мм", "colspan": 1, "rowspan": 3, "index": 1 },
+                    { "text": "Нормы тепловых потерь теплопроводами, ккал/(м . ч)", "colspan": 4, "rowspan": 1, "index": 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Разность среднегодовой температуры сетевой воды в подающем или обратном трубопроводах и наружного воздуха,°C", "colspan": 4, "rowspan": 1, "index": 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index": 2 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index": 3 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 4 },
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1, "index": 5 }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+t 0 0 №
+t 0 1 objID
+t 0 2 Наименование документа индекс
+t 0 3 Наименование документа
+t 0 4 Дата
+t 0 5 Документ
+
+Lookup2 3 "$ps$","remontDocumentTypes","name",2
+
+edit 2
+edit 3
+edit 4
+edit 5
+
+File 5 "JPG","Документы|*.jpg;*gif;*.doc;*.docx;*.pdf|","PATH_DEFECT"
+
+date 4
+
+
+
+w 0 50
+w 1 0
+w 2 0
+w 3 500
+w 4 100
+w 5 400

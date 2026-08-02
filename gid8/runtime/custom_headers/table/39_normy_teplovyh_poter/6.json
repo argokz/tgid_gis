@@ -1,0 +1,25 @@
+{
+    "table": {
+        "rows": [
+            {
+                "cells": [
+                    { "text": "Id", "colspan": 1, "rowspan": 3, "index": 0 },
+                    { "text": "Условный проход трубопровода, мм", "colspan": 1, "rowspan": 3, "index": 1 },
+                    { "text": "Средняя температура теплоносителя, °C", "colspan": 3, "rowspan": 1, "index": 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index": 2 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index": 3 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 4 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Нормы линейной плотности теплового потока, ккал/(м . ч)", "colspan": 3, "rowspan": 1, "index": 2 }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,25 @@
+-!Участок
+Участок
+--    id
+--    nodeid1_table
+--    nodeid1
+--    nodeid2_table
+--    nodeid2
+    externalsignlineid
+--    location
+    hydrores
+    organizationid
+    registnum
+    firstpicdate
+--    lastmaintdate
+--    displaysign
+    archivechangedate
+    operatorid
+    fileID
+--    coords
+--    typ
+--    removed
+--    idremoved
+--    shape
+--    globalid
+--    gistable

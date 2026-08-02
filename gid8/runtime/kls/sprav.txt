@@ -1,0 +1,441 @@
+STRING
+Город
+Организации владельцы
+$main$
+organizations
+Организации подрядчики
+$ps$
+
+Организации проектные
+$ps$
+
+Организации обслуживающие
+$ps$
+
+Населенные пункты
+$ps$
+SELECT * FROM towns
+Микрорайоны
+$ps$
+SELECT * FROM districts
+Улицы
+$ps$
+SELECT * FROM streets
+STRING
+Система теплоснабжения
+Энергосистемы
+$ps$
+
+Источники тепла
+$ps$
+
+Район эксплуатации
+$ps$
+
+Подразделения
+$ps$
+SELECT id, name FROM subdivisions
+Начальники участков
+$ps$
+
+Техники
+$main$
+responsibles
+Участки эксплуатации
+$ps$
+
+Магистрали
+$ps$
+
+Участок МС
+$ps$
+
+Участок РС
+$ps$
+
+Должности
+$ps$
+
+Отопительные сезоны
+$ps$
+SELECT id, date1, date2 FROM heating_seasons
+STRING
+Электрические сети
+Владельцы ЭС
+MAP
+Линия электропередач
+
+Типы источников электрических сетей
+MAP
+Линия электропередач
+
+Типы ЛЭП
+MAP
+Линия электропередач
+
+Типы приемников электрических сетей
+MAP
+Линия электропередач
+
+Марки кабелей ЭС
+MAP
+Линия электропередач
+
+Марки трансформаторов ЭС
+MAP
+Линия электропередач
+
+Типы трансформаторов
+$ps$
+SELECT * FROM transfTypes
+Должности
+$ps$
+SELECT * FROM dolzhnosti_es
+Ответственные по электросетям
+$main$
+responsibles_es
+-STRING
+-Опрессовка
+-Схемы опрессовок
+-$ps$
+-
+-Очередь опрессовок
+-$ps$
+-
+STRING
+Химслужба
+Должности
+$ps$
+SELECT * FROM dolzhnosti_korrozia
+Ответственные по химслужбе
+$main$
+responsibles_korrozia
+STRING
+Справочники
+01_Теплопроводность грунта
+sprav
+
+02_Теплоотдача от изоляции к окружаемому воздуху
+sprav
+
+06_Состояние изоляции
+sprav
+
+07_Теплоизоляционный материал.
+$ps$
+SELECT * FROM isolMaterials
+08_Местные гидравлические сопротивления
+sprav
+
+10_Тепловые характеристики зданий
+sprav
+
+11_Материал покровного слоя изоляции
+sprav
+
+12_Материалы конструкций камер
+sprav
+
+13_Климатические данные
+sprav
+
+14_Шероховатость стальных труб
+sprav
+
+17_Предельная толщина теплоизоляции при подземке
+sprav
+
+18_Физические свойства воды
+sprav
+
+19_Таблица для гидравлического расчета трубопроводов
+sprav
+SELECT * FROM [19_tablitsa_dlya_gidravlicheskogo_rascheta_truboprovodov]
+23_Поправочный коэфф расчета отопительной нагрузки здания
+sprav
+
+24_Удельный объем воды в системе отопления
+sprav
+
+26_Место прокладки участка трубопровода
+sprav
+
+27_Вид покрытия участка теплопровода
+sprav
+
+28_Коэффициенты расчета балансовой нагрузки ГВ
+sprav
+
+29_Коэфф часовой неравномерности нагрузки ГВ  СП 41 101 95
+sprav
+
+30_Коэффициенты местных тепловых потерь
+sprav
+
+31_Удельный объем воды в системе вентиляции
+sprav
+
+36_Наименование района местонахождения теплопровода
+sprav
+
+39_Нормы тепловых потерь
+sprav
+
+40_Поправочный коэффициент к тепловым характеристикам зданий
+sprav
+
+41_Оценка факторов отрицательных воздействий на трубопровод
+sprav
+
+42_Коэффициенты определения технологических ПСВ
+sprav
+
+43_Тепловая аккумуляция зданий
+sprav
+
+44_Темп падения температуры внутри зданий
+sprav
+
+45_Коэффициент начала кавитации
+sprav
+
+47_Типы труб
+$main$
+SELECT * FROM tubeTypes
+STRING
+Стандартное оборудование
+Насос стандартный
+$main$
+SELECT * FROM standardPumps
+Регуляторы давления стандартные
+$main$
+SELECT * FROM standardPressRegulators
+Элеватор стандартный
+$main$
+SELECT * FROM standardElevators
+Компесаторы стандартные
+$main$
+SELECT * FROM standardCompensators
+Калориферы стандартные
+$main$
+SELECT * FROM standardAirHeaters
+Клапан обратный стандартный
+$main$
+SELECT * FROM standardReverseValves
+Манометр стандартный
+$main$
+SELECT * FROM standardManometers
+Теплообменники пластинчатые стандартные
+$main$
+SELECT * FROM standardPlateHeatExchangers
+Регулятор температуры стандартные
+$main$
+SELECT * FROM standardTempRegulators
+Регуляторы расхода стандартные
+$main$
+SELECT * FROM standardConsRegulators
+Расходомер стандартный
+$main$
+SELECT * FROM standardFlowmeters
+Регулятор перепада стандартные
+$main$
+SELECT * FROM standardPressDropRegulators
+Теплообменники трубчатые стандартные
+$main$
+SELECT * FROM standardTubHeatExchangers
+Термометр стандартный
+$main$
+SELECT * FROM standardThermometers
+Трубы стандартные
+$main$
+SELECT * FROM standardTubes
+Клапан трехходовой стандартный
+$main$
+SELECT * FROM standardThreeWayValves
+Задвижки стандартные
+$main$
+SELECT * FROM standardDampers
+STRING
+Справочники для Геобазы
+Тип канала
+$ps$
+SELECT * FROM tip_kanala_setey_teplosnabzheniya
+Материал объектов сетей теплоснабжения
+$ps$
+
+-Конструкция перекрытия канала
+-$ps$
+-
+STRING
+Справочники Ремонт Новые
+Ремонтные бригады
+$ps$
+SELECT br.id,br.name AS name1,responsiblesID,r.name AS name2,subdivisionsID,s.name AS name3,kolichestvoСhelovek FROM brigades br LEFT JOIN responsibles r ON r.id=br.responsiblesID LEFT JOIN subdivisions s ON s.id=br.subdivisionsID 
+Начальники участков
+$ps$
+
+Мероприятия для повреждений
+$ps$
+SELECT id, name FROM defectMeroprType;
+Работы текущего ремонта (трубопровод, арматура, оборудование)
+$ps$
+SELECT id, name FROM remontTubeTypes;
+Работы текущего ремонта (каналы, камеры)
+$ps$
+SELECT id, name FROM remontChannelTypes;
+Работы капитального ремонта (трубопровод, арматура, оборудование)
+$ps$
+SELECT id, name FROM capitalRemontTubeTypes;
+Работы капитального ремонта (каналы, камеры)
+$ps$
+SELECT id, name FROM capitalRemontChannelTypes;
+Работы инвестиционного ремонта (трубопровод, арматура, оборудование)
+$ps$
+SELECT id, name FROM investRemontTubeTypes;
+Работы инвестиционного ремонта (каналы, камеры)
+$ps$
+SELECT id, name FROM investRemontChannelTypes;
+Виды документов
+$ps$
+SELECT id, name FROM remontDocumentTypes;
+STRING
+Справочники Ремонт
+Толщинометр
+$ps$
+
+Вид коррозии
+$ps$
+
+Виды труб
+$ps$
+
+Виды элементов
+$ps$
+
+Изоляция трубы
+$ps$
+
+Конструкция дренажного устройства
+$ps$
+
+Конструкция покровного слоя изоляции
+$ps$
+
+Материал покровного слоя
+$ps$
+
+Намеченные мероприятия по изоляционной конструкции
+$ps$
+
+Намеченные мероприятия по каналу
+$ps$
+
+Намеченные мероприятия по теплопроводу
+$ps$
+
+Намеченные мероприятия по элементам
+$ps$
+
+Причины коррозии
+$ps$
+
+Причины разрыва сварного шва
+$ps$
+
+Причины разрыва стенки трубы
+$ps$
+
+Причины свища
+$ps$
+
+Ремонт изоляционной конструкции
+$ps$
+
+Ремонт по восстановлению канала
+$ps$
+
+Состояние изоляционного материала
+$ps$
+
+Состояние конструкции канала
+$ps$
+
+Состояние покровного слоя изоляции
+$ps$
+
+Состояние противокоррозионного покрытия
+$ps$
+
+Состояние теплоизоляционной конструкции
+$ps$
+
+Тип изоляции
+$ps$
+
+Характер грунта
+$ps$
+
+Материал теплоизоляционный
+$ps$
+
+Восстановительные работы шурф
+$ps$
+
+STRING
+Справочники для тепловых потерь
+07_Теплоизоляционный материал
+sprav
+
+13_Климатические данные
+sprav
+
+18_Физические свойства воды
+sprav
+
+24_Удельный объем воды в системе отопления
+sprav
+
+30_Коэффициенты местных тепловых потер
+sprav
+
+31_Удельный объем воды в системе вентиляции
+sprav
+
+39_Нормы тепловых потерь
+sprav
+
+STRING
+Справочники Объекты ПТС
+Тип конструкции
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from constructionTypes
+Тип арматуры
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from armatureTypes
+Тип назначения
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from purposeTypes
+Тип исполнения
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from designTypes
+Тип месторасположения
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from locationTypes
+Тип материала
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from materialTypes
+Тип характеристики
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from characteristicTypes
+Тип конструкции камеры
+$main$
+SELECT id, name as 'Наименование', dbo.getRusField(visible) as 'Объекты ПТС', visible as 'Ключ' from constructionOverlapTypes
+Категория нарушений
+$main$
+SELECT * FROM remontCat
+Состояния оборудования
+$main$
+SELECT * FROM sost_oborud
+Состояние строительных конструкций
+$main$
+SELECT * FROM sost_konstr

@@ -1,0 +1,8 @@
+NoSave
+
+
+Filtr [nodeID][lineID][shape]
+--geo_table 2
+
+t 0 1 Начальный Узел
+t 0 2 Конечный Узел

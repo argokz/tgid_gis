@@ -1,0 +1,132 @@
+SELECT 
+d1.v AS v1, 
+d2.v AS v2, 
+d3.v AS v3, 
+d4.v AS v4, 
+d5.v AS v5, 
+d6.v AS v6, 
+d7.v AS v7, 
+d8.v AS v8, 
+d9.v AS v9, 
+d10.v AS v10, 
+d11.v AS v11,
+
+
+d.* FROM defect d
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM povrezhdennyiElementForDefect el
+JOIN povrezhdennyiElement el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d1 ON d1.id=d.id
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM prichinyPovrezhdeniaForDefect el
+JOIN prichinyPovrezhdenia el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d2 ON d2.id=d.id
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM prichiny_narusheniya_organizacionnye_for_defect el
+JOIN prichiny_narusheniya_organizacionnye el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d3 ON d3.id=d.id
+
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM soputstvuiushchiePrichinyForDefect el
+JOIN soputstvuiushchiePrichiny el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d4 ON d4.id=d.id
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM soputstvuiushchiePrichinyForDefect el
+JOIN soputstvuiushchiePrichiny el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d5 ON d5.id=d.id
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM sostKonstruktsiiKanalaForDefect el
+JOIN sostKonstruktsiiKanala el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d6 ON d6.id=d.id
+
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM sostKonstruktsiiKameryForDefect el
+JOIN sostKonstruktsiiKamery el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d7 ON d7.id=d.id
+
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM prichinyPovrezhdeniaForDefect el
+JOIN prichinyPovrezhdenia el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d8 ON d8.id=d.id
+
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM prichinyPovrezhdeniaForDefect el
+JOIN prichinyPovrezhdenia el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d9 ON d9.id=d.id
+
+
+LEFT JOIN (
+SELECT 
+objID AS id, STRING_AGG(el2.name, ',') AS v
+FROM prichinyPovrezhdeniaForDefect el
+JOIN prichinyPovrezhdenia el2 ON el2.id=el.activityID
+GROUP BY el.objID
+) d10 ON d10.id=d.id
+
+LEFT JOIN (
+
+SELECT 
+objID AS id,
+STRING_AGG(v, ', ') AS v
+
+FROM (
+SELECT 
+
+objID, 
+CONCAT(name, IIF(v IS NULL, '',  ' ('+v+')')) AS v
+
+FROM (
+
+SELECT 
+dt.objID,rt.name, STRING_AGG(se.name, ', ') AS v
+FROM defectTube dt
+LEFT JOIN spisokElementov se ON se.id=dt.elementID
+LEFT JOIN remontTruboprovodaSpisok rt ON rt.id=dt.activityID
+where se.id IS NOT NULL OR rt.id IS NOT NULL
+GROUP BY dt.objID,rt.ord,rt.name
+) _
+) _
+GROUP BY objID
+
+) d11 ON d11.id=d.id
+
+
+
+WHERE d1.id IS NOT NULL OR d2.id IS NOT NULL OR d3.id IS NOT NULL OR d4.id IS NOT NULL OR d5.id IS NOT NULL OR d6.id IS NOT NULL OR d7.id IS NOT NULL OR d8.id IS NOT NULL OR d9.id IS NOT NULL OR d10.id IS NOT NULL OR d11.id IS NOT NULL
+

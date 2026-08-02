@@ -1,0 +1,5 @@
+﻿<b>Форма А.1.Трубы</b>;;;;;;;;;;;
+;;;;;;;;;;;
+<border>Наименование участка трубопровода трассы;;<border>Подающая труба;;<border>Обратная труба;;<border>Толщина стенки трубы, мм;;<border><p>Объем трубы, м³</p>;;<border>Тип прокладки;
+<up><border>Начальный узел;<up><border>Конечный узел;<up><border>Наружный диаметр, мм;<up><border>Длина, м;<up><border>Наружный диаметр, мм;<up><border>Длина, м;<up><border>Подающая;<up><border>Обратная;<up><border>Подающая;<up><border>Обратная;<up><border>Тип прокладки;<up><border>Вид трубы
+<border>1;<border>2;<border>3;<border>4;<border>5;<border>6;<border>7;<border>8;<border>9;<border>10;<border>11;<border>12

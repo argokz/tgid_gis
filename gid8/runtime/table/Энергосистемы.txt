@@ -1,0 +1,5 @@
+defaut table $main$ energosistemy
+
+w 2 -2
+w 6 -2
+

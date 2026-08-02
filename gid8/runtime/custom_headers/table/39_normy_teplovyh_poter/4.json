@@ -1,0 +1,48 @@
+{
+    "table": {
+        "rows": [
+            {
+                "cells": [
+                    { "text": "Id", "colspan": 1, "rowspan": 5, "index": 0 },
+                    { "text": "Условный проход трубопровода, мм", "colspan": 1, "rowspan": 5, "index": 1 },
+                    { "text": "При числе работы в год 5000 и менее", "colspan": 4, "rowspan": 1, "index": 2 },
+                    { "text": "При числе часов работы в год более 5000", "colspan": 4, "rowspan": 1, "index": 6 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Трубопровод", "colspan": 8, "rowspan": 1, "index": 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index": 2 },
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index": 3 },
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index": 4 },
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index": 5 },
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index": 6 },
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index": 7 },
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index": 8 },
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index": 9 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Среднегодовая температура теплоносителя, °C", "colspan": 8, "rowspan": 1, "index": 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index": 2 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 3 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index": 4 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 5 },
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index": 6 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 7 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index": 8 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 9 }
+                ]
+            }
+        ]
+    }
+}

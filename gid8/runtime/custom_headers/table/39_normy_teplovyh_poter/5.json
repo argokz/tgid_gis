@@ -1,0 +1,34 @@
+{
+    "table": {
+        "rows": [
+            {
+                "cells": [
+                    { "text": "Id", "colspan": 1, "rowspan": 4, "index": 0 },
+                    { "text": "Условный проход трубопровода, мм", "colspan": 1, "rowspan": 4, "index": 1 },
+                    { "text": "При числе часов работы в год 5000 и более", "colspan": 3, "rowspan": 1, "index": 2 },
+                    { "text": "При числе часов работы в год 5000 и менее", "colspan": 3, "rowspan": 1, "index": 5 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Средняя температура °C", "colspan": 6, "rowspan": 1, "index": 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index": 2 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index": 3 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 4 },
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index": 5 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index": 6 },
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index": 7 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Нормы линейной плотности теплового потока, ккал/(м . ч)", "colspan": 6, "rowspan": 1, "index": 2 }
+                ]
+            }
+        ]
+    }
+}

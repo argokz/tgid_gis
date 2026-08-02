@@ -1,0 +1,27 @@
+Основные
+    kod
+    uzel
+    pr
+    kn
+    txz
+    txop
+    txoo
+    ventil_cv
+    otopl_zco
+    otopl_nco
+    otopl_pr
+    otopl_sm
+    otopl_ps
+    otopl_pw
+    gv_op
+    gv_oo
+    gv_sm
+    gv_pr
+    gv_ps
+    gv_pw
+    h
+    rez_op
+    rez_sm
+    rez_pr
+    rez_ps
+    rez_pw

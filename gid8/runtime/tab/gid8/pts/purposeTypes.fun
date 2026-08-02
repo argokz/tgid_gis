@@ -1,0 +1,1 @@
+visible view_pts

@@ -1,0 +1,9 @@
+N_adm_rayon NotNull
+N_rayon NotNull
+N_uchastok NotNull
+N_ist NotNull
+N_tg NotNull
+1N_street NotNull
+1N_mkr NotNull
+N_name NotNull
+N_house NotNull

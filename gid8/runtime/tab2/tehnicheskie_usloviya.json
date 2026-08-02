@@ -1,0 +1,289 @@
+{
+    "q": "
+
+SELECT tu.id
+      ,stateTu.name AS sostoyanie_dogovora
+      ,tu.dogovor
+      ,tu.akt
+      ,tu.data_annulirovaniya
+      ,tu.nomer
+      ,tu.god
+      ,tu.nomer_tu
+      ,tu.data_vydachi_tu
+      ,tu.naimenovanie_organizatsii__zaprashivayuschey_tu
+      ,tu.naimenovanie_obekta
+      ,tu.adres_obekta
+      ,tu.istochnik
+      ,tu.rayon_ekspluatatsii
+      ,tu.teplovye_potoki__gkal_ch
+      ,tu.v_tom_chisle_otoplenie
+      ,tu.v_tom_chisle_ventilyatsiya
+      ,tu.v_tom_chisle_gvs_maks
+      ,tu.prirost_nagruzki
+      ,tu.v_tom_chisle_prirost_otoplenie
+      ,tu.v_tom_chisle_prirost_ventilyatsiya
+      ,tu.v_tom_chisle_prirost_gvs_maks
+      ,tu.kamera
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya
+      ,tu.srok_deystviya_tu
+      ,tu.izmeneniya_prodleniya_1
+      ,tu.data_izmeneniya_prodleniya_1
+      ,tu.teplovye_potoki__gkal_ch_1
+      ,tu.v_tom_chisle_otoplenie_1
+      ,tu.v_tom_chisle_ventilyatsiya_1
+      ,tu.v_tom_chisle_gvs_maks_1
+      ,tu.prirost_nagruzki_1
+      ,tu.v_tom_chisle_prirost_otoplenie_1
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_1
+      ,tu.v_tom_chisle_prirost_gvs_maks_1
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_1
+      ,tu.izmeneniya_prodleniya_2
+      ,tu.data_izmeneniya_prodleniya_2
+      ,tu.teplovye_potoki__gkal_ch_2
+      ,tu.v_tom_chisle_otoplenie_2
+      ,tu.v_tom_chisle_ventilyatsiya_2
+      ,tu.v_tom_chisle_gvs_maks_2
+      ,tu.prirost_nagruzki_2
+      ,tu.v_tom_chisle_prirost_otoplenie_2
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_2
+      ,tu.v_tom_chisle_prirost_gvs_maks_2
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_2
+      ,tu.izmeneniya_prodleniya_3
+      ,tu.data_izmeneniya_prodleniya_3
+      ,tu.teplovye_potoki__gkal_ch_3
+      ,tu.v_tom_chisle_otoplenie_3
+      ,tu.v_tom_chisle_ventilyatsiya_3
+      ,tu.v_tom_chisle_gvs_maks_3
+      ,tu.prirost_nagruzki_3
+      ,tu.v_tom_chisle_prirost_otoplenie_3
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_3
+      ,tu.v_tom_chisle_prirost_gvs_maks_3
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_3
+      ,tu.izmeneniya_prodleniya_4
+      ,tu.data_izmeneniya_prodleniya_4
+      ,tu.teplovye_potoki__gkal_ch_4
+      ,tu.v_tom_chisle_otoplenie_4
+      ,tu.v_tom_chisle_ventilyatsiya_4
+      ,tu.v_tom_chisle_gvs_maks_4
+      ,tu.prirost_nagruzki_4
+      ,tu.v_tom_chisle_prirost_otoplenie_4
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_4
+      ,tu.v_tom_chisle_prirost_gvs_maks_4
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_4
+      ,tu.izmeneniya_prodleniya_5
+      ,tu.data_izmeneniya_prodleniya_5
+      ,tu.teplovye_potoki__gkal_ch_5
+      ,tu.v_tom_chisle_otoplenie_5
+      ,tu.v_tom_chisle_ventilyatsiya_5
+      ,tu.v_tom_chisle_gvs_maks_5
+      ,tu.prirost_nagruzki_5
+      ,tu.v_tom_chisle_prirost_otoplenie_5
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_5
+      ,tu.v_tom_chisle_prirost_gvs_maks_5
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_5
+      ,tu.izmeneniya_prodleniya_6
+      ,tu.data_izmeneniya_prodleniya_6
+      ,tu.teplovye_potoki__gkal_ch_6
+      ,tu.v_tom_chisle_otoplenie_6
+      ,tu.v_tom_chisle_ventilyatsiya_6
+      ,tu.v_tom_chisle_gvs_maks_6
+      ,tu.prirost_nagruzki_6
+      ,tu.v_tom_chisle_prirost_otoplenie_6
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_6
+      ,tu.v_tom_chisle_prirost_gvs_maks_6
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_6
+      ,tu.izmeneniya_prodleniya_7
+      ,tu.data_izmeneniya_prodleniya_7
+      ,tu.teplovye_potoki__gkal_ch_7
+      ,tu.v_tom_chisle_otoplenie_7
+      ,tu.v_tom_chisle_ventilyatsiya_7
+      ,tu.v_tom_chisle_gvs_maks_7
+      ,tu.prirost_nagruzki_7
+      ,tu.v_tom_chisle_prirost_otoplenie_7
+      ,tu.v_tom_chisle_prirost_ventilyatsiya_7
+      ,tu.v_tom_chisle_prirost_gvs_maks_7
+      ,tu.dopolnitelnye_tehnicheskie_meropriyatiya_7
+      ,tu.nomer_soglasovaniya_ts
+      ,tu.data_soglasovaniya_ts
+      ,tu.nomer_soglasovaniya_ov
+      ,tu.data_soglasovaniya_ov
+      ,tu.nomer_soglasovaniya_tp
+      ,tu.data_soglasovaniya_tp
+      ,tu.ispolnenie_dop_tehn_i_energ_meropriyatiy_v_ramkah_tu
+      ,tu.stadiya_stroitelstva_obektov
+      ,tu.nomer_vydachi_akta_dopuska
+      ,tu.data_vydachi_akta_dopuska
+      ,tu.teplovaya_nagruzka_po_aktu_dopuska__proektu__gkal_ch
+      ,tu.v_tom_chisle_otoplenie_po_aktu
+      ,tu.v_tom_chisle_ventilyatsiya_po_aktu
+      ,tu.v_tom_chisle_gvs_maks_po_aktu
+      ,tu.nomer_dogovora
+      ,tu.data_dogovora
+      ,tu.zdanie
+      ,tu.truba
+      ,tu.kod1
+      ,tu.uzel1
+      ,tu.protsent_nagruzki_1
+      ,tu.kod2
+      ,tu.uzel2
+      ,tu.protsent_nagruzki_2
+      ,tu.kod3
+      ,tu.uzel3
+      ,tu.protsent_nagruzki_3
+      ,tu.kod4
+      ,tu.uzel4
+      ,tu.protsent_nagruzki_4
+      ,tu.kod5
+      ,tu.uzel5
+      ,tu.protsent_nagruzki_5
+      ,tu.tehnicheskie_usloviya
+      ,tu.tehnicheskie_usloviya_2
+      ,tu.tehnicheskie_usloviya_3
+      ,tu.tehnicheskie_usloviya_4
+      ,tu.tehnicheskie_usloviya_5
+      ,tu.tehnicheskie_usloviya_6
+      ,tu.tehnicheskie_usloviya_7
+      ,tu.tehnicheskie_usloviya_8
+      ,tu.tehnicheskie_usloviya_9
+      ,tu.tehnicheskie_usloviya_10
+      ,tu.v_tom_chisle_gvs_sredn
+      ,tu.v_tom_chisle_prirost_gvs_sredn
+      ,tu.v_tom_chisle_gvs_sredn_1
+      ,tu.v_tom_chisle_prirost_gvs_sredn_1
+      ,tu.v_tom_chisle_gvs_sredn_2
+      ,tu.v_tom_chisle_prirost_gvs_sredn_2
+      ,tu.v_tom_chisle_gvs_sredn_3
+      ,tu.v_tom_chisle_prirost_gvs_sredn_3
+      ,tu.v_tom_chisle_gvs_sredn_4
+      ,tu.v_tom_chisle_prirost_gvs_sredn_4
+      ,tu.v_tom_chisle_gvs_sredn_5
+      ,tu.v_tom_chisle_prirost_gvs_sredn_5
+      ,tu.v_tom_chisle_gvs_sredn_6
+      ,tu.v_tom_chisle_prirost_gvs_sredn_6
+      ,tu.v_tom_chisle_gvs_sredn_7
+      ,tu.v_tom_chisle_prirost_gvs_sredn_7
+      ,tu.v_tom_chisle_gvs_sredn_po_aktu
+  FROM tehnicheskie_usloviya tu
+  LEFT JOIN stateTu ON stateTu.id=tu.sostoyanie_dogovora
+  WHERE tu.id=$ID$
+    
+    ",
+    "title": "Технические условия",
+    "tabs":[
+      {
+"title":"Основной",
+"type": "edit",
+"form": [
+
+
+{"key":"istochnik", "name":"Источник","type":"select1", "q" : "SELECT naimenovanie, naimenovanie AS name2 FROM istochniki_tepla ORDER BY naimenovanie"},
+{"key":"rayon_ekspluatatsii", "name":"Район эксплуатации","type":"select1", "q" : "SELECT naimenovanie_rayona_ekspluatatsii_istochnika_tepla, naimenovanie_rayona_ekspluatatsii_istochnika_tepla AS name2 FROM rayon_ekspluatatsii ORDER BY naimenovanie_rayona_ekspluatatsii_istochnika_tepla"},
+{"key":"sostoyanie_dogovora", "name":"Состояние договора","type":"select", "q" : "SELECT id, name FROM stateTu"},
+{"key":"nomer_tu", "name":"Номер ТУ","type":"input"},
+{"key":"data_vydachi_tu", "name":"Дата выдачи ТУ","type":"input", "typeField" : "date"},
+{"key":"data_annulirovaniya", "name":"Дата аннулирования","type":"input", "typeField" : "date"},
+{"key":"naimenovanie_organizatsii__zaprashivayuschey_tu", "name":"Наименование организации, запрашивающей ТУ","type":"inputLarge", "q1" : "SELECT id, naimenovanie_obekta FROM organizatsii"},
+{"key":"naimenovanie_obekta", "name":"Наименование объекта","type":"input"},
+{"key":"adres_obekta", "name":"Адрес объекта","type":"input"},
+{"key":"teplovye_potoki__gkal_ch", "name":"Тепловые потери. Гкал/ч","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_otoplenie", "name":"В том числе отопление","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_ventilyatsiya", "name":"В том числе вентиляция","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_gvs_maks", "name":"В том числе ГВС макс","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_gvs_sredn", "name":"В том числе ГВС средн","type":"input", "typeField" : "number"},
+{"key":"prirost_nagruzki", "name":"Прирост нагрузки","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_otoplenie", "name":"В том числе прирост отопление","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_ventilyatsiya", "name":"В том числе прирост вентиляция","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_gvs_maks", "name":"В том числе прирост ГВС макс","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_gvs_sredn", "name":"В том числе прирост ГВС средн","type":"input", "typeField" : "number"},
+{"key":"kamera", "name":"Камера","type":"input"},
+{"key":"dopolnitelnye_tehnicheskie_meropriyatiya", "name":"Дополнительные технические мероприятия","type":"input"},
+{"key":"srok_deystviya_tu", "name":"Срок действия ТУ","type":"input"},
+{"key":"nomer_soglasovaniya_ts", "name":"Номер согласования ТС","type":"input"},
+{"key":"data_soglasovaniya_ts", "name":"Дата согласования ТС","type":"input", "typeField" : "date"},
+{"key":"nomer_soglasovaniya_ov", "name":"Номер согласования ОВ","type":"input"},
+{"key":"data_soglasovaniya_ov", "name":"Дата согласования ОВ","type":"input", "typeField" : "date"},
+{"key":"nomer_soglasovaniya_tp", "name":"Номер согласования ТП","type":"input"},
+{"key":"data_soglasovaniya_tp", "name":"Дата согласования ТП","type":"input", "typeField" : "date"},
+{"key":"ispolnenie_dop_tehn_i_energ_meropriyatiy_v_ramkah_tu", "name":"Исполнение доп.техн и энерг.мероприятий в рамках ТУ","type":"input"},
+{"key":"stadiya_stroitelstva_obektov", "name":"Стадия строительства объекта","type":"input"},
+{"key":"nomer_dogovora", "name":"Номер договора","type":"input"},
+{"key":"data_dogovora", "name":"Дата договора","type":"input", "typeField" : "date"},
+{"key":"dogovor", "name":"Договор","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"}
+]
+},
+{
+"title":"Изменения",
+"table": null,
+"type": "add",
+
+"form": [
+{"key":"izmeneniya_prodleniya", "name":"Изменения продления","type":"textarea"},
+{"key":"data_izmeneniya_prodleniya", "name":"Дата изменения продления","type":"input", "typeField" : "date"},
+{"key":"teplovye_potoki__gkal_ch", "name":"Тепловые потоки","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_otoplenie", "name":"В том числе отопление","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_ventilyatsiya", "name":"В том числе вентиляция","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_gvs_maks", "name":"В том числе ГВС","type":"input", "typeField" : "number"},
+{"key":"prirost_nagruzki", "name":"Прирост нагрузки","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_otoplenie", "name":"В том числе прирост отопления","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_ventilyatsiya", "name":"В том числе прирост вентиляции","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_gvs_maks", "name":"В том числе прирост ГВС","type":"input", "typeField" : "number"},
+{"key":"dopolnitelnye_tehnicheskie_meropriyatiya", "name":"Дополнительные технические мероприятия","type":"textarea"}
+]
+},
+
+{
+"title":"Таблица",
+"table": "SELECT 
+
+[id]
+,[idT]
+,[izmeneniya_prodleniya]
+,[data_izmeneniya_prodleniya]
+,[teplovye_potoki__gkal_ch]
+,[v_tom_chisle_otoplenie]
+,[v_tom_chisle_ventilyatsiya]
+,[v_tom_chisle_gvs_maks]
+,[prirost_nagruzki]
+,[v_tom_chisle_prirost_otoplenie]
+,[v_tom_chisle_prirost_ventilyatsiya]
+,[v_tom_chisle_prirost_gvs_maks]
+,[dopolnitelnye_tehnicheskie_meropriyatiya]
+
+FROM changeTU",
+"form": null
+},
+
+{
+"title":"Технические условия",
+"type": "edit",
+"table": null,
+"form": [
+{"key":"tehnicheskie_usloviya", "name":"Технические условия","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_2", "name":"Технические условия_2","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_3", "name":"Технические условия_3","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_4", "name":"Технические условия_4","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_5", "name":"Технические условия_5","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_6", "name":"Технические условия_6","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_7", "name":"Технические условия_7","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_8", "name":"Технические условия_8","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_9", "name":"Технические условия_9","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"},
+{"key":"tehnicheskie_usloviya_10", "name":"Технические условия_10","type":"upload", "typeField" : "file", "path" : "PATH_AKT_TU"}
+]
+},
+{
+"title":"Акт доступа",
+"type": "edit",
+"table": null,
+"form": [
+{"key":"akt", "name":"akt","type":"upload", "typeField" : "file"},
+{"key":"nomer_vydachi_akta_dopuska", "name":"nomer_vydachi_akta_dopuska","type":"input"},
+{"key":"data_vydachi_akta_dopuska", "name":"data_vydachi_akta_dopuska","type":"input", "typeField" : "date"},
+{"key":"teplovaya_nagruzka_po_aktu_dopuska__proektu__gkal_ch", "name":"teplovaya_nagruzka по акту допуска проекту, Гкал/ч","type":"input"},
+{"key":"v_tom_chisle_otoplenie_po_aktu", "name":"В том числе отопление по акту","type":"input"},
+{"key":"v_tom_chisle_ventilyatsiya_po_aktu", "name":"В том числе вентиляция по акту","type":"input"},
+{"key":"v_tom_chisle_gvs_maks_po_aktu", "name":"В том числе ГВС макс по акту","type":"input"},
+{"key":"v_tom_chisle_gvs_sredn_po_aktu", "name":"В том числе ГВС средн по акту","type":"input"}
+]
+}
+]
+}

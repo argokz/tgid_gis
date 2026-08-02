@@ -1,0 +1,7 @@
+Основные
+--    calculationID
+--    nodeID
+--    externalSign
+    pih
+    t
+    t2

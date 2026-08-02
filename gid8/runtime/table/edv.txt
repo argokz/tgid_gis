@@ -1,0 +1,31 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+List
+    id
+    objID
+    purposeID
+    edvTypeID
+    marka_edv
+    pow
+    freq
+    seria
+    diap
+    prec
+    primechanie
+    id
+
+
+
+defaut table $ps$ edv
+
+
+t 0 13 Документы
+view_documents 13 edvDocuments remontDocumentTypes Документы
+
+
+
+w 1 0
+--w 4 400

@@ -1,0 +1,23 @@
+#
+SELECT 
+  MON, Ven, Vpusk+Visp+Vsliv, Vdr, VpuskDr+VispDr+VslivDr, 
+  Vpot, VpuskPot+VispPot, VItog,
+  Ggvs_pribor_fakt, QObezpr, Gakt_tex_fakt, Sliv, 
+  Gakt_avarija_fakt,
+  VfaktEn, VfaktDr, VfaktPt, Gpod_fakt,
+
+  (Gakt_tex_fakt+Sliv)*100/(Vpusk+Visp+Vsliv+VpuskDr+VispDr+VslivDr)
+
+
+
+ 
+FROM
+(
+#include ../POT_МесТеплоПСВФакт.sql
+)
+WHERE
+  period=0
+#
+xls/tgid.xls
+10 9
+F1

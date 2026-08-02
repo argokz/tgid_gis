@@ -1,0 +1,22 @@
+Основные
+--  objectid
+  id_adr_mas
+--  id_admraio
+  street_nam
+  number_1
+  year_of_fo
+--  shape_leng
+--  shape_area
+  floor
+  txt
+  otop
+  otop_cxema
+  gvs
+  gvs_cxema
+  vent
+  par
+  nagr
+  mkr2
+  street2
+  house2
+--  potrebitel

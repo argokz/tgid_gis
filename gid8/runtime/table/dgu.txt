@@ -1,0 +1,24 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+
+List
+  id
+  objID
+--  purposeID
+  pow
+  description
+  primechanie
+  id
+
+
+defaut table $ps$ dgu
+
+t 0 5 Документы
+view_documents 5 dguDocuments remontDocumentTypes Документы
+
+
+w 1 0
+--w 4 400

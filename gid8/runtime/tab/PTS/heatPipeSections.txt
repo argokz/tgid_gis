@@ -1,0 +1,26 @@
+Участок теплопровода
+  pipeSectionID
+  magistralSite
+  distSite
+  magistral
+--- Владелец
+--- Тип трубопровода
+  standardID
+  diameterCondit
+  diameterInternal
+  diameterExternal
+  wallThickness
+  pipeSectLength
+  tubesCount
+  tubingTypeID
+  tubeTypeID
+  tubeCharactID
+  factoryManufID
+  lastTransDate Дата последней перекладки
+  lastIsolDate Дата последней замены изоляционной конструкции
+  isolationTypeID
+  isolMaterialID
+  isolThickness
+  externMaterialID
+  externCoverThick
+  anticorrMaterialID Материал антикоррозийного покрытия

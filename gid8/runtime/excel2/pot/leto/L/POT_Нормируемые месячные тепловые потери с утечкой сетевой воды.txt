@@ -1,0 +1,32 @@
+#
+SELECT
+  MON,
+  round(IIF(period=1, VenZ, VenL), 3) AS Ven,
+  round(IIF(period=1, VprZ+VbpZ+VmgZ, VprL+VbpL+VmgL), 3) AS Vdr,
+  round(IIF(period=1, Vprib+Vbezpr, 0), 3) AS Vpot,
+  round(Ven*CT.a/100*24*length*((t1+t2)/2-t)*ro/1000, 3) AS Qen,
+  round(Vdr*CT.a/100*24*length*((t1+t2)/2-t)*ro/1000, 3) AS Qdr,
+  round(Qen+Qdr, 3),
+  round(Vpot*CT.a/100*24*length*((t1+t2)/2-t)*ro/1000, 3) AS Qpot,
+  round(Qen+Qdr+Qpot, 3)
+
+FROM
+  (
+#include ../../sql/Объемы.sql
+  ) OB,
+  [Система теплоснабжения] CT,
+  TEMP_PROD_OUT,
+  TEMP_IST_OUT
+
+WHERE
+  TEMP_IST_OUT.kod_ist=OB.kod_ist
+AND 
+  TEMP_PROD_OUT.kod_ist=TEMP_IST_OUT.kod_ist 
+AND OB.kod_ist='$IST$'
+AND period = 0
+                               
+
+#
+xls/tgid.xls
+10 9
+F1

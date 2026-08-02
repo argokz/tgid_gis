@@ -1,0 +1,16 @@
+SELECT top 2147483647 1 AS '№', 'Координаты точки начала рабочей зоны, расход, т/ч' AS 'Наименование', q_min AS 'Значение' FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 2, 'Координаты точки начала рабочей зоны, напор, м.вод.ст.', h_min FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 3, 'Координаты точки конца рабочей зоны, расход, т/ч', q_max FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 4, 'Координаты точки конца рабочей зоны, напор, м.вод.ст.', h_max FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 5, 'Расход воды через насос номинальный, т/ч', q_nomin FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 6, 'Напор воды через насос номинальный, м.вод.ст.', h_nomin FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 7, 'КПД насоса номинальный, %', k_nomin FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 8, 'Диаметр рабочего колеса номинальный,мм', d_nomin FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 9, 'Частота вращения рабочего колеса номинальная', rate_nomin FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 10,'Количество рабочих колес,шт.', kol_d FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 11,'Температура рабочей среды максимальная, °С',t_max  FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 12,'Давление воды на всасе насоса, м.вод.ст.',p_home  FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 13,'Высота всасывания вакууметрическая максимальная',h_home  FROM standardPumps WHERE id=$id$
+--UNION SELECT top 2147483647 14,'Завод-изготовитель',producer  FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 14,'Давление рабочее на входе максимальное, м.вод.ст.',p_home_max  FROM standardPumps WHERE id=$id$
+UNION SELECT top 2147483647 15,'Масса,кг', massa FROM standardPumps WHERE id=$id$

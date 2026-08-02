@@ -11,8 +11,8 @@
 # Заглушка создаётся автоматически, чтобы не тянуть зависимость.
 
 param(
-    [string]$Source   = 'H:\projects\tgid-app-new\gid8\gid8',
-    [string]$BuildDir = 'H:\build\gid8',
+    [string]$Source   = (Join-Path $PSScriptRoot '..\gid8\gid8'),
+    [string]$BuildDir = 'H:\build\gid8-tgid-gis',
     [string]$QtDir    = 'H:\Qt\6.8.3\msvc2022_64',
     [string]$BoostDir = 'H:\cpp\boost_1_85_0',
     [string]$StubDir  = 'H:\cpp\stub_include',
@@ -33,6 +33,12 @@ if (-not (Test-Path $cmake)) {
 
 foreach ($p in @($vcvars, $cmake, $QtDir, $BoostDir)) {
     if (-not (Test-Path $p)) { throw "не найдено: $p" }
+}
+
+$Source = (Resolve-Path $Source).Path
+$RuntimeDir = Join-Path (Split-Path $Source -Parent) 'runtime'
+if (-not (Test-Path (Join-Path $RuntimeDir 'sql3\us.sql'))) {
+    throw "не найдены ресурсы gid8: $RuntimeDir"
 }
 
 # Заглушка proj.h — заголовок подключается, но API не используется.
@@ -77,7 +83,12 @@ $lines = @(
     'if errorlevel 1 exit /b 1'
 )
 if (-not $Configure) {
-    $lines += "`"$cmake`" --build `"$BuildDir`" --config $Config"
+    $lines += @(
+        "`"$cmake`" --build `"$BuildDir`" --config $Config",
+        'if errorlevel 1 exit /b 1',
+        "`"$cmake`" -E copy_directory `"$RuntimeDir`" `"$BuildDir`"",
+        'if errorlevel 1 exit /b 1'
+    )
 }
 $lines | Set-Content -Path $bat -Encoding ascii
 

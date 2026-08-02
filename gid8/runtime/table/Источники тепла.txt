@@ -1,0 +1,4 @@
+defaut table $ps$ istochniki_tepla
+
+w 2 -2
+w 5 -2

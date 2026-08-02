@@ -1,0 +1,17 @@
+Основные
+    consumer_status
+    calculation_code
+    water_network_attachment_node
+    geodetic_axis_elevation
+    highest_building_floor
+    floor_height
+    summer_daily_water_consumption_code
+    winter_daily_water_consumption_code
+    calculated_flow_rate
+    max_flow_rate
+    required_headroom
+    coefficient_variation_group_code
+    dominant_point_membership
+    subscriber_name
+    subscriber_type
+    calculated_head_loss_up_to_dominant_point

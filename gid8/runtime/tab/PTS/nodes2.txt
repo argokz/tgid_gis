@@ -1,0 +1,34 @@
+Производственная служба
+  nodeName Наименование узла ПТС
+  nodeTypeID
+-  nodeTypeID
+-----  belongHN
+  organizationID
+---  registNumber
+  $ms_view Участки МС
+  $rs_view Участки РС
+  inventNumber
+  registNumber
+-  magistralSite
+-  distSite
+---  inventNumber
+-
+---  passport
+-  isBusy
+-  isLoaded
+-  belongMagistralSite
+-  belongDistSite
+---  calcPressFlow
+---  calcPressRet
+-----  memo Комментарий
+-Адрес
+-  gpsCoords
+-Конструкция
+-  stopArmatureDiameter
+-  scheme
+Даты эксплуатации
+  PICdate
+  lastRepairDate
+Архив
+  archiveChangeDate
+  operatorID

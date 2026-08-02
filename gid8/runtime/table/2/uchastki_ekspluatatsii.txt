@@ -1,0 +1,1 @@
+defaut table $ps$ uchastki_ekspluatatsii

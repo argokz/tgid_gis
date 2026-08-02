@@ -1,0 +1,26 @@
+Основные
+    schedule_code
+    interval_0_1
+    interval_1_2
+    interval_2_3
+    interval_3_4
+    interval_4_5
+    interval_5_6
+    interval_6_7
+    interval_7_8
+    interval_8_9
+    interval_9_10
+    interval_10_11
+    interval_11_12
+    interval_12_13
+    interval_13_14
+    interval_14_15
+    interval_15_16
+    interval_16_17
+    interval_17_18
+    interval_18_19
+    interval_19_20
+    interval_20_21
+    interval_21_22
+    interval_22_23
+    interval_23_24

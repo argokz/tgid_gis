@@ -1,0 +1,25 @@
+--"act","rayon",
+--"act","uchastok","uchastki_ekspluatatsii","id","nomer_uchastka",1,"SELECT TOP 2000000 ue.id, CONCAT(re.naimenovanie_rayona_ekspluatatsii_istochnika_tepla , ' ', nomer_uchastka, ' ', IIF(ue.vid_seti=1, 'МС', 'РС'), ' ', nach.fio) AS nomer_uchastka FROM uchastki_ekspluatatsii ue LEFT JOIN rayon_ekspluatatsii re ON re.id=ue.rayon_ekspluatatsii LEFT JOIN nachalniki_uchastkov nach ON nach.id=ue.nachalnik_uchastka ORDER BY nomer_uchastka"
+
+"tankBatteries","nodeID","nodes","id","externalNodeName",0
+
+
+--rayon int,           -- Район
+--uchastok int,        -- Участок
+--nomer_papki int,     -- Номер папки
+--kvartal varchar(50), -- Квартал
+--tm varchar(2),       -- Тм
+--ut varchar(10),      -- Ут
+--vremennyy int,       -- Временный
+
+
+"pressRegulators","nodeID","nodes","id","externalNodeName",1,"SELECT n.id, CONCAT(ec.name, ' ', n.externalNodeName) AS name FROM nodes n JOIN externalCodes ec ON ec.id=n.externalCodeID"
+"externalCodes","heatSourceID","heatSources","id","name",1,"SELECT TOP 2000000 hs.id, CONCAT(COALESCE(hs.name, n.externalNodeName), ' (',  f.name, ')') AS name FROM heatSources hs JOIN nodes n ON n.id=hs.nodeID JOIN fragments f ON f.id=n.fileID WHERE n.removed=0 AND n.fileID in ($fragments$) ORDER BY name"
+
+"zdaniya_2","otop_cxema","shema_nagr","id","name",0
+"zdaniya_2","gvs_cxema","shema_gvs","id","name",0
+
+
+"externalCodes","belongMagistral","externalCodes","id","name",1,"SELECT DISTINCT TOP 2000000 hs.id, CONCAT(COALESCE(hs.name, n.externalNodeName), ' ',  f.name) AS name FROM externalCodes hs JOIN nodes n ON n.externalCodeID=hs.id JOIN fragments f ON f.id=n.fileID WHERE n.removed=0 AND n.fileID in ($fragments$)  \n--AND_TXT AND CONCAT(COALESCE(hs.name, n.externalNodeName), ' ',  f.name) ilike '%$txt$%' \n  ORDER BY name"
+
+"externalCodes","heatSourceID","heatSources","id","name",1,"SELECT TOP 2000000 hs.id, CONCAT(COALESCE(hs.name, n.externalNodeName), ' ',  f.name) AS name FROM heatSources hs JOIN nodes n ON n.id=hs.nodeID JOIN fragments f ON f.id=n.fileID WHERE n.removed=0 AND n.fileID in ($fragments$) \n--AND_TXT AND CONCAT(COALESCE(hs.name, n.externalNodeName), ' ',  f.name) ilike '%$txt$%' \n  ORDER BY name"

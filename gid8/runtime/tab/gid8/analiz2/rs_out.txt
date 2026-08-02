@@ -1,0 +1,20 @@
+Основные
+    sos
+    calculationID
+    lineID
+    externalSignLineID
+    a4
+    a8
+    kod3
+    uzel3
+    pr3
+    a11
+    a12
+    a13
+    a14
+    a15
+    a16
+    a17
+    a18
+    dx
+    a19

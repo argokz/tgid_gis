@@ -1,0 +1,57 @@
+tabs-container {
+  width: 100%;
+  max-width: 700px;
+  height: auto; / Make the height flexible /
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  position: relative;
+}
+
+.tabs {
+  padding: 10px 20px 15px 20px; / Increased padding /
+}
+
+.tab-links {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tab-link {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 15px 30px; / Increased padding for spacing /
+  color: #ccc;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.tab-link.active,
+.tab-link:hover {
+  color: #b84de5; / Gradient purple /
+}
+
+.tab-link i {
+  margin-right: 10px;
+}
+
+.tab-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 3px;
+  bottom: -1px;
+  left: 50%;
+  background: linear-gradient(45deg, #b84de5, #7d41ff); / Purple gradient /
+  transition: all 0.4s ease;
+}
+
+.tab-link.active::after {
+  width: 100%;
+  left: 0;
+}

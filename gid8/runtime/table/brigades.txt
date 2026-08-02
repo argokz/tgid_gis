@@ -1,0 +1,28 @@
+--defaut table $ps$ brigades
+
+NoSave
+NoSaveZero
+
+Rows 1
+
+
+edit 1
+edit 2
+edit 4
+edit 6
+
+
+t 0 0  №
+t 0 1 Наименование
+t 0 2 Ответственный индекс
+t 0 3 Ответственный
+t 0 4 Подразделение индекс
+t 0 5 Подразделение
+t 0 6 Количество человек
+
+
+--Lookup2 3 "$ps$","responsibles","name",2
+Lookup2 5 "$ps$","subdivisions","name",4
+
+LookupQ 3 "$ps$","responsibles","SELECT id, name AS 'ФИО' FROM responsibles WHERE statusID=16",2
+

@@ -1,0 +1,190 @@
+
+NullableDateEdit,
+CustomDateEdit {
+    border: 1px solid #BDBDBD;
+    color: #212121;
+    border-radius: 4px;
+    margin-right: 0px;
+}
+
+
+QLineEdit {
+    border: 1px solid #BDBDBD;
+    color: #212121;
+    border-radius: 4px;
+    margin-right: 0px;
+}
+
+
+QLineEdit:hover {
+    border-color: #757575;
+    background-color: #FAFAFA;
+}
+
+QLineEdit[class='title'], QLineEdit[class='label'] {
+    border: none;
+    color: #000;
+    background: transparent;
+}
+
+
+QLineEdit[class='number'] {
+    border-right: 1px solid black;
+    text-align: center;
+    width: 20px;
+    color: blue;
+    background: transparent;
+}
+
+
+QLineEdit[class='title']:hover, QLineEdit[class='label']:hover, QLineEdit[class='number']:hover,
+QLineEdit[class='title']:focus, QLineEdit[class='label']:focus, QLineEdit[class='number']:focus {
+    background: transparent;
+    border: none;
+    color: #000;
+}
+
+
+QComboBox {
+    border: 1px solid #BDBDBD;
+    color: #212121;
+    border-radius: 4px;
+}
+
+QComboBox:hover {
+    border-color: #757575;
+    background-color: #FAFAFA;
+}
+
+
+QTreeWidget {
+    background-color: #ffffff;
+}
+
+QTreeWidget::item {
+    background-color: #ffffff;
+    border-top: 1px solid #E0E0E0;
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+}
+
+QTreeWidget::item:selected {
+    background-color: #E3F2FD; 
+    color: #000;
+}
+
+QTreeWidget::item:hover {
+    background-color: #F1F8FF; 
+}
+
+QScrollBar:vertical {
+    border: none;
+    background: #f7f7f7;
+    width: 8px;
+}
+
+QScrollBar::handle:vertical {
+    background: #c0c0c0;
+    min-height: 20px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #a0a0a0;
+}
+
+/*
+QToolTip {
+    background-color: #616161;
+    color: #ffffff;
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 3px;
+}
+*/
+
+QToolTip {
+    border: 2px solid darkkhaki;
+    white-space: normal;
+    padding: 5px;
+    border-radius: 3px;
+    opacity: 200;
+    font-size: 14px;
+}
+
+
+QHeaderView::section {
+    height: 10px;
+    color: black;
+    background-color: white;
+/*    background-color: #bdbdbd;*/
+
+    padding-left: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.2);;
+}
+
+QHeaderView::section:checked
+{
+/*    background-color: red;*/
+}
+
+/* style the sort indicator */
+QHeaderView::down-arrow {
+    image: url(down_arrow.png);
+}
+
+QHeaderView::up-arrow {
+    image: url(up_arrow.png);
+}
+
+/*[class='property_ok']*/
+
+QPushButton {
+    background-color: #f0f0f0;       /* Светло-серый фон */
+    color: black;                    /* Черный текст */
+    border: 1px solid #b0b0b0;       /* Легкая серая рамка */
+    padding: 4px 8px;               /* Отступы */
+    border-radius: 4px;              /* Легкое скругление углов */
+}
+
+QPushButton:hover {
+    background-color: #e6e6e6;       /* Немного темнее при наведении */
+}
+
+QPushButton:pressed {
+    background-color: #dcdcdc;       /* Еще темнее при нажатии */
+    padding-left: 6px;
+    padding-top: 6px;                /* Легкий эффект вдавливания */
+}
+
+QPushButton:disabled {
+    background-color: #f5f5f5;       /* Серый цвет для неактивного состояния */
+    color: #a0a0a0;
+}
+
+
+QPushButton[dialog='property'] {
+    font-size: 13px;
+}
+
+
+QPushButton[class='ok'] {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                      stop:0 #66cc66, stop:1 #4CAF50); /* Градиент сверху вниз */
+    color: white;                    /* Белый цвет текста */
+    border: 1px solid #388e3c;       /* Зеленая граница */
+}
+
+QPushButton[class='ok']:hover {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                      stop:0 #57a957, stop:1 #388e3c); /* Темный градиент при наведении */
+}
+
+QPushButton[class='ok']:pressed {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                      stop:0 #4CAF50, stop:1 #388e3c); /* Градиент для эффекта нажатия */
+}
+
+
+

@@ -1,0 +1,67 @@
+customHeaderList = {
+    row_1: [{
+        text: 'Id',
+        rowspan: 2,
+        colspan: 1,
+        class: 'custom-th'
+        },
+        {
+            text: 'Наружный диаметр труб, мм',
+            rowspan: 2,
+            colspan: 1,
+            class: 'custom-th'
+        },
+        {
+            text: 'Нормы тепловых потерь теплопроводами, ккал/(м.ч)',
+            rowspan: 1,
+            colspan: 4,
+            class: 'custom-th pt-5 pb-5'
+        },
+        {
+            text: 'Действия',
+            rowspan: 2,
+            colspan: 1,
+            class: 'custom-th'
+        }
+    ],
+    row_2: [{
+        text: 'обратным при средней температуре воды t1 = $data1$ °C',
+        rowspan: 1,
+        colspan: 1,
+        class: 'custom-th pt-5 pb-5',
+        key: 'h_col_1',
+        value: '$data1$',
+        name: 't1',
+        type: 'number'
+    },
+    {
+        text: 'двухтрубной прокладки при разности среднегодовых температур воды и грунта t2 = $data2$ °C',
+        rowspan: 1,
+        colspan: 1,
+        class: 'custom-th',
+        key: 'h_col_2',
+        value: '$data2$',
+        name: 't2',
+        type: 'number'
+    },
+    {
+        text: 'двухтрубной прокладки при разности среднегодовых температур воды и грунта t3 = $data3$ °C',
+        rowspan: 1,
+        colspan: 1,
+        class: 'custom-th',
+        key: 'h_col_3',
+        value: '$data3$',
+        name: 't3',
+        type: 'number'
+    },
+    {
+        text: 'двухтрубной прокладки при разности среднегодовых температур воды и грунта t4 = $data4$ °C',
+        rowspan: 1,
+        colspan: 1,
+        class: 'custom-th',
+        key: 'h_col_4',
+        value: '$data4$',
+        name: 't4',
+        type: 'number'
+    }],
+};

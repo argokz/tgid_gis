@@ -1,0 +1,28 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+t 0 0 №
+t 0 1 
+t 0 2 activityID
+t 0 3 Работы
+t 0 4 elementID
+t 0 5 Элемент
+
+Lookup2 3 "$ps$","remontTruboprovodaSpisok","name",2
+Lookup2 5 "$ps$","spisokElementov","name",4
+
+edit 1
+edit 2
+edit 3
+edit 4
+edit 5
+
+
+w 0 0
+w 1 0
+w 2 0
+w 3 300
+w 4 0
+w 5 300

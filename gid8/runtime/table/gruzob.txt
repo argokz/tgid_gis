@@ -1,0 +1,23 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+
+List
+  id
+  objID
+--  typeID
+  description
+--  kol
+  primechanie
+  id
+
+defaut table $ps$ gruzob
+
+
+t 0 4 Документы
+view_documents 4 gruzobDocuments remontDocumentTypes Документы
+
+w 1 0
+--w 4 400

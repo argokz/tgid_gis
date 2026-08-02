@@ -1,0 +1,4 @@
+defaut table $ps$ responsibles_es
+
+w 2 -2
+

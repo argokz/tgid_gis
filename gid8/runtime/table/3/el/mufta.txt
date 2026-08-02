@@ -1,0 +1,16 @@
+NoSave
+
+Filtr [shape]
+geo_table 999
+
+
+List
+  id
+  naimenovanie_lep
+  tip__marka__harakteristika_
+  rasstoyanie_do_priemnika__m
+  data_ustanovki
+  dolzhnostID
+  responsibleID
+  primechanie
+

@@ -1,0 +1,17 @@
+Основные
+    section_status_from_start_node
+    section_status_from_end_node
+    input_node_calculation_code
+    input_node_name
+    output_node_calculation_code
+    output_node_name
+    section_length
+    pipe_diameter
+    sum_of_local_resistance_coefficients
+    pipe_material
+    pipe_surface_condition
+    hydraulic_resistance_section
+    distance_from_start_node_to_breakage
+    node_name_at_breakage
+    terrain_elevation_at_node
+    breakage_hole_diameter_percent

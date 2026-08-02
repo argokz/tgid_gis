@@ -1,0 +1,38 @@
+{
+    "q": "
+
+SELECT id
+      ,idT
+      ,izmeneniya_prodleniya
+      ,data_izmeneniya_prodleniya
+      ,teplovye_potoki__gkal_ch
+      ,v_tom_chisle_otoplenie
+      ,v_tom_chisle_ventilyatsiya
+      ,v_tom_chisle_gvs_maks
+      ,prirost_nagruzki
+      ,v_tom_chisle_prirost_otoplenie
+      ,v_tom_chisle_prirost_ventilyatsiya
+      ,v_tom_chisle_prirost_gvs_maks
+      ,dopolnitelnye_tehnicheskie_meropriyatiya
+  FROM changeTu      
+  WHERE id=$ID$
+    
+    ",
+    "title": "Технические условия",
+"type": "edit",
+"form": [
+
+{"key":"izmeneniya_prodleniya", "name":"Изменения продления","type":"textarea"},
+{"key":"data_izmeneniya_prodleniya", "name":"Дата изменения продления","type":"input", "typeField" : "date"},
+{"key":"teplovye_potoki__gkal_ch", "name":"Тепловые потоки","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_otoplenie", "name":"В том числе отопление","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_ventilyatsiya", "name":"В том числе вентиляция","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_gvs_maks", "name":"В том числе ГВС","type":"input", "typeField" : "number"},
+{"key":"prirost_nagruzki", "name":"Прирост нагрузки","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_otoplenie", "name":"В том числе прирост отопления","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_ventilyatsiya", "name":"В том числе прирост вентиляции","type":"input", "typeField" : "number"},
+{"key":"v_tom_chisle_prirost_gvs_maks", "name":"В том числе прирост ГВС","type":"input", "typeField" : "number"},
+{"key":"dopolnitelnye_tehnicheskie_meropriyatiya", "name":"Дополнительные технические мероприятия","type":"textarea"}
+
+]
+}

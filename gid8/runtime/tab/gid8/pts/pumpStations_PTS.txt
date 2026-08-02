@@ -1,0 +1,12 @@
+-!Узел
+Насосная станция
+  name
+-!Насосная станция
+Насосная станция
+  purpose
+  capacity
+  pumpCountFlow
+  pumpCountRet
+--  state
+--  heightTubeMark
+--  heightAreaMark

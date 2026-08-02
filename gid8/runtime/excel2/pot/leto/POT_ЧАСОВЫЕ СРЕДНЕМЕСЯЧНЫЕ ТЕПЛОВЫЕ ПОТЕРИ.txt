@@ -1,0 +1,43 @@
+#
+SELECT
+  kod1, 
+  uzel1, 
+  pr1, 
+  kod2, 
+  uzel2, 
+  pr2, 
+  typ, 
+  year,
+  kolwork,
+  diam_vn, 
+  diametr_usl,
+  dlina,
+  qqP,
+  qqO,
+  qq,
+  ktp,
+  kti,
+  q01,q02,q03,q04,q05,q06,q07,q08,q09,q10,q11,q12,
+  qq01,
+  qq02,
+  qq03,
+  qq04,
+  qq05,
+  qq06,
+  qq07,
+  qq08,
+  qq09,
+  qq10,
+  qq11,
+  qq12
+FROM 
+(
+#include ../../sql/вюянбше япедмелеяъвмше реокнбше онрепх вепег реокнбсч хгнкъжхч.sql
+)
+
+#
+xls/tgid.xls
+13 10
+F1
+
+

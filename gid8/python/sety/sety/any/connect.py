@@ -34,7 +34,7 @@ def connect_pg(**conn_str: Any) -> Connection | None:
 
     _host = conn_str.get('server', 'localhost')
     _user = conn_str.get('user', 'gena1967')
-    _password = conn_str.get('password', '12345098')
+    _password = conn_str.get('password', '')
     _db = conn_str.get('db', 'gis')
     _port = conn_str.get('port', 5432)
     
@@ -92,7 +92,7 @@ def connect(**conn_str: Any) -> Connection | None:
     
     _host = conn_str.get('server', '45.132.85.23')
     _user = conn_str.get('user', 'Lifan')
-    _password = conn_str.get('password', 'Danil228')
+    _password = conn_str.get('password', '')
     _db = conn_str.get('db', 'Water')
     _port = conn_str.get('port', 1437)
 

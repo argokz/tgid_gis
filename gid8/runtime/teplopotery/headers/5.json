@@ -1,0 +1,94 @@
+customHeaderList = {
+    row_1: [{
+        text: 'Id',
+        rowspan: 4,
+        colspan: null,
+        class: 'custom-th'
+    },
+        {
+            text: 'Условный проход трубопровода, мм',
+            rowspan: 4,
+            colspan: null,
+            class: 'custom-th pt-5 pb-5'
+        },
+        {
+            text: 'При числе часов работы в год 5000 и более',
+            rowspan: 1,
+            colspan: 3,
+            class: 'custom-th'
+        },
+        {
+            text: 'При числе часов работы в год 5000 и менее',
+            rowspan: 1,
+            colspan: 3,
+            class: 'custom-th'
+        },
+        {
+            text: 'Действия',
+            rowspan: 4,
+            colspan: null,
+            class: 'custom-th'
+        }
+    ],
+    row_2: [{
+        text: 'Средняя температура °C',
+        rowspan: null,
+        colspan: 6,
+        class: 'custom-th pt-5 pb-5'
+    }],
+    row_3: [{
+            text: '$data1$',
+            rowspan: null,
+            colspan: null,
+            class: 'custom-th pt-5 pb-5',
+            key: 'h_col_1',
+            value: '$data1$',
+            name: 't1',
+            type: 'number'
+        },
+        {
+            text: '$data2$',
+            rowspan: null,
+            colspan: null,
+            class: 'custom-th',
+            key: 'h_col_2',
+            value: '$data2$',
+            name: 't2',
+            type: 'number'
+        },
+        {
+            text: '$data3$',
+            rowspan: null,
+            colspan: null,
+            class: 'custom-th',
+            key: 'h_col_3',
+            value: '$data3$',
+            name: 't3',
+            type: 'number'
+        },
+        {
+            text: '$data1$',
+            rowspan: null,
+            colspan: null,
+            class: 'custom-th'
+        },
+        {
+            text: '$data2$',
+            rowspan: null,
+            colspan: null,
+            class: 'custom-th'
+        },
+        {
+            text: '$data3$',
+            rowspan: null,
+            colspan: null,
+            class: 'custom-th'
+        }
+    ],
+    row_4: [{
+        text: 'Нормы линейной плотности теплового потока, ккал/(м . ч)',
+        rowspan: null,
+        colspan: 6,
+        class: 'custom-th'
+    }],
+};

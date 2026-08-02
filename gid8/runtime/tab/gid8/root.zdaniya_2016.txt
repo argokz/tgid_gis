@@ -1,0 +1,7 @@
+Основные
+--    id_admraio
+    id_adr_mas
+    street_nam
+    number_1
+    floor
+    year_of_fo

@@ -1,0 +1,29 @@
+copy vozdushnik2.txt drenazhnyy_kran2.txt
+copy vozdushnik2.txt zapornaya_armatura2.txt
+copy vozdushnik2.txt vozdushnik2.txt
+copy vozdushnik2.txt vvod_v_zdanie.txt
+copy vozdushnik2.txt vvody_v_zdanie.txt
+copy vozdushnik2.txt vertikalnyy_podem_opusk_truprovoda.txt
+copy vozdushnik2.txt kanal.txt
+copy vozdushnik2.txt kompensator.txt
+copy vozdushnik2.txt opora.txt
+copy vozdushnik2.txt perehod_diametra.txt
+copy vozdushnik2.txt ugol_povorota_truboprovoda.txt
+copy vozdushnik2.txt granitsy_vertikalnyh_kompensatorov.txt
+copy vozdushnik2.txt kamera_opuska_ili_podema.txt
+copy vozdushnik2.txt kolodtsy.txt
+copy vozdushnik2.txt perehlesty_setey.txt
+copy vozdushnik2.txt peremychki.txt
+copy vozdushnik2.txt uzel_kanala.txt
+copy vozdushnik2.txt tkamera.txt
+copy vozdushnik2.txt pavilion.txt
+copy vozdushnik2.txt tstrp.txt
+copy vozdushnik2.txt nasosnye_stantsii.txt
+copy vozdushnik2.txt istochniki_teplosnabzheniya.txt
+copy vozdushnik2.txt bridge_crossing.txt
+copy vozdushnik2.txt duker.txt
+
+copy vozdushnik2.txt defect.txt
+copy vozdushnik2.txt remont.txt
+copy vozdushnik2.txt diag.txt
+

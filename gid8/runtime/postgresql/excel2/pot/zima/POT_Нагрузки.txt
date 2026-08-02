@@ -1,0 +1,65 @@
+#
+SELECT 
+  sost,obob,
+  kod, uzel, name_building,
+  otoplz,
+  otopln,
+  tp,
+  ventil,
+  kondiz,
+  gvop,
+  gvoo,
+  rez_q,
+  gvpr,
+  gvsm,
+  gvps,
+  gvpw,
+  q,
+  gvop,
+  gvoo,
+  v_otop,
+  v_vent,
+  ORG.name
+FROM 
+(
+#include ../../sql/Потребители.sql
+)
+WHERE
+  kod_ist='$IST$'
+
+UNION ALL
+
+SELECT 
+  '.',' ',
+  '', '', 'Итого',
+  sum(IIF(sost='*', 0, otoplz)),
+  sum(IIF(sost='*', 0, otopln)),
+  sum(IIF(sost='*', 0, tp)),
+  sum(IIF(sost='*', 0, ventil)),
+  sum(IIF(sost='*', 0, kondiz)),
+  sum(IIF(sost='*', 0, gvop)),
+  sum(IIF(sost='*', 0, gvoo)),
+  sum(IIF(sost='*', 0, rez_q)),
+  sum(IIF(sost='*', 0, gvpr)),
+  sum(IIF(sost='*', 0, gvsm)),
+  sum(IIF(sost='*', 0, gvps)),
+  sum(IIF(sost='*', 0, gvpw)),
+  sum(IIF(sost='*', 0, q)),
+  sum(IIF(sost='*', 0, gvop)),
+  sum(IIF(sost='*', 0, gvoo)),
+  sum(IIF(sost='*', 0, v_otop)),
+  sum(IIF(sost='*', 0, v_vent)),
+  ''
+FROM 
+(
+#include ../../sql/Потребители.sql
+)
+WHERE
+  kod_ist='$IST$'
+
+
+
+#
+xls/tgid.xls
+13 7
+N1

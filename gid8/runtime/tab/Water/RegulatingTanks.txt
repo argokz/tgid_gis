@@ -1,0 +1,11 @@
+Основные
+    calculation_code
+    node_name
+    geodetic_bottom_elevation
+    tank_diameter
+    water_surface_area
+    initial_water_level
+    max_allowed_water_level
+    operating_duration_hours
+    tank_purpose
+    tank_state

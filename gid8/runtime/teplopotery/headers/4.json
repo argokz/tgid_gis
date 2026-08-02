@@ -1,0 +1,163 @@
+customHeaderList = {
+  row_1: [
+    {
+      text: "Id",
+      rowspan: 5,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "Условный проход трубопровода, мм",
+      rowspan: 5,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "При числе работы в год 5000 и менее",
+      rowspan: 1,
+      colspan: 4,
+      class: "custom-th",
+    },
+    {
+      text: "При числе часов работы в год более 5000",
+      rowspan: 1,
+      colspan: 4,
+      class: "custom-th",
+    },
+     {
+      text: "Действия",
+      rowspan: 5,
+      colspan: 1,
+      class: "custom-th",
+    },
+    
+  ],
+  row_2: [
+    {
+      text: "Трубопровод",
+      rowspan: 1,
+      colspan: 8,
+      class: "custom-th pt-5 pb-5",
+    },
+  ],
+  row_3: [
+    {
+      text: "подающий",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "обратный",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "подающий",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "обратный",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "подающий",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "обратный",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "подающий",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+    {
+      text: "обратный",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+    },
+  ],
+   row_4: [
+    {
+      text: "Среднегодовая температура теплоносителя, °C",
+      rowspan: 1,
+      colspan: 8,
+      class: "custom-th pt-5 pb-5",
+    },
+  ],
+  row_5: [
+     {
+      text: "$data1$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th pt-5 pb-5",
+      key: 'h_col_1',
+      value: '$data1$',
+      name: 't1 подача',
+      type: 'number'
+    },
+     {
+      text: "$data3$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th",
+      key: 'h_col_3',
+      value: '$data3$',
+      name: 't2 обратка',
+      type: 'number'
+    },
+     {
+      text: "$data2$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th  ",
+      key: 'h_col_2',
+      value: '$data2$',
+      name: 't3 подача',
+      type: 'number'
+    },
+     {
+      text: "$data3$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th  ",
+    },
+     {
+      text: "$data1$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th  ",
+    },
+     {
+      text: "$data3$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th  ",
+    },
+     {
+      text: "$data2$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th  ",
+    },
+     {
+      text: "$data3$",
+      rowspan: 1,
+      colspan: 1,
+      class: "custom-th  ",
+    },
+  ],
+};

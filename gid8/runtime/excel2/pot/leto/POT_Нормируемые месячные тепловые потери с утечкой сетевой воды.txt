@@ -1,0 +1,33 @@
+#
+SELECT
+PSVB.MON,
+VenP,
+VdrP,
+VpP,
+VenP*((t1+t2)/2-t)*ro/1000 AS Qen,
+VdrP*((t1+t2)/2-t)*ro/1000 AS Qdr,
+Qen+Qdr,
+VpP*((t1+t2)/2-t)*ro/1000 AS Qp,
+Qen+Qdr+Qp
+
+FROM
+(
+#include ../POT_ÌåñÏÑÂÁ.sql
+) PSVB,
+TEMP_PROD_OUT,
+TEMP_IST_OUT
+
+WHERE
+  TEMP_IST_OUT.kod_ist='$IST$'
+AND 
+  TEMP_PROD_OUT.kod_ist=TEMP_IST_OUT.kod_ist 
+AND 
+  PSVB.m=TEMP_IST_OUT.m
+AND
+  period=0
+
+
+#
+xls/tgid.xls
+10 9
+F1

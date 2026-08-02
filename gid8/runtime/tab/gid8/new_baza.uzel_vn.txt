@@ -1,0 +1,7 @@
+Узел
+    nodename
+    externalsignid
+    typeID2
+    nodeID2
+    archivechangedate
+    operatorid

@@ -138,18 +138,12 @@ static bool first = true;
 void init_cs0(ConnectStr &cs)
 {
     cs.rdbms = 1;   // postgreSQL
-    cs.user = "Lifan";
-    cs.password = "Danil228";
-    cs.port = 1433;
     cs.port = 5432;
-    cs.baza = "AstanaGID";
-    cs.geo = "Astana";
-    cs.baza = "demo_stand";
-    cs.geo = "demo_stand_map";
-
     cs.host = "localhost";
-    cs.user = "demo";
-    cs.password = "itwin";
+    cs.user = "postgres";
+    cs.password = "";
+    cs.baza = "tgid_gis";
+    cs.geo = "tgid_gis";
 
 /*
     if (first) {

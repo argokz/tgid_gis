@@ -1,0 +1,16 @@
+Основные
+    pump_state
+    input_node_calculation_code
+    input_node_name
+    output_node_calculation_code
+    output_node_name
+    required_headroom_pump_station
+    approximation_coefficient_R0
+    approximation_coefficient_R1
+    approximation_coefficient_R2
+    pump_station_characteristic_1st_point_head
+    pump_station_characteristic_1st_point_flow
+    pump_station_characteristic_2nd_point_head
+    pump_station_characteristic_2nd_point_flow
+    number_of_pumps
+    pump_type_code

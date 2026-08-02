@@ -1,0 +1,12 @@
+Основные
+    segment_status
+    input_node_calculation_code
+    input_node_name
+    output_node_calculation_code
+    output_node_name
+    segment_length
+    pipe_diameter
+    sum_of_local_resistance_coefficients
+    pipe_material
+    pipe_surface_condition
+    hydraulic_resistance_segment

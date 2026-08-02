@@ -35,7 +35,9 @@ bool readTableMap(QSqlDatabase &db, const QString & q, const QString & name_id, 
 
 bool read_q(QSqlDatabase &db)
 {
-    QFile file(argpath()+QString("sql3/us.sql"));
+    // Для PostgreSQL берём адаптированный запрос из postgresql/sql3,
+    // как и остальные внешние SQL-файлы приложения.
+    QFile file(nameQ(QString("sql3/us.sql")));
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             return false;

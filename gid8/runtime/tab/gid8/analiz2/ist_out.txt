@@ -1,0 +1,7 @@
+Основные
+    calculationID
+    nodeID
+    externalSignLineID
+    kod_ist
+    t1
+    t2

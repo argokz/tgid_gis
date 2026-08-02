@@ -1,0 +1,13 @@
+Список
+ PATH_AKT_TU A Технические условия
+ PATH_AKT_RAZD A Акты разделов
+ PATH_CXEMA A Рисунки/схемы
+ PATH_DEFECT A Дефекты
+ PATH_OSMOTR A Осмотры
+ PATH_SHURF A Шурфы
+ PATH_KAPREMONT A Ремонты
+ PATH_KORROZ A Индикаторы коррозии
+ PATH_OPRESSOVKA A Опрессовка
+ PATH_PAS A Паспорта
+-- PATH_CONTROL_TU A Контроль технического состояния
+ PATH_ELECTRO A Электросеть

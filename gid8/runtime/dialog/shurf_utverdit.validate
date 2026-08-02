@@ -1,0 +1,7 @@
+naznachenie NotNull
+fio_utverzhdaemogo NotNull
+dolzhnost_utverzhdaemogoID NotNull
+sluzhba_utverzhdaemogoID NotNull
+fio_viziruemogo_1 NotNull
+dolzhnost_viziruemogoID_1 NotNull
+data_utverzhdeniya_plana_shurfovok NotNull CurrentSeason

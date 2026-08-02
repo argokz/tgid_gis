@@ -1,0 +1,8 @@
+defaut table $main$ uchastok_rs
+
+w 1 -2
+w 2 200
+
+w 3 -2
+w 4 200
+

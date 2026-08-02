@@ -1,0 +1,61 @@
+1
+    line
+        invengteptr
+    node1
+    node2
+    node
+        invengtepist
+        invengtepup
+        invengtepvr
+        invengtepkol
+2
+    line
+        invengteptravtonom
+    node1
+    node2
+    node
+        invengtepistavtonom
+        invengtepupavtonom
+        invengtepvravtonom
+        invengtepkolavtonom
+
+
+-- Объекты теплоснабжения
+--     invengtepgrkom
+--     invengtepluk
+--     invengtepkam
+--     invengtepkom
+--     invengtepopor
+--     invengteppd
+--     invengteputv
+--     invengtepvp
+--     invengtepavarii
+-- 
+--     invengtepzona
+--     invengtepkamop
+--     invengtepkanal
+--     invengtepns
+--     invengteppav
+--     invengteppavfvtonom
+
+
+-- 
+-- 0,"invengtepavarii","Аварии на сетях"
+-- 0,"invengtepgrkom","Границы вертикальных компенсаторов сетей теплоснабжения"
+-- 0,"invengtepist","Источник теплоснабжения"
+-- 0,"invengtepkam","Камеры опуска и подъема сетей теплоснабжения"
+-- 0,"invengtepkamop","Камера опуска и подъема сетей теплоснабжения"
+-- 0,"invengtepkanal","Каналы сетей теплоснабжения"
+-- 0,"invengtepkom","Компенсаторы на трубах теплоснабжения"
+-- 0,"invengtepluk","Люк павильона сетей теплоснабжения"
+-- 0,"invengtepns","Насосные станции сетей теплоснабжения"
+-- 0,"invengtepopor","Неподвижные опоры сетей теплоснабжения"
+-- 0,"invengteppav","Тепловые камеры, павильоны"
+-- 0,"invengteppavfvtonom","Тепловые камеры, павильоны"
+-- 
+-- 0,"invengteppd","Переходы диаметра сетей теплоснабжения"
+-- 
+-- 0,"invengteputv","Врезки труб сетей теплоснабжения"
+-- 0,"invengtepvp","Вертикальный подъем, опуск трубопровода тепловой сети"
+-- 0,"invengtepzona","Буферные зоны источника теплоснабжения"
+

@@ -1,0 +1,36 @@
+#
+SELECT 
+  UT.kod1, UT.uzel1, UT.pr1, UT.kod2, UT.uzel2, UT.pr2,
+  name_typ_f,
+  year_n, 
+  IIF(UT.kolwork, "Больше", "Меньше"),
+  diam_vn*0.001,
+  UT0.diametr_usl*0.001,
+  dlina_p,
+  IIF(UT.name_typ='Н' AND UT.pr1 <> 'О', UT.q_P, 0) AS qP,
+  IIF(UT.name_typ='Н' AND UT.pr1 <> 'П', UT.q_O, 0) AS qO,
+  IIF(UT.name_typ<>'Н', 
+    IIF(UT.pr1 <> 'О', q_P, 0)+
+    IIF(UT.pr1 <> 'П', q_O, 0), 0) AS q,
+  IIF(diam_vn >= 150, 1.15, IIF(UT.name_typ='Б', 1.15, 1.2)) AS beta,
+  UT.kti,
+  dlina_p*qP*beta*UT.kti,
+  dlina_p*qO*beta*UT.kti,
+  dlina_p*q*beta*UT.kti
+
+
+FROM
+(
+#include ../../sql/Потери через изоляцию.sql
+) UT,
+[Расчетная схема] PC
+WHERE 
+  UT.kod1=PC.kod_rs
+AND
+  kod_ist='$IST$'
+
+
+#
+xls/tgid.xls
+14 4
+M1

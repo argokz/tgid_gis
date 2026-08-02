@@ -1,0 +1,2 @@
+nolookup
+defaut table $ps$ kontrol_tehnicheskogo_sostoyaniya

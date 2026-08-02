@@ -1,0 +1,27 @@
+#
+SELECT 
+  MON,
+  zimaleto,
+  ud,
+  udP,
+  udO,
+  length,
+  udlen,
+  udPOlen,
+  QQQ,
+  qh,
+  q,
+  qpq
+
+
+FROM 
+(
+#include ../POT_ћес€чные потери через изол€цию.sql
+) 
+WHERE
+  period=0
+
+#
+xls/tgid.xls
+11 6
+H1

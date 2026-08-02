@@ -1,0 +1,31 @@
+xls/G_PT.xls
+sql2/Потребители реальные.sql
+14 1
+sql2/Потребители обобщенные.sql
+14 2
+sql2/OUT_PT_Расчетные нагрузки.sql
+13 3
+sql2/OUT_Потребители2.sql
+15 4
+DOP G4 $out_rezhim
+DOP I4 $out_date
+DOP K4 $out_time
+DOP O4 $TnZ
+sql2/OUT_PT_Тепло.sql
+15 5
+DOP I4 $out_rezhim
+DOP K4 $out_date
+DOP M4 $out_time
+DOP Q4 $TnZ
+sql2/OUT_PT_ТеплоГидравл.sql
+15 6
+DOP J4 $out_rezhim
+DOP L4 $out_date
+DOP O4 $out_time
+DOP R4 $TnZ
+sql2/OUT_PT_Отключенные.sql
+14 7
+DOP F4 $out_rezhim
+DOP H4 $out_date
+DOP J4 $out_time
+DOP L4 $TnZ

@@ -1,0 +1,4 @@
+Основные
+    calculation_scheme_code
+    node_name
+    total_head

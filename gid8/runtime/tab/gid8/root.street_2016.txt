@@ -1,0 +1,10 @@
+Основные
+    street
+    old_street
+    all_name
+    width
+    kolich_pol
+    planshet_c
+    obcsh_area
+    protiaj__1
+--    shape_length

@@ -1,0 +1,12 @@
+#
+SELECT *
+FROM
+  (
+#include ../../sql/Участок2.sql
+  ) UT
+WHERE kod_ist='$IST$'
+
+#
+xls/tgid.xls
+13 8
+F1

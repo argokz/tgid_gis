@@ -1,0 +1,4 @@
+defaut table $main$ magistrali
+
+w 5 -2
+

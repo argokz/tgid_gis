@@ -1,0 +1,26 @@
+#
+SELECT 
+  UT.key_ut_p,
+  UT.kod1, UT.uzel1, UT.pr1, UT.kod2, UT.uzel2, UT.pr2, 
+  typ_param, 
+  year, 
+  dateend_izol,
+  diam_vn, 
+  dlina_p, 
+  MP,
+  MO,
+  M,
+  MMM,
+  0 AS Vzima,
+  Vlet AS V,
+  ORG.name
+  
+FROM 
+(
+#include ../POT_Материальная характеристика.sql
+)
+
+#
+xls/tgid.xls
+11 1
+L1

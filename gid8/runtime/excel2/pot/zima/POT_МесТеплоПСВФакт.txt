@@ -1,0 +1,33 @@
+#
+SELECT
+  Mon,
+  Qen,
+  Qdr,
+  Qen+Qdr,
+  Qpot,
+  Qen+Qdr+Qpot,
+
+  QenF,
+  QdrF,
+  QenF+QdrF,
+  QpotF,
+  QenF+QdrF+QpotF,
+
+  QenF*100/Qen,
+  QdrF*100/Qdr,
+  (QenF+QdrF)*100/(Qen+Qdr),
+  QpotF*100/Qpot,
+  (QenF+QdrF+QpotF)*100/(Qen+Qdr+Qpot)
+
+
+FROM
+  (
+#include ../POT_МесТеплоПСВФакт.sql
+  ) 
+WHERE
+  period=1
+
+#
+xls/tgid.xls
+10 9
+F1

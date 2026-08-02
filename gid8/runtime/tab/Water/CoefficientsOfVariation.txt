@@ -1,0 +1,7 @@
+Основные
+    coefficient_group_code
+    KV_for_summer_calculated_flow
+    KV_for_winter_calculated_flow
+    KV_for_summer_max_flow
+    KV_for_winter_max_flow
+    KV_for_relative_water_consumption

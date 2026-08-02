@@ -1,0 +1,30 @@
+-!Участок
+-  id
+-  lineID
+----  pipeSectionID
+Начальный узел
+   typeID1
+   nodeID1
+Конечый узел
+   typeID2
+   nodeID2
+Участок
+  fileID
+  ist
+  externalSignLineID
+  registNum
+  operatorID
+Регулятор давления
+  regulatorStateID
+  typeID
+  nodeID
+  pipelineSignID
+  h
+  deltaH
+  regValveRelCap
+  relLeakage
+  valveHydroResOpen
+  valveHydroResClose
+  consDrip
+  workAttrID
+

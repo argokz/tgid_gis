@@ -1,0 +1,397 @@
+-- СГЕНЕРИРОВАНО tools/gen_read_sql.py
+--
+-- Замена ut.sql для схемы net. Набор возвращаемых колонок совпадает
+-- с прежним, поэтому приложение менять не требуется — достаточно
+-- подложить этот файл вместо старого.
+--
+-- Запрос заканчивается WHERE: приложение дописывает
+--   AND n1.fileID IN (...)
+-- конкатенацией строки.
+
+SELECT
+    n1.id,
+    n1.fileid,
+    n1.nodeid1,
+    n1.nodeid2,
+    n1.externalsignlineid,
+    n1.displaysign,
+    n1.organizationid,
+    n1.dru_home,
+    n1.magistral,
+    n1.distsite,
+    n1.magistralsite,
+    n1.tubingtypeid,
+    n1.diameterinternal,
+    n1.diameterexternal,
+    n1.diametercondit,
+    n1.pipesectlength,
+    n1.wallthickness,
+    n1.crimpingquesite,
+    n1.pipesectionid,
+    n1.pipesectstateidflow,
+    n1.pipesectstateidret,
+    n1.id2,
+    n1.type_txt,
+    utp.id AS nomgp,
+    uto.id AS nomgo,
+    utp.a14 AS pod_poter,
+    utp.a10 AS pod_w,
+    utp.a11 AS pod_time1,
+    utp.a14 AS pod_a14,
+    utp.a15 AS pod_a15,
+    utp.a16 AS pod_a16,
+    utp.a17 AS pod_a17,
+    utp.tzam AS pod_tzam,
+    utp.tpot AS pod_tpot,
+    uto.a14 AS obr_poter,
+    uto.a10 AS obr_w,
+    uto.a11 AS obr_time1,
+    uto.a14 AS obr_a14,
+    uto.a15 AS obr_a15,
+    uto.a16 AS obr_a16,
+    uto.a17 AS obr_a17,
+    uto.tzam AS obr_tzam,
+    uto.tpot AS obr_tpot,
+    utp.b101 AS pod_b101,
+    utp.b102 AS pod_b102,
+    utp.b103 AS pod_b103,
+    utp.b104 AS pod_b104,
+    utp.b105 AS pod_b105,
+    utp.b106 AS pod_b106,
+    uto.b101 AS obr_b101,
+    uto.b102 AS obr_b102,
+    uto.b103 AS obr_b103,
+    uto.b104 AS obr_b104,
+    utp.a13 AS pod_q,
+    uto.a13 AS obr_q,
+    n1.coords
+FROM (
+SELECT
+    pipe_section.src_id AS id,
+    pipe_section.fragment_id AS fileid,
+    pipe_section.node_from_src AS nodeid1,
+    pipe_section.node_to_src AS nodeid2,
+    pipe_section.externalsignlineid,
+    pipe_section.displaysign,
+    pipe_section.organizationid,
+    NULL::text AS dru_home,
+    pipe_section.magistral,
+    pipe_section.distsite,
+    pipe_section.magistralsite,
+    pipe_section.tubingtypeid,
+    pipe_section.diameterinternal,
+    pipe_section.diameterexternal,
+    pipe_section.diametercondit,
+    pipe_section.pipesectlength,
+    pipe_section.wallthickness,
+    pipe_section.crimpingquesite,
+    pipe_section.pipesectionid,
+    pipe_section.pipesectstateidflow,
+    pipe_section.pipesectstateidret,
+    pipe_section.id AS id2,
+    'UT'::text AS type_txt,
+    pipe_section.coords_legacy AS coords,
+    0 AS removed
+FROM net.pipe_section pipe_section
+WHERE pipe_section.removed_at IS NULL
+UNION ALL
+SELECT
+    pump.src_id AS id,
+    pump.fragment_id AS fileid,
+    pump.node_from_src AS nodeid1,
+    pump.node_to_src AS nodeid2,
+    pump.externalsignlineid,
+    pump.displaysign,
+    pump.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    pump.id AS id2,
+    'HC'::text AS type_txt,
+    pump.coords_legacy AS coords,
+    0 AS removed
+FROM net.pump pump
+WHERE pump.removed_at IS NULL
+UNION ALL
+SELECT
+    regulator_press.src_id AS id,
+    regulator_press.fragment_id AS fileid,
+    regulator_press.node_from_src AS nodeid1,
+    regulator_press.node_to_src AS nodeid2,
+    regulator_press.externalsignlineid,
+    regulator_press.displaysign,
+    regulator_press.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    regulator_press.id AS id2,
+    'RD'::text AS type_txt,
+    regulator_press.coords_legacy AS coords,
+    0 AS removed
+FROM net.regulator_press regulator_press
+WHERE regulator_press.removed_at IS NULL
+UNION ALL
+SELECT
+    damper.src_id AS id,
+    damper.fragment_id AS fileid,
+    damper.node_from_src AS nodeid1,
+    damper.node_to_src AS nodeid2,
+    damper.externalsignlineid,
+    damper.displaysign,
+    damper.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    damper.diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    damper.id AS id2,
+    'ZD'::text AS type_txt,
+    damper.coords_legacy AS coords,
+    0 AS removed
+FROM net.damper damper
+WHERE damper.removed_at IS NULL
+UNION ALL
+SELECT
+    diaphragm.src_id AS id,
+    diaphragm.fragment_id AS fileid,
+    diaphragm.node_from_src AS nodeid1,
+    diaphragm.node_to_src AS nodeid2,
+    diaphragm.externalsignlineid,
+    diaphragm.displaysign,
+    diaphragm.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    diaphragm.diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    diaphragm.id AS id2,
+    'DR'::text AS type_txt,
+    diaphragm.coords_legacy AS coords,
+    0 AS removed
+FROM net.diaphragm diaphragm
+WHERE diaphragm.removed_at IS NULL
+UNION ALL
+SELECT
+    elevator.src_id AS id,
+    elevator.fragment_id AS fileid,
+    elevator.node_from_src AS nodeid1,
+    elevator.node_to_src AS nodeid2,
+    elevator.externalsignlineid,
+    elevator.displaysign,
+    elevator.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    elevator.id AS id2,
+    'EL'::text AS type_txt,
+    elevator.coords_legacy AS coords,
+    0 AS removed
+FROM net.elevator elevator
+WHERE elevator.removed_at IS NULL
+UNION ALL
+SELECT
+    radiator.src_id AS id,
+    radiator.fragment_id AS fileid,
+    radiator.node_from_src AS nodeid1,
+    radiator.node_to_src AS nodeid2,
+    radiator.externalsignlineid,
+    radiator.displaysign,
+    radiator.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    radiator.id AS id2,
+    'RO'::text AS type_txt,
+    radiator.coords_legacy AS coords,
+    0 AS removed
+FROM net.radiator radiator
+WHERE radiator.removed_at IS NULL
+UNION ALL
+SELECT
+    heat_exchanger.src_id AS id,
+    heat_exchanger.fragment_id AS fileid,
+    heat_exchanger.node_from_src AS nodeid1,
+    heat_exchanger.node_to_src AS nodeid2,
+    heat_exchanger.externalsignlineid,
+    heat_exchanger.displaysign,
+    heat_exchanger.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    heat_exchanger.id AS id2,
+    'TO'::text AS type_txt,
+    heat_exchanger.coords_legacy AS coords,
+    0 AS removed
+FROM net.heat_exchanger heat_exchanger
+WHERE heat_exchanger.removed_at IS NULL
+UNION ALL
+SELECT
+    air_heater.src_id AS id,
+    air_heater.fragment_id AS fileid,
+    air_heater.node_from_src AS nodeid1,
+    air_heater.node_to_src AS nodeid2,
+    air_heater.externalsignlineid,
+    air_heater.displaysign,
+    air_heater.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    air_heater.id AS id2,
+    'KU'::text AS type_txt,
+    air_heater.coords_legacy AS coords,
+    0 AS removed
+FROM net.air_heater air_heater
+WHERE air_heater.removed_at IS NULL
+UNION ALL
+SELECT
+    local_resistance.src_id AS id,
+    local_resistance.fragment_id AS fileid,
+    local_resistance.node_from_src AS nodeid1,
+    local_resistance.node_to_src AS nodeid2,
+    local_resistance.externalsignlineid,
+    local_resistance.displaysign,
+    local_resistance.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    local_resistance.id AS id2,
+    NULL::text AS type_txt,
+    local_resistance.coords_legacy AS coords,
+    0 AS removed
+FROM net.local_resistance local_resistance
+WHERE local_resistance.removed_at IS NULL
+UNION ALL
+SELECT
+    line_plain.src_id AS id,
+    line_plain.fragment_id AS fileid,
+    line_plain.node_from_src AS nodeid1,
+    line_plain.node_to_src AS nodeid2,
+    line_plain.externalsignlineid,
+    line_plain.displaysign,
+    line_plain.organizationid,
+    NULL::text AS dru_home,
+    NULL::integer AS magistral,
+    NULL::integer AS distsite,
+    NULL::integer AS magistralsite,
+    NULL::integer AS tubingtypeid,
+    NULL::double precision AS diameterinternal,
+    NULL::double precision AS diameterexternal,
+    NULL::double precision AS diametercondit,
+    NULL::double precision AS pipesectlength,
+    NULL::double precision AS wallthickness,
+    NULL::integer AS crimpingquesite,
+    NULL::integer AS pipesectionid,
+    NULL::integer AS pipesectstateidflow,
+    NULL::integer AS pipesectstateidret,
+    line_plain.id AS id2,
+    NULL::text AS type_txt,
+    line_plain.coords_legacy AS coords,
+    0 AS removed
+FROM net.line_plain line_plain
+WHERE line_plain.removed_at IS NULL
+) n1
+LEFT JOIN (
+    SELECT c.fileid, max(c.id) AS cid FROM calc.calculation c GROUP BY c.fileid
+) calc ON calc.fileid = n1.fileid
+LEFT JOIN calc.ut_out utp ON utp.lineid = n1.id
+                           AND utp.externalsignlineid IN (2, 4)
+                           AND utp.calculationid = calc.cid
+LEFT JOIN calc.ut_out uto ON uto.lineid = n1.id
+                           AND uto.externalsignlineid IN (3, 5)
+                           AND uto.calculationid = calc.cid
+WHERE n1.removed = 0

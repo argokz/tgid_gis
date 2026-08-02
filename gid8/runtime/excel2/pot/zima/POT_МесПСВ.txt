@@ -1,0 +1,15 @@
+#
+SELECT 
+  MON, Ven, Vpusk, Visp, Vsliv, VenItog, Vdr, VpuskDr, VispDr, VslivDr, VdrItog,
+  Vut, Vpot, VpuskPot, VispPot, VpotItog, VItog
+ 
+FROM
+(
+#include ../POT_ÌåñÏÑÂ.sql
+)
+WHERE
+  period=1
+#
+xls/tgid.xls
+10 9
+F1

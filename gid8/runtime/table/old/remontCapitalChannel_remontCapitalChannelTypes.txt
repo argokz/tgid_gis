@@ -1,0 +1,20 @@
+NoSave
+NoSaveZero
+
+Rows 1
+
+t 0 0 №
+t 0 1 
+t 0 2 activityID
+t 0 3 Работы
+
+Lookup2 3 "$ps$","remontCapitalChannelTypes","name",2
+
+edit 1
+edit 2
+
+
+w 0 0
+w 1 0
+w 2 0
+w 3 500

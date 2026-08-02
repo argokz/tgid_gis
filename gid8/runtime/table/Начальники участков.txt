@@ -1,0 +1,5 @@
+defaut table $ps$ nachalniki_uchastkov
+
+w 2 -2
+w 4 -2
+

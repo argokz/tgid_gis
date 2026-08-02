@@ -98,6 +98,10 @@ bool connectSQL0(int rdmbs, const QString & host, int port, const QString & baza
 bool connectSQL1(const QString & baza,  QSqlDatabase &m_db);
 bool connectSqlite0(const QString & baza,  QSqlDatabase &m_db);
 
+// Настраивает только сеанс старого Qt-клиента. Общий search_path базы
+// остаётся чистым для QGIS и других приложений.
+bool configureTgidPostgreSqlSession(QSqlDatabase &db);
+
 
 long sizeOfQ(QSqlDatabase &db, const QString & q);
 

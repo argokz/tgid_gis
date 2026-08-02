@@ -1,0 +1,7 @@
+Список
+ Z3 A Центральный меридиан 
+ Latitude_Of_Origin A Широта начала координат
+ False_Easting A Ложный восток
+ False_Northing A Ложный север
+ Scale_Factor A Коэффициент масштабирования
+ Angle A Угол поворота

@@ -5,6 +5,8 @@
 #include <QTranslator>
 #include <QFileDialog>
 #include <gidview/colorgtd.h>
+#include <config.h>
+#include <db/db.h>
 
 bool init_config();
 
@@ -119,6 +121,36 @@ void set_system_coord(double _False_Easting, double _False_Northing, double _Cen
 bool init_gis_convert(int epsg, const std::string & proj4);
 QString getFileDate();
 
+int runDatabaseSmokeTest()
+{
+    const ConnectStr cs = get_ini()->cs;
+    QSqlDatabase db;
+    if (!connectSQL0(cs.rdbms, cs.host, cs.port, cs.baza,
+                     cs.user, cs.password, db)) {
+        qCritical() << "DB_SMOKE: connection failed" << db.lastError().text();
+        return 2;
+    }
+
+    QSqlQuery query(db);
+    if (!query.exec(
+            "SELECT current_setting('search_path'), "
+            "(SELECT count(*) FROM nodes), "
+            "(SELECT count(*) FROM fragments)")) {
+        qCritical() << "DB_SMOKE: query failed" << query.lastError().text();
+        return 3;
+    }
+    if (!query.next()) {
+        qCritical() << "DB_SMOKE: query returned no row";
+        return 4;
+    }
+
+    qInfo() << "DB_SMOKE: OK"
+            << "search_path=" << query.value(0).toString()
+            << "nodes=" << query.value(1).toLongLong()
+            << "fragments=" << query.value(2).toLongLong();
+    return 0;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -222,6 +254,11 @@ int main(int argc, char *argv[])
 
 #endif
 
+    init_config();
+    if (a.arguments().contains("--db-smoke")) {
+        return runDatabaseSmokeTest();
+    }
+
     init_pics();
     open_b4();
     open_b5();
@@ -296,8 +333,6 @@ int main(int argc, char *argv[])
 
 //    QSettings settings(QString("Sirius"), QString("Gidr 8.0"), nullptr);
 //    if (!init_path(nullptr)) return 0;
-
-    init_config();
 
     MainWindow w;
     w.showMaximized();

@@ -156,6 +156,35 @@ QString SelectTop(const QString & q)
 static QSqlDatabase *global_db = nullptr;
 
 
+bool configureTgidPostgreSqlSession(QSqlDatabase &db)
+{
+    if (!db.isOpen() || RDBMS != POSTGRESQL) {
+        return true;
+    }
+
+    QSqlQuery query(db);
+    if (!query.exec(QString("SET application_name = '%1'")
+                        .arg(VER_FILEDESCRIPTION_STR))) {
+        qWarning() << "Не удалось задать application_name:"
+                   << query.lastError().text();
+        return false;
+    }
+
+    // compat содержит представления со старыми именами nodes/linesobj/...
+    // только для gid8. Схема намеренно не включена в search_path самой БД:
+    // QGIS, расчёт и новые клиенты продолжают работать с net/ref/calc.
+    if (!query.exec(
+            "SET search_path TO compat, public, net, ref, calc, "
+            "meta, addr, doc, el, ops, org")) {
+        qWarning() << "Не удалось настроить search_path gid8:"
+                   << query.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+
 void setRDBMS(int rdbms)
 {
     if (rdbms == 0) {
@@ -208,7 +237,7 @@ bool connectSQL0(int rdbms, const QString & host, int port, const QString & baza
         qDebug() << " m_db.open()";
         if (m_db.open()) {
             qDebug() << "!";
-            return true;
+            return configureTgidPostgreSqlSession(m_db);
         }
         qDebug() << "+";
     }
@@ -279,7 +308,7 @@ bool connectSQL0(int rdbms, const QString & host, int port, const QString & baza
         m_db.setDatabaseName(connectString);
 
         if (RDBMS == POSTGRESQL) {
-            qDebug() << connectString;
+            qDebug() << "PostgreSQL ODBC:" << host << port << baza << user;
 //            m_db.setConnectOptions("SQL_ATTR_LOGIN_TIMEOUT=5;SQL_ATTR_QUERY_TIMEOUT=5");
             m_db.setConnectOptions("SQL_ATTR_LOGIN_TIMEOUT=5");
             m_db.setPort(port);
@@ -301,9 +330,7 @@ bool connectSQL0(int rdbms, const QString & host, int port, const QString & baza
 
     if (ok) {
         if (RDBMS == POSTGRESQL) {
-            QSqlQuery query(m_db);
-            query.exec(QString("set application_name = '%1';").arg(VER_FILEDESCRIPTION_STR));
-            m_db.commit();
+            ok = configureTgidPostgreSqlSession(m_db);
         }
 
 //        std::cout << "Connected\n";
@@ -684,7 +711,7 @@ bool check_db(QSqlDatabase &db)
     if (!query.exec("select 1")) {
         if (QMessageBox::question(nullptr,  "", QObject::tr("Отключился сервер. Подключиться снова?")) == QMessageBox::Yes) {
             if ( db.open()) {
-                return true;
+                return configureTgidPostgreSqlSession(db);
             }
         }
         return false;

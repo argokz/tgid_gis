@@ -1,0 +1,4 @@
+NoSave
+
+Filtr [shape]
+geo_table 999

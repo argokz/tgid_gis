@@ -1,0 +1,2 @@
+select id_obj as id, CONCAT('Воздушник № ', id_obj,' ( ',ISNULL(externalLineStr,'признак трубопровада не указан'),' ), ','диаметр: ',ISNULL(CAST(diametr AS nvarchar(max)), 'не указан')) name
+from getPts($fileID$,'pipe', '$FragmentIds$') where tblName = 'vozdushnik'

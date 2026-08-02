@@ -1,0 +1,56 @@
+{
+    "table": {
+        "rows": [
+            {
+                "cells": [
+                    { "text": "Id", "colspan": 1, "rowspan": 5, "index" : 0},
+                    { "text": "Условный проход трубопровода, мм", "colspan": 1, "rowspan": 5,  "index" : 1 },
+                    { "text": "При числе работы в год 5000 и менее", "colspan": 6, "rowspan": 1,  "index" : 2},
+                    { "text": "При числе часов работы в год более 5000", "colspan": 6, "rowspan": 1,  "index" : 8 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Трубопровод", "colspan": 12, "rowspan": 1, "index" : 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index" : 2},
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index" : 3},
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index" : 4},
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index" : 5},
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index" : 6},
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index" : 7},
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index" : 8},
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index" : 9},
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index" : 10},
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index" : 11},
+                    { "text": "подающий", "colspan": 1, "rowspan": 1, "index" : 12},
+                    { "text": "обратный", "colspan": 1, "rowspan": 1, "index" : 13}
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "Среднегодовая температура теплоносителя, °C", "colspan": 12, "rowspan": 1, "index" : 2 }
+                ]
+            },
+            {
+                "cells": [
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index" : 2},
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1, "index" : 3 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1 , "index" : 4},
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1 , "index" : 5},
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1 , "index" : 6},
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1, "index" : 7 },
+                    { "text": "$data1$", "colspan": 1, "rowspan": 1, "index" : 8 },
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1, "index" : 9 },
+                    { "text": "$data2$", "colspan": 1, "rowspan": 1, "index" : 10 },
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1, "index" : 11},
+                    { "text": "$data3$", "colspan": 1, "rowspan": 1, "index" : 12 },
+                    { "text": "$data4$", "colspan": 1, "rowspan": 1, "index" : 13 }
+                ]
+            }
+        ]
+    }
+}

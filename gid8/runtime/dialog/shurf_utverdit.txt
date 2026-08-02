@@ -1,0 +1,8 @@
+Утверждение плана шурфовок
+   naznachenie A Наименование плана шурфовок
+   fio_utverzhdaemogo A ФИО утверждающего
+   dolzhnost_utverzhdaemogoID L "$ps$","dolzhnosti","id","znachenie" Должность утверждающего
+   sluzhba_utverzhdaemogoID L "$ps$","subdivisions","id","name" Служба утверждающего
+   fio_viziruemogo_1 A ФИО визирующего
+   dolzhnost_viziruemogoID_1 L "$ps$","dolzhnosti","id","znachenie" Должность визирующего
+   data_utverzhdeniya_plana_shurfovok D Дата утверждения плана шурфовок

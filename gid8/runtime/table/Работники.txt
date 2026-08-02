@@ -1,0 +1,4 @@
+defaut table $ps$ rabotniki
+
+w 2 -2
+

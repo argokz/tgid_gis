@@ -1,0 +1,10 @@
+defaut table $main$ uchastok_ms
+
+
+
+w 1 -2
+w 2 200
+
+w 5 -2
+w 6 200
+

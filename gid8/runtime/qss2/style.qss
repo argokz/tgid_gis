@@ -1,0 +1,110 @@
+
+QToolTip {
+    border: 2px solid darkkhaki;
+    white-space: normal;
+    padding: 5px;
+    border-radius: 3px;
+    opacity: 200;
+    font-size: 12px;
+}
+
+
+QHeaderView1::section {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                      stop:0 #616161, stop: 0.5 #505050,
+                                      stop: 0.6 #434343, stop:1 #656565);
+    color: white;
+    padding-left: 4px;
+    border: 1px solid #6c6c6c;
+}
+
+QHeaderView1::section:checked
+{
+    background-color: red;
+}
+
+
+QPushButton[class='ok'] {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                      stop:0 #66cc66, stop:1 #4CAF50); /* Градиент сверху вниз */
+    color: white;                    /* Белый цвет текста */
+    border: 1px solid #388e3c;       /* Зеленая граница */
+}
+
+QPushButton[class='ok']:hover {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                      stop:0 #57a957, stop:1 #388e3c); /* Темный градиент при наведении */
+}
+
+QPushButton[class='ok']:pressed {
+    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, 
+                                      stop:0 #4CAF50, stop:1 #388e3c); /* Градиент для эффекта нажатия */
+}
+
+
+/*
+QScrollBar:vertical {
+    background: rgb(188, 224, 235);
+}
+ QScrollBar::handle:vertical {
+    background: rgb(71, 153, 176);
+ }
+QScrollBar:horizontal {
+    background: rgb(188, 224, 235);
+}
+ QScrollBar::handle:horizontal {
+    background: rgb(71, 153, 176);
+ }
+*/
+
+
+
+
+#myRibbonButtonGroup {
+      background-color: #FA0000;
+      border: 1px solid #000;
+}
+
+
+QMenuBar { 
+    background-color: #f7f3f7; 
+    color: #000; 
+}
+
+QMenuBar::item:selected { background-color: #CDEBFF; }
+QMenuBar::item:pressed { background-color: #CDEBFF; }
+QMenuBar::icon { width: 0px; padding-left: 0px; }
+
+QMenu { background-color: #f7f3f7; color: #000; }
+
+QMenu::item:selected { background-color: #CDEBFF; }
+
+QMenu::item:pressed { background-color: #CDEBFF; }
+
+QMenu::item:disabled {
+    color: gray; /* Цвет текста */
+    background-color: transparent; /* Фон отключённого элемента */
+}
+
+
+QToolBar {
+   background: #dadada;
+   height: 30px;
+   padding: 1px;
+   spacing: 3px; /* spacing between items in the tool bar */
+}
+
+QToolBar::handle {
+    image: url(handle.svg);
+}
+
+QToolBar QLineEdit {
+   border-radius: 4px;
+   font-size: 14px;
+   border: none;
+}
+
+QToolBar QComboBox {
+   font-size: 14px;
+}
+

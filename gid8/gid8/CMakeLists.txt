@@ -783,6 +783,22 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
+# Старый интерфейс загружает SQL, описания карточек, классификаторы и
+# шаблоны отчётов с диска через argpath(). Держим эти ресурсы отдельно от
+# C++-исходников и кладём рядом с exe при каждой сборке.
+set(TGID_RUNTIME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../runtime")
+if(NOT EXISTS "${TGID_RUNTIME_DIR}/sql3/us.sql")
+    message(FATAL_ERROR "gid8 runtime assets were not found: ${TGID_RUNTIME_DIR}")
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${TGID_RUNTIME_DIR}"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    COMMENT "Deploying legacy gid8 SQL, classifiers and report templates"
+    VERBATIM
+)
+
 if(WIN32)
     get_target_property(_qt_qmake_executable Qt6::qmake IMPORTED_LOCATION)
     get_filename_component(_qt_bin_dir "${_qt_qmake_executable}" DIRECTORY)

@@ -1,0 +1,64 @@
+{
+    "docs": [
+        {
+            "name": "Участки теплопроводов",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc ut -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Байпасы",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc bp -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Дроссельные органы потребителей",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc dr -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Задвижки",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc zd -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Насосные агрегаты",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc ns -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Потребители",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc pt -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Регулирующая арматура",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc zd2 -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Сетевые регуляторы",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc rs -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Теплопотребление Потребители",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc tppt -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        },
+        {
+            "name": "Теплопотребление Расчетные схемы ",
+            "file": "docs/excel2/docs.py",
+            "args": "-doc tprs -run -fragments %fragments% %mark_lines%",
+            "type": "py"
+        }
+    ]
+}

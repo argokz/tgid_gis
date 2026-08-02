@@ -1,0 +1,6 @@
+Основные
+    calculation_code
+    node_name
+    terrain_elevation
+    dominant_point_membership
+    node_description

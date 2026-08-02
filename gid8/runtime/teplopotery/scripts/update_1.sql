@@ -1,0 +1,19 @@
+UPDATE [39_normy_teplovyh_poter]
+SET [d] = $col_1$,
+    [qo_1] = $col_2$,
+    [qo_2] = $col_2$,
+    [qo_3] = $col_2$,
+    [qo_4] = $col_2$,
+    [qp_1] = $col_3$ - $col_2$,
+    [qp_2] = $col_4$ - $col_2$,
+    [qp_3] = $col_5$ - $col_2$,
+    [qp_4] = $col_5$ - $col_2$,
+    [qo_1gt5000] = $col_2$,
+    [qo_2gt5000] = $col_2$,
+    [qo_3gt5000] = $col_2$,
+    [qo_4gt5000] = $col_2$, 
+    [qp_1gt5000] = $col_3$ - $col_2$,
+    [qp_2gt5000] = $col_4$ - $col_2$,
+    [qp_3gt5000] = $col_5$ - $col_2$,
+    [qp_4gt5000] = $col_5$ - $col_2$
+where id=$col_0$

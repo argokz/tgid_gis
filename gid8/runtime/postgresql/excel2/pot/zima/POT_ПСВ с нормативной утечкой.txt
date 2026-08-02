@@ -1,0 +1,178 @@
+#
+SELECT 
+  name,
+  round(Ven, 3),
+  round(Vpr, 3),
+  round(Vbp, 3),
+  round(Vmg, 3),
+  round(Vdrug, 3),
+  round(Vuch, 3),
+
+  round(Vprib1, 3),
+  round(Vbezpr1, 3),
+  round(Vpot, 3),
+  round(Vall, 3)
+
+FROM
+(
+
+SELECT *
+FROM
+(
+SELECT 
+  1 AS typ,
+  num,
+  name,
+  Ven,
+  Vpr,
+  Vbp,
+  Vmg,
+  Vdrug,
+  Vuch,
+
+  Vprib1,
+  Vbezpr1,
+  Vpot,
+  Vall,
+  kod_ist
+
+FROM
+(
+#include ../../sql/Объемы3.sql
+)
+
+
+UNION ALL
+
+SELECT 
+  2, 
+  num,
+  name2,
+  Ven*CT.a/100,
+  Vpr*CT.a/100,
+  Vbp*CT.a/100,
+  Vmg*CT.a/100,
+  Vdrug*CT.a/100,
+  Vuch*CT.a/100,
+
+  Vprib1*CT.a/100,
+  Vbezpr1*CT.a/100,
+  Vpot*CT.a/100,
+  Vall*CT.a/100,
+  kod_ist
+
+FROM
+(
+#include ../../sql/Объемы3.sql
+),
+[Система теплоснабжения] CT
+
+UNION ALL
+
+SELECT
+ 3,
+ num,
+ name3,
+  sum(VenP),
+  sum(VprP),
+  sum(VbpP),
+  sum(VmgP),
+  sum(VprP+VbpP+VmgP),
+  sum(VenP+VprP+VbpP+VmgP),
+
+  sum(VpprP),
+  sum(VpbpP),
+  sum(VpP),
+  sum(VpP+VuP),
+
+ kod_ist
+
+FROM
+(
+#include ../POT_МесПСВБ.sql
+) PSVB,
+(
+#include ../../sql/tab.sql
+) TAB2
+WHERE 
+  PSVB.period=1
+
+GROUP BY
+  kod_ist,
+  num,
+  name3
+
+
+UNION ALL
+
+SELECT
+  4, 
+  num,
+  name4,
+  Ven*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vpr*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vbp*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vmg*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vdrug*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vuch*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+
+  Vprib1*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vbezpr1*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vpot*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  Vall*CT.a/100*((t1A+t2A)/2-tA)*ro/1000,
+  kod_ist
+
+FROM
+(
+#include ../../sql/Объемы3.sql
+) OB2,
+TEMP_PROD4_OUT,
+[Система теплоснабжения] CT
+WHERE 
+  TEMP_PROD4_OUT.kod_ist=OB2.kod_ist
+AND 
+ ((num=1 AND period=1) OR (num=2 AND period=0) OR (num=3 AND period=2))
+
+UNION ALL
+
+SELECT
+  5, 
+  num,
+  name5,
+  Ven*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vpr*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vbp*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vmg*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vdrug*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vuch*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+
+  Vprib1*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vbezpr1*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vpot*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  Vall*CT.a/100*24*len*((t1A+t2A)/2-tA)*ro/1000,
+  kod_ist
+
+FROM
+(
+#include ../../sql/Объемы3.sql
+) OB2,
+TEMP_PROD4_OUT,
+[Система теплоснабжения] CT
+WHERE 
+  TEMP_PROD4_OUT.kod_ist=OB2.kod_ist
+AND 
+ ((num=1 AND period=1) OR (num=2 AND period=0) OR (num=3 AND period=2))
+)
+WHERE 
+  kod_ist='$IST$'
+AND 
+  num = 1
+  
+ORDER BY
+   typ, num
+)
+
+#
+xls/tgid.xls
+13 8
+G1

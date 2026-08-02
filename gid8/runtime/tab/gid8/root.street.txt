@@ -1,0 +1,7 @@
+Основные
+    ful_name
+    name
+    type
+    oldname
+    nas_punkt
+    notes

@@ -1,0 +1,107 @@
+"granitsy_uchastkov","name_rus","Наименование (рус)"
+"istochniki_teplosnab","name","Наименование"
+"istochniki_teplosnab","owner","Владелец"
+
+"lyuki2","name","Наименование"
+"lyuki2","elevation_1","Высота 1"
+"lyuki2","elevation_2","Высота 2"
+"lyuki2","elevation_3","Высота 3"
+
+"mag_kamery","name","Наименование"
+"mag_kamery","nomer","Номер"
+"mag_kamery","type","Тип"
+"mag_kamery","owner","Владелец"
+
+
+"mag_truboprovody","name","Наименование"
+"mag_truboprovody","amount_tr","Количество"
+"mag_truboprovody","diametr_up","Диаметр условный подача, мм"
+"mag_truboprovody","diametr_do","Диаметр условный обратка, мм"
+"mag_truboprovody","position","Расположение"
+"mag_truboprovody","owner","Владелец"
+"mag_truboprovody","number","Номер"
+"mag_truboprovody","predizol","Предизолированная"
+
+"ns","name","Наименование"
+"ns","owner","Владелец"
+
+"rayony","name_rus","Наименование (рус)"
+
+"teplov_kamery","name","Наименование"
+"teplov_kamery","nomer","Номер"
+"teplov_kamery","type","Тип"
+"teplov_kamery","owner","Владелец"
+
+"truboprovody1","name","Наименование"
+"truboprovody1","amount_tr","Количество"
+"truboprovody1","diametr_up","Диаметр условный подача, мм"
+"truboprovody1","diametr_do","Диаметр условный обратка, мм"
+"truboprovody1","position","Расположение"
+"truboprovody1","owner","Владелец"
+"truboprovody1","predizol","Предизолированная"
+
+"tstp","name_rus","Наименование (рус)"
+"tstp","position","Расположение"
+"tstp","owner","Владелец"
+
+"ugly_povorota","name","Наименование"
+
+"ulitsy","ful_name","Полное наименование"
+"ulitsy","name","Наименование"
+"ulitsy","type","Тип"
+"ulitsy","length","Длина"
+"ulitsy","oldname","Старое наименование"
+"ulitsy","id_street","ID Улицы"
+"ulitsy","nas_punkt","Населенный пункт"
+"ulitsy","name1","Наименование 1"
+"ulitsy","notes","Заметки"
+
+"vvody","name","Наименование"
+
+"zdaniya","floor","Этажность"
+"zdaniya","number_1","Номер дома"
+"zdaniya","year_z","Дата постройки"
+"zdaniya","street_nam","Наименование улицы"
+
+"zdaniya","id_adr_mas","Микрорайон"
+"zdaniya","year_of_fo","Год постройки"
+"zdaniya","txt","Текст"
+"zdaniya","otop","Нагрузка на отопление, Гкал/ч"
+"zdaniya","gvs","Нагрузка на гвс, Гкал/ч"
+"zdaniya","vent","Нагрузка на вентиляцию, Гкал/ч"
+"zdaniya","par","Нагрузка на пар, Гкал/ч"
+"zdaniya","nagr","Нагрузка общая, Гкал/ч"
+"zdaniya","mkr2","Микрорайон (АЛСЕКО)"
+"zdaniya","street2","Улица  (АЛСЕКО)"
+"zdaniya","house2","Номер дома  (АЛСЕКО)"
+
+
+"zdaniya_2","floor","Этажность"
+"zdaniya_2","number_1","Номер дома"
+"zdaniya_2","year_z","Дата постройки"
+"zdaniya_2","street_nam","Наименование улицы"
+
+"zdaniya_2","id_adr_mas","Микрорайон"
+"zdaniya_2","year_of_fo","Год постройки"
+"zdaniya_2","txt","Текст"
+"zdaniya_2","otop","Нагрузка на отопление, Гкал/ч"
+"zdaniya_2","gvs","Нагрузка на гвс, Гкал/ч"
+"zdaniya_2","vent","Нагрузка на вентиляцию, Гкал/ч"
+"zdaniya_2","par","Нагрузка на пар, Гкал/ч"
+"zdaniya_2","nagr","Нагрузка общая, Гкал/ч"
+"zdaniya_2","mkr2","Микрорайон (АЛСЕКО)"
+"zdaniya_2","street2","Улица  (АЛСЕКО)"
+"zdaniya_2","house2","Номер дома  (АЛСЕКО)"
+
+"zdaniya_2","otop_cxema","Схема включения отопления"
+"zdaniya_2","gvs_cxema","Схема включения ГВС"
+"zdaniya_2","potrebitel","Потребитель"
+
+
+
+
+
+
+
+
+

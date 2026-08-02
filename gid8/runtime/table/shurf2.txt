@@ -1,0 +1,2 @@
+nolookup
+defaut table $ps$ shurf2

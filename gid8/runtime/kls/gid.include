@@ -1,0 +1,50 @@
+-----------------------------------------------
+#select_node
+-----------------------------------------------
+    select id, 1 as typ, externalCodeID, nodeName from new_baza.uzel 
+    union select id, 2, externalCodeID, nodeName from new_baza.nasosn 
+    union select id, 3, externalCodeID, nodeName from new_baza.istoch 
+    union select id, 5, externalCodeID, nodeName from new_baza.general_potr 
+    union select id, 4, externalCodeID, nodeName from new_baza.real_potr
+-----------------------------------------------
+#select_nodeID1
+-----------------------------------------------
+select n.id, concat_ws(' ', ec.name, n.nodeName) as nodeName from (###select_node###) n 
+join externalcodes ec on ec.id=n.externalCodeID
+where n.typ in (select typeID1 from $table$ u where id=$id$)
+-----------------------------------------------
+-----------------------------------------------
+#select_nodeID2
+-----------------------------------------------
+select n.id, concat_ws(' ', ec.name, n.nodeName) as nodeName from (###select_node###) n 
+join externalcodes ec on ec.id=n.externalCodeID
+--join (###select_node_types###) v on v.id=n.typ
+where n.typ in (select typeID2 from $table$ u where id=$id$)
+-----------------------------------------------
+-----------------------------------------------
+#select_nodeID
+-----------------------------------------------
+select n.id, concat_ws(' ', ec.name, n.nodeName) as nodeName from (###select_node###) n 
+join externalcodes ec on ec.id=n.externalCodeID
+--join (###select_node_types###) v on v.id=n.typ
+where n.typ in (select typeID from $table$ u where id=$id$)
+-----------------------------------------------
+-----------------------------------------------
+#select_node_types
+-----------------------------------------------
+select * from  (
+VALUES 
+(1, 'Узел'),
+(2, 'Насосная станция'),
+(3, 'Источник тепла'),
+(4, 'Потребитель реальный'),
+(5, 'Потребитель обобщенный')
+) AS v (id, name)
+-----------------------------------------------
+#select_nodeID_for_rd
+-----------------------------------------------
+select n.id, concat_ws(' ', ec.name, n.nodeName) as nodeName from (###select_node###) n 
+join externalcodes ec on ec.id=n.externalCodeID
+--join (###select_node_types###) v on v.id=n.typ
+where n.typ in (select typeID from $table$ u where id=$id$)
+-----------------------------------------------

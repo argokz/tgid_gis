@@ -1,0 +1,7 @@
+Основные
+    system_name
+    operational_district_name
+    network_fragment_name
+    calculation_scheme_code
+    calendar_year_water_season
+    data_administrator

@@ -1,0 +1,77 @@
+Основные
+  consumerStateID
+  schemeNum
+  automDegID
+  name
+  buildHeight
+  buildingTypeID
+----------------
+--  calcSignResWDORetID
+--  calcSignSetLoadCloseSys
+--  calcSignSetLoadOpenSysFlow
+--  calcSignSetLoadOpenSysRet
+--  circHLosOpen
+--  closeSysCalcSignID
+--  hydroResWDOFlow
+--  hydroResWDORet
+--  calcSignOpenSysFlowID
+--  nodeID
+---  Сюда вставить Источник тепла по расч схеме
+  heatSourcePTSID
+  heatPointID
+  note_1
+  note_2
+-------  sectConsumerCode
+--Производственная сдужба (придумть что делать)
+Нагрузки
+  calcHLdep
+  calcHLindep
+--  relLoadFacade
+  calcInternHD
+  calcHLventil
+--  avgHLcond
+--  avgHLcloseSys
+--  avgHLopenSysFlow
+--  avgHLopenSysRet
+  avgHLGVSopenFlow
+  avgHLGVSopenRet
+  avgHLGVScloseParall
+  avgHLGVScloseMix
+  avgHLGVScloseConseq
+  avgHLGVSclosePreON
+  hourIrregCoeff
+  tempRecircPipe
+  calcTempHR
+  calcTempVS
+  calcTempHWDO
+Прибор учета
+  WEmeteringDeviceID
+  meterDevWorkSign
+  meterDevSafety
+  meterDevStampNum
+Договор
+  contractNumber
+--- Договора с теплоснабжающей организацией (Цеплять несколько)
+  $view_documents$realConsumerDocuments1$remontDocumentTypes$ Договора с теплоснабжающей организацией
+  streetID
+  houseNumber
+  countFloors
+  countBusinessConsumers
+  countUserGV
+  area
+  buildingVolume
+  basementVolume
+  builtInVolume
+--  reduceBuildingVolume
+  responsibleID
+--Остальные
+------------  calcSignRes
+------------  calcSignHL
+------------  stopValveTypeID
+------------  isolationType
+-----------------------
+--  builtYear
+Документы
+  $view_documents$realConsumerDocuments3$remontDocumentTypes$ Документы ПТС
+--  note_regime
+  note_pts

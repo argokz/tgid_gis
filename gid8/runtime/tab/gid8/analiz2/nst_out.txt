@@ -1,0 +1,7 @@
+Основные
+    calculationID
+    nodeID
+    pih1
+    pih2
+    ras
+    dP

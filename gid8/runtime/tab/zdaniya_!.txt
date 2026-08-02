@@ -1,0 +1,17 @@
+Основные
+-  Обслуживающая организация
+-  Номер телефона
+-  Техник Астана-Теплотранзит
+  owner Владелец
+  name_massi Жилой массив
+  name_stree Улица
+  street_nam Улица
+  number_1 Номер дома
+  function Назначение
+  year_z
+  floor Этажность
+  otop
+  gvs
+  vent
+  par
+  txt

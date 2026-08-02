@@ -1,0 +1,16 @@
+Основные
+    kod
+    t1
+    t2
+    tn
+    tgr
+    diametr
+    diametr_usl
+    y
+    kolwork
+    q_N_P
+    q_N_O
+    q_K_P
+    q_K_O
+    q_B_P
+    q_B_O

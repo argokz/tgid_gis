@@ -1,0 +1,17 @@
+select 
+
+CONCAT('Запорная арматура № ', obj.id, ' (', 
+case priznak_truboprovoda
+when 1 then 'общий'
+when 2 then 'подающий'
+when 3 then 'обратный'
+end,
+') ', ' диаметр: ',  obj.diametr)
+
+from zapornaya_armatura obj
+join linesobj l on ST_Distance(l.shape, obj.shape) < 0.1
+where l.id=$fileID$
+
+
+--select id_obj as id, CONCAT('Запорная арматура № ', id_obj,' ( ',ISNULL(externalLineStr,'признак трубопровада не указан'),' ), ','диаметр: ',ISNULL(CAST(diametr AS nvarchar(max)), 'не указан')) name
+--from getPts($fileID$,'pipe', '$FragmentIds$') where tblName = 'zapornaya_armatura'

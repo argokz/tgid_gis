@@ -1,0 +1,9 @@
+Общая информация
+    externalcodeid_1
+    externalnodename_1
+    externalcodeid_2
+    externalnodename_2
+    externalsignlineid
+    organizationid
+    hydrores
+

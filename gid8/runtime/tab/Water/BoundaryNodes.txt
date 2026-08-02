@@ -1,0 +1,5 @@
+Основные
+   calculation_code
+   node_name
+   measured_headroom
+   concentrated_equivalent_flow_rate

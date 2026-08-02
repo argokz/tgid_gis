@@ -1,0 +1,20 @@
+#
+SELECT 
+  MON, 
+  IIF(period=1,'Отопит',IIF(period=2,'Годовой','Летний')) AS zimaleto, 
+  tn_long, tgr_long, t1, t2,t,length,
+  tn_fakt, tgr_fakt, t1_fakt, t2_fakt,t_fakt,length_fakt,
+  Gpod_fakt, Ggvs_pribor_fakt, Gakt_tex_fakt, Gakt_avarija_fakt 
+
+FROM 
+(
+#include ../../sql/Температуры Полные.sql
+) TAB
+WHERE kod_ist='$IST$'
+AND (period = 0 OR period = 1)
+AND period = 0
+
+#
+xls/tgid.xls
+12 5
+E1

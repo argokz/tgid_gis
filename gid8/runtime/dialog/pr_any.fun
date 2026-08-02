@@ -1,0 +1,2 @@
+sopr ReadOnly
+ras ReadOnly
