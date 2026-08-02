@@ -931,7 +931,7 @@ private:
     bool openGeo(const QString & fn);
 
     bool del(CFPoint point){ return true; };
-    bool info_gid(CFPoint point){ return true; };
+    bool info_gid(CFPoint point);
     bool zd(CFPoint point){ return true; };
     bool neotr_node(CNode2 *node, CFPoint point);
     bool ism(CLINE2 *line){ return true; };

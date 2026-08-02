@@ -319,7 +319,7 @@ void GidWidget::onPropertyRejected()
                 case pr_type_node:     // Остальные точечные объекты
                     q = QString("delete from net.v_nodes where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
-                    q = QString("delete from %1 where nodeID in (%2,%3)").arg(dlg->m_table).arg(dlg->m_id1).arg(dlg->m_id2);
+                    q = QString("delete from %1 where nodeID in (%2,%3)").arg(tbl_sql(dlg->m_table)).arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
 
                     n = m_cxema.m_graph->find(dlg->m_id1);
@@ -335,7 +335,7 @@ void GidWidget::onPropertyRejected()
                 case pr_type_line:     // Линейные объекты
                     q = QString("delete from net.v_linesobj where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
-                    q = QString("delete from %1 where lineID in (%2,%3)").arg(dlg->m_table).arg(dlg->m_id1).arg(dlg->m_id2);
+                    q = QString("delete from %1 where lineID in (%2,%3)").arg(tbl_sql(dlg->m_table)).arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
 
                     m_cxema.m_graph->init_find_line_nom();
@@ -439,6 +439,37 @@ void GidWidget::info_gid(QSqlDatabase &db, const QString & title, const QString 
 
     connect(dlg, SIGNAL(accepted()), this, SLOT(onPropertyAccepted()));
     connect(dlg, SIGNAL(rejected()), this, SLOT(onPropertyRejected()));
+}
+
+bool GidWidget::info_gid(CFPoint point) // Результат расчета в точке карты
+{
+    double delta = geom.masx*D5;
+
+    CNode2 *n = m_cxema.m_graph->find(m_parent_id, point, delta);
+    if (n) {
+        beginDraw(n);
+        QString title = n->getNameFullFile();
+        if (n->node.typ == TIP_US) {
+            info_gid(m_cxema.m_db, title, "nodes", "US_OUT", n->id, -1, pr_type_node0);
+        }
+        else {
+            QString table = n->getTableMySQL();
+            info_gid(m_cxema.m_db, title, table, getOutTable(table), n->id, -1, pr_type_node);
+        }
+        return true;
+    }
+
+    CLINE2 *l = m_cxema.m_graph->findLine(m_parent_id, point, delta);
+    if (l) {
+        beginDraw(l);
+        CLine2 *ll = bline(l);
+        QString title = ll->getNameFullFile();
+        QString table = ll->getTableMySQL();
+        info_gid(m_cxema.m_db, title, table, getOutTable(table), ll->line.nomP, ll->line.nomO, pr_type_line);
+        return true;
+    }
+
+    return false;
 }
 
 void GidWidget::viewGeo(Klassif * kls, int id)

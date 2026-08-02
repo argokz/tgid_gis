@@ -144,7 +144,7 @@ int viewTuItog(QSqlDatabase &db, const QString &sql)
         xlsx.write(row, col ++, d);
         d = query.value(transl("Присоединенная мощность ГВС средняя")).toDouble();
         xlsx.write(row, col ++, d);
-        d = query.value(transl("Пар")).toDouble();
+        d = query.value(transl("Присоединенная мощность Пар")).toDouble();
         xlsx.write(row, col ++, d);
         d = query.value(transl("Нормативные тепловые потери")).toDouble();
         xlsx.write(row, col ++, d);
@@ -180,26 +180,33 @@ void print_tu_itog(QSqlDatabase &db, int y1, int y2, int y, double coef)
 {
     QString q;
 
-    q = QString("select * from %1 limit 100").arg(transl(TechUsl));
+    if (y <= 0) {
+        y = y2 > 0 ? y2 : y1;
+    }
+    if (y <= 0) {
+        bool ok = false;
+        y = (int)read_double_db(db, QString("SELECT max(god) AS g FROM %1").arg(transl("Присоединенная нагрузка источников")), "g", &ok);
+    }
 
-    int m_y0 = 2011;
+    double k = coef > 0 ? coef : 1.0;
 
     q = QString(R"(
-            SELECT *, PRN.ustanovlennaya_moschnost AS ust_m 
-            FROM %1 PRN 
+            SELECT *, PRN.ustanovlennaya_moschnost AS ust_m,
+            PRN.prisoedinennaya_moschnost_gvs_maksimalnaya / %7 AS prisoedinennaya_moschnost_gvs_srednyaya
+            FROM %1 PRN
             INNER JOIN (
-                %2 K 
+                %2 K
                 LEFT JOIN %3 RE ON K.%4 = RE.id
-            ) ON PRN.id2 = K.id 
+            ) ON PRN.id2 = K.id
             WHERE PRN.god=%5 ORDER BY %6
-            limit 100
-            )") 
+            )")
         .arg(transl("Присоединенная нагрузка источников"))
         .arg(transl(kot))
         .arg(transl("Район эксплуатации"))
         .arg(transl("Район эксплуатации"))
-        .arg(m_y0)
+        .arg(y)
         .arg(transl("Номер по порядку"))
+        .arg(k)
         ;
 
     qDebug() << q;

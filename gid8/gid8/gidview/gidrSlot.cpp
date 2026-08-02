@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QtGui>
+#include <QtWidgets>
 #include <QProgressDialog>
 
 #include <mainwindow.h>
@@ -1298,6 +1299,39 @@ void GidWidget::onTubing5() // Обвязка узлов и насосных с�
 
 void GidWidget::onFindKti() // По коэффициенту тепловых испытаний
 {
+    QString q = "SELECT heattestscoeff FROM heatpipesections"
+                " WHERE heattestscoeff IS NOT NULL"
+                " GROUP BY heattestscoeff ORDER BY heattestscoeff";
+
+    QStringList items;
+    QSqlQuery query(m_cxema.m_db);
+    query.setForwardOnly(true);
+    if (query_exec(m_cxema.m_db, query, q)) {
+        while (query.next()) {
+            items << QString::number(query.value(0).toDouble(), 'g', 12);
+        }
+    }
+
+    bool ok = false;
+    QString s = QInputDialog::getItem(this, tr("По коэффициенту тепловых испытаний"),
+                                      tr("Выберите коэффициент"), items, 0, false, &ok);
+    if (!ok || s.isEmpty()) return;
+
+    std::set<int> set_id;
+    q = QString(
+        "SELECT l.id FROM heatpipesections hps"
+        " JOIN linesobj l ON l.id=hps.lineid"
+        " JOIN nodes n ON l.nodeid1=n.id"
+        " WHERE heattestscoeff=%1 AND n.fileid IN (%2)").arg(s, m_cxema.m_par);
+
+    if (query_exec(m_cxema.m_db, query, q)) {
+        while (query.next()) {
+            set_id.insert(query.value(0).toInt());
+        }
+    }
+
+    m_cxema.m_graph->vyd_lines(set_id);
+    repaint();
 }
 
 
@@ -2128,6 +2162,21 @@ void GidWidget::onSavePjezo() // Сохранить направление...
 
 void GidWidget::onClearOut() // Удалить старые расчеты
 {
+    if (!UserRight::isAdmin()) {
+        QMessageBox::warning(this, "", tr("Для выполнения этой операции у вас должны быть права администратора!"));
+        return;
+    }
+
+    if (QMessageBox::question(this, "", tr("Удалить старые гидравлические расчеты?")) == QMessageBox::Yes) {
+        QString q = "DELETE FROM calculation WHERE NOT id IN ("
+                    " SELECT max(c.id) AS cid FROM calculation c"
+                    " LEFT JOIN fragments fr ON fr.id=c.fileid"
+                    " GROUP BY c.fileid, c.user_gid)";
+
+        if (query_exec(m_cxema.m_db, q)) {
+            QMessageBox::information(this, "", tr("Готово"));
+        }
+    }
 }
 
 
@@ -2180,8 +2229,41 @@ void GidWidget::onOut2() // Отчеты...
 }
 
 
+void view_db2(DbWindow *view, const QString & title, QWidget *parent); // table/table_part.cpp
+
 void GidWidget::onTableDan() // Редактор таблиц...
 {
+    QString q =
+        "SELECT table_schema || '.' || table_name "
+        "FROM information_schema.tables "
+        "WHERE table_schema IN ('compat','net','ref','calc','meta','addr','doc','el','ops','org') "
+        "AND table_type IN ('BASE TABLE','VIEW') "
+        "ORDER BY 1";
+
+    MMenuDial menu(this, tr("Редактор таблиц"));
+
+    QSqlQuery query(m_cxema.m_db);
+    query.setForwardOnly(true);
+
+    if (query_exec(m_cxema.m_db, query, q)) {
+        while (query.next()) {
+            QString tn = query.value(0).toString();
+            menu.Add(tn, tn);
+        }
+    }
+
+    if (menu.exec() != QDialog::Accepted) return;
+
+    QString tn = menu.value().toString();
+    QString qs = QString("SELECT * FROM %1").arg(tn);
+
+    DbWindow *table = getTableView(m_cxema.m_db, tn, qs, tn);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Ошибка открытия таблицы %1").arg(tn));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, tn, this);
 }
 
 void GidWidget::onGidinf(bool on) // Отображать информацию
@@ -2541,6 +2623,58 @@ void GidWidget::onTuZhurnal() // Журнал регистрации ТУ
 
 void GidWidget::onFindTuIst() // ТУ по источнику
 {
+    Klassif* kls = m_kl_list.findKlN("zdaniya_tu");
+    if (!kls) {
+        QMessageBox::information(this, "", tr("Не подключён файл Технических условий"));
+        return;
+    }
+
+    QString q = "SELECT DISTINCT istochnik FROM tehnicheskie_usloviya"
+                " WHERE istochnik IS NOT NULL AND istochnik <> '' ORDER BY istochnik";
+
+    QStringList items;
+    QSqlQuery query(*kls->m_db);
+    query.setForwardOnly(true);
+    if (query_exec(*kls->m_db, query, q)) {
+        while (query.next()) {
+            items << query.value(0).toString();
+        }
+    }
+
+    bool ok = false;
+    QString ist = QInputDialog::getItem(this, tr("ТУ по источнику"),
+                                        tr("Выберите источник тепла"), items, 0, true, &ok);
+    if (!ok || ist.isEmpty()) return;
+
+    std::set<int> set_id;
+    q = QString("SELECT DISTINCT z.id FROM tehnicheskie_usloviya t"
+                " JOIN zdaniya_tu z ON t.zdanie=z.id"
+                " WHERE t.istochnik='%1'").arg(QString(ist).replace("'", "''"));
+
+    if (query_exec(*kls->m_db, query, q)) {
+        while (query.next()) {
+            set_id.insert(query.value(0).toInt());
+        }
+    }
+
+    double x1 = 1e10, x2 = -1e10, y1 = 1e10, y2 = -1e10;
+    for (auto gl: kls->geo4) {
+        gl->mark = set_id.find(gl->nom) != set_id.end();
+        if (gl->mark) {
+            const CFRect &r = gl->rect;
+            if (r.left != 0 || r.right != 0 || r.top != 0 || r.bottom != 0) {
+                x1 = qMin(x1, r.left);
+                x2 = qMax(x2, r.right);
+                y1 = qMin(y1, qMin(r.top, r.bottom));
+                y2 = qMax(y2, qMax(r.top, r.bottom));
+            }
+        }
+    }
+
+    repaint();
+    if (x1 != 1e10) {
+        moveRect(CFRect(x1, y1, x2, y2));
+    }
 }
 
 /*
@@ -2577,11 +2711,87 @@ void GidWidget::onNagrOrgNeiz() // Юридические лица
 
 void GidWidget::onTuTableNeiz() // Ненайденные ТУ на карте
 {
+    QString q = QString(
+        "SELECT t.id, "
+        "t.nomer_tu AS %1, "
+        "t.data_vydachi_tu AS %2, "
+        "t.naimenovanie_organizatsii__zaprashivayuschey_tu AS %3, "
+        "t.naimenovanie_obekta AS %4, "
+        "t.adres_obekta AS %5, "
+        "t.istochnik AS %6 "
+        "FROM tehnicheskie_usloviya t "
+        "WHERE t.zdanie IS NULL "
+        "OR NOT EXISTS (SELECT 1 FROM zdaniya_tu z WHERE z.id = t.zdanie) "
+        "ORDER BY t.data_vydachi_tu NULLS LAST, t.nomer_tu")
+        .arg(quot_text("Номер ТУ"), quot_text("Дата выдачи ТУ"),
+             quot_text("Организация"), quot_text("Наименование объекта"),
+             quot_text("Адрес объекта"), quot_text("Источник"));
+
+    QString title = tr("Ненайденные ТУ на карте");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "tehnicheskie_usloviya", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(false);
+    view_db2(table, title, this);
 }
 
 
 void GidWidget::onTuIst() // Отчет по источникам
 {
+    QString q = QString(
+        "SELECT "
+        "ist.naimenovanie AS %1, "
+        "_nagr.nagr AS %2, "
+        "prirost AS %3, "
+        "god AS %4, "
+        "raspolagaemaya_moschnost_ov AS %5, "
+        "raspolagaemaya_moschnost_gvs_srednyaya AS %6, "
+        "raspolagaemaya_moschnost_summarnaya AS %7, "
+        "normativnye_teplovye_poteri AS %8, "
+        "prisoedinennaya_moschnost_otoplenie_1 AS %9, "
+        "prisoedinennaya_moschnost_ventilyatsiya_1 AS %10, "
+        "prisoedinennaya_moschnost_gvs_maksimalnaya_1 AS %11, "
+        "prisoedinennaya_moschnost_par_1 AS %12, "
+        "prisoedinennaya_moschnost_otoplenie AS %13, "
+        "prisoedinennaya_moschnost_ventilyatsiya AS %14, "
+        "prisoedinennaya_moschnost_gvs_maksimalnaya AS %15, "
+        "prisoedinennaya_moschnost_par AS %16 "
+        "FROM ("
+        "    SELECT istochnik_tepla, sum(nagr) AS nagr FROM ("
+        "       SELECT istochnik_tepla, nagruzka_gvs+nagruzka_otoplenie AS nagr FROM zhile"
+        "    UNION"
+        "       SELECT istochnik_tepla, nagruzka__otoplenie_+nagruzka__par_+nagruzka__ventilyatsiya_+nagruzka__gvs_ AS nagr"
+        "       FROM organizatsii"
+        "    ) _T GROUP BY istochnik_tepla"
+        ") _nagr "
+        "RIGHT JOIN istochniki_tepla ist ON _nagr.istochnik_tepla=ist.naimenovanie "
+        "   OR (_nagr.istochnik_tepla IS NULL AND ist.naimenovanie='АО \"АлЭС\" (ТЭЦ-1, ТЭЦ-2, ЗТК)') "
+        "LEFT JOIN (SELECT istochnik, sum(prirost_nagruzki) AS prirost FROM tehnicheskie_usloviya GROUP BY istochnik) tu "
+        "   ON tu.istochnik = ist.naimenovanie "
+        "LEFT JOIN prisoedinennaya_nagruzka_istochnikov pr ON pr.id2=ist.id "
+        "WHERE god = (SELECT max(god) FROM prisoedinennaya_nagruzka_istochnikov) "
+        "ORDER BY pr.id2")
+        .arg(quot_text("Наименование"), quot_text("Нагрузка"), quot_text("Прирост нагрузки"),
+             quot_text("Год"), quot_text("Располагаемая мощность ОВ"),
+             quot_text("Располагаемая мощность ГВС средняя"), quot_text("Располагаемая мощность суммарная"),
+             quot_text("Нормативные тепловые потери"),
+             quot_text("Присоединенная мощность Отопление 1"), quot_text("Присоединенная мощность Вентиляция 1"),
+             quot_text("Присоединенная мощность ГВС максимальная 1"), quot_text("Присоединенная мощность Пар 1"),
+             quot_text("Присоединенная мощность Отопление"), quot_text("Присоединенная мощность Вентиляция"),
+             quot_text("Присоединенная мощность ГВС максимальная"), quot_text("Присоединенная мощность Пар"));
+
+    QString title = tr("Отчет по источникам");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "istochniki_tepla", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(false);
+    view_db2(table, title, this);
 }
 
 
@@ -3470,8 +3680,24 @@ void GidWidget::onCreateSortNode() // Создание таблицы sortNodesF
 }
 
 
+void view_db2(DbWindow *view, const QString & title, QWidget *parent); // table/table_part.cpp
+
 void GidWidget::onRasList() // Список расчетов
 {
+    QString title = tr("Список расчетов");
+    QString q = QString(
+        "SELECT c.id, f.name AS fragment, c.date1, c.user_gid, c.name, c.tn"
+        " FROM calculation c"
+        " LEFT JOIN fragments f ON f.id=c.fileid"
+        " WHERE c.fileid IN (%1)"
+        " ORDER BY f.name NULLS LAST, c.date1 DESC NULLS LAST").arg(m_cxema.m_par);
+
+    DbWindow *view = getTableView(m_cxema.m_db, "calculation", q, title);
+
+    if (view) {
+        view->setGidWidget(this);
+        view_db2(view, title, this);
+    }
 }
 
 
@@ -3510,8 +3736,75 @@ void GidWidget::onTuZav() // Установить статус Завершен 
 }
 
 
+static bool write_out_table(QTextStream &ts, QSqlDatabase &db, const QString &out_table, int calcid, const QString &key_col)
+{
+    QString q = QString("SELECT * FROM %1 WHERE calculationid=%2 ORDER BY %3").arg(out_table).arg(calcid).arg(key_col);
+
+    QSqlQuery query(db);
+    query.setForwardOnly(true);
+    if (!query_exec(db, query, q)) {
+        return false;
+    }
+
+    QSqlRecord rec = query.record();
+    QStringList head;
+    for (int c = 0; c < rec.count(); c++) {
+        head << rec.fieldName(c);
+    }
+    ts << head.join('\t') << "\n";
+
+    while (query.next()) {
+        QStringList row;
+        for (int c = 0; c < rec.count(); c++) {
+            row << query.value(c).toString();
+        }
+        ts << row.join('\t') << "\n";
+    }
+
+    return true;
+}
+
 void GidWidget::onExport() // Экспорт гидравлики в TXT
 {
+    if (m_fileID == -1) {
+        onMainCxema();
+        if (m_fileID == -1) {
+            return;
+        }
+    }
+
+    int calcid = -1;
+    QString q = QString("SELECT max(id) FROM calculation WHERE fileid=%1").arg(m_fileID);
+    QSqlQuery query(m_cxema.m_db);
+    if (query_exec(m_cxema.m_db, query, q) && query.next()) {
+        calcid = query.value(0).toInt();
+    }
+
+    if (calcid <= 0) {
+        QMessageBox::information(this, "", tr("Нет расчетов для текущего фрагмента"));
+        return;
+    }
+
+    QString fn = QFileDialog::getSaveFileName(this, tr("Экспорт гидравлики в TXT"),
+                                              QString("gidr_%1.txt").arg(calcid), "TXT (*.txt)");
+    if (fn.isEmpty()) return;
+
+    QFile file(fn);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "", tr("Не могу открыть на запись файл %1").arg(fn));
+        return;
+    }
+
+    QTextStream ts(&file);
+    ts << tr("Расчёт") << " " << calcid << "\n\n" << "US_OUT" << "\n";
+    bool ok = write_out_table(ts, m_cxema.m_db, "us_out", calcid, "nodeid");
+    ts << "\n" << "UT_OUT" << "\n";
+    ok = write_out_table(ts, m_cxema.m_db, "ut_out", calcid, "lineid") && ok;
+    file.close();
+
+    if (ok) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fn));
+    }
 }
 
 
@@ -3551,8 +3844,12 @@ void GidWidget::onPsAstanaName() // Отображение имен узлов
 }
 
 
+extern bool m_isOnlyPTSColor;
+
 void GidWidget::onColorOnlyPts() // Цвета только для участков ПТС
 {
+    m_isOnlyPTSColor = !m_isOnlyPTSColor;
+    repaint();
 }
 
 
@@ -4145,6 +4442,21 @@ void GidWidget::onViewStatusBar() // Строка статуса
 
 void GidWidget::onHelpFinder() // Содержание\tF1
 {
+    const QString dir = QCoreApplication::applicationDirPath();
+    const QStringList candidates = {
+        dir + "/help/index.html",
+        dir + "/gid8.chm",
+        dir + "/gid8.pdf",
+    };
+
+    for (const QString &path: candidates) {
+        if (QFile::exists(path)) {
+            QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+            return;
+        }
+    }
+
+    QMessageBox::information(this, "", tr("Файл справки не найден"));
 }
 
 
