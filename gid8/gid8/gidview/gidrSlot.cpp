@@ -3675,9 +3675,7 @@ void GidWidget::onSetAvtoOff() // Сделать потребители неав
 }
 
 
-void GidWidget::onCreateSortNode() // Создание таблицы sortNodesForUchastok
-{
-}
+// onCreateSortNode перенесён в gidview/sort_node.cpp (порт gid6 temp.cpp)
 
 
 void view_db2(DbWindow *view, const QString & title, QWidget *parent); // table/table_part.cpp

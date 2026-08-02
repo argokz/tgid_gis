@@ -443,6 +443,7 @@ set(PROJECT_SOURCES
     gidview/gidrAction.cpp
     gidview/gidrMenu.cpp
     gidview/gidrSlot.cpp
+    gidview/sort_node.cpp
     gidview/gidrSlotRemont.cpp
     gidview/gidrToolBar.cpp
     gidview/gidr_calc.cpp
