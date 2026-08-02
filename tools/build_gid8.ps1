@@ -96,3 +96,7 @@ Write-Host "Qt:    $QtDir"
 Write-Host "Boost: $BoostDir"
 Write-Host "сборка: $BuildDir"
 & cmd.exe /c $bat
+$buildExitCode = $LASTEXITCODE
+if ($buildExitCode -ne 0) {
+    throw "сборка gid8 завершилась с кодом $buildExitCode (проверьте, не запущен ли $BuildDir\gid8.exe)"
+}

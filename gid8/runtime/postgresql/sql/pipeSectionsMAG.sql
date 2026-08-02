@@ -1,6 +1,6 @@
-SELECT p.id, m.naimenovanie_magistrali AS 'Наименование магистрали', 
- ec1.name AS 'Код РС начальной камеры', nn1.externalNodeName AS 'Наименование начальной камеры', 
- ec2.name AS 'Код РС конечной камеры', nn2.externalNodeName AS 'Наименование конечной камеры',
+SELECT p.id, m.naimenovanie_magistrali AS "Наименование магистрали", 
+ ec1.name AS "Код РС начальной камеры", nn1.externalNodeName AS "Наименование начальной камеры", 
+ ec2.name AS "Код РС конечной камеры", nn2.externalNodeName AS "Наименование конечной камеры",
 
 p.magistral,
 m.naimenovanie_magistrali AS __magistral,
