@@ -560,6 +560,10 @@ printSslInfo();
 
 bool MainWindow::check_protection()
 {
+#if !USE_ACTIVATION
+    qInfo() << "Activation check is disabled for this build";
+    return true;
+#else
     PROT_LEFT = get_ini()->PROT_LEFT;
 
     QString key25 = read_key25();
@@ -619,4 +623,5 @@ bool MainWindow::check_protection()
 
 #endif
     return true;
+#endif
 }

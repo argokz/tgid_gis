@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
+option(USE_ACTIVATION "Проверять сетевой ключ активации" OFF)
+option(USE_HASP "Проверять аппаратный ключ HASP" OFF)
 
 
 #option(USE_ITWIN "ITWIN" ON)
@@ -863,6 +865,7 @@ install(DIRECTORY lib/QXlsx/source/ DESTINATION src/QXlsx)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE USE_ITWIN=$<BOOL:${USE_ITWIN}>)
 target_compile_definitions(${PROJECT_NAME} PRIVATE USE_HASP=$<BOOL:${USE_HASP}>)
+target_compile_definitions(${PROJECT_NAME} PRIVATE USE_ACTIVATION=$<BOOL:${USE_ACTIVATION}>)
 target_compile_definitions(${PROJECT_NAME} PRIVATE USE_GID9=$<BOOL:${USE_GID9}>)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE

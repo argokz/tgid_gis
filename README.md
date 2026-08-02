@@ -84,6 +84,7 @@ SQL-контракты. При дальнейшем переносе эти ко
 | 55 | Воспроизводимый пакет старого `gid8`: Qt SQL, libpq, SQL, карточки и шаблоны | готово — [build_gid8.ps1](tools/build_gid8.ps1); аудит внешних запросов продолжается |
 | 56 | Паспорт `pipeSections` без второй копии сетевого объекта | готово — [173](sql/173_compat_pipesections.sql), [тест чтения/записи](sql/tests/test_compat_pipesections.sql) |
 | 57 | Рабочие таблицы дефектов, опрессовок, осмотров, шурфов и ремонтов | готово — [174](sql/174_return_ops_tables.sql), [175](sql/175_return_gid8_maintenance_tables.sql), [тест INSERT](sql/tests/test_gid8_maintenance_tables.sql) |
+| 58 | Временное отключение сетевого ключа активации и аппаратного HASP | готово — сборка `gid8` задаёт `USE_ACTIVATION=OFF`, `USE_HASP=OFF`; старый механизм сохранён для обратного включения |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше

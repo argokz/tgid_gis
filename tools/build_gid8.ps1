@@ -67,6 +67,7 @@ $cfgArgs = @(
     "-DCMAKE_BUILD_TYPE=$Config",
     "-DCMAKE_PREFIX_PATH=$QtDir",
     "-DUSE_HASP=OFF",
+    "-DUSE_ACTIVATION=OFF",
     "-DUSE_ITWIN=OFF"
 )
 
