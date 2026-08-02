@@ -12,7 +12,7 @@
 
 BEGIN;
 
--- bypass: 13 собственных колонок из public.bypass
+-- bypass: 14 собственных колонок из public.bypass
 CREATE TABLE IF NOT EXISTS net.bypass (
     id                     bigint DEFAULT nextval('obj_id_seq'::regclass) NOT NULL,
     fragment_id            integer,
@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS net.bypass (
     operatorid             integer,
     typ                    text,
     internalnodeid         integer,
+    nodeid                 integer,
     standardid             integer DEFAULT 1,
     standardtubelink       integer,
     length                 integer DEFAULT 1,
@@ -56,6 +57,7 @@ CREATE TABLE IF NOT EXISTS net.bypass (
     updated_by             text DEFAULT CURRENT_USER NOT NULL
 );
 
+ALTER TABLE net.bypass ADD COLUMN IF NOT EXISTS nodeid                 integer;
 ALTER TABLE net.bypass ADD COLUMN IF NOT EXISTS standardid             integer DEFAULT 1;
 ALTER TABLE net.bypass ADD COLUMN IF NOT EXISTS standardtubelink       integer;
 ALTER TABLE net.bypass ADD COLUMN IF NOT EXISTS length                 integer DEFAULT 1;
@@ -106,7 +108,7 @@ DROP TRIGGER IF EXISTS geometry_change_audit ON net.bypass;
 CREATE TRIGGER geometry_change_audit AFTER UPDATE OF geom ON net.bypass
     FOR EACH ROW EXECUTE FUNCTION net.annotate_geometry_change();
 
--- regulator_consumption: 10 собственных колонок из public.consumptregulators
+-- regulator_consumption: 11 собственных колонок из public.consumptregulators
 CREATE TABLE IF NOT EXISTS net.regulator_consumption (
     id                     bigint DEFAULT nextval('obj_id_seq'::regclass) NOT NULL,
     fragment_id            integer,
@@ -130,6 +132,7 @@ CREATE TABLE IF NOT EXISTS net.regulator_consumption (
     operatorid             integer,
     typ                    text,
     internalnodeid         integer,
+    nodeid                 integer,
     regconsmean            double precision DEFAULT 0,
     workattrid             integer,
     hydroresopen           double precision DEFAULT 0,
@@ -147,6 +150,7 @@ CREATE TABLE IF NOT EXISTS net.regulator_consumption (
     updated_by             text DEFAULT CURRENT_USER NOT NULL
 );
 
+ALTER TABLE net.regulator_consumption ADD COLUMN IF NOT EXISTS nodeid                 integer;
 ALTER TABLE net.regulator_consumption ADD COLUMN IF NOT EXISTS regconsmean            double precision DEFAULT 0;
 ALTER TABLE net.regulator_consumption ADD COLUMN IF NOT EXISTS workattrid             integer;
 ALTER TABLE net.regulator_consumption ADD COLUMN IF NOT EXISTS hydroresopen           double precision DEFAULT 0;
@@ -194,7 +198,7 @@ DROP TRIGGER IF EXISTS geometry_change_audit ON net.regulator_consumption;
 CREATE TRIGGER geometry_change_audit AFTER UPDATE OF geom ON net.regulator_consumption
     FOR EACH ROW EXECUTE FUNCTION net.annotate_geometry_change();
 
--- regulator_pressdrop: 10 собственных колонок из public.pressdropregulators
+-- regulator_pressdrop: 11 собственных колонок из public.pressdropregulators
 CREATE TABLE IF NOT EXISTS net.regulator_pressdrop (
     id                     bigint DEFAULT nextval('obj_id_seq'::regclass) NOT NULL,
     fragment_id            integer,
@@ -218,6 +222,7 @@ CREATE TABLE IF NOT EXISTS net.regulator_pressdrop (
     operatorid             integer,
     typ                    text,
     internalnodeid         integer,
+    nodeid                 integer,
     pressdropmean          double precision DEFAULT 0,
     regvalvehydrores       double precision DEFAULT 0,
     consthroughregvalve    double precision DEFAULT 0,
@@ -235,6 +240,7 @@ CREATE TABLE IF NOT EXISTS net.regulator_pressdrop (
     updated_by             text DEFAULT CURRENT_USER NOT NULL
 );
 
+ALTER TABLE net.regulator_pressdrop ADD COLUMN IF NOT EXISTS nodeid                 integer;
 ALTER TABLE net.regulator_pressdrop ADD COLUMN IF NOT EXISTS pressdropmean          double precision DEFAULT 0;
 ALTER TABLE net.regulator_pressdrop ADD COLUMN IF NOT EXISTS regvalvehydrores       double precision DEFAULT 0;
 ALTER TABLE net.regulator_pressdrop ADD COLUMN IF NOT EXISTS consthroughregvalve    double precision DEFAULT 0;
@@ -282,7 +288,7 @@ DROP TRIGGER IF EXISTS geometry_change_audit ON net.regulator_pressdrop;
 CREATE TRIGGER geometry_change_audit AFTER UPDATE OF geom ON net.regulator_pressdrop
     FOR EACH ROW EXECUTE FUNCTION net.annotate_geometry_change();
 
--- armature_control: 17 собственных колонок из public.regularmatures
+-- armature_control: 18 собственных колонок из public.regularmatures
 CREATE TABLE IF NOT EXISTS net.armature_control (
     id                     bigint DEFAULT nextval('obj_id_seq'::regclass) NOT NULL,
     fragment_id            integer,
@@ -306,6 +312,7 @@ CREATE TABLE IF NOT EXISTS net.armature_control (
     operatorid             integer,
     typ                    text,
     internalnodeid         integer,
+    nodeid                 integer,
     regpdmean              double precision DEFAULT 0,
     diametercondit         double precision DEFAULT 0,
     name                   varchar(50) DEFAULT NULL::character varying,
@@ -330,6 +337,7 @@ CREATE TABLE IF NOT EXISTS net.armature_control (
     updated_by             text DEFAULT CURRENT_USER NOT NULL
 );
 
+ALTER TABLE net.armature_control ADD COLUMN IF NOT EXISTS nodeid                 integer;
 ALTER TABLE net.armature_control ADD COLUMN IF NOT EXISTS regpdmean              double precision DEFAULT 0;
 ALTER TABLE net.armature_control ADD COLUMN IF NOT EXISTS diametercondit         double precision DEFAULT 0;
 ALTER TABLE net.armature_control ADD COLUMN IF NOT EXISTS name                   varchar(50) DEFAULT NULL::character varying;

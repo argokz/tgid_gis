@@ -37,9 +37,18 @@ HEAD = ['id', 'fragment_id', 'node_from', 'node_to', 'node_from_src',
         'archivechangedate', 'operatorid', 'typ', 'internalnodeid']
 TAIL = ['coords_legacy', 'subtype_src_id', 'row_version', 'updated_at',
         'updated_by']
-# Колонки подтипа, которые в объектную таблицу не переносятся:
-# id заменяется собственным, lineid и nodeid выражены через node_from/to.
-SKIP_OWN = {'id', 'lineid', 'nodeid'}
+# Колонки подтипа, которые в объектную таблицу не переносятся: id
+# заменяется собственным, lineid выражен через node_from/node_to.
+#
+# nodeid сюда НЕ входит. Предположение «nodeid всегда один из двух
+# концов линии» было неверным: у net.regulator_press (сделан не этим
+# генератором, а исходным конвертером) nodeid — самостоятельная
+# колонка, не совпадающая с node_from/node_to. Пока это исключение
+# держалось в SKIP_OWN, у четырёх новых классов регуляторов nodeid
+# молча терялся: колонка существовала в источнике, но не переносилась,
+# и обнаружилось это только при попытке построить представление
+# совместимости для gid8 (sql/177), а не сразу.
+SKIP_OWN = {'id', 'lineid'}
 
 
 def cols_of(cur, schema, table):
@@ -50,6 +59,28 @@ def cols_of(cur, schema, table):
         WHERE table_schema = %s AND table_name = %s
         ORDER BY ordinal_position""", (schema, table))
     return cur.fetchall()
+
+
+def find_schema(cur, table):
+    """В какой схеме сейчас лежит исходная таблица подтипа.
+
+    Она не обязана быть в public: неиспользуемые исходники этой БД
+    убираются на чердак (attic). Жёсткая привязка к public однажды уже
+    привела к тому, что генератор молча получал пустой список колонок
+    вместо ошибки — источник передвинулся, а код продолжал спрашивать
+    старое место.
+    """
+    cur.execute("""
+        SELECT table_schema FROM information_schema.tables
+        WHERE table_name = %s
+        ORDER BY (table_schema = 'public') DESC,
+                 (table_schema = 'attic') DESC
+        LIMIT 1""", (table,))
+    r = cur.fetchone()
+    if not r:
+        raise RuntimeError('исходная таблица %r не найдена ни в одной схеме'
+                           % table)
+    return r[0]
 
 
 def sql_type(row):
@@ -108,7 +139,8 @@ def main():
         # HEAD/TAIL; старое условие `r[0] not in tmpl` поэтому потеряло
         # relatleakage, diametercondit, name и ещё несколько полей.
         common = set(HEAD + TAIL)
-        own = [r for r in cols_of(cur, 'public', src)
+        src_schema = find_schema(cur, src)
+        own = [r for r in cols_of(cur, src_schema, src)
                if r[0] not in SKIP_OWN and r[0] not in common]
         def decl(row):
             # DEFAULT и NOT NULL берутся из образца: без них id новых
