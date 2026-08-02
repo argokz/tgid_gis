@@ -232,7 +232,6 @@ def node_query(tn, cols, s_fileID):
         WHERE NOT r.removed
           AND r.fragment_id IN ({s_fileID})
           AND r.internalnodeid IS NULL
-        ORDER BY 1
     """
 
 
@@ -294,7 +293,6 @@ def pt_node_query(tn, cols, s_fileID):
         JOIN net.node_reg r ON r.id = x.obj_id
         WHERE NOT r.removed
           AND r.fragment_id IN ({s_fileID})
-        ORDER BY 1
     """
 
 
