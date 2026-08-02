@@ -530,6 +530,36 @@ class Converter:
         for (t,) in cur.fetchall():
             cur.execute('ANALYZE net.%s' % q(t))
 
+    def nodes_without_coords(self, cur):
+        """Узлы, отброшенные из-за нулевых координат, — в отчёт.
+
+        insert_class фильтрует узлы условием (n.x <> 0 OR n.y <> 0):
+        точка в (0, 0) — это отсутствие координат, а не место на карте.
+        Отбрасывать такие узлы правильно, но молча — нет.
+
+        Так пропал 41 узел, включая семь МТК13-8: их не было ни в net,
+        ни в отчёте, и сверка результатов их не ловила — объекта нет ни
+        с одной стороны, расхождению взяться неоткуда. Всплыли они
+        случайно, через setpressnodes.
+
+        Правило: не перенести строку можно, не записать причину нельзя.
+        Сторожит sql/tests/test_no_silent_node_loss.sql.
+        """
+        self.log('Узлы без координат')
+        self.run(cur, """
+            INSERT INTO net.conversion_reject (src_table, src_id, reason, detail)
+            SELECT 'nodes', n.id, 'у узла нет координат',
+                   jsonb_build_object(
+                       'fileid', n.fileid,
+                       'externalnodename', n.externalnodename,
+                       'externalsignid', n.externalsignid)
+            FROM {src_nodes} n
+            WHERE n.removed = 0
+              AND n.x = 0 AND n.y = 0
+              AND NOT EXISTS (SELECT 1 FROM net.conversion_reject r
+                              WHERE r.src_table = 'nodes' AND r.src_id = n.id)
+        """.format(src_nodes=self.src_nodes), 'nodes_no_coords')
+
     def orphans(self, cur):
         self.log('Линии без разрешимых концов')
         self.run(cur, """
@@ -596,6 +626,7 @@ def main():
         c.extra_rows(cur, 'line')
         c.layers(cur)
         c.children(cur)
+        c.nodes_without_coords(cur)
         c.orphans(cur)
         c.mark_review(cur)
         c.bump_sequence(cur)
