@@ -81,15 +81,26 @@ cmake -S . -B build -DCMAKE_PREFIX_PATH='H:\Qt\6.8.3\msvc2022_64'
 cmake --build build --config Release
 ```
 
-Для запуска рядом с собранным приложением должен быть доступен Qt-плагин
-PostgreSQL `sqldrivers/qsqlpsql.dll` и его клиентская библиотека `libpq`.
+После сборки CMake автоматически запускает `windeployqt` и помещает рядом с
+`tgid_app.exe` библиотеки Qt, `Qt6Sql.dll`, плагин PostgreSQL
+`sqldrivers/qsqlpsql.dll`, `libpq.dll` и его зависимости. Поэтому собранная
+папка запускается без добавления каталогов Qt и PostgreSQL в `PATH`.
+
+Если PostgreSQL установлен не в стандартный каталог, укажите его `bin` при
+конфигурации:
+
+```powershell
+cmake -S . -B build `
+  -DCMAKE_PREFIX_PATH='H:\Qt\6.8.3\msvc2022_64' `
+  -DTGID_POSTGRES_BIN='D:\PostgreSQL\16\bin'
+```
 
 Проверка подключения без открытия основного окна:
 
 ```powershell
-.\build\tgid_app.exe --check-db
-.\build\tgid_app.exe --check-fragment 80
-.\build\tgid_app.exe --check-object heat_chamber:12345
+.\build\Release\tgid_app.exe --check-db
+.\build\Release\tgid_app.exe --check-fragment 80
+.\build\Release\tgid_app.exe --check-object heat_chamber:12345
 ```
 
 Приложение требует контракт БД версии 13 или новее. Для каждого поля

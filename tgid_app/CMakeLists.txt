@@ -82,6 +82,63 @@ set_target_properties(tgid_app PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+if(WIN32)
+    get_target_property(_qt_qmake_executable Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qt_qmake_executable}" DIRECTORY)
+
+    find_program(TGID_WINDEPLOYQT_EXECUTABLE
+        NAMES windeployqt
+        HINTS "${_qt_bin_dir}"
+        NO_DEFAULT_PATH
+        REQUIRED
+    )
+
+    set(TGID_POSTGRES_BIN "" CACHE PATH
+        "Directory containing libpq.dll and its PostgreSQL runtime dependencies"
+    )
+
+    if(NOT TGID_POSTGRES_BIN)
+        find_program(TGID_PG_CONFIG_EXECUTABLE
+            NAMES pg_config
+            HINTS
+                "C:/Program Files/PostgreSQL/18/bin"
+                "C:/Program Files/PostgreSQL/17/bin"
+                "C:/Program Files/PostgreSQL/16/bin"
+                "C:/Program Files/PostgreSQL/15/bin"
+        )
+
+        if(TGID_PG_CONFIG_EXECUTABLE)
+            execute_process(
+                COMMAND "${TGID_PG_CONFIG_EXECUTABLE}" --bindir
+                OUTPUT_VARIABLE _postgres_bin
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                COMMAND_ERROR_IS_FATAL ANY
+            )
+            set(TGID_POSTGRES_BIN "${_postgres_bin}" CACHE PATH
+                "Directory containing libpq.dll and its PostgreSQL runtime dependencies"
+                FORCE
+            )
+        endif()
+    endif()
+
+    if(NOT EXISTS "${TGID_POSTGRES_BIN}/libpq.dll")
+        message(FATAL_ERROR
+            "PostgreSQL libpq.dll was not found. Set TGID_POSTGRES_BIN to the PostgreSQL bin directory."
+        )
+    endif()
+
+    add_custom_command(TARGET tgid_app POST_BUILD
+        COMMAND powershell.exe -NoProfile -ExecutionPolicy Bypass
+            -File "${CMAKE_CURRENT_SOURCE_DIR}/../tools/deploy_qt_runtime.ps1"
+            -App "$<TARGET_FILE:tgid_app>"
+            -WindeployQt "${TGID_WINDEPLOYQT_EXECUTABLE}"
+            -PostgresBin "${TGID_POSTGRES_BIN}"
+            -Configuration "$<CONFIG>"
+        COMMENT "Deploying Qt SQL and PostgreSQL runtime"
+        VERBATIM
+    )
+endif()
+
 install(TARGETS tgid_app
     BUNDLE DESTINATION .
     RUNTIME DESTINATION bin
