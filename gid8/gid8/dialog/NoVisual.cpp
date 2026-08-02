@@ -37,7 +37,7 @@ bool inConsumer(QSqlDatabase &db, const QString & fn, int id)
 
 bool inTableNode(QSqlDatabase &db, const QString & tn, const QString & fn, int id)
 {
-    QString q = QString("SELECT id FROM nodes n WHERE %1=%2 and n.removed=0").arg(fn).arg(id);
+    QString q = QString("SELECT id FROM net.v_nodes n WHERE %1=%2 and n.removed=0").arg(fn).arg(id);
 
     if (sizeOfQ(db, q) > 0) {
         return true;
@@ -258,7 +258,7 @@ void initIST(QTreeWidgetItem *tree, QSqlDatabase &db, int fileID, QIcon &keyIcon
 //    initAdo(tree, db, "varCoefficients", "kodkv", fileID, keyIcon);
     QString where;
 
-//    q.Format("SELECT heatSources.id, heatSources.sourceName FROM heatSources JOIN nodes ON heatSources.nodeID=nodes.id WHERE fileID=%d", fileID);
+//    q.Format("SELECT heatSources.id, heatSources.sourceName FROM net.v_heatsources JOIN net.v_nodes ON heatSources.nodeID=nodes.id WHERE fileID=%d", fileID);
 
     if (tec == 1 || tec == 2 || tec == 3) {
       where = QString("hSourceTypeID=%1").arg(tec);
@@ -267,7 +267,7 @@ void initIST(QTreeWidgetItem *tree, QSqlDatabase &db, int fileID, QIcon &keyIcon
       where = "NOT hSourceTypeID IN (1,2,3)";
     }
 
-    QString q = QString("SELECT heatSources.id, nodes.id AS idn, heatSources.sourceName, heatSources.name, nodes.externalNodeName FROM heatSources JOIN nodes ON heatSources.nodeID=nodes.id WHERE %1 ORDER BY hSourceTypeID, heatSources.name, heatSources.sourceName, nodes.externalNodeName").arg(where);
+    QString q = QString("SELECT heatSources.id, nodes.id AS idn, heatSources.sourceName, heatSources.name, nodes.externalNodeName FROM net.v_heatsources JOIN net.v_nodes ON heatSources.nodeID=nodes.id WHERE %1 ORDER BY hSourceTypeID, heatSources.name, heatSources.sourceName, nodes.externalNodeName").arg(where);
 
 
     QSqlQuery query(db);

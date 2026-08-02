@@ -178,7 +178,7 @@ void fun_pipeSections_remont_history(PropertyDial *prop, QSqlDatabase &db, const
         "o.data_osmotra AS 'Дата осмотра'\n"
         "From remont2Deployed d\n"
         "LEFT JOIN remont2 o ON o.id=d.directionID\n"
-        "JOIN linesobj l ON l.id=d.lineID\n"
+        "JOIN net.v_linesobj l ON l.id=d.lineID\n"
         "JOIN heatPipeSections hps ON hps.lineID=l.id\n"
         "WHERE hps.pipeSectionID=%1\n").arg(quot_text("Наименование")).arg(id);
 

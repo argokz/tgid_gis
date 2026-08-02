@@ -241,16 +241,16 @@ int GidWidget::import_tgid0( QString fn)
     QSqlQuery query(m_cxema.m_db);
 
     QString q;
-    q = QString("UPDATE  l SET shape = NULL FROM linesobj l JOIN nodes n1 ON n1.id=l.nodeID1 WHERE n1.fileID=%1").arg(fileID);
+    q = QString("UPDATE  l SET shape = NULL FROM net.v_linesobj l JOIN net.v_nodes n1 ON n1.id=l.nodeID1 WHERE n1.fileID=%1").arg(fileID);
     query_exec(m_cxema.m_db, query, q);
 
     q = QString("UPDATE  l\n"
              "SET\n"
              "l.shape = geometry::STGeomFromText(CONCAT('LINESTRING(', n1.x/100, ' ',  -n1.y/100, ',',  dbo.str_coords(REPLACE(l.coords, ',', ' ')),n2.x/100, ' ', -n2.y/100, ')'), 0).MakeValid()\n"
 
-             "FROM linesobj l\n"
-             "JOIN nodes n1 ON n1.id=l.nodeID1\n"
-             "JOIN nodes n2 ON n2.id=l.nodeID2\n"
+             "FROM net.v_linesobj l\n"
+             "JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
+             "JOIN net.v_nodes n2 ON n2.id=l.nodeID2\n"
              "WHERE n1.internalNodeID IS NULL \n"
              "  AND (n1.x <> n2.x OR n1.y <> n2.y) \n"
              "  AND (n1.x <> 0 OR n1.y <> 0) \n"

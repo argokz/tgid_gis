@@ -110,10 +110,10 @@ void copyCommonRowsLines(QSqlDatabase &srcConn, QSqlDatabase &dstConn,
     QString deleteQuery;
     if (lineNode == "n0") {
         deleteQuery = QString(
-            "SELECT t.id FROM nodes t "
-            "LEFT JOIN generalizedConsumers gc ON t.id = gc.nodeID "
-            "LEFT JOIN realConsumers rc ON t.id = rc.nodeID "
-            "LEFT JOIN heatSources hs ON t.id = hs.nodeID "
+            "SELECT t.id FROM net.v_nodes t "
+            "LEFT JOIN net.v_generalizedconsumers gc ON t.id = gc.nodeID "
+            "LEFT JOIN net.v_realconsumers rc ON t.id = rc.nodeID "
+            "LEFT JOIN net.v_heatsources hs ON t.id = hs.nodeID "
             "WHERE t.removed = 1 AND t.sync_tgid "
             "AND gc.id IS NULL "
             "AND rc.id IS NULL "
@@ -156,10 +156,10 @@ void copyCommonRowsLines(QSqlDatabase &srcConn, QSqlDatabase &dstConn,
     QString selectQuery;
     if (lineNode == "n0") {
         selectQuery = QString(
-            "SELECT %1 FROM nodes t "
-            "LEFT JOIN generalizedConsumers gc ON t.id = gc.nodeID "
-            "LEFT JOIN realConsumers rc ON t.id = rc.nodeID "
-            "LEFT JOIN heatSources hs ON t.id = hs.nodeID "
+            "SELECT %1 FROM net.v_nodes t "
+            "LEFT JOIN net.v_generalizedconsumers gc ON t.id = gc.nodeID "
+            "LEFT JOIN net.v_realconsumers rc ON t.id = rc.nodeID "
+            "LEFT JOIN net.v_heatsources hs ON t.id = hs.nodeID "
             "WHERE t.removed = 0 AND t.sync_tgid "
             "AND gc.id IS NULL "
             "AND rc.id IS NULL "
@@ -171,7 +171,7 @@ void copyCommonRowsLines(QSqlDatabase &srcConn, QSqlDatabase &dstConn,
             selectQuery = QString(
                 "SELECT %1 FROM %2 t "
                 "JOIN %3 l ON l.id = t.%4 "
-                "JOIN nodes n1 ON l.nodeid1 = n1.id "
+                "JOIN net.v_nodes n1 ON l.nodeid1 = n1.id "
                 "WHERE l.removed = 0 AND l.sync_tgid")
                 .arg(colList0, srcTable, linesObj, lineId);
         }

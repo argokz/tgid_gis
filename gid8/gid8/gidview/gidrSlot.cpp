@@ -550,18 +550,18 @@ CNode2* get_undo_node(CGraph2 *graph, const QString &table, int id)
 int get_undo_node_fileID(QSqlDatabase &db, const QString &table, int id)
 {
     if (table == "nodes") {
-        return readTableVariant(db, QString("select fileID from nodes where id=%1").arg(id)).toInt();
+        return readTableVariant(db, QString("select fileID from net.v_nodes where id=%1").arg(id)).toInt();
     }
     if (table == "linesobj") {
-        return readTableVariant(db, QString("select n1.fileID from linesobj l join nodes n1 on n1.id=l.nodeid1 where l.id=%1").arg(id)).toInt();
+        return readTableVariant(db, QString("select n1.fileID from net.v_linesobj l join net.v_nodes n1 on n1.id=l.nodeid1 where l.id=%1").arg(id)).toInt();
     }
 
     if (nS.contains(table.toLower())) {
-        return readTableVariant(db, QString("select fileID from nodes where nodeID=%1").arg(id)).toInt();
+        return readTableVariant(db, QString("select fileID from net.v_nodes where nodeID=%1").arg(id)).toInt();
     }
 
     if (lS.contains(table.toLower())) {
-        return readTableVariant(db, QString("select n1.fileID from linesobj l join nodes n1 on n1.id=l.nodeid1 where l.lineID=%1").arg(id)).toInt();
+        return readTableVariant(db, QString("select n1.fileID from net.v_linesobj l join net.v_nodes n1 on n1.id=l.nodeid1 where l.lineID=%1").arg(id)).toInt();
     }
 
     return 0;
@@ -947,13 +947,13 @@ void GidWidget::onRasprMag() // Расчетные схемы
         " ot.name AS %5"
         " FROM externalCodes ec"
         " JOIN fragments fr ON fr.id=ec.fileID"
-        " LEFT JOIN heatSources hs ON hs.id=ec.heatSourceID"
+        " LEFT JOIN net.v_heatsources hs ON hs.id=ec.heatSourceID"
         " LEFT JOIN objectTypes ot ON ot.id=ec.objectID"
         " WHERE ec.removed=0 AND ec.fileID IN (%6)"
 
          " AND  EXISTS ( "
          "    SELECT 1  "
-         "    FROM nodes n "
+         "    FROM net.v_nodes n "
          "    WHERE n.externalcodeid = ec.id "
          " ) "
 
@@ -1074,8 +1074,8 @@ void GidWidget::onIstSety() // Источник
         "fr.name AS %3,\n"
         "hs.name AS %4,\n"
         "n.externalNodeName AS %5\n"
-        "FROM heatSources hs\n"
-        "JOIN nodes n ON n.id=hs.nodeID\n"
+        "FROM net.v_heatsources hs\n"
+        "JOIN net.v_nodes n ON n.id=hs.nodeID\n"
         "JOIN externalCodes ec ON ec.id=n.externalCodeID\n"
         "JOIN fragments fr ON fr.id=n.fileID\n"
         " WHERE fr.id IN (%2) and n.removed=0\n"
@@ -1149,15 +1149,15 @@ void GidWidget::onIstSetyNew() // Источник
         "fr.name AS %3,\n"
         "hs.name AS %4,\n"
         "n.externalNodeName AS %5\n"
-        "FROM heatSources hs\n"
-        "JOIN nodes n ON n.id=hs.nodeID\n"
+        "FROM net.v_heatsources hs\n"
+        "JOIN net.v_nodes n ON n.id=hs.nodeID\n"
         "JOIN externalCodes ec ON ec.id=n.externalCodeID\n"
         "JOIN fragments fr ON fr.id=n.fileID\n"
 //        " WHERE fr.id IN (%2) and n.removed=0\n"
 
         " where n.removed=0 and hs.id in (\n"
         " select distinct ist from us_out\n"
-        " join nodes n on n.id=us_out.nodeid\n" 
+        " join net.v_nodes n on n.id=us_out.nodeid\n" 
 
         " LEFT JOIN ( \n"
         "    SELECT \n"
@@ -1870,12 +1870,12 @@ void GidWidget::onZapNezak() // Незаконченные узлы
 "fr.name as %4\n"
 
 
-"from linesobj l \n"
-"join nodes n1 on n1.id=l.nodeID1 and n1.removed=0 and n1.internalNodeID is null\n"
-"join nodes n2 on n2.id=l.nodeID2 and n2.removed=0 and n2.internalNodeID is null\n"
+"from net.v_linesobj l \n"
+"join net.v_nodes n1 on n1.id=l.nodeID1 and n1.removed=0 and n1.internalNodeID is null\n"
+"join net.v_nodes n2 on n2.id=l.nodeID2 and n2.removed=0 and n2.internalNodeID is null\n"
 "JOIN fragments fr ON fr.id=n1.fileID\n"
 "LEFT JOIN externalCodes ec ON ec.id=n1.externalCodeID\n"
-"LEFT JOIN realConsumers rc ON rc.nodeID =n1.id\n"
+"LEFT JOIN net.v_realconsumers rc ON rc.nodeID =n1.id\n"
 
 "where l.removed=0\n"
 "and n1.fileID in (%5) \n"
@@ -1890,12 +1890,12 @@ void GidWidget::onZapNezak() // Незаконченные узлы
 "rc.name as %3,\n"
 "fr.name as %4\n"
 
-"from linesobj l \n"
-"join nodes n1 on n1.id=l.nodeID1 and n1.removed=0 and n1.internalNodeID is null\n"
-"join nodes n2 on n2.id=l.nodeID2 and n2.removed=0 and n2.internalNodeID is null\n"
+"from net.v_linesobj l \n"
+"join net.v_nodes n1 on n1.id=l.nodeID1 and n1.removed=0 and n1.internalNodeID is null\n"
+"join net.v_nodes n2 on n2.id=l.nodeID2 and n2.removed=0 and n2.internalNodeID is null\n"
 "JOIN fragments fr ON fr.id=n1.fileID\n"
 "LEFT JOIN externalCodes ec ON ec.id=n1.externalCodeID\n"
-"LEFT JOIN realConsumers rc ON rc.nodeID =n1.id\n"
+"LEFT JOIN net.v_realconsumers rc ON rc.nodeID =n1.id\n"
 
 "where l.removed=0\n"
 "and n1.fileID in (%5) \n"
@@ -2256,12 +2256,12 @@ void GidWidget::onZap6() // Закрытые потребители
     QString q = QString(R"(
 
 select n.id, ec.name, n.externalnodename, pt.name
-from nodes n
+from net.v_nodes n
 join externalcodes ec on ec.id=n.externalcodeid
 join (
-select gc.nodeID, gc.consumerStateID, gc.name from generalizedconsumers gc where gc.consumerStateID=2
+select gc.nodeID, gc.consumerStateID, gc.name from net.v_generalizedconsumers gc where gc.consumerStateID=2
 union
-select rc.nodeID, rc.consumerStateID, rc.name from realconsumers rc where rc.consumerStateID=2
+select rc.nodeID, rc.consumerStateID, rc.name from net.v_realconsumers rc where rc.consumerStateID=2
 ) pt on pt.nodeID=n.id
 where n.removed=0 and n.fileID in (%1)
 --AND_NODE
@@ -2281,10 +2281,10 @@ void GidWidget::onPotNagr0() // С нулевой нагрузкой
     QString q = QString(R"(
 
 select n.id, ec.name, n.externalnodename, pt.name
-from nodes n
+from net.v_nodes n
 join externalcodes ec on ec.id=n.externalcodeid
 join (
-select gc.nodeID, gc.consumerStateID, gc.name from generalizedconsumers gc where
+select gc.nodeID, gc.consumerStateID, gc.name from net.v_generalizedconsumers gc where
 
 (calcHLdep     is Null or calcHLdep    = 0) and
 (calcHLindep   is Null or calcHLindep  = 0) and
@@ -2294,7 +2294,7 @@ select gc.nodeID, gc.consumerStateID, gc.name from generalizedconsumers gc where
 (calcHLpreON   is Null or calcHLpreON  = 0)
 
 union
-select rc.nodeID, rc.consumerStateID, rc.name from realconsumers rc where
+select rc.nodeID, rc.consumerStateID, rc.name from net.v_realconsumers rc where
 (calcHLdep is Null or calcHLdep=0)
 and (calcHLindep is Null or calcHLindep=0)
 

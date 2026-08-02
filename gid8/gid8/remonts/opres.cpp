@@ -54,10 +54,10 @@ bool setOsmotr(QSqlDatabase &db, const QString & opres, CCxema* m_cxema, int dir
 
 "FROM osmotr o\n"
 "JOIN osmotrDeployed d ON d.directionID=o.id\n"
-"JOIN linesobj l ON l.id=d.lineID AND l.removed=0\n"
+"JOIN net.v_linesobj l ON l.id=d.lineID AND l.removed=0\n"
 "JOIN heatPipeSections hps ON hps.lineID=l.id\n"
-"JOIN nodes n1 ON n1.id=l.nodeID1\n"
-"JOIN nodes n2 ON n2.id=l.nodeID2\n"
+"JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
+"JOIN net.v_nodes n2 ON n2.id=l.nodeID2\n"
 "LEFT JOIN faktory_riska_truboprovoda f ON f.objID=o.id AND f.lineID=hps.pipeSectionID AND f.obj_type_faktory_riskaID=2\n"
 
         return;
@@ -97,8 +97,8 @@ bool setOsmotr(QSqlDatabase &db, const QString & opres, CCxema* m_cxema, int dir
 //"n1.fileID \n"
 "fr.name \n"
 "FROM %1Deployed d\n"
-"JOIN linesobj l ON l.id=d.lineID\n"
-"JOIN nodes n1 ON n1.id=l.nodeID1\n"
+"JOIN net.v_linesobj l ON l.id=d.lineID\n"
+"JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
 "JOIN fragments fr ON fr.id=n1.fileID\n"
             "Where directionID=%2 AND n1.fileID NOT IN (%3)\n").arg(opres).arg(directionID).arg(m_cxema->m_par);
 
@@ -298,7 +298,7 @@ void GidWidget::ListOpres(const QString & opres, const QString & title, const QS
             LEFT JOIN remontTypes rt ON rt.id=r.remontTypeID
             LEFT JOIN nachalniki_uchastkov nach ON nach.id=r.responsibleID
             JOIN remont2Deployed depl ON depl.directionID=r.id
-            JOIN linesobj l ON l.id=depl.lineID
+            JOIN net.v_linesobj l ON l.id=depl.lineID
             JOIN heatPipeSections hpss ON hpss.lineID=l.id $and_condition2$
             WHERE
               (
@@ -318,7 +318,7 @@ void GidWidget::ListOpres(const QString & opres, const QString & title, const QS
             FROM osmotr o
             LEFT JOIN nachalniki_uchastkov nach ON nach.id = otvetstvennoe_lico_ID
             JOIN osmotrDeployed depl ON depl.directionID=o.id
-            JOIN linesobj l ON l.id=depl.lineID
+            JOIN net.v_linesobj l ON l.id=depl.lineID
             JOIN heatPipeSections hpss ON hpss.lineID=l.id $and_condition2$
             WHERE
               (
@@ -340,7 +340,7 @@ void GidWidget::ListOpres(const QString & opres, const QString & title, const QS
             FROM opres r
             LEFT JOIN nachalniki_uchastkov nach ON nach.id=r.responsibleID
             JOIN opresDeployed depl ON depl.directionID=r.id
-            JOIN linesobj l ON l.id=depl.lineID
+            JOIN net.v_linesobj l ON l.id=depl.lineID
             JOIN heatPipeSections hpss ON hpss.lineID=l.id $and_condition2$
             WHERE
               (

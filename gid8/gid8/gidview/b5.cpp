@@ -205,7 +205,7 @@ bool delCxemaFull(CCxema *m_cxema, const CNode2 *node);
         query_exec(query, q);
 
         if (query_exec(query, q)) {
-            QString q = QString("DELETE linesobj WHERE nodeID1 in (SELECT id FROM nodes WHERE internalNodeID=%1)").arg(node->id);
+            QString q = QString("DELETE linesobj WHERE nodeID1 in (SELECT id FROM net.v_nodes WHERE internalNodeID=%1)").arg(node->id);
             if (query_exec(query, q)) {
                 m_cxema->m_graph->clearVnutr(node->id);
             }
@@ -779,7 +779,7 @@ void create_b5_new(QSqlDatabase &db, CNode2 *nP, CCxema* cxema)
 */
 
 
-    q = QString("select zd7, zd8, zd27, zd48, zd28, zd36, zd38, zd39, zd49, zd50, b20, b14, b23, b28, b32, b35, b38, b36 from realConsumers where nodeID=%1").arg(nP->id);
+    q = QString("select zd7, zd8, zd27, zd48, zd28, zd36, zd38, zd39, zd49, zd50, b20, b14, b23, b28, b32, b35, b38, b36 from net.v_realconsumers where nodeID=%1").arg(nP->id);
 
     std::vector<QVariant> vv;
 
@@ -817,8 +817,8 @@ void create_b5_new(QSqlDatabase &db, CNode2 *nP, CCxema* cxema)
 "--, n.id, n.externalNodeName\n"
 "--, * \n"
 "from us_out\n"
-"join nodes n on n.id=us_out.nodeid \n"
-"join realconsumers rc on rc.nodeid =n.id\n"
+"join net.v_nodes n on n.id=us_out.nodeid \n"
+"join net.v_realconsumers rc on rc.nodeid =n.id\n"
 "where n.removed = 0\n\n"
 //"where externalsign  > 4\n"
 //"and n.removed = 0\n"
@@ -848,8 +848,8 @@ void create_b5_new(QSqlDatabase &db, CNode2 *nP, CCxema* cxema)
     q = QString(
 
 "select * from any2_out\n"
-"join nodes n on n.id=any2_out.nodeid \n"
-"join realconsumers rc on rc.nodeid =n.id\n"
+"join net.v_nodes n on n.id=any2_out.nodeid \n"
+"join net.v_realconsumers rc on rc.nodeid =n.id\n"
 "where n.removed = 0\n"
 "and n.id=%1\n"
 "and any2_out.calculationID = (select MAX(id) from calculation c where c.fileID=n.fileID)\n")

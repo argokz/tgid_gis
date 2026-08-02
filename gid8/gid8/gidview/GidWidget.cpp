@@ -3818,11 +3818,11 @@ bool GidWidget::neotr_node(CNode2* node, CFPoint point)
             "fr.name AS %5\n"
 
 
-            "FROM nodes n\n"
+            "FROM net.v_nodes n\n"
             "LEFT JOIN externalCodes ec ON ec.id=n.externalCodeID\n"
             "JOIN fragments fr ON fr.id=n.fileID\n"
-            "LEFT JOIN realConsumers rc ON rc.nodeID =n.id\n"
-            "JOIN linesobj l ON(l.nodeID1 = n.id OR l.nodeID2 = n.id) AND(l.nodeID1 = %6 OR l.nodeID2 = %6)\n"
+            "LEFT JOIN net.v_realconsumers rc ON rc.nodeID =n.id\n"
+            "JOIN net.v_linesobj l ON(l.nodeID1 = n.id OR l.nodeID2 = n.id) AND(l.nodeID1 = %6 OR l.nodeID2 = %6)\n"
             "LEFT JOIN heatPipeSections hps ON hps.lineID=l.id\n"
             "WHERE n.fileID in (%7) AND (n.x=0 OR n.x IS NULL) AND (n.y=0 OR n.y IS NULL) AND n.internalNodeID IS NULL\n--AND_NODE")
             .arg(quot_text("Код РС"), quot_text("Имя узла"), quot_text("Описание"), quot_text("Длина"), quot_text("Фрагмент"))
@@ -3867,10 +3867,10 @@ bool GidWidget::neotr_node(CNode2* node, CFPoint point)
         "fr.name AS %4\n"
 
 
-        "FROM nodes n\n"
+        "FROM net.v_nodes n\n"
         "LEFT JOIN externalCodes ec ON ec.id=n.externalCodeID\n"
         "JOIN fragments fr ON fr.id=n.fileID\n"
-        "LEFT JOIN realConsumers rc ON rc.nodeID =n.id\n"
+        "LEFT JOIN net.v_realconsumers rc ON rc.nodeID =n.id\n"
         "WHERE n.fileID in (%5) AND n.x=0 AND n.y=0 AND n.internalNodeID IS NULL\n--AND_NODE")
         .arg(quot_text("Код РС"), quot_text("Имя узла"), quot_text("Описание"), quot_text("Длина"))
         .arg(m_cxema.m_par);

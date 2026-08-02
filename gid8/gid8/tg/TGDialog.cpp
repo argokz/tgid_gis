@@ -108,7 +108,7 @@ TGDialog::TGDialog(QWidget *parent, CCxema *cxema, QSqlDatabase &db, int id, int
   QString q = QString(R"SQL(
 SELECT TOP 10000 d.id, d.tn, d.Q_otn, d.t1, d.t2, d.t3, d.tv, d.t_bn
 FROM deployedTempGraphs d
-JOIN heatSources hs ON d.hSourceID=hs.id
+JOIN net.v_heatsources hs ON d.hSourceID=hs.id
 WHERE hs.id=%1
 ORDER BY d.hSourceID, 
 d.tn DESC
@@ -126,7 +126,7 @@ round(d.t3::NUMERIC, 1) as t3,
 round(d.tv::NUMERIC, 1) as tv,
 round(d.t_bn::NUMERIC, 1) as t_bn
 FROM deployedTempGraphs d
-JOIN heatSources hs ON d.hSourceID=hs.id
+JOIN net.v_heatsources hs ON d.hSourceID=hs.id
 WHERE hs.id=%1
 ORDER BY d.hSourceID,
 d.tn::NUMERIC

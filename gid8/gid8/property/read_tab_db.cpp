@@ -299,9 +299,9 @@ void get_3_param(QSqlDatabase & db, const QString & tn, const QString & table_fi
                             ftq = QString(
 "SELECT n.ID,\n"
 "CONCAT(IIF(np.id IS NULL, '', CONCAT('(', ecp.name, ' ', np.externalNodeName, ') ')), t2.name, ' ', n.externalNodeName, ' ', IIF(n.externalSignID = 2, '(П)', IIF(n.externalSignID = 3, '(О)', ''))) AS name\n"
-"FROM nodes n\n"
+"FROM net.v_nodes n\n"
 "LEFT JOIN externalCodes t2 ON t2.ID = n.externalCodeID\n"
-"LEFT JOIN nodes np ON np.id = n.internalNodeID\n"
+"LEFT JOIN net.v_nodes np ON np.id = n.internalNodeID\n"
 "LEFT JOIN externalCodes ecp ON ecp.ID = np.externalCodeID\n"
 //"WHERE n.fileID =  %1\n"
                             );
@@ -374,7 +374,7 @@ QString create_select_node(QSqlDatabase & db, const QString & tn)
 
     filtr.push_back("fileID");
 
-    joins += "LEFT JOIN nodes N ON N.id=T.nodeID\n";
+    joins += "LEFT JOIN net.v_nodes N ON N.id=T.nodeID\n";
     get_3_param(db, "nodes", "nodes", "N", i, par1, par2, joins, filtr, false, false, "shape", "id");
     filtr.clear();
     get_3_param(db, tn, tn, "T", i, par1, par2, joins, filtr, true, false, "shape", "id");
@@ -405,7 +405,7 @@ QString create_select_line(QSqlDatabase & db, const QString & tn, const QString 
     filtr.push_back("hydroRes");
 //    filtr.push_back("archiveChangeDateoperatorID");
 
-    joins += "LEFT JOIN linesobj L ON T.lineID=L.id\n";
+    joins += "LEFT JOIN net.v_linesobj L ON T.lineID=L.id\n";
     par2 += ",\nL.id AS L_ID";
     get_3_param(db, "linesobj", "linesobj", "L", i, par1, par2, joins, filtr, false, false, "shape", "id");
 
@@ -413,11 +413,11 @@ QString create_select_line(QSqlDatabase & db, const QString & tn, const QString 
     filtr_n.push_back("externalNodeName");
     filtr_n.push_back("fileID");
 
-    joins += "LEFT JOIN nodes N1 ON N1.id=L.nodeID1\n";
+    joins += "LEFT JOIN net.v_nodes N1 ON N1.id=L.nodeID1\n";
     par2 += ",\nN1.id AS N1_ID";
     get_3_param(db, "nodes", "nodes", "N1", i, par1, par2, joins, filtr_n, false, false, "shape", "id");
 
-    joins += "LEFT JOIN nodes N2 ON N2.id=L.nodeID2\n";
+    joins += "LEFT JOIN net.v_nodes N2 ON N2.id=L.nodeID2\n";
     par2 += ",\nN2.id AS N2_ID";
     get_3_param(db, "nodes", "nodes", "N2", i, par1, par2, joins, filtr_n, false, false, "shape", "id");
 

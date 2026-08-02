@@ -308,8 +308,8 @@ void CTempGraph::defaultLoadTempGraph(QSqlDatabase & db, QSqlQuery &query, int i
 
     long typ = 0;
     QString q;
-    q = QString("SELECT * FROM heatSources WHERE ID = %1").arg(id);
-//    q = QString("SELECT ist.* FROM heatSources ist JOIN nodes n ON n.id=ist.nodeID WHERE n.id = %1").arg(id);
+    q = QString("SELECT * FROM net.v_heatsources WHERE ID = %1").arg(id);
+//    q = QString("SELECT ist.* FROM net.v_heatsources ist JOIN net.v_nodes n ON n.id=ist.nodeID WHERE n.id = %1").arg(id);
 
     if (query_exec(db, query, q)) {
         if (query.next()) {
@@ -418,8 +418,8 @@ void CTempGraph::ogLoadTempGraph(QSqlDatabase & db, QSqlQuery &query, int id) {
     //  QString Value = "О";
 
     long typ = 0;
-    QString q = QString("SELECT * FROM heatSources WHERE ID = %1").arg(id);
-//    QString q = QString("SELECT ist.* FROM heatSources ist JOIN nodes n ON n.id=ist.nodeID WHERE n.id = %1").arg(id);
+    QString q = QString("SELECT * FROM net.v_heatsources WHERE ID = %1").arg(id);
+//    QString q = QString("SELECT ist.* FROM net.v_heatsources ist JOIN net.v_nodes n ON n.id=ist.nodeID WHERE n.id = %1").arg(id);
 
     if (query_exec(db, query, q)) {
 

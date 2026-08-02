@@ -134,7 +134,7 @@ int runDatabaseSmokeTest()
     QSqlQuery query(db);
     if (!query.exec(
             "SELECT current_setting('search_path'), "
-            "(SELECT count(*) FROM nodes), "
+            "(SELECT count(*) FROM net.v_nodes), "
             "(SELECT count(*) FROM fragments)")) {
         qCritical() << "DB_SMOKE: query failed" << query.lastError().text();
         return 3;

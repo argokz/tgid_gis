@@ -42,9 +42,9 @@ bool reset_shape_node_ms(QSqlDatabase & db, int id)
         " try_convert(decimal(20,2), -n2.y)/100 "
         ", ')'), 0).MakeValid()"
 
-        " FROM linesobj l"
-        " JOIN nodes n1 ON n1.id=l.nodeID1"
-        " JOIN nodes n2 ON n2.id=l.nodeID2"
+        " FROM net.v_linesobj l"
+        " JOIN net.v_nodes n1 ON n1.id=l.nodeID1"
+        " JOIN net.v_nodes n2 ON n2.id=l.nodeID2"
 
         " WHERE n1.internalNodeID IS NULL "
         "   AND (n1.x <> n2.x OR n1.y <> n2.y) "
@@ -93,9 +93,9 @@ bool reset_shape_node_pg(QSqlDatabase & db, int id)
         " cast(-n2.y as decimal(20,2))/100 \n"
         ", ')')))\n"
 
-        " FROM linesobj l\n"
-        " JOIN nodes n1 ON n1.id=l.nodeID1\n"
-        " JOIN nodes n2 ON n2.id=l.nodeID2\n"
+        " FROM net.v_linesobj l\n"
+        " JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
+        " JOIN net.v_nodes n2 ON n2.id=l.nodeID2\n"
 
         " WHERE linesobj.id=l.id AND n1.internalNodeID IS NULL \n"
         "   AND (n1.x <> n2.x OR n1.y <> n2.y) \n"
@@ -122,9 +122,9 @@ bool reset_shape_line_ms(QSqlDatabase & db, const QString & qq)
         " try_convert(decimal(20,2), -n2.y)/100 "
         ", ')'), 0).MakeValid()"
 
-        " FROM linesobj l"
-        " JOIN nodes n1 ON n1.id=l.nodeID1"
-        " JOIN nodes n2 ON n2.id=l.nodeID2"
+        " FROM net.v_linesobj l"
+        " JOIN net.v_nodes n1 ON n1.id=l.nodeID1"
+        " JOIN net.v_nodes n2 ON n2.id=l.nodeID2"
 
         " WHERE n1.internalNodeID IS NULL "
         "   AND (n1.x <> n2.x OR n1.y <> n2.y) "
@@ -153,9 +153,9 @@ bool reset_shape_line_pg(QSqlDatabase & db, const QString & qq)
         " cast(-n2.y as decimal(20,2))/100 \n"
         ", ')'), 0))\n"
 
-        " FROM linesobj l\n"
-        " JOIN nodes n1 ON n1.id=l.nodeID1\n"
-        " JOIN nodes n2 ON n2.id=l.nodeID2\n"
+        " FROM net.v_linesobj l\n"
+        " JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
+        " JOIN net.v_nodes n2 ON n2.id=l.nodeID2\n"
 
         " WHERE l.id=linesobj.id AND n1.internalNodeID IS NULL \n"
         "   AND (n1.x <> n2.x OR n1.y <> n2.y) \n"

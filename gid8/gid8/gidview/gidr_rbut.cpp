@@ -82,8 +82,8 @@ void GidWidget::viewNode(CNode2 *n, bool autodelete)
 
 "select us_out.id, us_out.externalsign, us_out.pih, us_out.t\n"
 "from us_out\n"
-"join nodes n on n.id=us_out.nodeid\n"
-"join realconsumers rc on rc.nodeid =n.id\n"
+"join net.v_nodes n on n.id=us_out.nodeid\n"
+"join net.v_realconsumers rc on rc.nodeid =n.id\n"
 "where n.removed = 0\n"
 "and n.id=%1\n"
 "and externalsign=%2\n"
@@ -185,11 +185,11 @@ bool delCxema1(CCxema *m_cxema, const CNode2 *node, int m_user)
         ret = query_exec(m_cxema->m_db, query, q);
 
         if (ret) {
-//            q.Format("D-ELETE FROM linesobj WHERE nodeID1 in (SELECT id FROM nodes WHERE internalNodeID=%d)", node->id);
+//            q.Format("D-ELETE FROM net.v_linesobj WHERE nodeID1 in (SELECT id FROM net.v_nodes WHERE internalNodeID=%d)", node->id);
 
   //          idRem = addRemoved(m_cxema->m_ado, CH_T_DELETE_LINE, node->id, "");
             
-            q = QString("UPDATE linesobj SET removed=1, idRemoved=%1, operatorID=%3, archiveChangeDate=%4, sync_tgid=true WHERE nodeID1 in (SELECT id FROM nodes WHERE internalNodeID=%2)")
+            q = QString("UPDATE linesobj SET removed=1, idRemoved=%1, operatorID=%3, archiveChangeDate=%4, sync_tgid=true WHERE nodeID1 in (SELECT id FROM net.v_nodes WHERE internalNodeID=%2)")
                 .arg(idRem).arg(node->id)
                 .arg(m_user)
                 .arg(get_now());
@@ -727,14 +727,14 @@ void GidWidget::viewLineVnutr(CLINE2 *ll)
     QString val = "";
 
     if (col != "") {
-        QString q = QString("SELECT %1 FROM realConsumers WHERE nodeID=%2").arg(col).arg(nc->id);
+        QString q = QString("SELECT %1 FROM net.v_realconsumers WHERE nodeID=%2").arg(col).arg(nc->id);
         val = readTableValue(m_cxema.m_db, q);
     }
 
     QString q = QString(
             "select ras, sopr from any2_out\n"
-            "join nodes n on n.id=any2_out.nodeid \n"
-            "join realconsumers rc on rc.nodeid =n.id\n"
+            "join net.v_nodes n on n.id=any2_out.nodeid \n"
+            "join net.v_realconsumers rc on rc.nodeid =n.id\n"
             "where n.removed = 0\n"
             "and n.id=%1\n"
             "and mesto=%2\n"

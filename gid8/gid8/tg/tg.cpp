@@ -14,7 +14,7 @@ static std::map<long, TLeto > map_TG_leto;
 bool readTG(QSqlDatabase &db, QSqlQuery &query)
 {
     map_TG_leto.clear();
-    QString q = "SELECT id, temperDWflowSummer, temperDWretSummer FROM heatSources";
+    QString q = "SELECT id, temperDWflowSummer, temperDWretSummer FROM net.v_heatsources";
 
     if (query_exec(db, query, q)) {
         if (query.next()) {

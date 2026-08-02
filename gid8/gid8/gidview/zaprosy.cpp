@@ -28,9 +28,9 @@ void GidWidget::onZap1() // Объем сети
         "hp.diameterInternal,  "
         "hp.pipeSectLength, "
         "IIF(l.externalSignLineID=1, 2, 1) AS db "
-        "FROM linesobj l "
+        "FROM net.v_linesobj l "
         "JOIN heatPipeSections hp ON hp.lineID=l.id "
-        "JOIN nodes n1 ON n1.id=l.nodeID1 "
+        "JOIN net.v_nodes n1 ON n1.id=l.nodeID1 "
         " @@ "
         "WHERE l.removed = 0 AND n1.internalNodeID IS NULL $$"
         ") _TTT"
@@ -92,10 +92,10 @@ void GidWidget::onZap2() // Длина теплопроводов
         "IIF(l.externalSignLineID IN (1,3,5), hp.pipeSectLength, 0) AS lenO "
 
 
-        "FROM linesobj l  "
+        "FROM net.v_linesobj l  "
         "JOIN heatPipeSections hp ON hp.lineID=l.id  "
-        "JOIN nodes n1 ON n1.id=l.nodeID1  "
-        "JOIN nodes n2 ON n2.id=l.nodeID2 "
+        "JOIN net.v_nodes n1 ON n1.id=l.nodeID1  "
+        "JOIN net.v_nodes n2 ON n2.id=l.nodeID2 "
         " @@ "
 
         "WHERE l.removed = 0 AND n1.internalNodeID IS NULL $$"
@@ -157,9 +157,9 @@ void GidWidget::onZap7() // Длина теплопроводов по диам�
         "hp.pipeSectLength,  "
         "IIF(l.externalSignLineID=1, 2, 1) AS db, "
         "n1.fileID "
-        "FROM linesobj l "
+        "FROM net.v_linesobj l "
         "JOIN heatPipeSections hp ON hp.lineID=l.id "
-        "JOIN nodes n1 ON n1.id=l.nodeID1 "
+        "JOIN net.v_nodes n1 ON n1.id=l.nodeID1 "
         " @@ "
 
         "WHERE l.removed = 0 $$ AND n1.internalNodeID IS NULL"
@@ -243,9 +243,9 @@ void GidWidget::onZap71() // Длина теплопроводов по диам
         "hp.pipeSectLength,   "
         "IIF(l.externalSignLineID=1, 2, 1) AS db,  "
         "n1.fileID  "
-        "FROM linesobj l  "
+        "FROM net.v_linesobj l  "
         "JOIN heatPipeSections hp ON hp.lineID=l.id  "
-        "JOIN nodes n1 ON n1.id=l.nodeID1  "
+        "JOIN net.v_nodes n1 ON n1.id=l.nodeID1  "
         " @@ "
 
         "WHERE l.removed = 0 AND n1.internalNodeID IS NULL $$"
@@ -397,7 +397,7 @@ SELECT
 
 FROM PT_OUT
 
-JOIN nodes n ON n.id=PT_OUT.nodeID and n.removed=0
+JOIN net.v_nodes n ON n.id=PT_OUT.nodeID and n.removed=0
 LEFT JOIN 
 (
 SELECT 
@@ -461,7 +461,7 @@ SELECT
 
 FROM PT_OUT
 
-JOIN nodes n ON n.id=PT_OUT.nodeID and n.removed=0
+JOIN net.v_nodes n ON n.id=PT_OUT.nodeID and n.removed=0
 LEFT JOIN 
 (
 SELECT 
@@ -517,7 +517,7 @@ SELECT
 
 FROM PT_OUT
 
-JOIN nodes n ON n.id=PT_OUT.nodeID and n.removed=0
+JOIN net.v_nodes n ON n.id=PT_OUT.nodeID and n.removed=0
 LEFT JOIN 
 (
 SELECT 

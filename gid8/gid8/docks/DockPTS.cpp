@@ -133,8 +133,8 @@ void NeOpisanMessage(QSqlDatabase &db, int id_ms, int id_rs)
     q = QString(R"SQL(
         SELECT DISTINCT fr.name
         FROM heatPipeSections hps
-        JOIN linesobj l ON l.id=hps.lineID AND l.removed=0
-        JOIN nodes n1 ON n1.id=l.nodeID1
+        JOIN net.v_linesobj l ON l.id=hps.lineID AND l.removed=0
+        JOIN net.v_nodes n1 ON n1.id=l.nodeID1
         JOIN fragments fr ON fr.id=n1.fileID
         WHERE (hps.magistralSite=%1 OR hps.distSite=%2)
         )SQL"

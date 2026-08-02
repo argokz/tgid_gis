@@ -282,7 +282,7 @@ bool setNodeXY(QSqlDatabase &db, int id, double x, double y, int m_user)
 
 "-- Получаем старую геометрию узла\n"
 "old_geom AS (\n"
-"  SELECT id, shape AS old_point FROM nodes WHERE id = (SELECT id FROM input)\n"
+"  SELECT id, shape AS old_point FROM net.v_nodes WHERE id = (SELECT id FROM input)\n"
 "),\n"
 
 "-- Обновляем точку\n"
@@ -323,7 +323,7 @@ bool setNodeXY(QSqlDatabase &db, int id, double x, double y, int m_user)
 
 "      ELSE NULL\n"
 "    END AS new_shape\n"
-"  FROM linesobj l, updated_node un\n"
+"  FROM net.v_linesobj l, updated_node un\n"
 "  WHERE ST_DWithin(l.shape, un.old_point, 0.001)\n"
 ")\n"
 

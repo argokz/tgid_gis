@@ -15,9 +15,9 @@ bool ispr_us2(QSqlDatabase &db, int id)
       "    nc.externalNodeName=n.externalNodeName, "
       "    nc.externalCodeID=n.externalCodeID, "
       "    nc.nodeName=n.nodeName "
-      "FROM nodes nc "
-      "JOIN connectNodes cn ON cn.nodeID=nc.id "
-      "JOIN nodes n ON n.id=cn.connectID "
+      "FROM net.v_nodes nc "
+      "JOIN net.v_connectnodes cn ON cn.nodeID=nc.id "
+      "JOIN net.v_nodes n ON n.id=cn.connectID "
       "WHERE n.id=%1").arg(id);
 
     return execQ(db, q);
@@ -171,7 +171,7 @@ bool GidWidget::insertNode(CNode2 *n, CLINE2 *line, double r)
     q = QString("UPDATE linesobj SET coords='%1', nodeID2=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n->id).arg(l->line.nomP).arg(l->line.nomO);
     bool ret = execQ(m_cxema.m_db, q);
 
-    q = QString("UPDATE cn SET connectID=%1 FROM connectNodes cn WHERE connectID IN (%2,%3)").arg(n->id).arg(n1->id).arg(n2->id);
+    q = QString("UPDATE cn SET connectID=%1 FROM net.v_connectnodes cn WHERE connectID IN (%2,%3)").arg(n->id).arg(n1->id).arg(n2->id);
     bool ret2 = execQ(m_cxema.m_db, q);
     ispr_us2(m_cxema.m_db, n->id);
 

@@ -262,10 +262,10 @@ bool CCxema::read_nodes(const QString & par, QProgressDialog* percent, bool firs
 
     QSqlQuery query(m_db);
 
-    QString qq = QString("SELECT id FROM nodes n WHERE n.removed=0 AND n.fileID IN (%1)").arg(par);
+    QString qq = QString("SELECT id FROM net.v_nodes n WHERE n.removed=0 AND n.fileID IN (%1)").arg(par);
 
     if (par.left(1) == "(") {
-        qq = QString("SELECT id FROM nodes n WHERE n.removed=0 AND %1").arg(par);
+        qq = QString("SELECT id FROM net.v_nodes n WHERE n.removed=0 AND %1").arg(par);
     }
 
     long cnt = sizeOfQ(m_db, qq);

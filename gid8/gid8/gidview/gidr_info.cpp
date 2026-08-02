@@ -303,7 +303,7 @@ void GidWidget::onPropertyRejected()
 
             switch(dlg->m_pr_type) {
                 case pr_type_node0:    // Узел
-                    q = QString("delete from nodes where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
+                    q = QString("delete from net.v_nodes where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
                     n = m_cxema.m_graph->find(dlg->m_id1);
                     if (n) {
@@ -317,7 +317,7 @@ void GidWidget::onPropertyRejected()
                     break;
 
                 case pr_type_node:     // Остальные точечные объекты
-                    q = QString("delete from nodes where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
+                    q = QString("delete from net.v_nodes where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
                     q = QString("delete from %1 where nodeID in (%2,%3)").arg(dlg->m_table).arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
@@ -333,7 +333,7 @@ void GidWidget::onPropertyRejected()
                     break;
 
                 case pr_type_line:     // Линейные объекты
-                    q = QString("delete from linesobj where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
+                    q = QString("delete from net.v_linesobj where id in (%1,%2)").arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);
                     q = QString("delete from %1 where lineID in (%2,%3)").arg(dlg->m_table).arg(dlg->m_id1).arg(dlg->m_id2);
                     query_exec(m_cxema.m_db, query, q);

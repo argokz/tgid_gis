@@ -224,10 +224,10 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
     QSqlQuery query(m_db);
     query.setForwardOnly(true);
 
-    QString qq = QString("SELECT l.id FROM linesobj l JOIN nodes n1 ON n1.id=l.nodeID1 AND n1.removed=0 AND l.removed=0 AND n1.fileID IN (%1)").arg(par);
+    QString qq = QString("SELECT l.id FROM net.v_linesobj l JOIN net.v_nodes n1 ON n1.id=l.nodeID1 AND n1.removed=0 AND l.removed=0 AND n1.fileID IN (%1)").arg(par);
 
     if (par.left(1) == "(") {
-        qq = QString("SELECT l.id FROM linesobj l JOIN nodes n1 ON n1.id=l.nodeID1 AND n1.removed=0 AND l.removed=0 AND %1").arg(par);
+        qq = QString("SELECT l.id FROM net.v_linesobj l JOIN net.v_nodes n1 ON n1.id=l.nodeID1 AND n1.removed=0 AND l.removed=0 AND %1").arg(par);
     }
 
 

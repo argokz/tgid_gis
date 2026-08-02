@@ -44,7 +44,7 @@ QString getNameChT(int id)
 QString getRemovedNodeName(QSqlDatabase &db, int id)
 {
     QString ret = "";
-    QString q = QString("SELECT n.id, ec.name, n.externalNodeName FROM nodes n JOIN externalCodes ec ON ec.id=n.externalCodeID WHERE n.idRemoved=%1").arg(id);
+    QString q = QString("SELECT n.id, ec.name, n.externalNodeName FROM net.v_nodes n JOIN externalCodes ec ON ec.id=n.externalCodeID WHERE n.idRemoved=%1").arg(id);
 
     QSqlQuery query(db);
     query.setForwardOnly(true);
@@ -65,7 +65,7 @@ QString getRemovedNodeName(QSqlDatabase &db, int id)
 QString getMovedNodeName(QSqlDatabase &db, int id)
 {
     QString ret = "";
-    QString q = QString("SELECT n.id, ec.name, n.externalNodeName FROM nodes n JOIN externalCodes ec ON ec.id=n.externalCodeID WHERE n.id=%1").arg(id);
+    QString q = QString("SELECT n.id, ec.name, n.externalNodeName FROM net.v_nodes n JOIN externalCodes ec ON ec.id=n.externalCodeID WHERE n.id=%1").arg(id);
 
     QSqlQuery query(db);
     query.setForwardOnly(true);
@@ -86,7 +86,7 @@ QString getMovedNodeName(QSqlDatabase &db, int id)
 QString getRemovedLineName(QSqlDatabase &db, int id)
 {
     QString ret = "";
-    QString q = QString("SELECT l.id, CONCAT(ec1.name, ' ', n1.externalNodeName, ' - ', ec2.name, ' ', n2.externalNodeName) FROM linesobj l JOIN nodes n1 ON n1.id=l.nodeID1 JOIN nodes n2 ON n2.id=l.nodeID2 JOIN externalCodes ec1 ON ec1.id=n1.externalCodeID JOIN externalCodes ec2 ON ec2.id=n2.externalCodeID WHERE l.idRemoved=%1").arg(id);
+    QString q = QString("SELECT l.id, CONCAT(ec1.name, ' ', n1.externalNodeName, ' - ', ec2.name, ' ', n2.externalNodeName) FROM net.v_linesobj l JOIN net.v_nodes n1 ON n1.id=l.nodeID1 JOIN net.v_nodes n2 ON n2.id=l.nodeID2 JOIN externalCodes ec1 ON ec1.id=n1.externalCodeID JOIN externalCodes ec2 ON ec2.id=n2.externalCodeID WHERE l.idRemoved=%1").arg(id);
 
     QSqlQuery query(db);
     query.setForwardOnly(true);
@@ -121,7 +121,7 @@ bool undo_move_node(QSqlDatabase &db, ChangedObject &co, int &fileID)
         return false;
     }
 
-    q = QString("SELECT id, fileID FROM nodes WHERE id=%1").arg(co.changedID);
+    q = QString("SELECT id, fileID FROM net.v_nodes WHERE id=%1").arg(co.changedID);
 
     QSqlQuery query(db);
     query.setForwardOnly(true);
@@ -157,8 +157,8 @@ bool undo_move_line(QSqlDatabase &db, ChangedObject &co, int &fileID)
     long id = -1;
     QString q;
 
-    q = QString("SELECT n1.fileID FROM linesobj l "
-        " JOIN nodes n1 ON l.nodeID1=n1.id "
+    q = QString("SELECT n1.fileID FROM net.v_linesobj l "
+        " JOIN net.v_nodes n1 ON l.nodeID1=n1.id "
         " WHERE l.id=%1").arg(co.changedID);
 
     QSqlQuery query(db);
@@ -193,8 +193,8 @@ bool undo_move_line_geo(QSqlDatabase &db, ChangedObject &co, int &fileID)
     long id = -1;
     QString q;
 
-    q = QString("SELECT n1.fileID FROM linesobj l "
-        " JOIN nodes n1 ON l.nodeID1=n1.id "
+    q = QString("SELECT n1.fileID FROM net.v_linesobj l "
+        " JOIN net.v_nodes n1 ON l.nodeID1=n1.id "
         " WHERE l.id=%1").arg(co.changedID);
 
     QSqlQuery query(db);
@@ -243,7 +243,7 @@ bool undo_move_line_geo(QSqlDatabase &db, ChangedObject &co, int &fileID)
 bool undo_node(QSqlDatabase &db, ChangedObject &co, int &fileID)
 {
     long id = -1;
-    QString q = QString("SELECT id, fileID FROM nodes WHERE idRemoved=%1").arg(co.id);
+    QString q = QString("SELECT id, fileID FROM net.v_nodes WHERE idRemoved=%1").arg(co.id);
 
     QSqlQuery query(db);
     query.setForwardOnly(true);
@@ -280,9 +280,9 @@ bool undo_line(QSqlDatabase &db, ChangedObject &co, int &fileID)
 {
     bool quit = false;
     QString q = QString("SELECT n1.fileID, CONCAT(ec1.name, ' ', n1.externalNodeName) AS name1, n1.removed AS n1r, "
-                             "  CONCAT(ec2.name, ' ', n2.externalNodeName) AS name2, n2.removed AS n2r FROM linesobj l "
-        " JOIN nodes n1 ON l.nodeID1=n1.id "
-        " JOIN nodes n2 ON l.nodeID2=n2.id "
+                             "  CONCAT(ec2.name, ' ', n2.externalNodeName) AS name2, n2.removed AS n2r FROM net.v_linesobj l "
+        " JOIN net.v_nodes n1 ON l.nodeID1=n1.id "
+        " JOIN net.v_nodes n2 ON l.nodeID2=n2.id "
         " JOIN externalCodes ec1 on ec1.id = n1.externalCodeID "
         " JOIN externalCodes ec2 on ec2.id = n2.externalCodeID "
         " WHERE l.idRemoved=%1").arg(co.id);

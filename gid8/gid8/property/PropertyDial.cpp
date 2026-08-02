@@ -1877,7 +1877,7 @@ bool viewLookup(QWidget *widget, PropertyStr &pr, QString &text, int &index)
         QString q = getQLookup(pr);
 
         if (pr.lookup->field.toLower() == "connectid") {
-            q = QString("SELECT DISTINCT n2.id, CONCAT(ec.name, ' ', n2.externalNodeName) AS externalNodeName FROM linesobj l JOIN nodes n2 ON(n2.id = l.nodeID1 OR n2.id = l.nodeID2) LEFT JOIN externalCodes ec ON ec.id = n2.externalCodeID JOIN nodes n1 ON(n1.id = l.nodeID1 OR n1.id = l.nodeID2) AND n1.id <> n2.id JOIN nodes nc ON nc.internalNodeID = n1.id JOIN connectNodes cn ON cn.nodeID = nc.id WHERE cn.id = %1").arg(pr.id);
+            q = QString("SELECT DISTINCT n2.id, CONCAT(ec.name, ' ', n2.externalNodeName) AS externalNodeName FROM net.v_linesobj l JOIN net.v_nodes n2 ON(n2.id = l.nodeID1 OR n2.id = l.nodeID2) LEFT JOIN externalCodes ec ON ec.id = n2.externalCodeID JOIN net.v_nodes n1 ON(n1.id = l.nodeID1 OR n1.id = l.nodeID2) AND n1.id <> n2.id JOIN net.v_nodes nc ON nc.internalNodeID = n1.id JOIN net.v_connectnodes cn ON cn.nodeID = nc.id WHERE cn.id = %1").arg(pr.id);
         }
 
     //    QInputDialog::getMultiLineText(nullptr, "", "", q);

@@ -391,7 +391,7 @@ bool export_table_node(QTextStream &out, QSqlDatabase & db, const QString & tn, 
 {
     QString q = QString(
         "SELECT obj.* FROM %1 obj\n"
-        "JOIN nodes n ON n.id = obj.nodeID\n"
+        "JOIN net.v_nodes n ON n.id = obj.nodeID\n"
         "WHERE n.fileID = %2 AND n.removed = 0").arg(br_text(tn)).arg(fileID);
 
     return export_table(out, db, tn, q, "nodeID", true, graph);
@@ -401,9 +401,9 @@ bool export_table_line(QTextStream &out, QSqlDatabase & db, const QString & tn, 
 {
     QString q = QString(
     "SELECT obj.* FROM %1 obj\n"
-        "JOIN linesobj l ON l.id = obj.lineID\n"
-        "JOIN nodes n1 ON n1.id = l.nodeID1\n"
-        "JOIN nodes n2 ON n2.id = l.nodeID2\n"
+        "JOIN net.v_linesobj l ON l.id = obj.lineID\n"
+        "JOIN net.v_nodes n1 ON n1.id = l.nodeID1\n"
+        "JOIN net.v_nodes n2 ON n2.id = l.nodeID2\n"
         "WHERE n1.fileID = %2 AND n2.fileID = %3 AND l.removed = 0 AND n1.removed = 0 AND n2.removed = 0").arg(br_text(tn)).arg(fileID).arg(fileID);
 
     return export_table(out, db, tn, q, "lineID", false, graph);
@@ -463,14 +463,14 @@ bool export_tgid(QSqlDatabase & db, const QString & fn, int fileID, CGraph2 *gra
     //    export_table_unvisual(out, db, "sortLinesForUchastok", fileID);
 
 
-    q = QString("SELECT * FROM nodes WHERE fileID=%1 AND removed=0").arg(fileID);
+    q = QString("SELECT * FROM net.v_nodes WHERE fileID=%1 AND removed=0").arg(fileID);
     export_table(out, db, "nodes", q, "id", true, graph);
 
     q = QString(
 "SELECT pss.* FROM pipeSections pss\n"
 "JOIN heatPipeSections hps ON hps.pipeSectionID=pss.id\n"
-"JOIN linesobj l ON l.id=hps.lineID\n"
-"JOIN nodes n1 ON n1.id=l.nodeID1\n"
+"JOIN net.v_linesobj l ON l.id=hps.lineID\n"
+"JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
 "WHERE n1.fileID=%1 AND l.removed=0"
 ).arg(fileID);
 
@@ -478,9 +478,9 @@ bool export_tgid(QSqlDatabase & db, const QString & fn, int fileID, CGraph2 *gra
 
 
     q = QString(
-        "SELECT l.* FROM linesobj l\n"
-        "JOIN nodes n1 ON n1.id=l.nodeID1\n"
-        "JOIN nodes n2 ON n2.id=l.nodeID2\n"
+        "SELECT l.* FROM net.v_linesobj l\n"
+        "JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
+        "JOIN net.v_nodes n2 ON n2.id=l.nodeID2\n"
         "WHERE n1.fileID=%1 AND n1.fileID=n2.fileID\n"
         "AND l.removed=0 AND n1.removed=0 AND n2.removed=0\n"
         "AND (n1.internalNodeID=n2.internalNodeID OR (n1.internalNodeID IS NULL AND n2.internalNodeID IS NULL))"
@@ -489,7 +489,7 @@ bool export_tgid(QSqlDatabase & db, const QString & fn, int fileID, CGraph2 *gra
 
     export_table(out, db, "linesobj", q, "id", false, graph);
 
-    q = QString("SELECT zn.* FROM setPressNodes zn JOIN nodes n ON n.id=zn.nodeID WHERE n.fileID=%1 AND n.removed=0").arg(fileID);
+    q = QString("SELECT zn.* FROM setPressNodes zn JOIN net.v_nodes n ON n.id=zn.nodeID WHERE n.fileID=%1 AND n.removed=0").arg(fileID);
 
     export_table(out, db, "setPressNodes", q, "nodeID", true, graph);
 
@@ -508,7 +508,7 @@ bool export_tgid(QSqlDatabase & db, const QString & fn, int fileID, CGraph2 *gra
     export_table_node(out, db, "refillNodes", fileID, graph);
     export_table_node(out, db, "threeWayValves", fileID, graph);
 
-    q = QString("SELECT tg.* FROM deployedTempGraphs tg JOIN heatSources hs ON hs.id=tg.hSourceID JOIN nodes n ON n.id=hs.nodeID WHERE n.fileID=%1").arg(fileID);
+    q = QString("SELECT tg.* FROM deployedTempGraphs tg JOIN net.v_heatsources hs ON hs.id=tg.hSourceID JOIN net.v_nodes n ON n.id=hs.nodeID WHERE n.fileID=%1").arg(fileID);
 
     export_table(out, db, "deployedTempGraphs", q, "", false, graph);
 
@@ -1132,9 +1132,9 @@ bool ispr_nodes(QSqlDatabase & db)
 {
     QString q =
        "update nodes set internalnodeid=n.id\n"
-       "from nodes nn\n"
+       "from net.v_nodes nn\n"
        "join __nodes on __nodes.id=nn.id_old\n"
-       "join nodes n on n.id_old = __nodes.internalnodeid\n"
+       "join net.v_nodes n on n.id_old = __nodes.internalnodeid\n"
        "where nodes.id=nn.id";
 
     bool ret = query_exec(db, q);
@@ -1150,7 +1150,7 @@ bool ispr_externalCodes(QSqlDatabase & db)
        "from externalcodes ec\n"
        "join __externalcodes ec2 on ec2.id=ec.id_old \n"
        "join __heatsources hs2 on hs2.id=ec2.heatsourceid \n"
-       "join heatsources hs on hs.id_old=hs2.id\n"
+       "join net.v_heatsources hs on hs.id_old=hs2.id\n"
        "join __nodes n2 on n2.id=hs2.nodeid \n"
        "where ec2.fileid = n2.fileid\n"
        "and ec.id=externalcodes.id\n";
