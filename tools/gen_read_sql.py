@@ -33,8 +33,15 @@ NODE_TYPE_CODE = {
 SPECIAL_NODE = {
     'id': '{t}.src_id',
     'fileid': '{t}.fragment_id',
-    'x': 'ST_X({t}.geom) * 100.0',
-    'y': '-ST_Y({t}.geom) * 100.0',
+    # ST_StartPoint нужен из-за regulator_press: он линейный объект
+    # (LINESTRING), но в узловом запросе участвует наравне с точками —
+    # так его видело старое приложение. ST_X от линии — ошибка
+    # «Argument to ST_X() must have type POINT», и приложение падало
+    # на фрагментах, где такой регулятор есть.
+    # Для точки ST_StartPoint возвращает её саму, поэтому выражение
+    # одинаково годится для всех классов.
+    'x': 'ST_X(ST_StartPoint({t}.geom)) * 100.0',
+    'y': '-ST_Y(ST_StartPoint({t}.geom)) * 100.0',
     'id2': '{t}.id',
     'type_txt': "'{code}'",
     'removed': "CASE WHEN {t}.removed_at IS NULL THEN 0 ELSE 1 END",
@@ -230,14 +237,14 @@ FROM (
 {union}
 ) n
 LEFT JOIN (
-    SELECT c.fileid, max(c.id) AS cid FROM public.calculation c GROUP BY c.fileid
-) calc ON calc.fileid = n.fileid
-LEFT JOIN public.us_out usp ON usp.nodeid = n.id AND usp.externalsign = 1
-                           AND usp.calculationid = calc.cid
-LEFT JOIN public.us_out uso ON uso.nodeid = n.id AND uso.externalsign = 2
-                           AND uso.calculationid = calc.cid
-LEFT JOIN public.pt_out  ON pt_out.nodeid = n.id AND pt_out.calculationid = calc.cid
-LEFT JOIN public.dr_out  ON dr_out.nodeid = n.id AND dr_out.calculationid = calc.cid
+    SELECT c.fileid, max(c.id) AS cid FROM calc.calculation c GROUP BY c.fileid
+) lastcalc ON lastcalc.fileid = n.fileid
+LEFT JOIN calc.us_out usp ON usp.nodeid = n.id AND usp.externalsign = 1
+                           AND usp.calculationid = lastcalc.cid
+LEFT JOIN calc.us_out uso ON uso.nodeid = n.id AND uso.externalsign = 2
+                           AND uso.calculationid = lastcalc.cid
+LEFT JOIN calc.pt_out  ON pt_out.nodeid = n.id AND pt_out.calculationid = lastcalc.cid
+LEFT JOIN calc.dr_out  ON dr_out.nodeid = n.id AND dr_out.calculationid = lastcalc.cid
 WHERE n.removed = 0
 """.format(cols=',\n    '.join(outer), union=union)
 
@@ -316,14 +323,14 @@ FROM (
 {union}
 ) n1
 LEFT JOIN (
-    SELECT c.fileid, max(c.id) AS cid FROM public.calculation c GROUP BY c.fileid
-) calc ON calc.fileid = n1.fileid
-LEFT JOIN public.ut_out utp ON utp.lineid = n1.id
+    SELECT c.fileid, max(c.id) AS cid FROM calc.calculation c GROUP BY c.fileid
+) lastcalc ON lastcalc.fileid = n1.fileid
+LEFT JOIN calc.ut_out utp ON utp.lineid = n1.id
                            AND utp.externalsignlineid IN (2, 4)
-                           AND utp.calculationid = calc.cid
-LEFT JOIN public.ut_out uto ON uto.lineid = n1.id
+                           AND utp.calculationid = lastcalc.cid
+LEFT JOIN calc.ut_out uto ON uto.lineid = n1.id
                            AND uto.externalsignlineid IN (3, 5)
-                           AND uto.calculationid = calc.cid
+                           AND uto.calculationid = lastcalc.cid
 WHERE n1.removed = 0
 """.format(cols=',\n    '.join(outer), union=union)
 
