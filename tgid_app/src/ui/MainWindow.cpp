@@ -14,8 +14,10 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDockWidget>
+#include <QDoubleSpinBox>
 #include <QFont>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QHash>
 #include <QHeaderView>
 #include <QHBoxLayout>
@@ -23,6 +25,8 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QProcessEnvironment>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
@@ -34,8 +38,10 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QTextCursor>
 #include <QTextStream>
 #include <QTimer>
+#include <QDir>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
@@ -304,6 +310,31 @@ MainWindow::MainWindow(QWidget* parent)
     mapWatcher_ = new QFutureWatcher<repo::MapData>(this);
     connect(mapWatcher_, &QFutureWatcher<repo::MapData>::finished,
             this, &MainWindow::finishMapLoad);
+    calculationProcess_ = new QProcess(this);
+    calculationProcess_->setProcessChannelMode(QProcess::MergedChannels);
+    connect(calculationProcess_, &QProcess::readyReadStandardOutput,
+            this, &MainWindow::readNetworkCalculationOutput);
+    connect(calculationProcess_, &QProcess::finished,
+            this, &MainWindow::finishNetworkCalculation);
+    connect(calculationProcess_, &QProcess::errorOccurred, this,
+            [this](QProcess::ProcessError error) {
+                if (error != QProcess::FailedToStart) {
+                    return;
+                }
+                calculationProgress_->setRange(0, 1);
+                calculationProgress_->setValue(0);
+                calculationFragmentCombo_->setEnabled(
+                    calculationFragmentCombo_->count() > 0);
+                calculationTemperatureSpin_->setEnabled(true);
+                startCalculationButton_->setEnabled(
+                    calculationFragmentCombo_->count() > 0);
+                cancelCalculationButton_->setEnabled(false);
+                calculationStatusLabel_->setStyleSheet(
+                    QStringLiteral("color: #b42318;"));
+                calculationStatusLabel_->setText(
+                    QStringLiteral("Не удалось запустить расчёт: %1")
+                        .arg(calculationProcess_->errorString()));
+            });
     QTimer::singleShot(0, this, &MainWindow::connectAndRefresh);
 }
 
@@ -746,6 +777,58 @@ void MainWindow::buildInterface()
     pipeVolumeReportTable_->horizontalHeader()->setStretchLastSection(true);
     volumeLayout->addWidget(pipeVolumeReportTable_, 1);
     tabs->addTab(volumeTab, QStringLiteral("Объём сети"));
+
+    auto* calculationTab = new QWidget(tabs);
+    auto* calculationLayout = new QVBoxLayout(calculationTab);
+    auto* calculationToolbar = new QHBoxLayout();
+    calculationToolbar->addWidget(
+        new QLabel(QStringLiteral("Фрагмент:"), calculationTab));
+    calculationFragmentCombo_ = new QComboBox(calculationTab);
+    calculationFragmentCombo_->setMinimumWidth(280);
+    calculationFragmentCombo_->setEnabled(false);
+    calculationToolbar->addWidget(calculationFragmentCombo_, 1);
+    calculationToolbar->addWidget(
+        new QLabel(QStringLiteral("Tн, °C:"), calculationTab));
+    calculationTemperatureSpin_ = new QDoubleSpinBox(calculationTab);
+    calculationTemperatureSpin_->setRange(-100.0, 50.0);
+    calculationTemperatureSpin_->setDecimals(1);
+    calculationTemperatureSpin_->setValue(-25.0);
+    calculationToolbar->addWidget(calculationTemperatureSpin_);
+    startCalculationButton_ = new QPushButton(
+        QStringLiteral("Запустить"), calculationTab);
+    startCalculationButton_->setEnabled(false);
+    connect(startCalculationButton_, &QPushButton::clicked,
+            this, &MainWindow::startNetworkCalculation);
+    calculationToolbar->addWidget(startCalculationButton_);
+    cancelCalculationButton_ = new QPushButton(
+        QStringLiteral("Отменить"), calculationTab);
+    cancelCalculationButton_->setEnabled(false);
+    connect(cancelCalculationButton_, &QPushButton::clicked,
+            this, &MainWindow::cancelNetworkCalculation);
+    calculationToolbar->addWidget(cancelCalculationButton_);
+    saveCalculationLogButton_ = new QPushButton(
+        QStringLiteral("Сохранить журнал"), calculationTab);
+    saveCalculationLogButton_->setEnabled(false);
+    connect(saveCalculationLogButton_, &QPushButton::clicked,
+            this, &MainWindow::saveNetworkCalculationLog);
+    calculationToolbar->addWidget(saveCalculationLogButton_);
+    calculationLayout->addLayout(calculationToolbar);
+    calculationProgress_ = new QProgressBar(calculationTab);
+    calculationProgress_->setRange(0, 1);
+    calculationProgress_->setValue(0);
+    calculationProgress_->setTextVisible(false);
+    calculationLayout->addWidget(calculationProgress_);
+    calculationStatusLabel_ = new QLabel(
+        QStringLiteral("Подключитесь к БД и выберите фрагмент"),
+        calculationTab);
+    calculationStatusLabel_->setWordWrap(true);
+    calculationLayout->addWidget(calculationStatusLabel_);
+    calculationLog_ = new QPlainTextEdit(calculationTab);
+    calculationLog_->setReadOnly(true);
+    calculationLog_->setPlaceholderText(
+        QStringLiteral("Здесь появится журнал расчётного ядра sety"));
+    calculationLayout->addWidget(calculationLog_, 1);
+    tabs->addTab(calculationTab, QStringLiteral("Расчёт сети"));
 
     auto* heatTab = new QWidget(tabs);
     auto* heatLayout = new QVBoxLayout(heatTab);
@@ -1330,6 +1413,14 @@ void MainWindow::showError(const QString& message)
     exportPipeVolumeReportButton_->setEnabled(false);
     pipeVolumeReportStatusLabel_->setText(
         QStringLiteral("Отчёт недоступен"));
+    calculationFragmentCombo_->clear();
+    calculationFragmentCombo_->setEnabled(false);
+    startCalculationButton_->setEnabled(false);
+    if (calculationProcess_->state() == QProcess::NotRunning) {
+        calculationStatusLabel_->setStyleSheet({});
+        calculationStatusLabel_->setText(
+            QStringLiteral("Расчёт недоступен"));
+    }
     heatConsumptionReportTable_->setRowCount(0);
     heatConsumptionReport_ = {};
     heatFragmentCombo_->clear();
@@ -1920,6 +2011,7 @@ void MainWindow::populateReportFragments(
 {
     reportFragmentCombo_->clear();
     volumeFragmentCombo_->clear();
+    calculationFragmentCombo_->clear();
     heatFragmentCombo_->clear();
     closedConsumerFragmentCombo_->clear();
     zeroLoadConsumerFragmentCombo_->clear();
@@ -1952,6 +2044,9 @@ void MainWindow::populateReportFragments(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         volumeFragmentCombo_->addItem(
+            QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
+            fragment.id);
+        calculationFragmentCombo_->addItem(
             QStringLiteral("%1 (#%2)").arg(label).arg(fragment.id),
             fragment.id);
         heatFragmentCombo_->addItem(
@@ -1995,6 +2090,17 @@ void MainWindow::populateReportFragments(
     pipeVolumeReportStatusLabel_->setStyleSheet({});
     pipeVolumeReportStatusLabel_->setText(
         QStringLiteral("Выберите параметры и рассчитайте объём"));
+    calculationFragmentCombo_->setEnabled(
+        calculationFragmentCombo_->count() > 0
+        && calculationProcess_->state() == QProcess::NotRunning);
+    startCalculationButton_->setEnabled(
+        calculationFragmentCombo_->count() > 0
+        && calculationProcess_->state() == QProcess::NotRunning);
+    if (calculationProcess_->state() == QProcess::NotRunning) {
+        calculationStatusLabel_->setStyleSheet({});
+        calculationStatusLabel_->setText(
+            QStringLiteral("Выберите фрагмент и запустите расчёт"));
+    }
     heatFragmentCombo_->setEnabled(heatFragmentCombo_->count() > 0);
     runHeatConsumptionReportButton_->setEnabled(
         heatFragmentCombo_->count() > 0);
@@ -2456,6 +2562,210 @@ void MainWindow::exportPipeVolumeReport()
     }
     statusBar()->showMessage(
         QStringLiteral("Отчёт сохранён: %1").arg(fileName));
+}
+
+void MainWindow::startNetworkCalculation()
+{
+    if (calculationProcess_->state() != QProcess::NotRunning) {
+        return;
+    }
+
+    const qint64 fragmentId = calculationFragmentCombo_->currentData().toLongLong();
+    if (fragmentId <= 0) {
+        QMessageBox::warning(
+            this, QStringLiteral("Расчёт сети"),
+            QStringLiteral("Выберите рабочий фрагмент сети."));
+        return;
+    }
+
+    QString python = qEnvironmentVariable("TGID_SETY_PYTHON");
+    if (python.trimmed().isEmpty()) {
+        python = QStringLiteral("H:/venv/sety/Scripts/python.exe");
+    }
+    QString script = qEnvironmentVariable("TGID_SETY_SCRIPT");
+    if (script.trimmed().isEmpty()) {
+        script = QStringLiteral(
+            "H:/projects/tgid-app-new/gid8/python/sety/sety/ww.py");
+    }
+    if (!QFileInfo(python).isFile()) {
+        const QString message = QStringLiteral(
+            "Не найден Python расчётного ядра: %1. "
+            "Укажите путь в TGID_SETY_PYTHON.").arg(python);
+        calculationStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        calculationStatusLabel_->setText(message);
+        QMessageBox::critical(this, QStringLiteral("Расчёт сети"), message);
+        return;
+    }
+    if (!QFileInfo(script).isFile()) {
+        const QString message = QStringLiteral(
+            "Не найден ww.py расчётного ядра: %1. "
+            "Укажите путь в TGID_SETY_SCRIPT.").arg(script);
+        calculationStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b42318;"));
+        calculationStatusLabel_->setText(message);
+        QMessageBox::critical(this, QStringLiteral("Расчёт сети"), message);
+        return;
+    }
+
+    const QString outputFile = QDir::temp().filePath(
+        QStringLiteral("tgid_calc_%1_f%2.txt")
+            .arg(QDateTime::currentDateTime().toString(
+                QStringLiteral("yyyyMMdd_HHmmss")))
+            .arg(fragmentId));
+    const QString temperature = QString::number(
+        calculationTemperatureSpin_->value(), 'f', 1);
+    QStringList arguments{
+        script,
+        QStringLiteral("-type_of_net"), QStringLiteral("1"),
+        QStringLiteral("-server"), config_.host,
+        QStringLiteral("-database"), config_.database,
+        QStringLiteral("-user"), config_.user,
+        QStringLiteral("-port"), QString::number(config_.port),
+        QStringLiteral("-fileID"), QString::number(fragmentId),
+        QStringLiteral("-Tn"), temperature,
+        QStringLiteral("-GWS"), QStringLiteral("1"),
+        QStringLiteral("-GWS2"), QStringLiteral("1"),
+        QStringLiteral("-sopr"), QStringLiteral("0"),
+        QStringLiteral("-roP"), QStringLiteral("0.975"),
+        QStringLiteral("-roO"), QStringLiteral("0.975"),
+        QStringLiteral("-ro_temp"),
+        QStringLiteral("-rdbms"), QStringLiteral("postgreSQL"),
+        QStringLiteral("-out_file"), outputFile,
+        QStringLiteral("-user_gid"), QStringLiteral("tgid-qt"),
+    };
+    if (!config_.password.isEmpty()) {
+        arguments.append({QStringLiteral("-password"), config_.password});
+    }
+
+    QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+    environment.insert(QStringLiteral("PYTHONIOENCODING"),
+                       QStringLiteral("utf-8"));
+    environment.insert(QStringLiteral("PYTHONUTF8"), QStringLiteral("1"));
+    calculationProcess_->setProcessEnvironment(environment);
+    calculationProcess_->setWorkingDirectory(QFileInfo(script).absolutePath());
+
+    calculationCancelled_ = false;
+    calculationLog_->clear();
+    calculationLog_->appendPlainText(
+        QStringLiteral("Старт: %1\nБД: %2\nФрагмент: %3\nTн: %4 °C\n"
+                       "Результат ядра: %5\n---")
+            .arg(QDateTime::currentDateTime().toString(Qt::ISODate),
+                 config_.displayName(), QString::number(fragmentId),
+                 temperature, outputFile));
+    calculationStatusLabel_->setStyleSheet({});
+    calculationStatusLabel_->setText(
+        QStringLiteral("Расчёт фрагмента %1 выполняется…").arg(fragmentId));
+    calculationProgress_->setRange(0, 0);
+    calculationFragmentCombo_->setEnabled(false);
+    calculationTemperatureSpin_->setEnabled(false);
+    startCalculationButton_->setEnabled(false);
+    cancelCalculationButton_->setEnabled(true);
+    saveCalculationLogButton_->setEnabled(false);
+    statusBar()->showMessage(QStringLiteral("Выполняется расчёт сети"));
+    calculationProcess_->start(python, arguments);
+}
+
+void MainWindow::cancelNetworkCalculation()
+{
+    if (calculationProcess_->state() == QProcess::NotRunning) {
+        return;
+    }
+    calculationCancelled_ = true;
+    cancelCalculationButton_->setEnabled(false);
+    calculationStatusLabel_->setText(QStringLiteral("Отмена расчёта…"));
+    calculationLog_->appendPlainText(QStringLiteral("---\nЗапрошена отмена."));
+    calculationProcess_->terminate();
+    QTimer::singleShot(3000, calculationProcess_, [this]() {
+        if (calculationProcess_->state() != QProcess::NotRunning) {
+            calculationProcess_->kill();
+        }
+    });
+}
+
+void MainWindow::readNetworkCalculationOutput()
+{
+    const QByteArray output = calculationProcess_->readAllStandardOutput();
+    if (!output.isEmpty()) {
+        calculationLog_->moveCursor(QTextCursor::End);
+        calculationLog_->insertPlainText(QString::fromUtf8(output));
+        calculationLog_->moveCursor(QTextCursor::End);
+    }
+}
+
+void MainWindow::finishNetworkCalculation(
+    int exitCode, QProcess::ExitStatus exitStatus)
+{
+    readNetworkCalculationOutput();
+    calculationProgress_->setRange(0, 1);
+    calculationProgress_->setValue(
+        !calculationCancelled_ && exitStatus == QProcess::NormalExit
+                && exitCode == 0
+            ? 1
+            : 0);
+    calculationFragmentCombo_->setEnabled(
+        calculationFragmentCombo_->count() > 0);
+    calculationTemperatureSpin_->setEnabled(true);
+    startCalculationButton_->setEnabled(
+        calculationFragmentCombo_->count() > 0);
+    cancelCalculationButton_->setEnabled(false);
+    saveCalculationLogButton_->setEnabled(
+        !calculationLog_->toPlainText().isEmpty());
+
+    if (calculationCancelled_) {
+        calculationStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #b54708;"));
+        calculationStatusLabel_->setText(QStringLiteral("Расчёт отменён"));
+        calculationLog_->appendPlainText(QStringLiteral("---\nРасчёт отменён."));
+        statusBar()->showMessage(QStringLiteral("Расчёт отменён"));
+        return;
+    }
+    if (exitStatus == QProcess::NormalExit && exitCode == 0) {
+        calculationStatusLabel_->setStyleSheet(
+            QStringLiteral("color: #067647;"));
+        calculationStatusLabel_->setText(
+            QStringLiteral("Расчёт успешно завершён"));
+        calculationLog_->appendPlainText(
+            QStringLiteral("---\nРасчёт завершён, код возврата 0."));
+        statusBar()->showMessage(QStringLiteral("Расчёт сети завершён"));
+        return;
+    }
+
+    calculationStatusLabel_->setStyleSheet(
+        QStringLiteral("color: #b42318;"));
+    calculationStatusLabel_->setText(
+        QStringLiteral("Расчёт завершился с ошибкой (код %1)").arg(exitCode));
+    calculationLog_->appendPlainText(
+        QStringLiteral("---\nОшибка расчёта, код возврата %1.").arg(exitCode));
+    statusBar()->showMessage(QStringLiteral("Ошибка расчёта сети"));
+}
+
+void MainWindow::saveNetworkCalculationLog()
+{
+    const QString fileName = QFileDialog::getSaveFileName(
+        this, QStringLiteral("Сохранить журнал расчёта"),
+        QStringLiteral("tgid-calc-%1.log")
+            .arg(QDateTime::currentDateTime().toString(
+                QStringLiteral("yyyyMMdd-HHmmss"))),
+        QStringLiteral("Журнал (*.log *.txt);;Все файлы (*)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this, QStringLiteral("Сохранение журнала"), file.errorString());
+        return;
+    }
+    QTextStream stream(&file);
+    stream.setEncoding(QStringConverter::Utf8);
+    stream << calculationLog_->toPlainText();
+    if (!file.commit()) {
+        QMessageBox::critical(
+            this, QStringLiteral("Сохранение журнала"), file.errorString());
+        return;
+    }
+    statusBar()->showMessage(QStringLiteral("Журнал расчёта сохранён"));
 }
 
 void MainWindow::executeHeatConsumptionReport()

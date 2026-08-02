@@ -19,12 +19,16 @@
 #include <QElapsedTimer>
 #include <QFutureWatcher>
 #include <QMainWindow>
+#include <QProcess>
 
 class QLabel;
 class QDockWidget;
 class QComboBox;
 class QCheckBox;
 class QLineEdit;
+class QDoubleSpinBox;
+class QPlainTextEdit;
+class QProgressBar;
 class QPushButton;
 class QTableWidget;
 class QTreeWidget;
@@ -78,6 +82,11 @@ private slots:
     void exportPipeVolumeReport();
     void executeHeatConsumptionReport();
     void exportHeatConsumptionReport();
+    void startNetworkCalculation();
+    void cancelNetworkCalculation();
+    void readNetworkCalculationOutput();
+    void finishNetworkCalculation(int exitCode, QProcess::ExitStatus exitStatus);
+    void saveNetworkCalculationLog();
     void refreshClosedConsumers();
     void exportClosedConsumers();
     void openClosedConsumer(int row, int column);
@@ -174,6 +183,15 @@ private:
     QPushButton* exportPipeVolumeReportButton_ = nullptr;
     QLabel* pipeVolumeReportStatusLabel_ = nullptr;
     QTableWidget* pipeVolumeReportTable_ = nullptr;
+    QComboBox* calculationFragmentCombo_ = nullptr;
+    QDoubleSpinBox* calculationTemperatureSpin_ = nullptr;
+    QPushButton* startCalculationButton_ = nullptr;
+    QPushButton* cancelCalculationButton_ = nullptr;
+    QPushButton* saveCalculationLogButton_ = nullptr;
+    QLabel* calculationStatusLabel_ = nullptr;
+    QProgressBar* calculationProgress_ = nullptr;
+    QPlainTextEdit* calculationLog_ = nullptr;
+    QProcess* calculationProcess_ = nullptr;
     QComboBox* heatFragmentCombo_ = nullptr;
     QComboBox* heatModeCombo_ = nullptr;
     QPushButton* runHeatConsumptionReportButton_ = nullptr;
@@ -237,6 +255,7 @@ private:
     qint64 pendingObjectId_ = 0;
     QString pendingObjectClassTable_;
     bool pendingObjectIsNode_ = false;
+    bool calculationCancelled_ = false;
 };
 
 }  // namespace tgid::ui
