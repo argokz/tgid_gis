@@ -149,8 +149,390 @@ search_path`, установленный в той же транзакции, п
 Сейчас `sety` стал вычислять `ist` корректно (реальные значения вместо
 нуля), и несовпадение системы нумерации стало видно впервые.
 
-Не исправлено намеренно: правильный ответ (сопоставлять `ist` с
-`hs.subtype_src_id`, а не с `hs.id`) требует решения — трогать ли это
-единственное место или системно развязать нумерацию источников тепла
-везде, где она может встретиться. Это отдельная задача, не входящая в
-сегодняшний объём.
+### Перепроверка (шаг 65)
+
+На живой `tgid_gis` join `net.v_heatsources hs ON hs.id = o.ist`
+**корректен**: у представления колонка `id` уже есть `subtype_src_id`
+(`sql/055_subtype_views.sql`). Сверка:
+
+* `calc.us_out` с `ist <> 0` — 24 392 строки;
+* join через `net.v_heatsources` — 24 392;
+* join через физический `net.heat_source.id` — 0;
+* join через `net.heat_source.subtype_src_id` — 24 392;
+* `ref.externalcodes.heatsourceid` → `v_heatsources.id` — 469 / 469.
+
+Менять C++ на `hs.subtype_src_id` **нельзя**, пока запрос идёт к
+`net.v_heatsources`: там нет такой колонки в роли ключа строки, ключ
+уже назван `id`. Расхождение с эталоном `almatygid` (там `ist` всегда 0)
+— улучшение расчёта, не регрессия join.
+
+## Шаг 3: резолвер `tbl_sql` для динамических имён таблиц
+
+Добавлен `tbl_sql(tn)` в [`db.cpp`](../gid8/gid8/db/db.cpp) /
+[`db.h`](../gid8/gid8/db/db.h): для 20 типов с представлениями
+`net.v_*` возвращает `net.v_<имя>`, иначе — прежний `br_text(tn)`
+(через `compat` / `search_path`).
+
+Подключено в движке карточек и соседних путях, где имя приходит
+переменной: `cxema_edit`, `read_tab_db`, `PropertyDial`,
+`export_fragment`, `geo_select`, `geo_open`, `edit`, `TableWindow`,
+`DbWindow`, `MultiHeaderTable`. Колонки и русские подписи по-прежнему
+идут через `br_text`.
+
+Сборка: `H:\build\gid8-tgid-gis-step65\gid8.exe` (273 объекта).
+
+ИТП-классы и `bypass` переведены на `net.v_*` в
+[`sql/178_itp_net_views.sql`](../sql/178_itp_net_views.sql); `compat.*` —
+тонкие обёртки. Attic-пробросы (`WDOdevices` и пустые узлы) пока через
+`compat` / `br_text`.
+
+## Сопутствующие фиксы точности (шаг 65)
+
+Два известных провала `sql/tests` (23/25) оказались регрессией после
+паспорта `pipe_section` (шаг 56 / `173`):
+
+* `pipesectionid` BEFORE INSERT := `id` → `join_lines` считал участки
+  разными по «бизнес-атрибутам»;
+* `id_old` DEFAULT 0 и `pipesectionid` блокировали `reclass_object`
+  `pipe_section → line_plain` как «потерю заполненных полей».
+
+Исправлено в [`111_line_join.sql`](../sql/111_line_join.sql) и
+[`113_object_reclass.sql`](../sql/113_object_reclass.sql): суррогаты
+исключены из сравнения/копирования и из проверки потери полей.
+После применения — **25/25**.
+
+`deploy_sql.ps1` раскатывает `us.sql`/`ut.sql` во все каталоги
+`gid8/runtime`, `gid6/gidr` и сборки `H:\build\gid8*`, а не в один.
+
+## Шаг 66: системный проход по интерфейсу — запись
+
+По матрице UI→SQL ([gidrMenu](../gid8/gid8/gidview/gidrMenu.cpp) →
+[gidrAction](../gid8/gid8/gidview/gidrAction.cpp) →
+[gidrSlot](../gid8/gid8/gidview/gidrSlot.cpp)) проверено и доведено
+по цепочке: открыть фрагмент → карточка → изменить → удалить/перенести →
+откатить → отчёт. Чтение (`us_net`/`ut_net`, `fragments`, `calc.us_out`)
+и основные запросы `onZap1`/`onZap7`/`onZap3` уже были на `net`; оставался
+путь **записи**.
+
+* `db.cpp`: `insertIntoDatabase`, `updateDatabaseRow`, `updateRow`
+  теперь всегда резолвят имя через `tbl_sql`, а не только при чтении.
+* `undo_gid.cpp`: undo move/delete узла/линии переведены с `nodes`/
+  `linesobj` на `net.v_nodes`/`net.v_linesobj`.
+* `gidr_info.cpp`: удаление подтипа при отмене карточки (`pr_type_node`/
+  `pr_type_line`) — через `tbl_sql(dlg->m_table)`.
+* `gidr_rbut.cpp`: скрыть/массовые UPDATE (`nodes`, `linesobj`,
+  `realConsumers`, `refillNodes`, `setPressNodes`, динамические
+  `getTableMySQL()` через `tbl_sql`).
+* `gidr_del.cpp`, `gidr_insert.cpp`, `gidr_find.cpp`,
+  `GidWidget.cpp`: `UPDATE` координат/переключателей идут напрямую в
+  `net.v_linesobj`.
+
+Проверка записи на живой `tgid_gis` (в транзакции, откат): `INSERT` узла,
+`UPDATE` узла, `DELETE` через `net.v_nodes` (removed=1), `INSERT` подтипа
+в `net.v_connectnodes`, `UPDATE` через `net.v_connectnodes` — всё
+успешно. `sql/tests` — 25/25. Сборка `H:\build\gid8-tgid-gis-step65`
+— без ошибок.
+
+Остаток, не входивший в карту записи: метаданные
+(`fragments`/`externalCodes`/`texts`/`heatSystem`) и запуск `sety4` из
+`gidr_calc.cpp` — следующий блок; электрика и `sprav.dbo` мёртвые.
+
+## Шаг 67: запуск расчёта из клиента
+
+Проверка цепочки `onDoIt*` → `get_sety4()` → bat → `ww.py` показала,
+что из свежей сборки расчёт не стартовал бы: `init_sety4()` искал
+`ww.py` только в развёрнутом пакете (`argpath()`/`dir+"/../python"`),
+а `python_exe()` — только embed-интерпретатор; ни того ни другого рядом
+с `H:\build\gid8-tgid-gis-step65\gid8.exe` нет.
+
+Исправлено:
+
+* [`gidr_calc.cpp`](../gid8/gid8/gidview/gidr_calc.cpp) `init_sety4()` —
+  сначала явный `config/sety4` из QSettings, затем кандидаты пакета
+  с проверкой существования, последним — рабочая копия
+  `gid8/python/sety/sety/ww.py`.
+* [`export.cpp`](../gid8/gid8/gidview/export.cpp) `python_exe()` —
+  после embed-пакета ищет venv движка (`dir+"/../venv/sety/..."`,
+  затем `H:/venv/sety/Scripts/python.exe`), в конце — `python` из PATH.
+
+Проверка: CLI, который строит `getDoIt()` (`-type_of_net 1 -Tn -25
+-GWS 1 -GWS2 1 -sopr 0 -roP 0.975 -roO 0.975 -ro_temp -rdbms postgreSQL
+-color -user_gid`), прогнан на фрагменте 2 — создан расчёт 158
+(`calc.us_out` 4 908 строк, `calc.ut_out` 2 773). Параметр
+`-type_of_net` движком не используется (suppress в `config.py`),
+оставлен для совместимости с `tools/recalc_all.ps1`.
+
+Запросы отчётов (`zaprosy.cpp` `onZap1/2/3/7`, `onPoteri`) и чтение
+результатов (`calc.us_out/ut_out` по `fileid`) проходят `EXPLAIN` на
+`tgid_gis`; `heatPipeSections`/`CALCULATION`/`IIF` резолвятся через
+`compat` — функционально закрыто, переписывание литералов на
+`net.v_*`/`CASE` остаётся косметикой.
+
+## Шаг 68: attic-пробросы закрыты — wdodevices на целевой таблице
+
+Целевая модель (docs/02) предписывала `wdodevices` дочерней таблицей
+`net.node_metering_device`; таблица была создана ещё в `sql/010` с
+10 живыми строками (src_id 481–490, узел 14522), а `compat.wdodevices`
+остался пробросом на чердак со всеми 3 385 строками (3 375 — мёртвые,
+разбор в docs/14, шаг 12) и без записи. `b5.cpp` (построение внутренней
+схемы) делает `insertIntoDatabase("WDOdevices", …)` — через проброс это
+падало бы.
+
+`sql/179_wdodevices_net.sql`: `compat.wdodevices` теперь представление
+над `net.node_metering_device` в старой форме (id/nodeid/externalsignid/
+wdo/hydrores), `id = COALESCE(src_id, id)` — старые строки отдают прежние
+481–490 (экспорт не заметит), новые — реальный net id (RETURNING у
+`insertIntoDatabase` не NULL). INSTEAD OF INSERT/UPDATE/DELETE пишет в
+целевую таблицу. Тест `test_wdodevices_compat.sql` — OK.
+
+Пять пустых узловых таблиц (`overgroundnodes`, `pavilions`,
+`undergroundnodes`, `uninstallednodes`, `internalnodes`) — 0 строк, их
+читает только экспорт фрагмента; проброс через `compat` остаётся
+осознанным резолвером, переносить нечего.
+
+Электрика: в `tgid_gis` схема `el` содержит только 5 справочников
+(energosistemy 1, marki_kabeley_es 16, marki_transformatorov_es 2,
+tipy_istochnikov 4, tipy_lep 2, tipy_priemnikov 6) — объектных таблиц
+нет и никогда не было; слоты `onElectro*` в `gidrSlot.cpp` пустые.
+Мигрировать нечего, UI мёртвый.
+
+## Шаг 69: запись через карточки ИТП + восстановлена net.reclass_line
+
+Проверка вставки выявила латентный дефект: триггеры линейных подтипов из
+`sql/055_subtype_views.sql` вызывали `net.reclass_line(bigint, text)`,
+которой в живой БД не было (существовали только `reclass_node` и
+`reclass_object`). INSERT в `net.v_pressregulators` и любой другой
+линейный подтип падал с «function net.reclass_line does not exist» —
+карточки регуляторов/насосов/шиберов на запись были сломаны.
+
+`sql/180_itp_write.sql`:
+* `net.reclass_line` — симметрично `reclass_node`, по `net.line_reg`:
+  перенос строки между классовыми таблицами с копированием общих колонок.
+* INSTEAD OF INSERT/UPDATE/DELETE на пять представлений шага 65
+  (`v_bypass`, `v_consumptregulators`, `v_pressdropregulators`,
+  `v_regularmatures`, `v_reversevalves`) по образцу `v_pressregulators`:
+  INSERT — reclass в класс + UPDATE атрибутов, DELETE — снятие типа в
+  `line_plain` (объект не удаляется).
+
+Тест `test_itp_write.sql`: reclass туда-обратно, INSERT/UPDATE/DELETE
+через `v_bypass`, ранее мёртвый путь `v_pressregulators`,
+`v_consumptregulators`, `v_reversevalves` — OK. `sql/tests` — 27/27.
+
+## Шаг 70: фрагменты-копии — диагноз снят, это исходные данные
+
+В очереди висело «фрагменты без строки в `fragments` (80, 91, …)».
+Строки уже были восстановлены ранее («Фрагмент 80 (восстановлен
+автоматически)»), поэтому проверили, считается ли теперь sety.
+
+Прогоны CLI `getDoIt` (`tools/_calc_copy_probe.py`):
+* фр. 76 (копия): «Не задана нагрузка ГВ [РС1-4 пэу5/12-2]»;
+* фр. 72 (оригинал семьи, ЗЭР): «Не задана нагрузка ГВ [РС1-7 пэу17*]»
+  (`read_vnutr.py:410`, элемент t=46 рециркуляции с нулевыми расходами);
+* фр. 91 (оригинал своей семьи): «Не указан Источник тепла в Расчетных
+  схемах» (`check_ec_hs.py:60`, список 6-8, 9-9, К1-1…К1-6) + та же ГВ.
+
+A/B-контроль: тот же прогон на **исходной `almatygid`** для фр. 72 дал
+идентичную ошибку (`tools/_sety_almatygid_72_stdout.txt`). Значит схемы
+никогда не считались — это незаполненность исходных данных (нагрузки ГВ
+во внутренних схемах, коды источников), а не дефект миграции. Правится
+оператором в gid8, после чего расчёт пойдёт по уже проверенному контуру.
+
+Топология фрагментов-копий полная (76: 2 972 узла / 6 846 линий во всех
+классах; 91: 1 419 / 3 771).
+
+## Шаг 71: фр. 1 — крах check_GG устранён, расхождение со старой БД объяснено
+
+Регрессия дня: `tgid_gis` фр. 1 стала падать `StopIteration` в
+`check_ist3.check_GG` (`src_max = next(iter(src))` на пустом множестве),
+хотя 29.07 та же схема считалась, а `almatygid` считается по-прежнему.
+
+**Расследование по слоям** (пробы `tools/_inputs_diff_probe.py`,
+`_dict_diff_probe.py`, `_log_diff_probe.py`):
+
+1. **Все прямые входы идентичны**: узлы/линии карты (2028/1997),
+   все классы подтипов (насосы, регуляторы, потребители, участки),
+   словари `ref.*` (varCoefficients, specExpends, calcTemperatures,
+   externalCodes, deployedtempgraphs, standardpumps/tubes…),
+   параметры источников и узлы с заданным напором — 0 расхождений.
+2. **Первый гидравлический проход сходится 1:1** до 16-й итерации
+   (расхождение d < 1e-5 относительное) — ядро и данные эквивалентны.
+3. Расхождение входит **между проходами**: в `check_GG` выбор источника
+   для перевода поддерева зависел от `next(iter(src))` (порядок множества
+   = порядок хешей = порядок физических строк БД) и от argmax с нестрогим
+   порядком обхода. На `tgid_gis` максимальным по расходу оказалось ребро
+   с пустым `src` (у узлов '2-46' и '2КИР-4' — расходы 58.8 и 75.5 т/ч
+   при нулевой атрибуции) → раньше это был крах, на старой БД порядок
+   строк «везло» и ребро с пустым src в максимум не попадало.
+4. Отдельный механизм дрейфа: движок пишет расчётные поля обратно в
+   карточки потребителей (`net.consumer_real/general`), поэтому следующий
+   расчёт читает результат предыдущего — результаты зависят от истории
+   расчётов БД (у tgid_gis свои расчёты 155–160, у almatygid только
+   эталонные). Узел 1747 ('Айтеке Б,80/1') — показательный: tg=0 против
+   131.6 между соседними прогонами.
+
+**Исправлено в `check_ist3.py`**:
+* пустой `src` на максимальном ребре больше не роняет расчёт —
+  `set_descendant` пропускается с диагностикой в лог (имя узла, ребро,
+  расход);
+* `next(iter(src))` заменён на `min(src)` — детерминированный выбор
+  источника, не зависящий от порядка строк и хешей. Остальные
+  `next(iter(...))` в движке проверены и безопасны (все под защитой
+  проверок непустоты).
+
+**Проверка**:
+* `run_calc.ps1 -Compare -Fragment 1` — оба расчёта exit 0, строки во всех
+  `*_OUT` совпадают (4592/3459/956/34/61);
+* детерминизм `tgid_gis`: calc 159 против 160 — `us/ut/ns/rs_out`
+  идентичны полностью, в `pt_out` 1 строка (узел 1747, write-back дрейф).
+
+**Вывод**: бит-в-бит паритет с `almatygid` для фр. 1 недостижим и не нужен:
+расчёт зависит от истории расчётов самой БД (write-back в потребителей,
+узлы с заданным напором от последнего расчёта магистрали), а атрибуция
+источников исторически порядок-зависима. Эталон дальше —
+самосогласованность `tgid_gis` (детерминизм подтверждён), а не побайтовое
+равенство со старой БД.
+
+## Шаг 72: блок «Карта и навигация» — 16/16 команд закрыты
+
+Решение заказчика от 2026-08-02: все 335 команд интерфейса — `required`,
+перенос по блокам сверху вниз (`docs/12`, матрица `function-matrix.canvas.tsx`).
+Первый по порядку незакрытый блок — «Карта и навигация».
+
+Инвентаризация блока показала: 11 команд — чистый UI без обращений к БД
+(`aFon`, `aFont`, `aFont2`, `aFontMag`, `aFontPanel`, `aMasPodpis`,
+`aMasall`, `aMasshtab`, `aNavigator`, `aFindcoordDeg`, `aZoom` — режим
+рамки-масштаба через `regimGroup`, тело слота не требуется), `aMapSearch`
+закрыт шагом 16. Четыре команды были пустыми заглушками в
+`gidrSlot.cpp` и перенесены из gid6:
+
+* `onFindKti` (aFindKti, «По коэффициенту тепловых испытаний») — выбор
+  коэффициента из `heatpipesections`, выделение линий через
+  `vyd_lines`. A/B: `almatygid` 5982 линии (k=1.0, фр. 1–3), `tgid_gis`
+  5979 — разница ровно 3 линии (10196–10198), все три учтены в
+  `net.line_orphan` (известный пробел шага 27, геометрия не
+  восстановлена). Ошибки миграции нет.
+* `onFindTuIst` (aFindTuIst, «ТУ по источнику») — выбор источника из
+  `tehnicheskie_usloviya` (схема `doc`), маркировка зданий слоя
+  `zdaniya_tu` (схема `addr`) и переход к их охвату. A/B: 72 источника
+  1:1, выборка зданий совпадает. Таблицы резолвятся через `search_path`
+  gid8 (`addr`, `doc` уже входят, см. `db.cpp`).
+* `onColorOnlyPts` (aColorOnlyPts) — переключение флага
+  `m_isOnlyPTSColor` (используется отрисовкой в `gidr_draw.cpp`) +
+  `repaint()`.
+* `onHelpFinder` (aHelpFinder, F1) — открытие `help/index.html` /
+  `gid8.chm` / `gid8.pdf` рядом с исполняемым файлом; при отсутствии —
+  сообщение. Контента справки в обоих проектах нет и не было.
+
+Замечание по данным: в `heatpipesections` фактически одно значение
+коэффициента (1.0) в обеих БД — команда работоспособна, но выбор
+тривиален до появления реальных КТИ в данных.
+
+## Шаг 73: блок «Гидравлические расчёты» — 15/15 команд закрыты
+
+Инвентаризация блока: `aDoIt` закрыт шагами 67–71; `aDoItDr`,
+`aDoItList`, `aDoItListDr` используют ту же проверенную машинерию
+запуска (`getDoItList*` + `run_bat`/`main_window->start`);
+`aRasprMag`, `aSetTr`, `aSetOpenGvsT`, `aSetKodRs`, `aSavePjezo`,
+`aPjezo`, `aListPjezo` уже реализованы в gid8 — для них выполнена
+A/B-проверка SQL и наличия таблиц:
+
+* `onRasprMag` (externalCodes+fragments+heatSources+objectTypes):
+  24 строки, содержимое 1:1 со старой БД;
+* `savePjezo` пишет в `directions`/`deployedDirections` — таблицы
+  есть в `ref`;
+* экспорт гидравлики: `us_out`/`ut_out` последнего расчёта фр. 1 —
+  4592/3459 строк в обеих БД (свои calc id: 35 против 161 — истории
+  расчётов разные, это ожидаемо);
+* колонки `calc.calculation`/`us_out`/`ut_out` идентичны старой БД
+  (включая `calculationid`, `fileid`) — legacy SQL работает через
+  `search_path` без изменений.
+
+Четыре команды были пустыми заглушками и реализованы:
+
+* `onClearOut` (aClearOut) — перенос из gid6: права администратора +
+  `DELETE FROM calculation`, оставляющий последний расчёт каждой пары
+  фрагмент/пользователь. FK-каскадов на `calc.calculation` нет ни в
+  одной из БД — поведение паритетное (дочерние `*_out` чистятся как в
+  legacy, отдельных сирот не создаём: тот же SQL, та же семантика).
+* `onRasList` (aRasList) — вместо MFC-дерева `CCalcTree`: таблица
+  `calc.calculation` + имя фрагмента через `DbWindow` (идиома gid8).
+* `onInfoGid` (aInfoGid) — реализован `GidWidget::info_gid(CFPoint)`
+  (в `GidWidget.h` был inline-стаб, карточка никогда не открывалась):
+  поиск узла/линии в точке и диспетчер на `info_gid(db,…)`, как в
+  контекстном меню (`viewNodeCalc`/`viewLineCalc`); режим карты
+  `aInfoGid` в `gidr_find.cpp` уже был подключён.
+* `onExport` (aExport, «Экспорт гидравлики в TXT») — в gid6 объявлен,
+  но никогда не был реализован (нет тела и привязки к сообщениям).
+  Реализован заново по названию: последний расчёт активного фрагмента,
+  дамп `us_out` + `ut_out` (tab-separated, с заголовками колонок) в
+  выбранный TXT и открытие файла.
+
+## Шаг 74: рассинхрон деревьев gid8 устранён + блок 4 «Запросы и отчёты» (часть 1)
+
+**Найден дефект процесса**: работа шагов 65–73 шла в корневой копии
+`gid8/` (отдельный git-репозиторий, база «qgis 4» от 24.06), а все
+сборки (`gid8-net-direct`, `gid8-tgid-gis-*`) и коммиты шагов 59–64 —
+в каноническом дереве `tgid_gis/gid8/gid8`. Деревья разошлись в
+противоположных направлениях: в корневой копии не было шагов 59–64
+(прямой `net.v_*`), в каноне — шагов 65–73. Проверка хэшей 12 ключевых
+файлов: 11 различаются.
+
+**Устранение**: `git apply --3way` не сошёлся (разные базы +
+uncommitted-изменения в каноне), перенос выполнен вручную по патчу
+`tools/_steps65_73.patch` (9 файлов, +411/−11): блоки 2–3 шагов 72–73
+и блок 4 (ниже). Защита `isFragmentList` + `SET search_path` в каноне
+уже присутствовала (шаги 70–71 были перенесены ранее). Сборка
+`gid8-tgid-gis-20260802` после переноса успешна; отдельно решена
+проблема окружения: `CMakeLists.txt:229` жёстко ссылается на
+`C:/cpp/proj-9.4.1/src` — создан с заглушкой `H:\cpp\stub_include\proj.h`
+(`proj_coord.cpp` использует Boost.Geometry, реальный PROJ не нужен).
+Коммит `6cbf27eb`.
+
+**Блок 4 (продолжение шагов 17, 21–27)**: A/B-проверка SQL
+(`tools/_block4_probe.py`): `zap2/zap7/zap71` — расхождение сумм
+объяснено составом `fragments` (конвертер восстановил фрагменты,
+которых не было в `almatygid`, `tools/_frag_probe.py`); `zapNezak`,
+`zapVnCx` (find_node_vn.sql), `us_big8/ut_big8` (onPtsTable) — 1:1.
+Реализованы заглушки:
+
+* `onTableDan` (aTableDan) — редактор таблиц: список из
+  `information_schema.tables` по рабочим схемам, `DbWindow` с
+  `setEdit(true)`.
+* `onTuTableNeiz` (aTuTableNeiz) — ТУ без привязки к зданиям
+  (`zdanie IS NULL` или битая ссылка; A/B: 177 ≡ 177).
+* `onTuIst` (aTuIst) — отчёт по источникам, порт `tu/1.sql`
+  (A/B 1:1 по 6 источникам, суммы нагрузок совпадают).
+* `print_tu_itog` (aTuExcel) — год из диалога (был захардкожен 2011),
+  убран `limit 100`, добавлена колонка ГВС средняя = макс/coef,
+  исправлено имя колонки «Пар» → «Присоединенная мощность Пар».
+
+## Шаг 75: onCreateSortNode — блок 4 закрыт (34/34)
+
+Последний стаб блока. Перенесён из gid6 `temp.cpp` в новый файл
+`gidview/sort_node.cpp`:
+
+* `sortNodeDb` — для каждого участка МС/РС (ops.uchastok_ms 60 /
+  uchastok_rs 34) граф обрезается (`vydMS`/`vydRS` +
+  `copyVydGraph_new`), сортируется (`sort_line_rs_new`), порядок
+  строгих узлов ПС пишется в `ops.sortnodesforuchastok`;
+* `insertSortLinesToDb2` — «большие линии» (подача/обратка между
+  строгими узлами) в `ops.sortlinesforuchastok` (orderID,
+  pipeSectionID, lineID, nodeID1/2, totalLength, fileID, участок);
+* `isPS` портирован как `isPS_sort` (в `db/temp.cpp` живёт заглушка
+  `isPSstrict()==true` для `create_vyd_node_table0_BIG` — не тронута);
+* `get_first_last`, `copy_ut`, `BigLine` — 1:1 из gid6;
+* `isPjezo` сохраняется/восстанавливается (`save_pjezo`/
+  `restore_pjezo`), прогресс `QProgressDialog`, вход — только
+  администратор, подтверждение перед перестроением.
+
+Отличия от gid6 продиктованы новой моделью «одна таблица — один
+объект»: legacy `pipeSections` мёртв (`attic`, `compat.pipesections` —
+read-only view), поэтому ветка «pipeSectionID==0 → INSERT INTO
+pipeSections + UPDATE heatPipeSections» убрана — в новой модели
+`pipesectionid` системный (= id heatpipesection), при нуле в
+`sortlinesforuchastok` пишется NULL. `copyPTS` (апдейт legacy
+pipeSections) и `DELETE FROM iznos` (attic-пустая) не переносились.
+`map_big`/`set_map_big` в gid6 пусты — опущены.
+
+Сборка успешна (коммит `411823cd`). Целевые таблицы до запуска пустые
+(0 строк) — заполнение проверяется запуском команды из приложения.
