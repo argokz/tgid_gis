@@ -8,9 +8,6 @@
 #include <db/db.h>
 
 
-QString br_text(const QString & txt);
-
-
 bool edit(QSqlDatabase &db, QWidget *window, const QString & tn, int n);
 
 bool CCxema::info(CFPoint point, double delta, QWidget *window)
@@ -28,7 +25,7 @@ bool CCxema::info(CFPoint point, double delta, QWidget *window)
         tn = "nodes";
 
         if (edit(m_db, window, tn, n)) {
-            if (query_exec(m_db, query, QString("SELECT * FROM %1 WHERE id=%2").arg(br_text(tn)).arg(n))) {
+            if (query_exec(m_db, query, QString("SELECT * FROM %1 WHERE id=%2").arg(tbl_sql(tn)).arg(n))) {
                 QSqlRecord record = query.record();
 //        init_PT(record);
                 if (query.next()) {
@@ -47,7 +44,7 @@ bool CCxema::info(CFPoint point, double delta, QWidget *window)
         tn = "linesobj";
 
         if (edit(m_db, window, tn, n)) {
-            if (query_exec(m_db, query, QString("SELECT * FROM %1 WHERE id=%2").arg(br_text(tn)).arg(n))) {
+            if (query_exec(m_db, query, QString("SELECT * FROM %1 WHERE id=%2").arg(tbl_sql(tn)).arg(n))) {
 
                 QSqlRecord record = query.record();
                 if (query.next()) {

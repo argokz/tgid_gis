@@ -475,7 +475,7 @@ bool GidWidget::moveLineEnd(CNode2 *n1, CNode2 *node, CLINE2 *line)
 
 
     if (swap) {
-        str = QString("UPDATE linesobj SET nodeID2=%1 WHERE (ID=%2 OR ID=%3)")
+        str = QString("UPDATE net.v_linesobj SET nodeID2=%1 WHERE (ID=%2 OR ID=%3)")
                   .arg(node->id).arg(l->line.nomP).arg(l->line.nomO);
     }
     else {
@@ -483,7 +483,7 @@ bool GidWidget::moveLineEnd(CNode2 *n1, CNode2 *node, CLINE2 *line)
 //            if (where(line)->node.nomP);
 //        }
 
-        str = QString("UPDATE linesobj SET nodeID1=%1 WHERE (ID=%2 OR ID=%3)")
+        str = QString("UPDATE net.v_linesobj SET nodeID1=%1 WHERE (ID=%2 OR ID=%3)")
           .arg(node->id).arg(l->line.nomP).arg(l->line.nomO);
     }
 

@@ -206,13 +206,18 @@ BEGIN
             shared_node, connected_count;
     END IF;
 
+    -- pipesectionid / id_old — суррогатные поля паспорта (шаг 173):
+    -- BEFORE INSERT ставит pipesectionid = id, id_old по умолчанию 0.
+    -- Это не бизнес-атрибуты участка; сравнивать/копировать их нельзя,
+    -- иначе два свежих участка никогда не соединятся.
     EXECUTE format(
         'SELECT (to_jsonb(a) - ARRAY[
                     ''id'', ''geom'', ''node_from'', ''node_to'',
                     ''node_from_src'', ''node_to_src'', ''fileid_src'',
                     ''src_id'', ''subtype_src_id'', ''removed_at'',
                     ''row_version'', ''updated_at'', ''updated_by'',
-                    ''coords_legacy'', ''pipesectlength''
+                    ''coords_legacy'', ''pipesectlength'',
+                    ''pipesectionid'', ''id_old''
                 ]::text[])
                 =
                 (to_jsonb(b) - ARRAY[
@@ -220,7 +225,8 @@ BEGIN
                     ''node_from_src'', ''node_to_src'', ''fileid_src'',
                     ''src_id'', ''subtype_src_id'', ''removed_at'',
                     ''row_version'', ''updated_at'', ''updated_by'',
-                    ''coords_legacy'', ''pipesectlength''
+                    ''coords_legacy'', ''pipesectlength'',
+                    ''pipesectionid'', ''id_old''
                 ]::text[])
            FROM net.%1$I a, net.%1$I b
           WHERE a.id = $1 AND b.id = $2', p_table)
@@ -287,7 +293,8 @@ BEGIN
            'node_from_src', 'node_to_src', 'fileid_src',
            'src_id', 'subtype_src_id', 'removed_at',
            'row_version', 'updated_at', 'updated_by',
-           'coords_legacy', 'pipesectlength'
+           'coords_legacy', 'pipesectlength',
+           'pipesectionid', 'id_old'
        );
     IF copy_columns IS NULL THEN
         RAISE EXCEPTION 'Не найдены копируемые поля net.%', p_table;

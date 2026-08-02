@@ -152,7 +152,9 @@ BEGIN
        AND a.attnum > 0 AND NOT a.attisdropped
        AND a.attname NOT IN (
            'id', 'geom', 'removed_at', 'row_version',
-           'updated_at', 'updated_by', 'src_id', 'subtype_src_id')
+           'updated_at', 'updated_by', 'src_id', 'subtype_src_id',
+           -- суррогаты паспорта pipe_section (шаг 173); не бизнес-поля
+           'pipesectionid', 'id_old')
        AND NOT EXISTS (
            SELECT 1 FROM pg_attribute b
             WHERE b.attrelid = format('net.%I', p_target)::regclass

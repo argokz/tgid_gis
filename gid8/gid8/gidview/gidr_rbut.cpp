@@ -173,7 +173,7 @@ bool delCxema1(CCxema *m_cxema, const CNode2 *node, int m_user)
 
         change_group_start(m_cxema->m_db, "Удаление внутренней схемы");
 
-        q = QString("UPDATE nodes SET removed=1, idRemoved=%1, operatorID=%3, archiveChangeDate=%4, sync_tgid=true WHERE internalNodeID=%2")
+        q = QString("UPDATE net.v_nodes SET removed=1, idRemoved=%1, operatorID=%3, archiveChangeDate=%4, sync_tgid=true WHERE internalNodeID=%2")
             .arg(idRem).arg(node->id)
             .arg(m_user)
             .arg(get_now());
@@ -189,7 +189,7 @@ bool delCxema1(CCxema *m_cxema, const CNode2 *node, int m_user)
 
   //          idRem = addRemoved(m_cxema->m_ado, CH_T_DELETE_LINE, node->id, "");
             
-            q = QString("UPDATE linesobj SET removed=1, idRemoved=%1, operatorID=%3, archiveChangeDate=%4, sync_tgid=true WHERE nodeID1 in (SELECT id FROM net.v_nodes WHERE internalNodeID=%2)")
+            q = QString("UPDATE net.v_linesobj SET removed=1, idRemoved=%1, operatorID=%3, archiveChangeDate=%4, sync_tgid=true WHERE nodeID1 in (SELECT id FROM net.v_nodes WHERE internalNodeID=%2)")
                 .arg(idRem).arg(node->id)
                 .arg(m_user)
                 .arg(get_now());
@@ -409,7 +409,7 @@ void GidWidget::delUP()
             if (n->node.nUP != -1) {
                 if (QMessageBox::question(this,  "", tr("Удалить узел подпитки?")) == QMessageBox::Yes) {
 
-                    QString q = QString("DELETE FROM %1 WHERE nodeID=%2").arg("refillNodes").arg(n->id);
+                    QString q = QString("DELETE FROM %1 WHERE nodeID=%2").arg(tbl_sql("refillNodes")).arg(n->id);
 
                     QSqlQuery query(m_cxema.m_db);
 
@@ -438,7 +438,7 @@ void GidWidget::delZN()
             if (n->node.nZN != -1) {
                 if (QMessageBox::question(this,  "", tr("Удалить узел с заданным напором?")) == QMessageBox::Yes) {
 
-                    QString q = QString("DELETE FROM %1 WHERE nodeID=%2").arg("setPressNodes").arg(n->id);
+                    QString q = QString("DELETE FROM %1 WHERE nodeID=%2").arg(tbl_sql("setPressNodes")).arg(n->id);
 
                     QSqlQuery query(m_cxema.m_db);
 
@@ -674,7 +674,7 @@ void GidWidget::onPrAccepted()
                 if (col != "") {
                     int sost = dlg->getIndex("sost");
                     if (sost == 1 || sost == 2) {
-                        QString q = QString("UPDATE realConsumers SET %1=%2 WHERE nodeID=%3").arg(col).arg(sost).arg(pr_id);
+                        QString q = QString("UPDATE net.v_realconsumers SET %1=%2 WHERE nodeID=%3").arg(col).arg(sost).arg(pr_id);
 
                         if (query_exec(m_cxema.m_db, q)) {
                             l->line.pod.isOtkl = (sost == 2);
@@ -690,7 +690,7 @@ void GidWidget::onPrAccepted()
                 QString col = mesto_col(mesto);
                 if (col != "") {
                     double diam = dlg->getValue("diam").toDouble();
-                    QString q = QString("UPDATE realConsumers SET %1=%2 WHERE nodeID=%3").arg(col).arg(diam).arg(pr_id);
+                    QString q = QString("UPDATE net.v_realconsumers SET %1=%2 WHERE nodeID=%3").arg(col).arg(diam).arg(pr_id);
 
                     if (query_exec(m_cxema.m_db, q)) {
                         l->line.pod.diam = diam;
@@ -910,12 +910,12 @@ bool GidWidget::setState(CLINE2 *line, int state)
     QString q;
 
     if (l->line.typ == TIP_UT) {
-        q = QString("UPDATE %1 SET pipeSectStateIDflow=%2, pipeSectStateIDret=%3 WHERE ID=%4 OR ID=%5").arg(l->getTableMySQL()).arg(state).arg(state).arg(l->line.idP2).arg(l->line.idO2);
+        q = QString("UPDATE %1 SET pipeSectStateIDflow=%2, pipeSectStateIDret=%3 WHERE ID=%4 OR ID=%5").arg(tbl_sql(l->getTableMySQL())).arg(state).arg(state).arg(l->line.idP2).arg(l->line.idO2);
     }
     else {
         QString otkr = getLineOtkr(l->line.typ);
         if (otkr != "") {
-            q = QString("UPDATE %1 SET %2=%3 WHERE ID=%4 OR ID=%5").arg(l->getTableMySQL()).arg(otkr).arg(state).arg(l->line.idP2).arg(l->line.idO2);
+            q = QString("UPDATE %1 SET %2=%3 WHERE ID=%4 OR ID=%5").arg(tbl_sql(l->getTableMySQL())).arg(otkr).arg(state).arg(l->line.idP2).arg(l->line.idO2);
         }
     }
 
@@ -948,7 +948,7 @@ void GidWidget::closeLineVnutr(CLINE2 *ll)
         QString col = mesto_col(mesto);
         if (col != "") {
             int sost = l->line.pod.isOtkl ? 1 : 2;
-            QString q = QString("UPDATE realConsumers SET %1=%2 WHERE nodeID=%3").arg(col).arg(sost).arg(pr_id);
+            QString q = QString("UPDATE net.v_realconsumers SET %1=%2 WHERE nodeID=%3").arg(col).arg(sost).arg(pr_id);
 
             if (query_exec(m_cxema.m_db, q)) {
                 l->line.pod.isOtkl = (sost == 2);

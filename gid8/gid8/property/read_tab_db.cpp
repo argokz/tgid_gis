@@ -290,7 +290,7 @@ void get_3_param(QSqlDatabase & db, const QString & tn, const QString & table_fi
 
                         
                         joins += QString("LEFT JOIN %1 %2%3 ON %4%5.%6 = %7.%8\n")
-                                     .arg(br_text(ft->table)).arg(prefix).arg(ii).arg(prefix).arg(ii).arg(ft->id).arg(prefix, c);
+                                     .arg(tbl_sql(ft->table)).arg(prefix).arg(ii).arg(prefix).arg(ii).arg(ft->id).arg(prefix, c);
                     }
                     else {
                         QString ftq = ft->q;
@@ -344,7 +344,7 @@ QString create_select(QSqlDatabase & db, const QString & tn, const QString & s_s
 
     get_3_param(db, tn, tn, "T", i, par1, par2, joins, filtr, true, false, s_shape, s_id);
 
-    QString q = QString("SELECT T.%1,%2\n%3\nFROM %4 T\n%5").arg(s_id, par1, par2, br_text(tn), joins);
+    QString q = QString("SELECT T.%1,%2\n%3\nFROM %4 T\n%5").arg(s_id, par1, par2, tbl_sql(tn), joins);
     return q;
 }
 
@@ -379,7 +379,7 @@ QString create_select_node(QSqlDatabase & db, const QString & tn)
     filtr.clear();
     get_3_param(db, tn, tn, "T", i, par1, par2, joins, filtr, true, false, "shape", "id");
 
-    QString q = QString("SELECT T.id,n.id as N_ID,%1\n%2\nFROM %3 T\n%4").arg(par1, par2, br_text(tn), joins);
+    QString q = QString("SELECT T.id,n.id as N_ID,%1\n%2\nFROM %3 T\n%4").arg(par1, par2, tbl_sql(tn), joins);
     return q;
 }
 
@@ -423,7 +423,7 @@ QString create_select_line(QSqlDatabase & db, const QString & tn, const QString 
 
     get_3_param(db, tn, table_file, "T", i, par1, par2, joins, filtr_l, true, false, "shape", "id");
 
-    QString q = QString("SELECT T.id,%1\n%2\nFROM %3 T\n%4").arg(par1, par2, br_text(tn), joins);
+    QString q = QString("SELECT T.id,%1\n%2\nFROM %3 T\n%4").arg(par1, par2, tbl_sql(tn), joins);
 
     return q;
 }
@@ -469,6 +469,6 @@ QString create_select_rus(QSqlDatabase & db, const QString & tn, const QString &
 
     get_3_param(db, tn, tn, "T", i, par1, par2, joins, filtr, false, true, s_shape, s_id);
 
-    QString q = QString("SELECT T.%1,%2\n%3\nFROM %4 T\n%5").arg(s_id, par1, par2, br_text(tn), joins);
+    QString q = QString("SELECT T.%1,%2\n%3\nFROM %4 T\n%5").arg(s_id, par1, par2, tbl_sql(tn), joins);
     return q;
 }

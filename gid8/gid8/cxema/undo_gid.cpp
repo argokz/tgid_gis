@@ -132,7 +132,7 @@ bool undo_move_node(QSqlDatabase &db, ChangedObject &co, int &fileID)
         }
     }
 
-    q = QString("UPDATE nodes SET x=%1, y=%2 WHERE id=%3").arg(x).arg(y).arg(co.changedID);
+    q = QString("UPDATE net.v_nodes SET x=%1, y=%2 WHERE id=%3").arg(x).arg(y).arg(co.changedID);
 
     bool ret = query_exec(db, query, q);
     if (ret) {
@@ -170,7 +170,7 @@ bool undo_move_line(QSqlDatabase &db, ChangedObject &co, int &fileID)
         }
     }
 
-    q = QString("UPDATE linesobj SET coords='%1' WHERE id=%2").arg(co.text).arg(co.changedID);
+    q = QString("UPDATE net.v_linesobj SET coords='%1' WHERE id=%2").arg(co.text).arg(co.changedID);
 
     bool ret = query_exec(db, query, q);
 
@@ -219,7 +219,7 @@ bool undo_move_line_geo(QSqlDatabase &db, ChangedObject &co, int &fileID)
 
     text = cl.saveStr();
 
-    q = QString("UPDATE linesobj SET coords='%1' WHERE id=%2").arg(co.text).arg(co.changedID);
+    q = QString("UPDATE net.v_linesobj SET coords='%1' WHERE id=%2").arg(co.text).arg(co.changedID);
 
     bool ret = query_exec(db, query, q);
 
@@ -259,7 +259,7 @@ bool undo_node(QSqlDatabase &db, ChangedObject &co, int &fileID)
         return false;
     }
 
-    q = QString("UPDATE nodes SET removed=0, idRemoved=NULL WHERE idRemoved=%1").arg(co.id);
+    q = QString("UPDATE net.v_nodes SET removed=0, idRemoved=NULL WHERE idRemoved=%1").arg(co.id);
 
     bool ret = query_exec(db, query, q);
     if (ret) {
@@ -309,7 +309,7 @@ bool undo_line(QSqlDatabase &db, ChangedObject &co, int &fileID)
     }
     if (quit) return false;
 
-    q = QString("UPDATE linesobj SET removed=0, idRemoved=NULL WHERE idRemoved=%1").arg(co.id);
+    q = QString("UPDATE net.v_linesobj SET removed=0, idRemoved=NULL WHERE idRemoved=%1").arg(co.id);
 
     bool ret = query_exec(db, query, q);
     if (ret) {

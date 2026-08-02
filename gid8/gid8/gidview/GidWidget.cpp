@@ -1011,7 +1011,7 @@ bool GidWidget::setCoord(CLINE2 *line, CCoordList &cl)
     std::string wkt = toWKTLineString(line);
 
 //    QString q = QString("UPDATE linesobj SET coords='%1', shape=%2 WHERE ID=%3 OR ID=%4").arg(coord, shape).arg(l->line.nomP).arg(l->line.nomO);
-    QString q = QString("UPDATE linesobj SET coords='%1', shape=%2, operatorID=%5, archiveChangeDate=%6, sync_tgid=true WHERE ID=%3 OR ID=%4")
+    QString q = QString("UPDATE net.v_linesobj SET coords='%1', shape=%2, operatorID=%5, archiveChangeDate=%6, sync_tgid=true WHERE ID=%3 OR ID=%4")
         .arg(coord, shape).arg(l->line.nomP).arg(l->line.nomO)
         .arg(m_user)
         .arg(get_now());
@@ -1248,7 +1248,7 @@ bool GidWidget::setCoord1(CLINE2 *line, CCoordList &cl)
     int idP2 = l->line.idP2;
     int idO2 = l->line.idO2;
 
-    QString q = QString("UPDATE linesobj SET externalSignLineID=2 WHERE id=%1").arg(nomP);
+    QString q = QString("UPDATE net.v_linesobj SET externalSignLineID=2 WHERE id=%1").arg(nomP);
 
     bool ret = query_exec(m_cxema.m_db, q);
 
@@ -1268,7 +1268,7 @@ bool GidWidget::setCoord1(CLINE2 *line, CCoordList &cl)
         else {
             QString shape = shape_text(where(line), other(line), cl);
 
-            q = QString("UPDATE linesobj SET externalSignLineID=3, coords='%1', shape=%2 WHERE id=%3").arg(coord, shape).arg(nomO);
+            q = QString("UPDATE net.v_linesobj SET externalSignLineID=3, coords='%1', shape=%2 WHERE id=%3").arg(coord, shape).arg(nomO);
             bool ret = query_exec(m_cxema.m_db, q);
 
 //            reset_shape_line(ado, nomO);

@@ -12,9 +12,6 @@
 #include <db/db.h>
 
 
-QString br_text(const QString & txt);
-
-
 static QMap<QString, EditItem> map_item;
 //static QMap<QString, QMap<QString, EditItem > > map_item2;
 
@@ -133,7 +130,7 @@ bool edit_q(QSqlDatabase &db, QWidget *window, const QString & tn, const QString
 //
 //  QMessageBox::warning(0, QObject::tr("!"), QString("SELECT * FROM [%1] WHERE %2").arg(tn, q));
 
-  if (!query_exec(db, query, QString("SELECT * FROM %1 WHERE %2").arg(br_text(tn), q))) {
+  if (!query_exec(db, query, QString("SELECT * FROM %1 WHERE %2").arg(tbl_sql(tn), q))) {
     QMessageBox::warning(0, QObject::tr("!"), q);
     return false;
   }
@@ -221,7 +218,7 @@ bool edit_q(QSqlDatabase &db, QWidget *window, const QString & tn, const QString
         q1 = q1.left(q1.size()-1);
 
         q0 = QString("UPDATE %1 SET %2 WHERE %3")
-         .arg(br_text(tn)).arg(q1).arg(q);
+         .arg(tbl_sql(tn)).arg(q1).arg(q);
 
         if (query_exec(db, query, q0)) {
           return true;

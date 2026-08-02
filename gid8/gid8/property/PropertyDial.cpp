@@ -2275,7 +2275,7 @@ bool update_db_2(QSqlDatabase & db, const QString table0, int id, std::map<QStri
 
     QString node_line = "linesobj";
 
-    QString q = QString("UPDATE %1 SET %2 WHERE %3_id=%4").arg(br_text(table), s_set).arg(node_line).arg(id);
+    QString q = QString("UPDATE %1 SET %2 WHERE %3_id=%4").arg(tbl_sql(table), s_set).arg(node_line).arg(id);
     query.prepare(q);
 
     for (auto &it1: map_edited) {
@@ -2377,7 +2377,7 @@ bool update_db(std::map<QString, std::map<int, std::map<QString, PropertyStr> > 
             }
 
 
-            QString q = QString("UPDATE %1 SET %2 WHERE id=%3").arg(br_text(table), s_set).arg(id);
+            QString q = QString("UPDATE %1 SET %2 WHERE id=%3").arg(tbl_sql(table), s_set).arg(id);
             query.prepare(q);
             for (auto &it3: it2.second) {
                 QString col = it3.first;

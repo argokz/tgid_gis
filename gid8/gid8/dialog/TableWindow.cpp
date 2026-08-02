@@ -73,7 +73,7 @@ TableWindow::TableWindow(QSqlDatabase &db, const QString & tn, const QString & t
         que = QString("SELECT * FROM (\n%1\n) __").arg(que);
     }
     else {
-        que = QString("SELECT * FROM %1").arg(br_text(tn));
+        que = QString("SELECT * FROM %1").arg(tbl_sql(tn));
     }
 
     qDebug() << que;

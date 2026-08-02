@@ -517,7 +517,7 @@ QString getGeoSelect(Klassif *kls, CGraph2 *graph)
             if (ft) {
                 QString join;
                 join = QString("\nLEFT JOIN %1 T%2 ON T%3.id=T0.%4")
-                    .arg(br_text(ft->table)).arg(n_join).arg(n_join).arg(br_text(s_col));
+                    .arg(tbl_sql(ft->table)).arg(n_join).arg(n_join).arg(br_text(s_col));
                 joins += join;
                 s_col = QString("T%1.%2").arg(n_join).arg(ft->name);
                 n_join += 1;
@@ -589,7 +589,7 @@ QString getGeoSelect(Klassif *kls, CGraph2 *graph)
     }
 */
 
-    QString q = QString("SELECT %1 %2\nFROM %3 T0%4\nWHERE %5").arg(top100000(), par, br_text(tn), joins, dt);
+    QString q = QString("SELECT %1 %2\nFROM %3 T0%4\nWHERE %5").arg(top100000(), par, tbl_sql(tn), joins, dt);
 
 
     if (mark_line != "") {

@@ -344,14 +344,6 @@ QString python_exe()
     QString p = "python";
     QString pp = QString("%1/python-3.12.7-embed-amd64/python.exe").arg(argpath_local());
 
-    qDebug() << argpath_local();
-
-/*
-    if (!QFile::exists(pp)) {
-        pp = QString("%1/python/Scripts/python.exe").arg(argpath_local());
-    }
-*/
-
 #if !_WIN32
 
     pp = "/app/bin/python3.12";
@@ -360,17 +352,30 @@ QString python_exe()
         return pp;
     }
 
-    pp = QString("/opt/ItWin/venv/bin/python").arg(argpath_local());
+    pp = "/opt/ItWin/venv/bin/python";
 
     if (QFile::exists(pp)) {
         return pp;
     }
-#endif
-
-
+#else
+    // embed-пакет рядом с данными
     if (QFile::exists(pp)) {
         return QString("\"%1\"").arg(pp);
     }
+
+    // venv движка sety: рядом с exe и известный каталог разработчика
+    const QString dir = QCoreApplication::applicationDirPath();
+    const QStringList venvs = {
+        dir + "/../venv/sety/Scripts/python.exe",
+        "H:/venv/sety/Scripts/python.exe",
+    };
+    for (const QString &v : venvs) {
+        if (QFile::exists(v)) {
+            return QString("\"%1\"").arg(v);
+        }
+    }
+#endif
+
     return p;
 }
 

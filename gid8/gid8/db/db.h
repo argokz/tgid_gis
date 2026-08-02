@@ -135,6 +135,9 @@ void copy_q(QSqlDatabase &db, const QString & q);
 
 QString quot_text(const QString & txt);
 QString br_text(const QString & txt);
+// Имя отношения для подстановки в FROM/JOIN/INSERT/UPDATE/DELETE.
+// Для перенесённых сетевых типов возвращает net.v_<имя>, иначе — br_text.
+QString tbl_sql(const QString & tn);
 QString SelectTop(const QString & q);
 QString top100000();
 int get_RDMS();

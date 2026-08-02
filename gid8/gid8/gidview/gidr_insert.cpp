@@ -168,7 +168,7 @@ bool GidWidget::insertNode(CNode2 *n, CLINE2 *line, double r)
         }
     }
 
-    q = QString("UPDATE linesobj SET coords='%1', nodeID2=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n->id).arg(l->line.nomP).arg(l->line.nomO);
+    q = QString("UPDATE net.v_linesobj SET coords='%1', nodeID2=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n->id).arg(l->line.nomP).arg(l->line.nomO);
     bool ret = execQ(m_cxema.m_db, q);
 
     q = QString("UPDATE cn SET connectID=%1 FROM net.v_connectnodes cn WHERE connectID IN (%2,%3)").arg(n->id).arg(n1->id).arg(n2->id);

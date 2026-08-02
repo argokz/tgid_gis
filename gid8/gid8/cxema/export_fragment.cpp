@@ -383,7 +383,7 @@ bool export_table(QTextStream &out, QSqlDatabase & db, const QString & tn, const
 
 bool export_table_unvisual(QTextStream &out, QSqlDatabase & db, const QString & tn, int fileID, CGraph2* graph)
 {
-    QString q = QString("SELECT * FROM %1 WHERE fileID=%2").arg(br_text(tn)).arg(fileID);
+    QString q = QString("SELECT * FROM %1 WHERE fileID=%2").arg(tbl_sql(tn)).arg(fileID);
     return export_table(out, db, tn, q, "", false, graph);
 }
 
@@ -392,7 +392,7 @@ bool export_table_node(QTextStream &out, QSqlDatabase & db, const QString & tn, 
     QString q = QString(
         "SELECT obj.* FROM %1 obj\n"
         "JOIN net.v_nodes n ON n.id = obj.nodeID\n"
-        "WHERE n.fileID = %2 AND n.removed = 0").arg(br_text(tn)).arg(fileID);
+        "WHERE n.fileID = %2 AND n.removed = 0").arg(tbl_sql(tn)).arg(fileID);
 
     return export_table(out, db, tn, q, "nodeID", true, graph);
 }
@@ -404,7 +404,7 @@ bool export_table_line(QTextStream &out, QSqlDatabase & db, const QString & tn, 
         "JOIN net.v_linesobj l ON l.id = obj.lineID\n"
         "JOIN net.v_nodes n1 ON n1.id = l.nodeID1\n"
         "JOIN net.v_nodes n2 ON n2.id = l.nodeID2\n"
-        "WHERE n1.fileID = %2 AND n2.fileID = %3 AND l.removed = 0 AND n1.removed = 0 AND n2.removed = 0").arg(br_text(tn)).arg(fileID).arg(fileID);
+        "WHERE n1.fileID = %2 AND n2.fileID = %3 AND l.removed = 0 AND n1.removed = 0 AND n2.removed = 0").arg(tbl_sql(tn)).arg(fileID).arg(fileID);
 
     return export_table(out, db, tn, q, "lineID", false, graph);
 }
@@ -877,7 +877,7 @@ bool check_import(QSqlDatabase & db, const QString & tn, std::map<QString, std::
             if (cols3 != "") cols3 += " or ";
             cols3 += QString("not %1").arg(br_text(cl));
 
-            joins += QString("\nleft join %1 t%2 on t%2.id=t.%3").arg(br_text(it_l->second.table)).arg(nj).arg(c);
+            joins += QString("\nleft join %1 t%2 on t%2.id=t.%3").arg(tbl_sql(it_l->second.table)).arg(nj).arg(c);
             nj ++;
         }
     }

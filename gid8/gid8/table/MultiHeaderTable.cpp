@@ -516,7 +516,7 @@ void MultiHeaderTable::OnEdit()
 
 void MultiHeaderTable::OnAdd()
 {
-    QString q = QString("INSERT INTO %1 DEFAULT VALUES").arg(br_text(this->tn));
+    QString q = QString("INSERT INTO %1 DEFAULT VALUES").arg(tbl_sql(this->tn));
     QSqlQuery query(*this->m_db);
 
 //    int last_id = execInsertQ(*this->m_db, q);
@@ -560,7 +560,7 @@ void MultiHeaderTable::OnDelete()
 
     if (QMessageBox::question(0, "", QString("Удалить строку № %1 в таблице %2 ?").arg(this->m_id).arg(this->tn)) != QMessageBox::Yes) return;
 
-    QString q = QString("DELETE FROM %1 where id=%2").arg(br_text(this->tn)).arg(this->m_id);
+    QString q = QString("DELETE FROM %1 where id=%2").arg(tbl_sql(this->tn)).arg(this->m_id);
     QSqlQuery query(*this->m_db);
 
     if (query_exec(*this->m_db, query, q)) {
@@ -771,7 +771,7 @@ void MultiHeaderTable::onPropertyRejected()
     auto *dlg = qobject_cast<PropertyDial *>(sender());
     if (dlg) {
         if (dlg->get_autodelete()) {
-            QString q = QString("delete from %1 where id in (%2)").arg(br_text(dlg->m_table)).arg(dlg->m_id1);
+            QString q = QString("delete from %1 where id in (%2)").arg(tbl_sql(dlg->m_table)).arg(dlg->m_id1);
             query_exec(*this->m_db, q);
 
             QSortFilterSqlQueryModel *model = (QSortFilterSqlQueryModel *)mainTable->model();

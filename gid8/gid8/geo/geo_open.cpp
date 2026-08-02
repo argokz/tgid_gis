@@ -627,7 +627,7 @@ q =
         }
         else {
 */
-            tnb = br_text(kl.nazv);
+            tnb = tbl_sql(kl.nazv);
 //        }
 
         if (kl.nazv == "zdaniya_tu") {

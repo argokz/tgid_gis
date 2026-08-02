@@ -21,37 +21,36 @@ QString init_sety4()
 {
     QSettings settings;
 
-    QString path = argpath()+"sety/ww.pyc";
-    if (!QFile::exists(path)) {
-        QString dir = QCoreApplication::applicationDirPath();
-#if _WIN32
-        path = dir+"/../python/sety/sety/ww.py";
-#else
-        path = dir+"/../../../python/sety/sety/ww.py";
-#endif
+    // 1) явный выбор пользователя
+    QString path = settings.value("config/sety4", sety4).toString();
+    if (path != "" && QFile::exists(path)) {
+        return path;
     }
 
-    /*
-
-    QMessageBox::warning(this, tr(""), "Выберите активный фрагмент");
-
-    if (!QFile::exists(path)) {
-        path = settings.value("config/sety4", sety4).toString();
-
-        while (path == "" || !QFile::exists(path)) {
-            path = QFileDialog::getOpenFileName(nullptr,
-                QObject::tr("Выберите программу для расчета"), 
-                QString(), 
-                QObject::tr("Программы (*.exe *.py *.pyc)"));
-
-            if (path.isEmpty()) {
-                return path;
-            }
-            settings.setValue("config/sety4", path);
+    // 2) развёрнутый пакет рядом с данными / exe
+    const QString dir = QCoreApplication::applicationDirPath();
+    const QStringList candidates = {
+        argpath() + "sety/ww.pyc",
+#if _WIN32
+        dir + "/../python/sety/sety/ww.py",
+#else
+        dir + "/../../../python/sety/sety/ww.py",
+#endif
+        dir + "/python/sety/sety/ww.py",
+    };
+    for (const QString &cand : candidates) {
+        if (QFile::exists(cand)) {
+            return cand;
         }
     }
-*/
-    return path;
+
+    // 3) исходный репозиторий разработчика (рабочая машина)
+    const QString repo = "H:/projects/tgid-app-new/gid8/python/sety/sety/ww.py";
+    if (QFile::exists(repo)) {
+        return repo;
+    }
+
+    return candidates.first();
 }
 
 QString python_exe();

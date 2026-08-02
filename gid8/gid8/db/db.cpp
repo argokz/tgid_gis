@@ -126,6 +126,54 @@ QString br_text(const QString & txt0)
     return QString("[%1]").arg(txt);
 }
 
+QString tbl_sql(const QString & tn)
+{
+    // Аналог sety.net_mode.tbl_sql: динамическое имя таблицы из карточек,
+    // экспорта и справочников. Статический разбор FROM/JOIN такие места
+    // не видит (tn приходит переменной), поэтому резолвер здесь.
+    if (RDBMS != POSTGRESQL) {
+        return br_text(tn);
+    }
+
+    static const QSet<QString> kNetViews = {
+        // общие
+        QStringLiteral("nodes"),
+        QStringLiteral("linesobj"),
+        // узлы-подтипы (sql/055_subtype_views.sql)
+        QStringLiteral("connectnodes"),
+        QStringLiteral("generalizedconsumers"),
+        QStringLiteral("heatchambers"),
+        QStringLiteral("heatsources"),
+        QStringLiteral("pumpstations"),
+        QStringLiteral("realconsumers"),
+        QStringLiteral("refillnodes"),
+        QStringLiteral("threewayvalves"),
+        // линии-подтипы
+        QStringLiteral("airheaters"),
+        QStringLiteral("dampers"),
+        QStringLiteral("diaphragms"),
+        QStringLiteral("elevators"),
+        QStringLiteral("heatexchangers"),
+        QStringLiteral("heatpipesections"),
+        QStringLiteral("localhydroresistances2"),
+        QStringLiteral("pressregulators"),
+        QStringLiteral("pumps"),
+        QStringLiteral("systemradiators"),
+        // ИТП / bypass (sql/130 + sql/178_itp_net_views.sql)
+        QStringLiteral("bypass"),
+        QStringLiteral("consumptregulators"),
+        QStringLiteral("pressdropregulators"),
+        QStringLiteral("regularmatures"),
+        QStringLiteral("reversevalves"),
+    };
+
+    const QString key = tn.toLower();
+    if (kNetViews.contains(key)) {
+        return QStringLiteral("net.v_%1").arg(key);
+    }
+    return br_text(tn);
+}
+
 QString full_name(const QString & schema, const QString & table0)
 {
     QString table = table0;
@@ -1012,7 +1060,7 @@ bool updateDatabaseRow(QSqlDatabase &db, const QString &tableName, int id, const
     }
 //    QString sql = QString("UPDATE %1 SET %2 WHERE id = :id")
     QString sql = QString("UPDATE %1 SET %2 WHERE id = ?")
-                  .arg(tableName)
+                  .arg(tbl_sql(tableName))
                   .arg(setClauses.join(", "));
 
     QSqlQuery query(db);
@@ -1079,13 +1127,13 @@ int insertIntoDatabase(QSqlDatabase &db, const QString &tableName, const std::ma
     }
 
     QString sql = QString("INSERT INTO %1 (%2)\nVALUES (%3)\nRETURNING id")
-                  .arg(tableName)
+                  .arg(tbl_sql(tableName))
                   .arg(columns.join(", "))
                   .arg(placeholders.join(", "));
 
     if (columns.length() == 0) {
         sql = QString("INSERT INTO %1\nDEFAULT VALUES\nRETURNING id")
-                          .arg(tableName);
+                          .arg(tbl_sql(tableName));
     }
 
     QSqlQuery query(db);
@@ -1207,7 +1255,7 @@ bool updateRow(QSqlDatabase &m_db, const QString &table, int id, const QMap<QStr
     }
     QString setClause = setParts.join(", ");
 
-    QString sql = QString("UPDATE %1 SET %2 WHERE id = ?").arg(table, setClause);
+    QString sql = QString("UPDATE %1 SET %2 WHERE id = ?").arg(tbl_sql(table), setClause);
 
 
     qDebug() << "-------------------------";

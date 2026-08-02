@@ -131,10 +131,10 @@ bool GidWidget::delNode2(CNode2 *node)
     QString q;
 
     if (IsBegin(l1)) {
-        q = QString("UPDATE linesobj SET coords='%1', nodeID1=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n2->id).arg(bline(l1)->line.nomP).arg(bline(l1)->line.nomO);
+        q = QString("UPDATE net.v_linesobj SET coords='%1', nodeID1=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n2->id).arg(bline(l1)->line.nomP).arg(bline(l1)->line.nomO);
     }
     else {
-        q = QString("UPDATE linesobj SET coords='%1', nodeID2=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n2->id).arg(bline(l1)->line.nomP).arg(bline(l1)->line.nomO);
+        q = QString("UPDATE net.v_linesobj SET coords='%1', nodeID2=%2 WHERE id IN (%3, %4)").arg(s1_coords).arg(n2->id).arg(bline(l1)->line.nomP).arg(bline(l1)->line.nomO);
     }
 
     QSqlQuery query(m_cxema.m_db);
