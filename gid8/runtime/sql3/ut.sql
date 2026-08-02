@@ -387,11 +387,11 @@ WHERE line_plain.removed_at IS NULL
 ) n1
 LEFT JOIN (
     SELECT c.fileid, max(c.id) AS cid FROM calc.calculation c GROUP BY c.fileid
-) calc ON calc.fileid = n1.fileid
+) lastcalc ON lastcalc.fileid = n1.fileid
 LEFT JOIN calc.ut_out utp ON utp.lineid = n1.id
                            AND utp.externalsignlineid IN (2, 4)
-                           AND utp.calculationid = calc.cid
+                           AND utp.calculationid = lastcalc.cid
 LEFT JOIN calc.ut_out uto ON uto.lineid = n1.id
                            AND uto.externalsignlineid IN (3, 5)
-                           AND uto.calculationid = calc.cid
+                           AND uto.calculationid = lastcalc.cid
 WHERE n1.removed = 0
