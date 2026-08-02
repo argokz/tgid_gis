@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><ui version="4.0"><class>Print_frDialog</class>
+
+
+
+<widget class="QDialog">
+
+
+<property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>240</width>
+     <height>239</height>
+    </rect>
+   </property>
+<property name="windowTitle"><string>Выберите параметры печати</string></property>
+
+
+
+<widget class="QGroupBox" name="group_Static1">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>11</y>
+     <width>117</width>
+     <height>61</height>
+    </rect>
+   </property>
+<property name="title"><string>Ориентация</string></property>
+</widget>
+
+<widget class="QGroupBox" name="group_Static2">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>85</y>
+     <width>127</width>
+     <height>54</height>
+    </rect>
+   </property>
+<property name="title"><string>Бумага</string></property>
+</widget>
+
+
+<widget class="QGroupBox" name="group_Static3">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>155</y>
+     <width>165</width>
+     <height>66</height>
+    </rect>
+   </property>
+<property name="title"><string>Масштаб</string></property>
+</widget>
+
+
+<widget class="QPushButton" name="push_Ok">
+<property name="geometry">
+    <rect>
+     <x>146</x>
+     <y>11</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>OK</string></property>
+</widget>
+<widget class="QPushButton" name="push_Cancel">
+<property name="geometry">
+    <rect>
+     <x>146</x>
+     <y>39</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Отменить</string></property>
+</widget>
+<widget class="QRadioButton" name="radio_Portret">
+<property name="geometry">
+    <rect>
+     <x>23</x>
+     <y>33</y>
+     <width>92</width>
+     <height>16</height>
+    </rect>
+   </property>
+<property name="text"><string>Книжная</string></property>
+<attribute name="buttonGroup">
+<string notr="true">bg_Portret</string>
+</attribute>
+</widget>
+<widget class="QRadioButton" name="radio_Radio2">
+<property name="geometry">
+    <rect>
+     <x>23</x>
+     <y>51</y>
+     <width>89</width>
+     <height>16</height>
+    </rect>
+   </property>
+<property name="text"><string>Альбомная</string></property>
+<attribute name="buttonGroup">
+<string notr="true">bg_Portret</string>
+</attribute>
+</widget>
+<widget class="QComboBox" name="combo_Paper">
+<property name="geometry">
+    <rect>
+     <x>13</x>
+     <y>103</y>
+     <width>120</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QComboBox" name="combo_Mas">
+<property name="geometry">
+    <rect>
+     <x>18</x>
+     <y>176</y>
+     <width>115</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+</widget>
+<buttongroups>
+<buttongroup name="bg_Portret"/>
+</buttongroups>
+</ui>

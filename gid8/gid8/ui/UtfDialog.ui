@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><ui version="4.0"><class>UtfDialog</class>
+<widget class="QDialog">
+<property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>412</width>
+     <height>229</height>
+    </rect>
+   </property>
+<property name="windowTitle"><string>Рассчет коэффициента смешения</string></property>
+<widget class="QPushButton" name="push_Ok">
+<property name="geometry">
+    <rect>
+     <x>77</x>
+     <y>194</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Принять</string></property>
+</widget>
+<widget class="QPushButton" name="push_Cancel">
+<property name="geometry">
+    <rect>
+     <x>171</x>
+     <y>194</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Отменить</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_T1">
+<property name="geometry">
+    <rect>
+     <x>79</x>
+     <y>33</y>
+     <width>64</width>
+     <height>24</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_T2">
+<property name="geometry">
+    <rect>
+     <x>79</x>
+     <y>67</y>
+     <width>64</width>
+     <height>24</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_T3">
+<property name="geometry">
+    <rect>
+     <x>79</x>
+     <y>102</y>
+     <width>64</width>
+     <height>24</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_G">
+<property name="geometry">
+    <rect>
+     <x>232</x>
+     <y>39</y>
+     <width>64</width>
+     <height>24</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_G0">
+<property name="geometry">
+    <rect>
+     <x>232</x>
+     <y>77</y>
+     <width>64</width>
+     <height>24</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Uf">
+<property name="geometry">
+    <rect>
+     <x>94</x>
+     <y>150</y>
+     <width>57</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QRadioButton" name="radio_M1">
+<property name="geometry">
+    <rect>
+     <x>219</x>
+     <y>128</y>
+     <width>138</width>
+     <height>16</height>
+    </rect>
+   </property>
+<property name="text"><string>Через температуры</string></property>
+<attribute name="buttonGroup">
+<string notr="true">bg_M1</string>
+</attribute>
+</widget>
+<widget class="QRadioButton" name="radio_M2">
+<property name="geometry">
+    <rect>
+     <x>219</x>
+     <y>150</y>
+     <width>103</width>
+     <height>16</height>
+    </rect>
+   </property>
+<property name="text"><string>Через расход</string></property>
+<attribute name="buttonGroup">
+<string notr="true">bg_M1</string>
+</attribute>
+</widget>
+<widget class="QLabel" name="label_Static1">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>33</y>
+     <width>34</width>
+     <height>24</height>
+    </rect>
+   </property>
+<property name="text"><string>T1</string></property>
+</widget>
+<widget class="QLabel" name="label_Static2">
+<property name="geometry">
+    <rect>
+     <x>28</x>
+     <y>67</y>
+     <width>34</width>
+     <height>24</height>
+    </rect>
+   </property>
+<property name="text"><string>T2</string></property>
+</widget>
+<widget class="QLabel" name="label_Static3">
+<property name="geometry">
+    <rect>
+     <x>28</x>
+     <y>97</y>
+     <width>34</width>
+     <height>24</height>
+    </rect>
+   </property>
+<property name="text"><string>T3</string></property>
+</widget>
+<widget class="QLabel" name="label_Static4">
+<property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>41</y>
+     <width>31</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>G</string></property>
+</widget>
+<widget class="QLabel" name="label_Static5">
+<property name="geometry">
+    <rect>
+     <x>186</x>
+     <y>74</y>
+     <width>31</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>G0</string></property>
+</widget>
+</widget>
+<buttongroups>
+<buttongroup name="bg_M1"/>
+</buttongroups>
+</ui>

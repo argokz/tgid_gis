@@ -1,0 +1,1651 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{3EC62327-6D70-4B00-AC80-ADFFB3934AA4}</ProjectGuid>
+    <Keyword>MFCProj</Keyword>
+    <RootNamespace>gid6</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);Ultimate Grid\Include;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Lib;</LibraryPath>
+    <OutDir>$(SolutionDir)\gidr\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Python36-32\include;Ultimate Grid\Include</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;lib\zlib;lib\openssl\include;lib\;lib\Ultimate Grid\Include;lib\nlohmann;lib\DuckX\include;lib\DuckX\thirdparty\pugixml;lib\DuckX\thirdparty\zip;lib\DuckX\src;C:\cpp\boost_1_85_0</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>Mpr.Lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x86</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TypeLibraryFile>
+      </TypeLibraryFile>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>lib\zlib;lib\Ultimate Grid;C:\Python36-32\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;lib\zlib;lib\openssl\include;lib\;lib\Ultimate Grid\Include;lib\nlohmann;lib\DuckX\thirdparty\pugixml;lib\DuckX\thirdparty\zip;lib\DuckX\include;lib\DuckX\src;C:\cpp\boost_1_85_0</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Mpr.Lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x86</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <TypeLibraryFile>
+      </TypeLibraryFile>
+      <OutputFile>$(SolutionDir)\gidr\gid6.exe</OutputFile>
+      <ShowProgress>NotSet</ShowProgress>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>lib\zlib;lib\Ultimate Grid;C:\Python36-32\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>C:\vc_projects\gid6\gidr\gid6.exe</OutputFile>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="aboutbox.h" />
+    <ClInclude Include="AddressLeft.h" />
+    <ClInclude Include="ado.h" />
+    <ClInclude Include="BBB.H" />
+    <ClInclude Include="Bgi.h" />
+    <ClInclude Include="bmp.h" />
+    <ClInclude Include="CAddrInit.h" />
+    <ClInclude Include="CalcTree.h" />
+    <ClInclude Include="calendarbar.h" />
+    <ClInclude Include="CConvert.h" />
+    <ClInclude Include="CDefectElem.h" />
+    <ClInclude Include="CDefectElements.h" />
+    <ClInclude Include="CDialog7.h" />
+    <ClInclude Include="CDialog8.h" />
+    <ClInclude Include="CDiams.h" />
+    <ClInclude Include="CGidResist.h" />
+    <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="ChPassword2.h" />
+    <ClInclude Include="ChPasswordRight.h" />
+    <ClInclude Include="ChPasswordRightNew.h" />
+    <ClInclude Include="CKorroziaZapros.h" />
+    <ClInclude Include="ClassView.h" />
+    <ClInclude Include="clip\polyarea.h" />
+    <ClInclude Include="clip\polyio.h" />
+    <ClInclude Include="clip\vectmatr.h" />
+    <ClInclude Include="CMSopr.h" />
+    <ClInclude Include="CMSoprAdd.h" />
+    <ClInclude Include="CNagr2.h" />
+    <ClInclude Include="CNagruzZdan.h" />
+    <ClInclude Include="CNasChar.h" />
+    <ClInclude Include="CNsDb.h" />
+    <ClInclude Include="colorgtd.h" />
+    <ClInclude Include="ColorLine1.h" />
+    <ClInclude Include="Colors.h" />
+    <ClInclude Include="colorsv.h" />
+    <ClInclude Include="coordlis.h" />
+    <ClInclude Include="CRACK.H" />
+    <ClInclude Include="css.h" />
+    <ClInclude Include="CTableIst.h" />
+    <ClInclude Include="CTeplopoteriFactDialog.h" />
+    <ClInclude Include="CTeplopoteriFilling.h" />
+    <ClInclude Include="CTeplopoteriGeneral.h" />
+    <ClInclude Include="CTeplopoteriGilling2.h" />
+    <ClInclude Include="CTeplopoteriKti.h" />
+    <ClInclude Include="CTeplopoteriOpress.h" />
+    <ClInclude Include="CTeplopoteriOpressov.h" />
+    <ClInclude Include="CTeplopoteriOpressovka.h" />
+    <ClInclude Include="CTeplopoteriParams.h" />
+    <ClInclude Include="CTeplopoteriSarz.h" />
+    <ClInclude Include="CTeplopoteriSheet.h" />
+    <ClInclude Include="CTeplopoteriSheet2.h" />
+    <ClInclude Include="CTeplopoteriWC.h" />
+    <ClInclude Include="CTeploPotMain.h" />
+    <ClInclude Include="CTeploset.h" />
+    <ClInclude Include="CTu2.h" />
+    <ClInclude Include="CWear.h" />
+    <ClInclude Include="Cxema.h" />
+    <ClInclude Include="CZdanieNagruzki.h" />
+    <ClInclude Include="Dialog3.h" />
+    <ClInclude Include="dibapi.h" />
+    <ClInclude Include="DopPodklNagr.h" />
+    <ClInclude Include="DXF.H" />
+    <ClInclude Include="dxf\DXF.H" />
+    <ClInclude Include="dxf\DXFI.H" />
+    <ClInclude Include="dxf\Token.h" />
+    <ClInclude Include="NewPassport\CWebDialog.h" />
+    <ClInclude Include="NewPassport\CWebViewBrowser.h" />
+    <ClInclude Include="NewPassport\CWebViewTable.h" />
+    <ClInclude Include="ElemList.h" />
+    <ClInclude Include="excel.h" />
+    <ClInclude Include="FileList.h" />
+    <ClInclude Include="FileView.h" />
+    <ClInclude Include="Filtr3.h" />
+    <ClInclude Include="GeoFile.h" />
+    <ClInclude Include="GeoMenu.h" />
+    <ClInclude Include="gid6.h" />
+    <ClInclude Include="gid6Doc.h" />
+    <ClInclude Include="gid6View.h" />
+    <ClInclude Include="gidrView.h" />
+    <ClInclude Include="global.h" />
+    <ClInclude Include="Graph.h" />
+    <ClInclude Include="graph2.h" />
+    <ClInclude Include="GRAPHAPR.H" />
+    <ClInclude Include="GraphNS.h" />
+    <ClInclude Include="GRAPHR.H" />
+    <ClInclude Include="graphtemplate.h" />
+    <ClInclude Include="grid\msflexgrid.h" />
+    <ClInclude Include="grid\msword8.h" />
+    <ClInclude Include="grid\rowcursor.h" />
+    <ClInclude Include="grlist.h" />
+    <ClInclude Include="hlink.h" />
+    <ClInclude Include="html.h" />
+    <ClInclude Include="http2\httpparser.h" />
+    <ClInclude Include="http2\HTTPThrea.h" />
+    <ClInclude Include="http2\http_parser.h" />
+    <ClInclude Include="http2\mongoose.h" />
+    <ClInclude Include="http2\WebServerDlg2.h" />
+    <ClInclude Include="ImportShape.h" />
+    <ClInclude Include="Inf2.h" />
+    <ClInclude Include="Input2.h" />
+    <ClInclude Include="InputDia.h" />
+    <ClInclude Include="join.h" />
+    <ClInclude Include="jsmn.h" />
+    <ClInclude Include="json.h" />
+    <ClInclude Include="Klassif.h" />
+    <ClInclude Include="KlEdit.h" />
+    <ClInclude Include="KlMenu.h" />
+    <ClInclude Include="KlTyp.h" />
+    <ClInclude Include="kltyp2.h" />
+    <ClInclude Include="kltypvect.h" />
+    <ClInclude Include="Kti.h" />
+    <ClInclude Include="Left1Dial.h" />
+    <ClInclude Include="Left2Dial.h" />
+    <ClInclude Include="Left4Dial.h" />
+    <ClInclude Include="lib\tiff\t4.h" />
+    <ClInclude Include="lib\tiff\tiff.h" />
+    <ClInclude Include="lib\tiff\tiffconf.h" />
+    <ClInclude Include="lib\tiff\tiffconf.vc.h" />
+    <ClInclude Include="lib\tiff\tiffconf.wince.h" />
+    <ClInclude Include="lib\tiff\tiffio.h" />
+    <ClInclude Include="lib\tiff\tiffiop.h" />
+    <ClInclude Include="lib\tiff\tiffvers.h" />
+    <ClInclude Include="lib\tiff\tif_config.h" />
+    <ClInclude Include="lib\tiff\tif_config.vc.h" />
+    <ClInclude Include="lib\tiff\tif_config.wince.h" />
+    <ClInclude Include="lib\tiff\tif_dir.h" />
+    <ClInclude Include="lib\tiff\tif_fax3.h" />
+    <ClInclude Include="lib\tiff\tif_predict.h" />
+    <ClInclude Include="lib\tiff\uvcode.h" />
+    <ClInclude Include="lib\zip\unzip.h" />
+    <ClInclude Include="lib\zip\zip.h" />
+    <ClInclude Include="LineStyle.h" />
+    <ClInclude Include="LoginDialog.h" />
+    <ClInclude Include="Lzw.h" />
+    <ClInclude Include="MagNode.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MapDlg.h" />
+    <ClInclude Include="MapNavigator.h" />
+    <ClInclude Include="maps.h" />
+    <ClInclude Include="maptabs.h" />
+    <ClInclude Include="MdbList.h" />
+    <ClInclude Include="menuexcel.h" />
+    <ClInclude Include="menuitem.h" />
+    <ClInclude Include="MMenu.h" />
+    <ClInclude Include="MMenu2.h" />
+    <ClInclude Include="NagrTree.h" />
+    <ClInclude Include="NewPassport\HostObjectSampleImpl.h" />
+    <ClInclude Include="NewPassport\WebPageVirtualTable.h" />
+    <ClInclude Include="Okno.h" />
+    <ClInclude Include="opc.h" />
+    <ClInclude Include="OpcParam.h" />
+    <ClInclude Include="OPCThread2.h" />
+    <ClInclude Include="OpcTree.h" />
+    <ClInclude Include="OpenServer.h" />
+    <ClInclude Include="OpenServerNew.h" />
+    <ClInclude Include="OperDate.h" />
+    <ClInclude Include="OtobrInf.h" />
+    <ClInclude Include="OutputWnd.h" />
+    <ClInclude Include="OutThrea.h" />
+    <ClInclude Include="Param.h" />
+    <ClInclude Include="Param1.h" />
+    <ClInclude Include="Param2.h" />
+    <ClInclude Include="Pjezo.h" />
+    <ClInclude Include="Podl.h" />
+    <ClInclude Include="primdrawline.h" />
+    <ClInclude Include="primdrawnode.h" />
+    <ClInclude Include="PrintFrDial.h" />
+    <ClInclude Include="PrintIni.h" />
+    <ClInclude Include="PropertiesWnd.h" />
+    <ClInclude Include="PropertyGrid\AFXDTCTL.H" />
+    <ClInclude Include="PropertyGrid\CustomItem.h" />
+    <ClInclude Include="PropertyGrid\DynDialogEx.h" />
+    <ClInclude Include="PropertyGrid\DynDialogItemEx.h" />
+    <ClInclude Include="PropertyGrid\ListDynDialogEx.h" />
+    <ClInclude Include="PropertyGrid\PropertyGrid.h" />
+    <ClInclude Include="PropertyGrid\PropertyGridCombo.h" />
+    <ClInclude Include="PropertyGrid\PropertyGridDirectoryPicker.h" />
+    <ClInclude Include="PropertyGrid\PropertyGridInPlaceEdit.h" />
+    <ClInclude Include="PropertyGrid\PropertyGridMonthCalCtrl.h" />
+    <ClInclude Include="PropertyGrid\test\CustomTreeCtrl.h" />
+    <ClInclude Include="PropertyGrid\test\GradientItem.h" />
+    <ClInclude Include="PropertyGrid\test\PropGridDlg.h" />
+    <ClInclude Include="PropertyGrid\test\RectEditDlg.h" />
+    <ClInclude Include="PropertyGrid\test\RectItem.h" />
+    <ClInclude Include="PropertyGrid\test\SerialItem.h" />
+    <ClInclude Include="PropertyGrid\test\TreeItem.h" />
+    <ClInclude Include="Prot.h" />
+    <ClInclude Include="ProtEdit.h" />
+    <ClInclude Include="Protocol.h" />
+    <ClInclude Include="ps_alma.h" />
+    <ClInclude Include="PtsSprav2.h" />
+    <ClInclude Include="RastrBut.h" />
+    <ClInclude Include="RastrWnd.h" />
+    <ClInclude Include="RastrWnd2.h" />
+    <ClInclude Include="RastrWndVect.h" />
+    <ClInclude Include="rdgif.h" />
+    <ClInclude Include="RemontZapros.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SCROLL.H" />
+    <ClInclude Include="NewPassport\SearchUtility.h" />
+    <ClInclude Include="Sheme\Common.h" />
+    <ClInclude Include="Sheme\ConsrtuctorDoc.h" />
+    <ClInclude Include="Sheme\CustomView.h" />
+    <ClInclude Include="Sheme\SHEME.H" />
+    <ClInclude Include="Sheme\TEMLPWND.H" />
+    <ClInclude Include="Sheme\Templ.h" />
+    <ClInclude Include="Sheme\Tube.h" />
+    <ClInclude Include="shp_dbf.h" />
+    <ClInclude Include="SortHeaderCtrl.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="table.h" />
+    <ClInclude Include="TableDlg.h" />
+    <ClInclude Include="tables.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="TempGraph\NagrSum.h" />
+    <ClInclude Include="TempGraph\tempgraph.h" />
+    <ClInclude Include="TempGraph\TgWnd.h" />
+    <ClInclude Include="TeplopoteriD.h" />
+    <ClInclude Include="TeplopotrBox.h" />
+    <ClInclude Include="TgDlg.h" />
+    <ClInclude Include="TimeDial.h" />
+    <ClInclude Include="TranspDialog.h" />
+    <ClInclude Include="ttipctl2.h" />
+    <ClInclude Include="TuFind.h" />
+    <ClInclude Include="TuItogInit.h" />
+    <ClInclude Include="TuZapros.h" />
+    <ClInclude Include="Uf.h" />
+    <ClInclude Include="Ultimate Grid\AdoCUG.h" />
+    <ClInclude Include="Ultimate Grid\AdoHead.h" />
+    <ClInclude Include="Ultimate Grid\ADOImpDatasource.h" />
+    <ClInclude Include="Ultimate Grid\ADOSampleView.h" />
+    <ClInclude Include="Ultimate Grid\FormCUG.h" />
+    <ClInclude Include="Ultimate Grid\FormDialog.h" />
+    <ClInclude Include="Ultimate Grid\Mycug.h" />
+    <ClInclude Include="Ultimate Grid\TableDialog.h" />
+    <ClInclude Include="Ultimate Grid\TnCUG.h" />
+    <ClInclude Include="Ultimate Grid\TPView.h" />
+    <ClInclude Include="Ultimate Grid\UGCTsarw.h" />
+    <ClInclude Include="Ultimate Grid\UpdatedRow.h" />
+    <ClInclude Include="Ultimate Grid\Virtdata.h" />
+    <ClInclude Include="Ultimate Grid\VirtualTable2.h" />
+    <ClInclude Include="UnvisualTree.h" />
+    <ClInclude Include="update.h" />
+    <ClInclude Include="utp\utp_diam_rasch.h" />
+    <ClInclude Include="ViewTree.h" />
+    <ClInclude Include="virtlistView.h" />
+    <ClInclude Include="virtualdata.h" />
+    <ClInclude Include="VirtualDlg.h" />
+    <ClInclude Include="VirtualListCtrl.h" />
+    <ClInclude Include="virtualnodelist.h" />
+    <ClInclude Include="VirtualTable.h" />
+    <ClInclude Include="Win.h" />
+    <ClInclude Include="wincc.h" />
+    <ClInclude Include="NewPassport\WVAdoImpDataSource.h" />
+    <ClInclude Include="NewPassport\CWebHelpDialog.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="aboutbox.cpp" />
+    <ClCompile Include="AddressLeft.cpp" />
+    <ClCompile Include="ado.cpp" />
+    <ClCompile Include="ado2.cpp" />
+    <ClCompile Include="adolist.cpp" />
+    <ClCompile Include="ado_def.cpp" />
+    <ClCompile Include="ado_geo.cpp" />
+    <ClCompile Include="ado_gidr.cpp" />
+    <ClCompile Include="alg.cpp" />
+    <ClCompile Include="alma.cpp" />
+    <ClCompile Include="alseco.cpp" />
+    <ClCompile Include="au.cpp" />
+    <ClCompile Include="b5.cpp" />
+    <ClCompile Include="Bgi.cpp" />
+    <ClCompile Include="bmp.cpp" />
+    <ClCompile Include="CAddrInit.cpp" />
+    <ClCompile Include="CalcTree.cpp" />
+    <ClCompile Include="CALENDAR.CPP" />
+    <ClCompile Include="calendarbar.cpp" />
+    <ClCompile Include="CConvert.cpp" />
+    <ClCompile Include="CDefectElem.cpp" />
+    <ClCompile Include="CDefectElements.cpp" />
+    <ClCompile Include="CDiams.cpp" />
+    <ClCompile Include="CGidResist.cpp" />
+    <ClCompile Include="CheckColor.cpp" />
+    <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="ChPassword2.cpp" />
+    <ClCompile Include="ChPasswordRight.cpp" />
+    <ClCompile Include="ChPasswordRightNew.cpp" />
+    <ClCompile Include="CKorroziaZapros.cpp" />
+    <ClCompile Include="CKorroziaZapros2.cpp" />
+    <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="clip\polygon0.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="clip\polygon1.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="clip\polyio.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="clip\vectmatr.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="CMSopr.cpp" />
+    <ClCompile Include="CMSoprAdd.cpp" />
+    <ClCompile Include="CNagr2.cpp" />
+    <ClCompile Include="CNagruzZdan.cpp" />
+    <ClCompile Include="CNasChar.cpp" />
+    <ClCompile Include="CNsDb.cpp" />
+    <ClCompile Include="Code.cpp" />
+    <ClCompile Include="colorgtd.cpp" />
+    <ClCompile Include="ColorLine.cpp" />
+    <ClCompile Include="ColorLine1.cpp" />
+    <ClCompile Include="colorsv.cpp" />
+    <ClCompile Include="coordlis.cpp" />
+    <ClCompile Include="Crack.cpp" />
+    <ClCompile Include="css.cpp" />
+    <ClCompile Include="csv.cpp" />
+    <ClCompile Include="CTableIst.cpp" />
+    <ClCompile Include="CTeplopoteriFilling.cpp" />
+    <ClCompile Include="CTeplopoteriGeneral.cpp" />
+    <ClCompile Include="CTeplopoteriGilling2.cpp" />
+    <ClCompile Include="CTeplopoteriKti.cpp" />
+    <ClCompile Include="CTeplopoteriOpr.cpp" />
+    <ClCompile Include="CTeplopoteriSarz.cpp" />
+    <ClCompile Include="CTeplopoteriSheet.cpp" />
+    <ClCompile Include="CTeplopoteriSheet2.cpp" />
+    <ClCompile Include="CTeplopoteriWC.cpp" />
+    <ClCompile Include="CTeploPotMain.cpp" />
+    <ClCompile Include="CTeploset.cpp" />
+    <ClCompile Include="CTeploset2.cpp" />
+    <ClCompile Include="CTu2.cpp" />
+    <ClCompile Include="CustomYesNoDlg.cpp" />
+    <ClCompile Include="CWear.cpp" />
+    <ClCompile Include="Cxema.cpp" />
+    <ClCompile Include="CZdanieNagruzki.cpp" />
+    <ClCompile Include="Decode.cpp" />
+    <ClCompile Include="Dialog3.cpp" />
+    <ClCompile Include="dialog_pr.cpp" />
+    <ClCompile Include="diametrs.cpp" />
+    <ClCompile Include="dibapi.cpp" />
+    <ClCompile Include="dlinaAlma.cpp" />
+    <ClCompile Include="DopPodklNagr.cpp" />
+    <ClCompile Include="drawLabel.cpp" />
+    <ClCompile Include="drawPoly.cpp" />
+    <ClCompile Include="draw_2024.cpp" />
+    <ClCompile Include="dxf\Dxfi.cpp" />
+    <ClCompile Include="dxf\dxfView.cpp" />
+    <ClCompile Include="dxf\Ent.cpp" />
+    <ClCompile Include="dxf\Entities.cpp" />
+    <ClCompile Include="dxf\LAYER.CPP" />
+    <ClCompile Include="dxf\ltype.cpp" />
+    <ClCompile Include="dxf\minimum.cpp" />
+    <ClCompile Include="dxf\Parser.cpp" />
+    <ClCompile Include="dxf\Token.cpp" />
+    <ClCompile Include="dxf_export.cpp" />
+    <ClCompile Include="electro.cpp" />
+    <ClCompile Include="electro_pas.cpp" />
+    <ClCompile Include="ElemList.cpp" />
+    <ClCompile Include="geo_select.cpp" />
+    <ClCompile Include="lib\DuckX\src\duckx.cpp" />
+    <ClCompile Include="make_ut_pts.cpp" />
+    <ClCompile Include="NewPassport\CWebDialog.cpp" />
+    <ClCompile Include="NewPassport\CWebViewBrowser.cpp" />
+    <ClCompile Include="NewPassport\CWebViewTable.cpp" />
+    <ClCompile Include="excel.cpp" />
+    <ClCompile Include="excel2.cpp" />
+    <ClCompile Include="excel_cxema.cpp" />
+    <ClCompile Include="export_fragment.cpp" />
+    <ClCompile Include="FileList.cpp" />
+    <ClCompile Include="FileView.cpp" />
+    <ClCompile Include="Filtr3.cpp" />
+    <ClCompile Include="fun.cpp" />
+    <ClCompile Include="fun2.cpp" />
+    <ClCompile Include="fun_after.cpp" />
+    <ClCompile Include="fun_korrozia.cpp" />
+    <ClCompile Include="fun_tu.cpp" />
+    <ClCompile Include="gdb.cpp" />
+    <ClCompile Include="geodez.cpp" />
+    <ClCompile Include="GeoDraw.cpp" />
+    <ClCompile Include="GeoDxf.cpp" />
+    <ClCompile Include="GeoFile.cpp" />
+    <ClCompile Include="GeoMenu.cpp" />
+    <ClCompile Include="geotree.cpp" />
+    <ClCompile Include="gid6.cpp" />
+    <ClCompile Include="gid6Doc.cpp" />
+    <ClCompile Include="gid6View.cpp" />
+    <ClCompile Include="gidrdraw.cpp" />
+    <ClCompile Include="gidrView.cpp" />
+    <ClCompile Include="gidrviewpopup.cpp" />
+    <ClCompile Include="gidr_calc.cpp" />
+    <ClCompile Include="gidr_find.cpp" />
+    <ClCompile Include="gidr_map.cpp" />
+    <ClCompile Include="gidr_wincc.cpp" />
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="graph2.cpp" />
+    <ClCompile Include="GRAPHAPR.CPP" />
+    <ClCompile Include="GraphNS.cpp" />
+    <ClCompile Include="GRAPHR.CPP" />
+    <ClCompile Include="graphtemplate.cpp" />
+    <ClCompile Include="grid\msflexgrid.cpp" />
+    <ClCompile Include="grid\msword8.cpp" />
+    <ClCompile Include="grid\rowcursor.cpp" />
+    <ClCompile Include="grlist.cpp" />
+    <ClCompile Include="hasp.cpp" />
+    <ClCompile Include="hasp\BNET.CPP">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="hlink.cpp" />
+    <ClCompile Include="html.cpp" />
+    <ClCompile Include="html2.cpp" />
+    <ClCompile Include="http.cpp" />
+    <ClCompile Include="http2\httpparser.cpp" />
+    <ClCompile Include="http2\HTTPThrea.cpp" />
+    <ClCompile Include="http2\http_parser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="http2\mime.cpp" />
+    <ClCompile Include="http2\mongoose.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="http2\TableServer.cpp" />
+    <ClCompile Include="http2\WebServerDlg2.cpp" />
+    <ClCompile Include="http_form.cpp" />
+    <ClCompile Include="http_ms.cpp" />
+    <ClCompile Include="ImportShape.cpp" />
+    <ClCompile Include="Inf2.cpp" />
+    <ClCompile Include="init_files.cpp" />
+    <ClCompile Include="Input2.cpp" />
+    <ClCompile Include="InputDia.cpp" />
+    <ClCompile Include="InputDialogDate.cpp" />
+    <ClCompile Include="ip.cpp" />
+    <ClCompile Include="join.cpp" />
+    <ClCompile Include="join2.cpp" />
+    <ClCompile Include="jsmn.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="json.cpp" />
+    <ClCompile Include="Klassif.cpp" />
+    <ClCompile Include="KlEdit.cpp" />
+    <ClCompile Include="KlMenu.cpp" />
+    <ClCompile Include="KlTyp.cpp" />
+    <ClCompile Include="kltyp2.cpp" />
+    <ClCompile Include="kltypvect.cpp" />
+    <ClCompile Include="Kti.cpp" />
+    <ClCompile Include="Left1Dial.cpp" />
+    <ClCompile Include="Left2Dial.cpp" />
+    <ClCompile Include="Left4Dial.cpp" />
+    <ClCompile Include="lib\jpeg-6a\jcapimin.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcapistd.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jccoefct.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jccolor.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcdctmgr.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jchuff.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcinit.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcmainct.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcmarker.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcmaster.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcomapi.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcparam.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcphuff.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcprepct.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jcsample.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jctrans.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdapimin.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdapistd.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdatadst.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdatasrc.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdcoefct.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdcolor.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jddctmgr.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdhuff.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdinput.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdmainct.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdmarker.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdmaster.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdmerge.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdphuff.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdpostct.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdsample.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jdtrans.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jerror.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jfdctflt.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jfdctfst.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jfdctint.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jidctflt.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jidctfst.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jidctint.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jidctred.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jmemansi.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jmemmgr.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jpegdec.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jquant1.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jquant2.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\jpeg-6a\jutils.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\opcbc_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\OpcCmd_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\opccomn_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\opcda_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\OpcDx_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\OpcEnum_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\opchda_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\opcSec_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\opc\opc_ae_i.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcreposix.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_chartables.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_compile.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_config.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_dfa_exec.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_exec.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_fullinfo.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_get.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_globals.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_info.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_maketables.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_newline.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_ord2utf8.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_refcount.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_study.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_tables.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_try_flipped.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_ucp_searchfuncs.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_valid_utf8.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_version.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\pcre-7.0\pcre_xclass.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\png.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngerror.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngget.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngmem.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngpread.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngread.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngrio.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngrtran.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngrutil.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngset.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngtrans.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngwio.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngwrite.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngwtran.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\png\pngwutil.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_aux.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_close.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_codec.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_color.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_compress.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_dir.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_dirinfo.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_dirread.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_dirwrite.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_dumpmode.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_error.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_extension.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_fax3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_fax3sm.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_flush.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_getimage.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_jbig.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_jpeg.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_jpeg_12.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_luv.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_lzma.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_lzw.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_next.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_ojpeg.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_open.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_packbits.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_pixarlog.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_predict.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_print.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_read.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_strip.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_swab.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_thunder.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_tile.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_version.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_warning.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_webp.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_win32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_write.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_zip.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tiff\tif_zstd.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGCBType.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGCell.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGCelTyp.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGCnrBtn.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGCTarrw.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGCtrl.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGDLType.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGDrgDrp.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGDrwHnt.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGDtaSrc.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGEdit.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGEditBase.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugformat.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\uggdinfo.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGGrid.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGHint.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ughscrol.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugLstBox.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGMEdit.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGMemMan.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGMultiS.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugprint.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugptrlst.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugsidehd.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGStrOp.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugtab.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGTopHdg.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\ugvscrol.cpp" />
+    <ClCompile Include="lib\Ultimate Grid\Source\UGXPThemes.cpp" />
+    <ClCompile Include="lib\zip\unzip.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="lib\zip\zip.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\adler32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\compress.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\crc32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\deflate.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\example.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\gzio.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\infback.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\inffast.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\inflate.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\inftrees.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\trees.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\uncompr.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="lib\zlib\zutil.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="LineStyle.cpp" />
+    <ClCompile Include="LoginDialog.cpp" />
+    <ClCompile Include="lur.cpp" />
+    <ClCompile Include="Lzw.CPP" />
+    <ClCompile Include="lzw1.cpp" />
+    <ClCompile Include="MagNode.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MapDlg.cpp" />
+    <ClCompile Include="MapNavigator.cpp" />
+    <ClCompile Include="maps_u.cpp">
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="maptabs.cpp" />
+    <ClCompile Include="md5.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="MdbList.cpp" />
+    <ClCompile Include="menuexcel.cpp" />
+    <ClCompile Include="MMenu.cpp" />
+    <ClCompile Include="MMenu2.cpp" />
+    <ClCompile Include="ms_rs.cpp" />
+    <ClCompile Include="NewPassport\HostObjectSampleImpl.cpp" />
+    <ClCompile Include="mysql.cpp" />
+    <ClCompile Include="mysql2.cpp" />
+    <ClCompile Include="mysqlgeo.cpp" />
+    <ClCompile Include="NagrTree.cpp" />
+    <ClCompile Include="nagruz.cpp" />
+    <ClCompile Include="NewPassport\AsyncCheck.cpp" />
+    <ClCompile Include="NewPassport\ElectricalNetworkPassport.cpp" />
+    <ClCompile Include="NewPassport\ExtensionPassport.cpp" />
+    <ClCompile Include="NewPassport\HeatPointPassport.cpp" />
+    <ClCompile Include="NewPassport\NewPassport.cpp" />
+    <ClCompile Include="NewPassport\TeplopoteryHelper.cpp" />
+    <ClCompile Include="NewPassport\WebPageVirtualTable.cpp" />
+    <ClCompile Include="Okno.cpp" />
+    <ClCompile Include="opc.cpp" />
+    <ClCompile Include="OpcParam.cpp" />
+    <ClCompile Include="OPCThread2.cpp" />
+    <ClCompile Include="OpcTree.cpp" />
+    <ClCompile Include="OpenServer.cpp" />
+    <ClCompile Include="OpenServerNew.cpp" />
+    <ClCompile Include="openssl2.cpp" />
+    <ClCompile Include="OperDate.cpp" />
+    <ClCompile Include="opres2.cpp" />
+    <ClCompile Include="opressovka.cpp" />
+    <ClCompile Include="opr_pas.cpp" />
+    <ClCompile Include="osmotr2.cpp" />
+    <ClCompile Include="OtobrInf.cpp" />
+    <ClCompile Include="OtopSezon.cpp" />
+    <ClCompile Include="OutDialog.cpp" />
+    <ClCompile Include="OutputWnd.cpp" />
+    <ClCompile Include="OutThrea.cpp" />
+    <ClCompile Include="Param.cpp" />
+    <ClCompile Include="Param1.cpp" />
+    <ClCompile Include="Param2.cpp" />
+    <ClCompile Include="parse_math.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="pas.cpp" />
+    <ClCompile Include="pas2.cpp" />
+    <ClCompile Include="password.cpp" />
+    <ClCompile Include="pas_kam.cpp" />
+    <ClCompile Include="Pjezo.cpp" />
+    <ClCompile Include="Podl.cpp" />
+    <ClCompile Include="podllist.cpp" />
+    <ClCompile Include="podp.cpp" />
+    <ClCompile Include="popen.cpp" />
+    <ClCompile Include="PotrCx.cpp" />
+    <ClCompile Include="primdraw.cpp" />
+    <ClCompile Include="print.cpp" />
+    <ClCompile Include="PrintFrDial.cpp" />
+    <ClCompile Include="PrintIni.cpp" />
+    <ClCompile Include="PropertiesWnd.cpp" />
+    <ClCompile Include="PropertyGrid\DynDialogEx.cpp" />
+    <ClCompile Include="PropertyGrid\DynDialogItemEx.cpp" />
+    <ClCompile Include="PropertyGrid\ListDynDialogEx.cpp" />
+    <ClCompile Include="PropertyGrid\PropertyGrid.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">lib\zlib;lib\openssl\include;lib\;lib\Ultimate Grid\Include;E:\Python\include ;..</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">lib\zlib;lib\openssl\include;lib\;lib\Ultimate Grid\Include;E:\Python\include;..</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="PropertyGrid\PropertyGridCombo.cpp" />
+    <ClCompile Include="PropertyGrid\PropertyGridDirectoryPicker.cpp" />
+    <ClCompile Include="PropertyGrid\PropertyGridInPlaceEdit.cpp" />
+    <ClCompile Include="PropertyGrid\PropertyGridMonthCalCtrl.cpp" />
+    <ClCompile Include="PropertyGrid\test\CustomTreeCtrl.cpp" />
+    <ClCompile Include="PropertyGrid\test\GradientItem.cpp" />
+    <ClCompile Include="PropertyGrid\test\PropGridDlg.cpp" />
+    <ClCompile Include="PropertyGrid\test\RectEditDlg.cpp" />
+    <ClCompile Include="PropertyGrid\test\RectItem.cpp" />
+    <ClCompile Include="PropertyGrid\test\SerialItem.cpp" />
+    <ClCompile Include="PropertyGrid\test\TreeItem.cpp" />
+    <ClCompile Include="Prot.cpp" />
+    <ClCompile Include="protection.cpp" />
+    <ClCompile Include="ProtEdit.cpp" />
+    <ClCompile Include="Protocol.cpp" />
+    <ClCompile Include="Pr_bmp.cpp" />
+    <ClCompile Include="pr_gif.cpp" />
+    <ClCompile Include="pr_jpg.cpp" />
+    <ClCompile Include="pr_tif.cpp" />
+    <ClCompile Include="ps1.cpp" />
+    <ClCompile Include="ps_alma.cpp" />
+    <ClCompile Include="pts.cpp" />
+    <ClCompile Include="PtsAlmaM2.cpp" />
+    <ClCompile Include="PtsOpressovka.cpp" />
+    <ClCompile Include="PtsPipe.cpp" />
+    <ClCompile Include="PtsSprav2.cpp" />
+    <ClCompile Include="py.cpp" />
+    <ClCompile Include="RastrBut.cpp" />
+    <ClCompile Include="RastrWnd.cpp" />
+    <ClCompile Include="RastrWnd2.cpp" />
+    <ClCompile Include="RastrWndVect.cpp" />
+    <ClCompile Include="RDGIF.CPP" />
+    <ClCompile Include="remont2.cpp" />
+    <ClCompile Include="RemontZapros.cpp" />
+    <ClCompile Include="RemontZapros2.cpp" />
+    <ClCompile Include="remont_gid.cpp" />
+    <ClCompile Include="RunTable.cpp" />
+    <ClCompile Include="Scroll.cpp" />
+    <ClCompile Include="NewPassport\SearchUtility.cpp" />
+    <ClCompile Include="set_line.cpp" />
+    <ClCompile Include="set_obl.cpp" />
+    <ClCompile Include="sezon.cpp" />
+    <ClCompile Include="shape.cpp" />
+    <ClCompile Include="Sheme\ConsrtuctorDoc.cpp" />
+    <ClCompile Include="Sheme\CustomView.cpp" />
+    <ClCompile Include="Sheme\SHEME.CPP" />
+    <ClCompile Include="Sheme\TEMLPWND.CPP" />
+    <ClCompile Include="Sheme\Templ.cpp" />
+    <ClCompile Include="Sheme\Tube.cpp" />
+    <ClCompile Include="shp_dbf.cpp" />
+    <ClCompile Include="SortHeaderCtrl.cpp" />
+    <ClCompile Include="sort_graph.cpp" />
+    <ClCompile Include="sort_graph_rs_new.cpp" />
+    <ClCompile Include="sort_line.cpp" />
+    <ClCompile Include="split_sql.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Table.cpp" />
+    <ClCompile Include="TableDlg.cpp" />
+    <ClCompile Include="TaskProgressDlg.cpp" />
+    <ClCompile Include="temp.cpp" />
+    <ClCompile Include="TempGraph\NagrSum.cpp" />
+    <ClCompile Include="TempGraph\tempgraph.cpp" />
+    <ClCompile Include="TempGraph\TgWnd.cpp" />
+    <ClCompile Include="teplopoteri.cpp" />
+    <ClCompile Include="TeplopotrBox.cpp" />
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="tg.cpp" />
+    <ClCompile Include="TgDlg.cpp" />
+    <ClCompile Include="TimeDial.cpp" />
+    <ClCompile Include="TranspDialog.cpp" />
+    <ClCompile Include="TreeCtrlX.cpp" />
+    <ClCompile Include="ttipctl2.cpp" />
+    <ClCompile Include="tu.cpp" />
+    <ClCompile Include="TuFind.cpp" />
+    <ClCompile Include="TuItogInit.cpp" />
+    <ClCompile Include="TuZapros.cpp" />
+    <ClCompile Include="tu_gid.cpp" />
+    <ClCompile Include="Uf.cpp" />
+    <ClCompile Include="Ultimate Grid\AdoCUG.cpp" />
+    <ClCompile Include="Ultimate Grid\AdoHead.cpp" />
+    <ClCompile Include="Ultimate Grid\ADOImpDatasource.cpp" />
+    <ClCompile Include="Ultimate Grid\ADOSampleView.cpp" />
+    <ClCompile Include="Ultimate Grid\FormCUG.cpp" />
+    <ClCompile Include="Ultimate Grid\FormDialog.cpp" />
+    <ClCompile Include="Ultimate Grid\Mycug.cpp" />
+    <ClCompile Include="Ultimate Grid\TableDialog.cpp" />
+    <ClCompile Include="Ultimate Grid\TnCUG.cpp" />
+    <ClCompile Include="Ultimate Grid\TPView.cpp" />
+    <ClCompile Include="Ultimate Grid\UGCTsarw.cpp" />
+    <ClCompile Include="Ultimate Grid\UpdatedRow.cpp" />
+    <ClCompile Include="Ultimate Grid\Virtdata.cpp" />
+    <ClCompile Include="Ultimate Grid\VirtualTable2.cpp" />
+    <ClCompile Include="undo_gid.cpp" />
+    <ClCompile Include="UnvisualTree.cpp" />
+    <ClCompile Include="update.cpp" />
+    <ClCompile Include="utf-8.cpp" />
+    <ClCompile Include="UTM.cpp" />
+    <ClCompile Include="utp\utp_diam_rasch.cpp" />
+    <ClCompile Include="ViewTree.cpp" />
+    <ClCompile Include="view_nodes.cpp" />
+    <ClCompile Include="virtlistView.cpp" />
+    <ClCompile Include="virtualdata.cpp" />
+    <ClCompile Include="VirtualDlg.cpp" />
+    <ClCompile Include="VirtualListCtrl.cpp" />
+    <ClCompile Include="virtualnodelist.cpp" />
+    <ClCompile Include="VirtualTable.cpp" />
+    <ClCompile Include="vydel.cpp" />
+    <ClCompile Include="water.cpp" />
+    <ClCompile Include="wgs_kr.cpp" />
+    <ClCompile Include="Win.cpp" />
+    <ClCompile Include="wincc.cpp" />
+    <ClCompile Include="wkb.cpp" />
+    <ClCompile Include="Word.cpp" />
+    <ClCompile Include="Word2\AktRasledovania2.cpp" />
+    <ClCompile Include="Word2\KartaPovrezhdaemosti2.cpp" />
+    <ClCompile Include="Word2\Remont_docx1.cpp" />
+    <ClCompile Include="Word2\Remont_docx2.cpp" />
+    <ClCompile Include="Word2\Remont_docx3.cpp" />
+    <ClCompile Include="WordDefectZhurnal.cpp" />
+    <ClCompile Include="WordKorroz.cpp" />
+    <ClCompile Include="NewPassport\WVAdoImpDataSource.cpp" />
+    <ClCompile Include="Word\AktRasledovania.cpp" />
+    <ClCompile Include="Word\AktShurfovki.cpp" />
+    <ClCompile Include="Word\InfoAreaDoc.cpp" />
+    <ClCompile Include="Word\GrafikShurfovok.cpp" />
+    <ClCompile Include="Word\KartaPovrezhdaemosti.cpp" />
+    <ClCompile Include="Word\OpresTables.cpp" />
+    <ClCompile Include="Word\PlanOpresProbation.cpp" />
+    <ClCompile Include="zap.cpp" />
+    <ClCompile Include="NewPassport\CWebHelpDialog.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="gid6.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Downloads\VS2019 Image Library\vswin2019\AddBinaryFile\AddBinaryFile_16x.png" />
+    <Image Include="..\..\..\..\Downloads\WebFormTemplate_11274_32x.png" />
+    <Image Include="..\..\..\..\Downloads\WebFormTemplate_11274_48x.png" />
+    <Image Include="res\alseco.bmp" />
+    <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\bitmap10.bmp" />
+    <Image Include="res\bitmap11.bmp" />
+    <Image Include="res\bitmap12.bmp" />
+    <Image Include="res\bitmap16.bmp" />
+    <Image Include="res\bitmap17.bmp" />
+    <Image Include="res\bitmap2.bmp" />
+    <Image Include="res\bitmap5.bmp" />
+    <Image Include="res\bitmap6.bmp" />
+    <Image Include="res\bitmap7.bmp" />
+    <Image Include="res\bitmap8.bmp" />
+    <Image Include="res\bmp00001.bmp" />
+    <Image Include="res\bmp00002.bmp" />
+    <Image Include="res\bmp00003.bmp" />
+    <Image Include="res\bmp00004.bmp" />
+    <Image Include="res\bmp00005.bmp" />
+    <Image Include="res\bmp00006.bmp" />
+    <Image Include="res\bmp00007.bmp" />
+    <Image Include="res\bmp00008.bmp" />
+    <Image Include="res\bmp00009.bmp" />
+    <Image Include="res\bmp00010.bmp" />
+    <Image Include="res\bmp00011.bmp" />
+    <Image Include="res\bmp00011_2.bmp" />
+    <Image Include="res\bmp00012.bmp" />
+    <Image Include="res\bmp00013.bmp" />
+    <Image Include="res\bmp00014.bmp" />
+    <Image Include="res\bmp00015.bmp" />
+    <Image Include="res\bmp00016.bmp" />
+    <Image Include="res\bmp00017.bmp" />
+    <Image Include="res\bmp00018.bmp" />
+    <Image Include="res\bmp00019.bmp" />
+    <Image Include="res\bmp00020.bmp" />
+    <Image Include="res\bmp00021.bmp" />
+    <Image Include="res\bmp00022.bmp" />
+    <Image Include="res\bmp00023.bmp" />
+    <Image Include="res\bmp00024.bmp" />
+    <Image Include="res\bmp1532.bmp" />
+    <Image Include="res\bmp_any.bmp" />
+    <Image Include="res\buttons.bmp" />
+    <Image Include="res\categori.bmp" />
+    <Image Include="res\classview.bmp" />
+    <Image Include="res\classview_hc.bmp" />
+    <Image Include="res\class_view.ico" />
+    <Image Include="res\class_view_hc.ico" />
+    <Image Include="res\explorer.bmp" />
+    <Image Include="res\explorer_hc.bmp" />
+    <Image Include="res\filelarge.bmp" />
+    <Image Include="res\filesmall.bmp" />
+    <Image Include="res\fileview.bmp" />
+    <Image Include="res\fileview_hc.bmp" />
+    <Image Include="res\file_view.ico" />
+    <Image Include="res\file_view_hc.ico" />
+    <Image Include="res\folder_c.bmp" />
+    <Image Include="res\gid6.ico" />
+    <Image Include="res\gid6Doc.ico" />
+    <Image Include="res\icon-developer-icon.png" />
+    <Image Include="res\icon-developer-icon48.png" />
+    <Image Include="res\icon1.ico" />
+    <Image Include="res\idc_spla.bmp" />
+    <Image Include="res\if_bullet_toggle_plus_35788(1).bmp" />
+    <Image Include="res\info.bmp" />
+    <Image Include="res\LIST.BMP" />
+    <Image Include="res\list_sma.bmp" />
+    <Image Include="res\main.bmp" />
+    <Image Include="res\mainfram.bmp" />
+    <Image Include="res\menu.bmp" />
+    <Image Include="res\menuimages.bmp" />
+    <Image Include="res\menuimages_hc.bmp" />
+    <Image Include="res\nosort.bmp" />
+    <Image Include="res\output_wnd.ico" />
+    <Image Include="res\output_wnd_hc.ico" />
+    <Image Include="res\properties.bmp" />
+    <Image Include="res\properties_hc.bmp" />
+    <Image Include="res\properties_wnd.ico" />
+    <Image Include="res\properties_wnd_hc.ico" />
+    <Image Include="res\ribbonhome.png" />
+    <Image Include="res\shield.png" />
+    <Image Include="res\sirius.bmp" />
+    <Image Include="res\sort.bmp" />
+    <Image Include="res\sort_hc.bmp" />
+    <Image Include="res\status.bmp" />
+    <Image Include="res\Toolbar.bmp" />
+    <Image Include="res\toolbar1.bmp" />
+    <Image Include="res\toolbar2.bmp" />
+    <Image Include="res\Toolbar256.bmp" />
+    <Image Include="res\toolbar3.bmp" />
+    <Image Include="res\toolbar4.bmp" />
+    <Image Include="res\toolbar5.bmp" />
+    <Image Include="res\toolbar6.bmp" />
+    <Image Include="res\toolbar_.bmp" />
+    <Image Include="res\toolbar_z.bmp" />
+    <Image Include="res\t_defect.bmp" />
+    <Image Include="res\t_opres.bmp" />
+    <Image Include="res\t_osmotr.bmp" />
+    <Image Include="res\t_remont.bmp" />
+    <Image Include="res\t_shurfy.bmp" />
+    <Image Include="res\t_tu.bmp" />
+    <Image Include="res\userimages.bmp" />
+    <Image Include="res\writelarge.bmp" />
+    <Image Include="res\writesmall.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="packages.config" />
+    <None Include="resource.hm" />
+    <None Include="res\gid6.rc2" />
+    <None Include="res\ribbon.mfcribbon-ms" />
+    <None Include="res\ribbon1.mfcribbon-ms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="hasp_hl\libhasp_windows.lib" />
+    <Library Include="lib\duckx.lib" />
+    <Library Include="lib\libcrypto.lib" />
+    <Library Include="lib\libssl.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="NewPassport\HostObjectSample.idl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Windows.ImplementationLibrary.1.0.220201.1\build\native\Microsoft.Windows.ImplementationLibrary.targets" Condition="Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.220201.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" />
+    <Import Project="..\packages\Microsoft.Web.WebView2.1.0.1343.22\build\native\Microsoft.Web.WebView2.targets" Condition="Exists('..\packages\Microsoft.Web.WebView2.1.0.1343.22\build\native\Microsoft.Web.WebView2.targets')" />
+    <Import Project="..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Windows.ImplementationLibrary.1.0.220201.1\build\native\Microsoft.Windows.ImplementationLibrary.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Windows.ImplementationLibrary.1.0.220201.1\build\native\Microsoft.Windows.ImplementationLibrary.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.1343.22\build\native\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.1343.22\build\native\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets'))" />
+  </Target>
+</Project>

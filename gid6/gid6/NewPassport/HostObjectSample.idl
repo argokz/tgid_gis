@@ -1,0 +1,39 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[uuid(0a7a4655-5660-47d0-8a37-98ae21399e57), version(0.1)]
+library HostObjectSampleLibrary
+{
+    //! [AddHostObjectInterface]
+    [uuid(3a14c9c0-bc3e-453f-a314-4ce4a0ec81d8), object, local]
+    interface IHostObjectSample : IUnknown
+    {
+    
+        HRESULT InsertData([in] BSTR jsonStringParameter, [in] IDispatch* callbackParameter);
+
+        HRESULT OnExcel([in] BSTR jsonStringParameter, [in] IDispatch* callbackParameter);
+
+        HRESULT DeleteData([in] VARIANT* idArray, [in] IDispatch* callbackParameter);
+
+        HRESULT MoveTo([in] INT id, [in] BSTR type, [in] BSTR value, [in] IDispatch* callbackParameter);
+
+        HRESULT OnSearch([in] BSTR value, [in] IDispatch* callbackParameter);
+
+        HRESULT CreatePdf([in] BSTR data, [in] INT count);
+
+        HRESULT UpdateData([in] INT idParameter, [in] BSTR jsonStringParameter, [in] IDispatch* callbackParameter);
+
+        HRESULT UploadFile([in] BSTR fieldParameter, [in] IDispatch* callbackParameter);
+
+        HRESULT UtverditAction([in] INT idParameter, [in] BSTR jsonStringParameter, [in] IDispatch* callbackParameter);
+
+    };
+    //! [AddHostObjectInterface]
+
+    [uuid(637abc45-11f7-4dde-84b4-317d62a638d3)]
+    coclass HostObjectSample
+    {
+        [default] interface IHostObjectSample;
+        interface IDispatch;
+    };
+}

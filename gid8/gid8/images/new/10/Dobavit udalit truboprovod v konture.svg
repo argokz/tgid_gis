@@ -1,0 +1,25 @@
+<svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M26.375 1H4.625C2.62297 1 1 2.62297 1 4.625V26.375C1 28.377 2.62297 30 4.625 30H26.375C28.377 30 30 28.377 30 26.375V4.625C30 2.62297 28.377 1 26.375 1Z" stroke="transparent" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g clip-path="url(#clip0_201_1179)">
+<path d="M8.125 23.875H4.375V27.625H8.125V23.875Z" stroke="black" stroke-miterlimit="10"/>
+<path d="M27.625 4.375H23.875V8.125H27.625V4.375Z" stroke="black" stroke-miterlimit="10"/>
+<path d="M20.5 12.25V11.5H19.75" stroke="black" stroke-miterlimit="10"/>
+<path d="M19 11.5H12.625" stroke="black" stroke-miterlimit="10" stroke-dasharray="50 25"/>
+<path d="M12.25 11.5H11.5V12.25" stroke="black" stroke-miterlimit="10"/>
+<path d="M11.5 13V19.375" stroke="black" stroke-miterlimit="10" stroke-dasharray="50 25"/>
+<path d="M11.5 19.75V20.5H12.25" stroke="black" stroke-miterlimit="10"/>
+<path d="M13 20.5H19.375" stroke="black" stroke-miterlimit="10" stroke-dasharray="50 25"/>
+<path d="M19.75 20.5H20.5V19.75" stroke="black" stroke-miterlimit="10"/>
+<path d="M20.5 19V12.625" stroke="black" stroke-miterlimit="10" stroke-dasharray="50 25"/>
+<path d="M8.125 23.875L11.5 20.5" stroke="black" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M20.5 11.5L23.875 8.125" stroke="black" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M26.88 24.44H18.88" stroke="#EF1B1B" stroke-width="3" stroke-miterlimit="10"/>
+<path d="M7.80005 4V12" stroke="#0F7C41" stroke-width="2" stroke-miterlimit="10"/>
+<path d="M11.8 8H3.80005" stroke="#0F7C41" stroke-width="2" stroke-miterlimit="10"/>
+</g>
+<defs>
+<clipPath id="clip0_201_1179">
+<rect width="24" height="24" fill="white" transform="translate(4 4)"/>
+</clipPath>
+</defs>
+</svg>

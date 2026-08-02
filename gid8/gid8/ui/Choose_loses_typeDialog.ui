@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Choose_loses_typeDialog</class>
+ <widget class="QDialog" name="dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>465</width>
+    <height>193</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>465</width>
+    <height>193</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>465</width>
+    <height>193</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Расчет нормируемых тепловых потерь</string>
+  </property>
+
+  
+
+  <widget class="QGroupBox" name="group_Static1">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>10</y>
+     <width>211</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Новый сезон</string>
+   </property>
+  </widget>
+
+  
+  <widget class="QPushButton" name="push_Ok">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>160</y>
+     <width>101</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+
+
+
+  <widget class="QDateEdit" name="date_Datetimepicker1">
+   <property name="geometry">
+    <rect>
+     <x>249</x>
+     <y>37</y>
+     <width>193</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="dateTime">
+    <datetime>
+     <hour>19</hour>
+     <minute>0</minute>
+     <second>0</second>
+     <year>2024</year>
+     <month>10</month>
+     <day>14</day>
+    </datetime>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="date_Datetimepicker2">
+   <property name="geometry">
+    <rect>
+     <x>249</x>
+     <y>77</y>
+     <width>193</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="dateTime">
+    <datetime>
+     <hour>19</hour>
+     <minute>0</minute>
+     <second>0</second>
+     <year>2025</year>
+     <month>4</month>
+     <day>14</day>
+    </datetime>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Add_heating_date">
+   <property name="geometry">
+    <rect>
+     <x>249</x>
+     <y>107</y>
+     <width>191</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Задать</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="check_Fragment">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>112</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>По фрагменту</string>
+   </property>
+  </widget>
+
+
+  <widget class="QGroupBox" name="group_Static2">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>10</y>
+     <width>221</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Существующий сезон</string>
+   </property>
+   <widget class="QComboBox" name="combo_Combo1">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>201</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="push_Del">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>70</y>
+      <width>201</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Удалить</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_Static3">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>380</y>
+     <width>301</width>
+     <height>57</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Тип потерь</string>
+   </property>
+   <widget class="QRadioButton" name="radio_Radio1">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>20</y>
+      <width>100</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>нормируемые</string>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_Radio1</string>
+    </attribute>
+   </widget>
+   <widget class="QRadioButton" name="radio_Radio2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>100</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>фактические</string>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_Radio1</string>
+    </attribute>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="bg_Radio1"/>
+ </buttongroups>
+</ui>

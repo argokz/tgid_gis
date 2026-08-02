@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   fill="#000000"
+   height="800px"
+   width="800px"
+   version="1.1"
+   id="Layer_1"
+   viewBox="0 0 512 512"
+   xml:space="preserve"
+   sodipodi:docname="binoculars-find 1.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs42" /><sodipodi:namedview
+   id="namedview40"
+   pagecolor="#ffffff"
+   bordercolor="#999999"
+   borderopacity="1"
+   inkscape:showpageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   showgrid="false"
+   inkscape:zoom="1.5591705"
+   inkscape:cx="400.21282"
+   inkscape:cy="413.04015"
+   inkscape:window-width="3360"
+   inkscape:window-height="1766"
+   inkscape:window-x="-12"
+   inkscape:window-y="-12"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<g
+   id="g13"
+   transform="matrix(0.81057988,0,0,0.64057931,53.135964,94.1366)">
+	<g
+   id="g11">
+		<path
+   d="M 209.455,0 H 87.51 C 74.657,0 64.237,10.42 64.237,23.273 v 69.818 h 168.49 V 23.273 C 232.727,10.42 222.307,0 209.455,0 Z"
+   id="path9" />
+	</g>
+</g>
+<g
+   id="g19"
+   transform="matrix(0.81057988,0,0,0.64057931,53.135964,94.1366)">
+	<g
+   id="g17">
+		<path
+   d="M 424.49,0 H 302.545 c -12.853,0 -23.273,10.42 -23.273,23.273 v 69.818 h 168.49 V 23.273 C 447.763,10.42 437.343,0 424.49,0 Z"
+   id="path15" />
+	</g>
+</g>
+<g
+   id="g25"
+   transform="matrix(0.81057988,0,0,0.64057931,53.135964,94.1366)">
+	<g
+   id="g23">
+		<polygon
+   points="279.273,310.303 279.273,341.333 509.184,341.333 483.086,139.636 28.914,139.636 2.816,341.333 232.727,341.333 232.727,310.303 "
+   id="polygon21" />
+	</g>
+</g>
+<g
+   id="g31"
+   transform="matrix(0.81057988,0,0,0.64057931,53.135964,94.1366)">
+	<g
+   id="g29">
+		<path
+   d="M 0,387.879 V 488.728 C 0,501.578 10.42,512 23.273,512 h 186.182 c 12.853,0 23.273,-10.422 23.273,-23.273 V 387.879 Z"
+   id="path27" />
+	</g>
+</g>
+<g
+   id="g37"
+   transform="matrix(0.81057988,0,0,0.64057931,53.135964,94.1366)">
+	<g
+   id="g35">
+		<path
+   d="m 279.273,387.879 v 100.849 c 0,12.851 10.42,23.273 23.273,23.273 H 488.728 C 501.58,512 512,501.578 512,488.727 V 387.879 Z"
+   id="path33" />
+	</g>
+</g>
+</svg>

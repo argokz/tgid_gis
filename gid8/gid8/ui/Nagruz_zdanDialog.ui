@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?><ui version="4.0"><class>Nagruz_zdanDialog</class>
+<widget class="QDialog">
+<property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>518</width>
+     <height>264</height>
+    </rect>
+   </property>
+<property name="windowTitle"><string>Расчет расчетных тепловых нагрузок</string></property>
+<widget class="QGroupBox" name="group_Static1">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>9</y>
+     <width>490</width>
+     <height>117</height>
+    </rect>
+   </property>
+<property name="title"><string>Параметры</string></property>
+</widget>
+<widget class="QGroupBox" name="group_Static2">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>132</y>
+     <width>488</width>
+     <height>89</height>
+    </rect>
+   </property>
+<property name="title"><string>Результат</string></property>
+</widget>
+<widget class="QPushButton" name="push_Ok">
+<property name="geometry">
+    <rect>
+     <x>318</x>
+     <y>229</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Сохранить</string></property>
+</widget>
+<widget class="QPushButton" name="push_Cancel">
+<property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>229</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Отменить</string></property>
+</widget>
+<widget class="QComboBox" name="combo_Combo1">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>18</y>
+     <width>200</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit2">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>39</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit3">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>59</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit5">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>80</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit6">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>102</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit7">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>141</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit4">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>165</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Edit8">
+<property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>186</y>
+     <width>118</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLabel" name="label_Static3">
+<property name="geometry">
+    <rect>
+     <x>173</x>
+     <y>19</y>
+     <width>87</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Назначение</string></property>
+</widget>
+<widget class="QLabel" name="label_Static4">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>41</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Год постройки</string></property>
+</widget>
+<widget class="QLabel" name="label_Static5">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>62</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Наружный объем</string></property>
+</widget>
+<widget class="QLabel" name="label_Static6">
+<property name="geometry">
+    <rect>
+     <x>399</x>
+     <y>62</y>
+     <width>66</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>м3</string></property>
+</widget>
+<widget class="QLabel" name="label_Static7">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>84</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Расчетная температура наружного воздуха</string></property>
+</widget>
+<widget class="QLabel" name="label_Static8">
+<property name="geometry">
+    <rect>
+     <x>399</x>
+     <y>84</y>
+     <width>66</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>°С</string></property>
+</widget>
+<widget class="QLabel" name="label_Static9">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>105</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Расчетная температура внутри помещения</string></property>
+</widget>
+<widget class="QLabel" name="label_Static10">
+<property name="geometry">
+    <rect>
+     <x>399</x>
+     <y>105</y>
+     <width>66</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>°С</string></property>
+</widget>
+<widget class="QLabel" name="label_Static11">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>166</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Удельная характеристика здания</string></property>
+</widget>
+<widget class="QLabel" name="label_Static12">
+<property name="geometry">
+    <rect>
+     <x>399</x>
+     <y>166</y>
+     <width>90</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>ккал/(м3*ч*°С)</string></property>
+</widget>
+<widget class="QLabel" name="label_Static13">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>145</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Поправочный коэфф. t наружного. воздуха</string></property>
+</widget>
+<widget class="QLabel" name="label_Static14">
+<property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>188</y>
+     <width>249</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Расчетная тепловая нагрузка</string></property>
+</widget>
+<widget class="QLabel" name="label_Static15">
+<property name="geometry">
+    <rect>
+     <x>399</x>
+     <y>188</y>
+     <width>66</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Гкал/ч</string></property>
+</widget>
+<widget class="QPushButton" name="push__help">
+<property name="geometry">
+    <rect>
+     <x>186</x>
+     <y>229</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Помощь</string></property>
+</widget>
+</widget>
+<buttongroups>
+</buttongroups>
+</ui>

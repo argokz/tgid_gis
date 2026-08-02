@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CNas_charDialog</class>
+ <widget class="QDialog" name="CNas_charDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>701</width>
+    <height>453</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Характеристики насосов</string>
+  </property>
+  <widget class="QGroupBox" name="group_Function">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>9</y>
+     <width>341</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Функция</string>
+   </property>
+   <widget class="QRadioButton" name="radio_Radio1">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>311</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Аппроксимация характеристик насосов и насосных
+станций с параллельно включенными насосами
+одного типа</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeat">
+     <bool>false</bool>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioFunction</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_ResistanceData">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>10</y>
+     <width>291</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Расчет гидравлического сопротивления</string>
+   </property>
+   <widget class="QPushButton" name="calcResistanceButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>170</y>
+      <width>240</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Рассчитать сопротивление</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edit_Edit_s">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>140</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static10">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>140</y>
+      <width>163</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>S - сопротивление, м*ч2/т2</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edit_Edit_g">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>110</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static9">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>110</y>
+      <width>156</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>G - расход на участке, т/ч</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edit_Edit_p">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>70</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static8">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>80</y>
+      <width>148</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>P - перепад напора, м</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static11">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>30</y>
+      <width>254</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Формула ( по перепаду напора ) : S = P / G^2</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_Resistance">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>200</y>
+     <width>341</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Гидравлическое сопротивление обвязки</string>
+   </property>
+   <widget class="QRadioButton" name="radio_Radio6">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>156</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Не учитывать</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioResistance</string>
+    </attribute>
+   </widget>
+   <widget class="QRadioButton" name="radio_Radio5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>173</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Учитывать при расчете</string>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioResistance</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_WheelData">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>260</y>
+     <width>291</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Диаметр рабочего колеса</string>
+   </property>
+   <widget class="QLineEdit" name="edit_Edit_dzad">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>70</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edit_Edit_dnom">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>40</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static13">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>173</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Новое значение диаметра, мм</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static14">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>40</y>
+      <width>105</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Номинальный, мм</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_DriveData">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>341</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Частота вращения рабочего колеса</string>
+   </property>
+   <widget class="QLineEdit" name="edit_Edit_fzad">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>70</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="edit_Edit_fnom">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>30</y>
+      <width>66</width>
+      <height>23</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static15">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>70</y>
+      <width>211</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Новое значение частоты, об/мин</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Static16">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>153</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Номинальная, об/мин</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_Drive">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>201</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Привод</string>
+   </property>
+   <widget class="QRadioButton" name="radio_Radio8">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>156</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Частотно регулируемый</string>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioDrive</string>
+    </attribute>
+   </widget>
+   <widget class="QRadioButton" name="radio_Radio7">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>135</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Нерегулируемый</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioDrive</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="group_Wheel">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>130</y>
+     <width>121</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Колесо</string>
+   </property>
+   <widget class="QRadioButton" name="radio_Radio10">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>94</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Срезанное</string>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioWheel</string>
+    </attribute>
+   </widget>
+   <widget class="QRadioButton" name="radio_Radio9">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>102</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Номинальное</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <attribute name="buttonGroup">
+     <string notr="true">bg_RadioWheel</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QLineEdit" name="edit_Edit_kol">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>240</y>
+     <width>66</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Button6">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>420</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Помощь</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Calc">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>420</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Расчет</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Ok">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>420</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Сохранить</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Cancel">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>420</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Отмена</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Static12">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>220</y>
+     <width>201</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Количество параллельно включеннных насосов в группе</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Calc_diam">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>370</y>
+     <width>291</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Расчет диаметра срезанного рабочего
+колеса и характеристик насоса</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="bg_RadioWheel"/>
+  <buttongroup name="bg_RadioResistance"/>
+  <buttongroup name="bg_RadioDrive"/>
+  <buttongroup name="bg_RadioFunction"/>
+ </buttongroups>
+</ui>

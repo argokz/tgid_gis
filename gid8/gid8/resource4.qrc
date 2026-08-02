@@ -1,0 +1,142 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/briefcase_1.svg</file>
+        <file>icons/engineering_1.svg</file>
+        <file>icons/information_1.svg</file>
+        <file>icons/monitor_1.svg</file>
+        <file>icons/add_database_2.svg</file>
+        <file>icons/add_folder_2.svg</file>
+        <file>icons/add_link_2.svg</file>
+        <file>icons/create_new_2.svg</file>
+        <file>icons/file_2.svg</file>
+        <file>icons/live_folder_2.svg</file>
+        <file>icons/save_2.svg</file>
+        <file>images4/menu-svgrepo-com.svg</file>
+        <file>images4/three-dots-menu.svg</file>
+        <file>images4/triangle-down-svgrepo-com.svg</file>
+        <file>images4/documents.svg</file>
+        <file>images/db2/add_item_blue.svg</file>
+        <file>images/db2/check-correct.svg</file>
+        <file>images/db2/col_remove.svg</file>
+        <file>images/db2/edit-writing.svg</file>
+        <file>images/db2/excel.svg</file>
+        <file>images/db2/minus.svg</file>
+        <file>images/db2/plus.svg</file>
+        <file>images/db2/print.svg</file>
+        <file>images/db2/remove_item.svg</file>
+        <file>images/db2/reset.svg</file>
+        <file>images/db2/table-col-list.svg</file>
+        <file>images/db2/table-style.svg</file>
+        <file>images/db2/uncheck-correct.svg</file>
+        <file>images/db2/find-svgrepo-com.svg</file>
+        <file>images/db2/cross-svgrepo-com.svg</file>
+        <file>images/new/1/cursor-click 1.svg</file>
+        <file>images/new/1/preview-color 1.svg</file>
+        <file>images/new/1/print-color 1.svg</file>
+        <file>images/new/1/rectangle 1.svg</file>
+        <file>images/new/1/settings 1.svg</file>
+        <file>images/new/1/table.svg</file>
+        <file>images/new/1/turn-left-arrows 1.svg</file>
+        <file>images/new/1/Vector.svg</file>
+        <file>images/new/2/pan 1.svg</file>
+        <file>images/new/2/update 1.svg</file>
+        <file>images/new/2/hand.svg</file>
+        <file>images/new/2/zoom-in-alt 1.svg</file>
+        <file>images/new/2/zoom-out-alt 1.svg</file>
+        <file>images/new/2/zoom-select 1.svg</file>
+        <file>images/new/3/document-info 1.svg</file>
+        <file>images/new/3/eye-view-svgrepo-com 1.svg</file>
+        <file>images/new/3/hash-svgrepo-com 1.svg</file>
+        <file>images/new/3/ruler-svgrepo-com.svg</file>
+        <file>images/new/4/binoculars-find 1.svg</file>
+        <file>images/new/4/curve-arrow-left 1.svg</file>
+        <file>images/new/4/curve-arrow-left 2.svg</file>
+        <file>images/new/4/selection-select-svgrepo-com 1.svg</file>
+        <file>images/new/4/sum 1.svg</file>
+        <file>images/new/4/up-down-arrow 1.svg</file>
+        <file>images/new/big/act.svg</file>
+        <file>images/new/big/select-window 1.svg</file>
+        <file>images/new/big/file-excel.svg</file>
+        <file>images/new/big/export.svg</file>
+        <file>images/new/big/setup.svg</file>
+        <file>images/new/big/setup_blue.svg</file>
+        <file>images/new/big/AddDop.svg</file>
+        <file>images/new/big/MainCxema.svg</file>
+        <file>images/new/big/switch-double-svgrepo-com 1.svg</file>
+        <file>images/new/big/text-field-focus-svgrepo-com 1.svg</file>
+        <file>images/new/big/doit.svg</file>
+        <file>images/new/big/doitdr.svg</file>
+        <file>images/new/big/add-db.svg</file>
+        <file>images/new/big/connect.svg</file>
+        <file>images/new/big/Exit.svg</file>
+        <file>images/new/big/geobaza.svg</file>
+        <file>images/new/big/file-svgrepo-com.svg</file>
+        <file>images/new/big/query-svgrepo-com.svg</file>
+        <file>images/new/7/copy.svg</file>
+        <file>images/new/7/png-file-extension-interface-symbol-svgrepo-com 1.svg</file>
+        <file>images/new/7/select-all-svgrepo-com 1.svg</file>
+        <file>images/new/7/select-object.svg</file>
+        <file>images/new/7/select-svgrepo-com 1.svg</file>
+        <file>images/new/8/delete-svgrepo-com 1.svg</file>
+        <file>images/new/8/flag-2-svgrepo-com 1.svg</file>
+        <file>images/new/8/flow-parallel-svgrepo-com 1.svg</file>
+        <file>images/new/8/info-svgrepo-com 1.svg</file>
+        <file>images/new/8/kam.svg</file>
+        <file>images/new/8/line-tool-svgrepo-com 1.svg</file>
+        <file>images/new/8/move.svg</file>
+        <file>images/new/8/node.svg</file>
+        <file>images/new/8/select-product-svgrepo-com 1.svg</file>
+        <file>images/new/8/type-svgrepo-com.svg</file>
+        <file>images/new/8/swap.svg</file>
+        <file>images/new/8/moveline.svg</file>
+        <file>images/new/8/open_close.svg</file>
+        <file>images/new/9/add.svg</file>
+        <file>images/new/9/del.svg</file>
+        <file>images/new/9/find.svg</file>
+        <file>images/new/9/info.svg</file>
+        <file>images/new/9/MS.svg</file>
+        <file>images/new/9/RS.svg</file>
+        <file>images/new/9/table.svg</file>
+        <file>images/new/9/view.svg</file>
+        <file>images/new/10/Dobavit udalit truboprovod v konture.svg</file>
+        <file>images/new/10/Mag.svg</file>
+        <file>images/new/10/MS.svg</file>
+        <file>images/new/10/Pasport.svg</file>
+        <file>images/new/10/RS.svg</file>
+        <file>images/new/10/Ubrat vydelenie.svg</file>
+        <file>images/new/10/Vybrat konechnyj uzel uchastka MS.svg</file>
+        <file>images/new/10/Vybrat nachalnyj uzel uchastka MS.svg</file>
+        <file>images/new/10/Vybrat napravlenie.svg</file>
+        <file>images/new/10/Vybrat napravlenie po magistrale.svg</file>
+        <file>images/new/10/Vydelit fragment seti.svg</file>
+        <file>images/new/10/Vydelit fragment seti muzhdu uzlami.svg</file>
+        <file>images/new/10/Vydelit oblast raschetnoj shemy.svg</file>
+        <file>images/new/10/Vydelit raschetnuju shemu.svg</file>
+        <file>images/new/11/SetCoordNull.svg</file>
+        <file>images/new/11/ZapNezak.svg</file>
+        <file>images/new/big/a/Analiz.svg</file>
+        <file>images/new/big/a/AdmissibilityAnalysis.svg</file>
+        <file>images/new/big/a/AnalizVyd.svg</file>
+        <file>images/new/big/a/Queries.svg</file>
+        <file>images/new/pjezo/pjezo_save.svg</file>
+        <file>images/new/pjezo/pjezo.svg</file>
+        <file>images/new/pjezo/pjezo_list.svg</file>
+        <file>images/new/pjezo/pjezo_v.svg</file>
+
+        <file>images/sync/sync1.svg</file>
+        <file>images/sync/sync2.svg</file>
+        <file>images/sync/sync3.svg</file>
+
+        <file>images/alseco/alseco_00.bmp</file>
+        <file>images/alseco/alseco_01.bmp</file>
+        <file>images/alseco/alseco_02.bmp</file>
+        <file>images/alseco/alseco_03.bmp</file>
+        <file>images/alseco/alseco_04.bmp</file>
+        <file>images/alseco/alseco_05.bmp</file>
+        <file>images/alseco/alseco_06.bmp</file>
+        <file>images/alseco/alseco_07.bmp</file>
+        <file>images/alseco/alseco_08.bmp</file>
+
+        <file>images/db2/marker.svg</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Param1Dialog</class>
+ <widget class="QDialog" name="dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>416</width>
+    <height>681</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Установки расчета планового режима</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="group_Static1">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="visible">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Нагрузки</string>
+     </property>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QRadioButton" name="radio_Dop_nagr">
+        <property name="text">
+         <string>Расчетные</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">bg_Dop_nagr</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radio_Radio3">
+        <property name="text">
+         <string>Договорные</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">bg_Dop_nagr</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radio_Radio4">
+        <property name="text">
+         <string>Перспективные</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">bg_Dop_nagr</string>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_Static8">
+     <property name="title">
+      <string>Наименование расчета</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLineEdit" name="edit_Name"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Plan">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="visible">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Плановый расчетный режим магистрального фрагмента</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_Static2">
+     <property name="title">
+      <string>Расчетные расходы потребителей</string>
+     </property>
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QRadioButton" name="radio_Ur">
+           <property name="text">
+            <string>По удельным расходам</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">bg_Ur</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_Ur2">
+           <property name="text">
+            <string>По температурному графику</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">bg_Ur</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Teplopoter">
+        <property name="text">
+         <string>C учетом тепловых потерь в сети</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Uf_calc">
+        <property name="text">
+         <string>С учетом рассчитанных коэффициентов смешения</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Teplovyd">
+        <property name="text">
+         <string>С учетом внутренних тепловыделений</string>
+        </property>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QGroupBox" name="group_Static3">
+        <property name="title">
+         <string>Температура расчета тепловых потерь</string>
+        </property>
+        <layout class="QHBoxLayout">
+         <item>
+          <widget class="QComboBox" name="combo_Metod"/>
+         </item>
+         <item>
+          <widget class="QComboBox" name="combo_Trtp"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+
+     </layout>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QGroupBox" name="group_Static4">
+        <property name="title">
+         <string>Температура наружного воздуха</string>
+        </property>
+        <layout class="QHBoxLayout">
+         <item>
+          <widget class="QLineEdit" name="edit_Tn"/>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="check_Veter">
+           <property name="text">
+            <string>Учитывать ветер</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QGroupBox" name="group_Static7">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="check_Dross">
+        <property name="text">
+         <string>Расчет дроссельных органов и запись сопротивлений</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Avtomat">
+        <property name="text">
+         <string>Расчет автоматизированных потребителей</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Uf_new">
+        <property name="text">
+         <string>Запись коэффициентов смешения</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Char_sety">
+        <property name="text">
+         <string>Количественные характеристики сети</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_Static6">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="visible">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="check_Utechki">
+        <property name="text">
+         <string>Учет нормируемых утечек на трубопроводах</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Zn0">
+        <property name="text">
+         <string>Подбор заданных перепадов на источнике</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_Static6">
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QLabel" name="label_Static9">
+        <property name="text">
+         <string>Расчетный перепад напора:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Mag_fragment">
+        <property name="text">
+         <string>Магистральный фрагмент</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="check_Save_po">
+        <property name="text">
+         <string>Запись тепловых нагрузок и потерь в обобщенный потребитель</string>
+        </property>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QCheckBox" name="check_Kv">
+        <property name="text">
+         <string>С учетом коэффициентов вариации</string>
+        </property>
+       </widget>
+      </item>
+
+     </layout>
+    </widget>
+   </item>
+
+
+
+   <item>
+    <widget class="QGroupBox" name="groupBox_iter">
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QGroupBox" name="group_Static_iter">
+        <property name="title">
+         <string>Количество итераций для расчета регуляторов</string>
+        </property>
+        <layout class="QHBoxLayout">
+         <item>
+          <widget class="QLineEdit" name="edit_kol_iter"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+
+
+
+
+   <item>
+    <widget class="QCheckBox" name="check_copy_calc">
+     <property name="text">
+      <string>Синхронизировать</string>
+     </property>
+    </widget>
+   </item>
+
+
+
+
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="push_Ok">
+        <property name="text">
+         <string>Расчет</string>
+        </property>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QPushButton" name="push_Cancel">
+        <property name="text">
+         <string>Отмена</string>
+        </property>
+       </widget>
+      </item>
+
+
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+
+
+
+     <item>
+       <widget class="QPushButton" name="push_Setup">
+        <property name="text">
+         <string>Настройка</string>
+        </property>
+       </widget>
+      </item>
+
+
+
+
+
+
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="bg_Ur"/>
+  <buttongroup name="bg_Dop_nagr"/>
+ </buttongroups>
+</ui>

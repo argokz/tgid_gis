@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+                <ui version="4.0"><class>PercentDialog</class>
+<widget class="QDialog" name="dialog">
+<property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>464</width>
+     <height>125</height>
+    </rect>
+   </property>
+<property name="windowTitle"><string>Операция выполняется, подождите пожалуйста...</string></property>
+<widget class="QPushButton" name="pushButton_IDCANCEL">
+<property name="geometry">
+    <rect>
+     <x>166</x>
+     <y>90</y>
+     <width>112</width>
+     <height>27</height>
+    </rect>
+   </property>
+<property name="text"><string>Стоп</string></property>
+</widget>
+<widget class="QProgressBar" name="progressBar_CG_PROGDLG_PROGRESS">
+<property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>25</y>
+     <width>392</width>
+     <height>13</height>
+    </rect>
+   </property>
+<!--
+<property name="text"><string>Progress1</string></property>
+-->
+</widget>
+<widget class="QLabel" name="label_CG_PROGDLG_PERCENT">
+<property name="geometry">
+    <rect>
+     <x>215</x>
+     <y>59</y>
+     <width>30</width>
+     <height>13</height>
+    </rect>
+   </property>
+<!--
+<property name="text"><string>0 %</string></property>
+-->
+</widget>
+<widget class="QLabel" name="label_1">
+<property name="geometry">
+    <rect>
+     <x>32</x>
+     <y>59</y>
+     <width>20</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>0 %</string></property>
+</widget>
+<widget class="QLabel" name="label_2">
+<property name="geometry">
+    <rect>
+     <x>404</x>
+     <y>59</y>
+     <width>34</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>100 %</string></property>
+</widget>
+</widget>
+</ui>

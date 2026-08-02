@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Colors2Dialog</class>
+ <widget class="QDialog" name="dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>450</width>
+    <height>359</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Стиль линии</string>
+  </property>
+  <widget class="QLabel" name="label_Static1">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>100</y>
+     <width>92</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Толщина линии</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Static2">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>150</y>
+     <width>92</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Расстояние</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="check_Punkt">
+   <property name="geometry">
+    <rect>
+     <x>366</x>
+     <y>123</y>
+     <width>69</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Пунктир</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="edit_Line_thickness">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>122</y>
+     <width>67</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spin_Line_thickness">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>122</y>
+     <width>67</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="edit_Distance">
+   <property name="geometry">
+    <rect>
+     <x>275</x>
+     <y>171</y>
+     <width>161</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Pod">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>250</y>
+     <width>72</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Подача</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Obr">
+   <property name="geometry">
+    <rect>
+     <x>87</x>
+     <y>250</y>
+     <width>72</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Обратка</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="combo_Open">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>66</y>
+     <width>158</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="combo_Mag_ras">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>9</y>
+     <width>158</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="combo_Typ">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>37</y>
+     <width>158</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Ok">
+   <property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>323</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Cancel">
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>323</y>
+     <width>82</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Отменить</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Default">
+   <property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>283</y>
+     <width>102</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>По умолчанию</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Colors_window">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>11</y>
+     <width>252</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Podf">
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>285</y>
+     <width>72</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Подача</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Obrf">
+   <property name="geometry">
+    <rect>
+     <x>87</x>
+     <y>285</y>
+     <width>72</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Обратка</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Static3">
+   <property name="geometry">
+    <rect>
+     <x>277</x>
+     <y>199</y>
+     <width>155</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Размер точечных объектов</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="edit_Ring">
+   <property name="geometry">
+    <rect>
+     <x>275</x>
+     <y>221</y>
+     <width>160</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Color_uzel">
+   <property name="geometry">
+    <rect>
+     <x>273</x>
+     <y>250</y>
+     <width>163</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Цвет узла</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="push_Default2">
+   <property name="geometry">
+    <rect>
+     <x>384</x>
+     <y>283</y>
+     <width>52</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ПТС</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="pictureBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>251</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+  <layout class="QVBoxLayout" name="grLayout"/>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

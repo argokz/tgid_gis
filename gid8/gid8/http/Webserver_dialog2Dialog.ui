@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?><ui version="4.0"><class>Webserver_dialog2Dialog</class>
+<widget class="QDialog" name="dialog">
+<property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>436</width>
+     <height>488</height>
+    </rect>
+   </property>
+<property name="windowTitle"><string>Веб-сервер</string></property>
+<widget class="QGroupBox" name="group_Static1">
+<property name="geometry">
+    <rect>
+     <x>321</x>
+     <y>11</y>
+     <width>105</width>
+     <height>153</height>
+    </rect>
+   </property>
+<property name="title"><string>Управление</string></property>
+</widget>
+<widget class="QGroupBox" name="group_Static2">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>11</y>
+     <width>304</width>
+     <height>265</height>
+    </rect>
+   </property>
+<property name="title"><string>Настройка</string></property>
+</widget>
+<widget class="QGroupBox" name="group_Static3">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>286</y>
+     <width>305</width>
+     <height>193</height>
+    </rect>
+   </property>
+<property name="title"><string>HTTPS</string></property>
+</widget>
+<widget class="QPushButton" name="push_Start">
+<property name="geometry">
+    <rect>
+     <x>334</x>
+     <y>32</y>
+     <width>80</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>Запуск</string></property>
+</widget>
+<widget class="QPushButton" name="push_Stop">
+<property name="geometry">
+    <rect>
+     <x>334</x>
+     <y>62</y>
+     <width>80</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>Стоп</string></property>
+</widget>
+<widget class="QPushButton" name="push_Reset">
+<property name="geometry">
+    <rect>
+     <x>334</x>
+     <y>92</y>
+     <width>80</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>Перезапуск</string></property>
+</widget>
+<widget class="QPushButton" name="push_Ok">
+<property name="geometry">
+    <rect>
+     <x>334</x>
+     <y>123</y>
+     <width>80</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>Выход</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_Homedir">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>44</y>
+     <width>236</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Tiles_dir">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>88</y>
+     <width>236</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QPushButton" name="push_Homedirbrowse">
+<property name="geometry">
+    <rect>
+     <x>265</x>
+     <y>43</y>
+     <width>24</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_Defindexfile">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>180</y>
+     <width>236</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Port">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>248</y>
+     <width>70</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QSpinBox" name="spin_Port">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>248</y>
+     <width>70</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Pto">
+<property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>248</y>
+     <width>78</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLabel" name="label_Static1">
+<property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>28</y>
+     <width>140</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Домашний каталог</string></property>
+</widget>
+<widget class="QLabel" name="label_Static2">
+<property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>70</y>
+     <width>140</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Каталог изображений</string></property>
+</widget>
+<widget class="QLabel" name="label_Static3">
+<property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>161</y>
+     <width>140</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Сетевой адрес</string></property>
+</widget>
+<widget class="QLabel" name="label_Static4">
+<property name="geometry">
+    <rect>
+     <x>139</x>
+     <y>227</y>
+     <width>84</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Тайм-аут (сек)</string></property>
+</widget>
+<widget class="QLabel" name="label_Static5">
+<property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>227</y>
+     <width>38</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Порт</string></property>
+</widget>
+<widget class="QLabel" name="label_Static6">
+<property name="geometry">
+    <rect>
+     <x>222</x>
+     <y>251</y>
+     <width>38</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>0 - Нет тайм-аута</string></property>
+</widget>
+<widget class="QCheckBox" name="check_Https">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>307</y>
+     <width>64</width>
+     <height>16</height>
+    </rect>
+   </property>
+<property name="text"><string>HTTPS</string></property>
+</widget>
+<widget class="QLabel" name="label_Static7">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>377</y>
+     <width>134</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Приватный ключ</string></property>
+</widget>
+<widget class="QLabel" name="label_Static8">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>427</y>
+     <width>100</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>SSL сертификат</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_Private">
+<property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>398</y>
+     <width>236</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_Public">
+<property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>448</y>
+     <width>236</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QPushButton" name="push_Privatebrowse">
+<property name="geometry">
+    <rect>
+     <x>267</x>
+     <y>396</y>
+     <width>24</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+<widget class="QPushButton" name="push_Publicbrowse">
+<property name="geometry">
+    <rect>
+     <x>267</x>
+     <y>446</y>
+     <width>24</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_Port_https">
+<property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>348</y>
+     <width>70</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QSpinBox" name="spin_Port_https">
+<property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>348</y>
+     <width>70</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLabel" name="label_Static9">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>329</y>
+     <width>67</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Порт</string></property>
+</widget>
+<widget class="QPushButton" name="push_Tile_dir_browse">
+<property name="geometry">
+    <rect>
+     <x>265</x>
+     <y>86</y>
+     <width>24</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+<widget class="QLabel" name="label_Status">
+<property name="geometry">
+    <rect>
+     <x>323</x>
+     <y>176</y>
+     <width>104</width>
+     <height>16</height>
+    </rect>
+   </property>
+<property name="text"><string>Idle...</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_Web_dir">
+<property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>132</y>
+     <width>236</width>
+     <height>19</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLabel" name="label_Static10">
+<property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>112</y>
+     <width>140</width>
+     <height>12</height>
+    </rect>
+   </property>
+<property name="text"><string>Каталог Веб-приложения</string></property>
+</widget>
+<widget class="QPushButton" name="push_Web_dir_browse">
+<property name="geometry">
+    <rect>
+     <x>265</x>
+     <y>131</y>
+     <width>24</width>
+     <height>22</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+</widget>
+</ui>

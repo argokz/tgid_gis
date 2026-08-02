@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+                <ui version="4.0"><class>OpenServer</class>
+<widget class="QDialog" name="dialog">
+<property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>525</width>
+     <height>294</height>
+    </rect>
+   </property>
+<property name="windowTitle"><string>Подключение к серверу</string></property>
+<widget class="QPushButton" name="pushButton_IDOK">
+<property name="geometry">
+    <rect>
+     <x>336</x>
+     <y>261</y>
+     <width>85</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>OK</string></property>
+</widget>
+<widget class="QPushButton" name="pushButton_IDCANCEL">
+<property name="geometry">
+    <rect>
+     <x>428</x>
+     <y>261</y>
+     <width>85</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Отменить</string></property>
+</widget>
+<widget class="QLabel" name="label_1">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>11</y>
+     <width>85</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Имя хоста/IP:</string></property>
+</widget>
+<widget class="QLabel" name="label_2">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>35</y>
+     <width>85</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Пользователь:</string></property>
+</widget>
+<widget class="QLabel" name="label_3">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>59</y>
+     <width>85</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Пароль:</string></property>
+</widget>
+<widget class="QLabel" name="label_4">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>83</y>
+     <width>85</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Порт:</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_IP">
+<property name="geometry">
+    <rect>
+     <x>119</x>
+     <y>11</y>
+     <width>238</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_USER">
+<property name="geometry">
+    <rect>
+     <x>119</x>
+     <y>35</y>
+     <width>238</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_PASSWORD">
+<property name="geometry">
+    <rect>
+     <x>119</x>
+     <y>59</y>
+     <width>238</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_PORT">
+<property name="geometry">
+    <rect>
+     <x>119</x>
+     <y>83</y>
+     <width>68</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QPushButton" name="pushButton_CHECK">
+<property name="geometry">
+    <rect>
+     <x>28</x>
+     <y>132</y>
+     <width>122</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Проверка связи</string></property>
+</widget>
+<widget class="QLabel" name="label_5">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>170</y>
+     <width>105</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Схема сети:</string></property>
+</widget>
+<widget class="QLabel" name="label_6">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>193</y>
+     <width>105</width>
+     <height>13</height>
+    </rect>
+   </property>
+<property name="text"><string>Карта города:</string></property>
+</widget>
+<widget class="QLineEdit" name="edit_BD_GID">
+<property name="geometry">
+    <rect>
+     <x>119</x>
+     <y>170</y>
+     <width>238</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QLineEdit" name="edit_BD_GEO">
+<property name="geometry">
+    <rect>
+     <x>119</x>
+     <y>193</y>
+     <width>238</width>
+     <height>23</height>
+    </rect>
+   </property>
+</widget>
+<widget class="QPushButton" name="pushButton_BD_GID_BTN">
+<property name="geometry">
+    <rect>
+     <x>357</x>
+     <y>170</y>
+     <width>30</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+<widget class="QPushButton" name="pushButton_BD_GEO_BTN">
+<property name="geometry">
+    <rect>
+     <x>357</x>
+     <y>193</y>
+     <width>30</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>...</string></property>
+</widget>
+<widget class="QPushButton" name="pushButton_NEW_BAZA">
+<property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>261</y>
+     <width>124</width>
+     <height>23</height>
+    </rect>
+   </property>
+<property name="text"><string>Новая база</string></property>
+</widget>
+</widget>
+</ui>

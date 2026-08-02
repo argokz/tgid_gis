@@ -1,0 +1,55 @@
+#pragma once
+
+enum info
+{
+  I_NAPOR, // Напоры, H, м.вод.ст.
+  I_RAS, // Расходы, G, т/ч
+  I_DLINA, //Длины, L, м
+  I_DIAM_V, // , Диаметры внутренние, Двн, мм
+  I_DIAM_U, // Диаметры условные, Ду, мм
+  I_OB, // Объемы, V, м3
+  I_TEMP, // Температуры, t, °C
+  I_RAS_U, // Узловой расход, G, т/ч
+  I_SKOR, // Скорость, w, м/c
+  I_UD_POT, // Удельные потери, R, мм.вод.ст./м
+  I_NAGR, // Нагрузки, G, Гкал/ч
+  I_RASP, // Располагаемый напор, dH, м
+  I_GEOD, // Геодезическая отметка, h, м
+  I_NAGR_U, // Расчетная нагрузка на участках, Q, Гкал/ч
+  I_NAPOR2, // Полные напоры, H, м.вод.ст.
+};
+
+
+
+#if 0
+
+#include <QDialog>
+#include <dialog/SaveGeometry.h>
+
+class QListWidget;
+class QLineEdit;
+
+
+class InfDial : public QDialog
+{
+    Q_OBJECT
+
+public:
+    InfDial(bool *m_bIsInfo, QWidget *parent);
+    QString curText;
+    int index;
+
+private slots:
+    void okClicked();
+    void helpClicked();
+
+
+private:
+    QListWidget *lw;
+    bool *m_bIsInfo;
+    int N;
+
+    SaveGeometry save;
+
+};
+#endif
