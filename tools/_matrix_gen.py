@@ -75,6 +75,14 @@ DONE = {
     "aPjezo": "Шаг 73: пьезометр реализован (Pjezo.cpp)",
     "aListPjezo": "Шаг 73: список направлений реализован (MMenuDial)",
     "aSavePjezo": "Шаг 73: insertIntoDatabase directions/deployedDirections (ref)",
+    "aNagrZd": "Шаг 76: редактор addr.zhile (DbWindow)",
+    "aNagrOrg": "Шаг 76: редактор org.organizatsii (DbWindow)",
+    "aNagrZdNeiz": "Шаг 76: zhile без привязки к зданиям (A/B 653≡653)",
+    "aNagrOrgNeiz": "Шаг 76: organizatsii без привязки (A/B 4225≡4225)",
+    "aTuTable": "Шаг 76: редактор doc.tehnicheskie_usloviya + ref.statetu",
+    "aPrisNagrEdit": "Шаг 76: ref.prisoedinennaya_nagruzka_istochnikov по годам (2011–2019)",
+    "aTuFind": "Поиск ТУ/договоров (tu/tu.cpp, transl + zdaniya_tu) — работал",
+    "aTuOnOff": "Переключатель панели ТУ через map_toolbar (m_barTu) — работал",
 }
 
 ENGINE = {
@@ -125,6 +133,7 @@ SPECIAL_NOTES = {
     "aSqlDelFragment": "Удаление фрагмента, шаг 64",
     "aImportFragmentMdb": "Конвертор старых форматов ТГИД-05/07",
     "aZn": "Узел с заданным напором — критично для расчётов",
+    "aViewToolbarControlTu": "Панель «Контроль ТС» = команды ремонтов (ID_REMONT_*); переносится с блоком 6",
 }
 
 

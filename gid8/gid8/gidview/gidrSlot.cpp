@@ -2577,11 +2577,36 @@ void GidWidget::onZona() // Гидростатические зоны
 
 void GidWidget::onNagrOrg() // Юридические лица
 {
+    QString title = tr("Организации");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "organizatsii", "SELECT * FROM organizatsii", title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Ошибка открытия таблицы %1").arg(title));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, title, this);
 }
 
 
 void GidWidget::onTuTable() // Технические условия
 {
+    QString q = QString(
+        "SELECT t.*, st.name AS %1 "
+        "FROM tehnicheskie_usloviya t "
+        "LEFT JOIN statetu st ON st.id=t.sostoyanie_dogovora "
+        "ORDER BY t.data_vydachi_tu NULLS LAST, t.nomer_tu")
+        .arg(quot_text("Состояние договора"));
+
+    QString title = tr("Технические условия");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "tehnicheskie_usloviya", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, title, this);
 }
 
 
@@ -2686,6 +2711,41 @@ void GidWidget::onTuFind() // ТУ, Договора
 
 void GidWidget::onPrisNagrEdit() // Присоединенная нагрузка по источникам
 {
+    MMenuDial menu(this, tr("Выберите год"));
+
+    QSqlQuery query(m_cxema.m_db);
+    query.setForwardOnly(true);
+    if (query_exec(m_cxema.m_db, query,
+                   "SELECT DISTINCT god FROM prisoedinennaya_nagruzka_istochnikov ORDER BY god")) {
+        while (query.next()) {
+            int y = query.value(0).toInt();
+            menu.Add(QString::number(y), y);
+        }
+    }
+
+    if (menu.exec() != QDialog::Accepted) return;
+
+    int year = menu.value().toInt();
+
+    QString q = QString(
+        "SELECT P.id, P.id2, K.naimenovanie, P.ustanovlennaya_moschnost, "
+        "P.raspolagaemaya_moschnost_ov, P.raspolagaemaya_moschnost_gvs_srednyaya, "
+        "P.raspolagaemaya_moschnost_summarnaya, P.normativnye_teplovye_poteri, "
+        "P.prisoedinennaya_moschnost_otoplenie, P.prisoedinennaya_moschnost_ventilyatsiya, "
+        "P.prisoedinennaya_moschnost_gvs_maksimalnaya, P.prisoedinennaya_moschnost_par, P.god "
+        "FROM prisoedinennaya_nagruzka_istochnikov P "
+        "INNER JOIN istochniki_tepla K ON K.id = P.id2 "
+        "WHERE P.god=%1").arg(year);
+
+    QString title = tr("Присоединенная нагрузка по источникам (%1)").arg(year);
+
+    DbWindow *table = getTableView(m_cxema.m_db, "prisoedinennaya_nagruzka_istochnikov", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, title, this);
 }
 
 
@@ -2696,16 +2756,71 @@ void GidWidget::onQGvs() // Коэффициент перевода k=Qгвmax/Q
 
 void GidWidget::onNagrZd() // Физические лица
 {
+    QString title = tr("Жилье");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "zhile", "SELECT * FROM zhile", title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Ошибка открытия таблицы %1").arg(title));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, title, this);
 }
 
 
 void GidWidget::onNagrZdNeiz() // Физические лица
 {
+    QString q = QString(
+        "SELECT id, adres AS %1, ploschad_doma AS %2, nagruzka_otoplenie AS %3, "
+        "nagruzka_gvs AS %4, administrativnyy_rayon AS %5, "
+        "priznak_nalichiya_opu AS %6, ekspluatatsionnyy_rayon AS %7 "
+        "FROM zhile WHERE zdanie = 0 OR zdanie IS NULL")
+        .arg(quot_text("Адрес"), quot_text("Площадь дома"),
+             quot_text("Нагрузка Отопление"), quot_text("Нагрузка ГВС"),
+             quot_text("Административный район"), quot_text("Признак наличия ОПУ"),
+             quot_text("Эксплуатационный район"));
+
+    QString title = tr("Ненайденные здания (физические лица)");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "zhile", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(false);
+    view_db2(table, title, this);
 }
 
 
 void GidWidget::onNagrOrgNeiz() // Юридические лица
 {
+    QString q = QString(
+        "SELECT id, nomer_dogovora AS %1, naimenovanie_obekta AS %2, adres_obekta AS %3, "
+        "naznachenie_obekta AS %4, naimenovanie_kontragenta AS %5, ploschad AS %6, "
+        "etazhnost AS %7, nagruzka__otoplenie_ AS %8, nagruzka__ventilyatsiya_ AS %9, "
+        "nagruzka__gvs_ AS %10, nagruzka__par_ AS %11, nomer_a__pribora_ucheta AS %12, "
+        "ekspluatatsionnyy_rayon_po_obektu AS %13, ekspluatatsionnyy_uchastok_po_obektu AS %14, "
+        "administrativnyy_rayon_po_obektu AS %15 "
+        "FROM organizatsii WHERE zdanie = 0 OR zdanie IS NULL")
+        .arg(quot_text("Номер договора"), quot_text("Наименование объекта"),
+             quot_text("Адрес объекта"), quot_text("Назначение объекта"),
+             quot_text("Наименование контрагента"), quot_text("Площадь"),
+             quot_text("Этажность"), quot_text("Нагрузка Отопление"),
+             quot_text("Нагрузка Вентиляция"), quot_text("Нагрузка ГВС"),
+             quot_text("Нагрузка Пар"), quot_text("Номер(а) прибора учета"),
+             quot_text("Эксплуатационный район по объекту"),
+             quot_text("Эксплуатационный участок по объекту"),
+             quot_text("Административный район по объекту"));
+
+    QString title = tr("Ненайденные здания (юридические лица)");
+
+    DbWindow *table = getTableView(m_cxema.m_db, "organizatsii", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(false);
+    view_db2(table, title, this);
 }
 
 

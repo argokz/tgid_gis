@@ -536,3 +536,43 @@ pipeSections) и `DELETE FROM iznos` (attic-пустая) не переноси�
 
 Сборка успешна (коммит `411823cd`). Целевые таблицы до запуска пустые
 (0 строк) — заполнение проверяется запуском команды из приложения.
+
+## Шаг 76: блок 5 «Техусловия (ТУ)» — 10/10 закрыт
+
+A/B-проба (`tools/_tu5_probe.py`): структуры `zhile` (addr, 25 кол.),
+`organizatsii` (org, 37 кол.), `statetu` (ref), `tehnicheskie_usloviya`
+(doc, 162 кол.), `prisoedinennaya_nagruzka_istochnikov` (ref) — 1:1 с
+`almatygid`; «неизвестные» запросы дают идентичные числа
+(zhile 653≡653, organizatsii 4225≡4225), годы присоединённой нагрузки
+2011–2019 совпадают.
+
+Реализованы заглушки в `gidrSlot.cpp`:
+
+* `onNagrZd` (aNagrZd) — редактор `zhile` (физические лица), DbWindow
+  с `setEdit(true)`.
+* `onNagrOrg` (aNagrOrg) — редактор `organizatsii` (юридические лица).
+* `onNagrZdNeiz` (aNagrZdNeiz) — zhile без привязки к зданиям
+  (`zdanie=0 OR NULL`), read-only, русские алиасы колонок.
+* `onNagrOrgNeiz` (aNagrOrgNeiz) — organizatsii без привязки, read-only.
+* `onTuTable` (aTuTable) — редактор `tehnicheskie_usloviya` с подменой
+  `sostoyanie_dogovora` на `statetu.name` (LEFT JOIN), `setEdit(true)`.
+* `onPrisNagrEdit` (aPrisNagrEdit) — выбор года (MMenuDial из
+  `SELECT DISTINCT god`), редактируемая таблица
+  `prisoedinennaya_nagruzka_istochnikov` JOIN `istochniki_tepla`.
+
+Уже работали и подтверждены:
+
+* `onTuFind` (aTuFind) — поиск ТУ/договоров (`tu/tu.cpp`,
+  `init_tu_find` через `transl()` + переход к зданию `zdaniya_tu`).
+* `aTuOnOff` — переключатель панели ТУ: общий механизм
+  `map_toolbar` (`m_barTu` наполнена: aTuNew/aTuLine/aTuInfo/aTuDel/
+  aTuFind/aTuSost/aTuExcel/aTuSvod/aTuZhurnal); пустой стаб
+  `onTuOnOff()` — мёртвый код, слот не подключён.
+* `aPotNagr0` — шаг 24.
+
+`aViewToolbarControlTu` — панель «Контроль технического состояния» в
+gid6 состоит из команд ремонтов (ID_REMONT_INFO/CONTROL_TU/DEL/OTCHET),
+которых в gid8 пока нет — переносится вместе с блоком 6 «Ремонты»
+(action осознанно закомментирован в `gidrMenu.cpp:166`).
+
+Сборка `H:\build\gid8-tgid-gis\gid8.exe` успешна.
