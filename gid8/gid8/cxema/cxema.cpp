@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QLocale>
 #include <QTranslator>
 #include <QtSql/QSqlDatabase>
@@ -428,29 +429,48 @@ bool CCxema::open_cxema_2(const QString & par, QProgressDialog *percent)
 
 bool CCxema::open_cxema(GidWidget *view, const QString & par, QProgressDialog *percent)
 {
+    // Замер этапов открытия схемы.
+    //
+    // Чтение из БД замерено отдельно (tools/measure_fragments.py): все
+    // 25 фрагментов, 167 321 объект — около 1,6 с. Заказчик говорит, что
+    // открытие всех фрагментов занимает больше минуты. Значит почти всё
+    // время уходит не в запросы, а в этапы ниже, и какой именно — из
+    // журнала было не видно: он про них молчал.
+    QElapsedTimer _t_all, _t;
+    _t_all.start();
+    _t.start();
+#define TGID_CXEMA_STEP(name, call)                                     \
+    do {                                                                \
+        _t.restart();                                                   \
+        call;                                                           \
+        qInfo() << "открытие схемы:" << name << _t.elapsed() << "мс";    \
+    } while (0)
+
     void initDefault();
     initDefault();
 
-    open_heating_seasons();
+    TGID_CXEMA_STEP("сезоны", open_heating_seasons());
+    TGID_CXEMA_STEP("система теплоснабжения", openheatSystem());
+    TGID_CXEMA_STEP("фрагменты", openFragments(par));
+    TGID_CXEMA_STEP("источники", openIst());
 
-    openheatSystem();
+    TGID_CXEMA_STEP("внешние коды",
+        readTableMap(m_db, "SELECT id,name FROM externalCodes WHERE removed = 0",
+                     "id", "name", m_graph->map_kod));
 
-    openFragments(par);
-    openIst();
+    TGID_CXEMA_STEP("узлы", read_nodes(par, percent, true));
+    TGID_CXEMA_STEP("участки", read_lines(par, percent, false));
+    TGID_CXEMA_STEP("надписи", read_text(par, nullptr));
 
-    readTableMap(m_db, "SELECT id,name FROM externalCodes WHERE removed = 0", "id", "name", m_graph->map_kod);
+    bool ok_zn = true, ok_up = true;
+    TGID_CXEMA_STEP("уставки давления", ok_zn = openZN());
+    TGID_CXEMA_STEP("узлы подпитки", ok_up = openUP());
 
-///    std::cout << "nodes!" << std::endl;
-    read_nodes(par, percent, true);
-//    std::cout << "lines!" << std::endl;
-    read_lines(par, percent, false);
-//    std::cout << "Ok!" << std::endl;
+    qInfo() << "открытие схемы: ВСЕГО" << _t_all.elapsed() << "мс";
+#undef TGID_CXEMA_STEP
 
-    read_text(par, nullptr);
-
-
-    if (!openZN()) return false;
-    if (!openUP()) return false;
+    if (!ok_zn) return false;
+    if (!ok_up) return false;
 //    if (!openUP(ado, "refillNodes")) return false;
 //    if (!openVP(ado, "WDOdevices")) return false;
 

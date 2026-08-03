@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <QElapsedTimer>
 #include <cmath>
 
 
@@ -1043,6 +1044,11 @@ void GidWidget::draw(QPainter *painter, CCxema *cxema)
 
 #include <dxf/dxfi.h>
 
+// Порог, с которого кадр считается дорогим и попадает в журнал.
+// Перерисовка идёт на каждое движение мыши, поэтому писать про
+// каждый кадр нельзя — журнал станет бесполезным.
+static const int kSlowFrameMs = 150;
+
 void drawDxf(cdxf* dxf, QPainter* pDC, CRect m_rect, double m_bx, double m_by, double masx, double masy);
 
 
@@ -1096,27 +1102,55 @@ void GidWidget::draw(QPainter *painter, double w, double h, const ScrollGeom &ge
     CRect m_rect(0, 0, w, h);
     CFRect r(0, 0, w, h);
 
+    // Замер этапов отрисовки.
+    //
+    // Чтение схемы из БД замерено отдельно (tools/measure_fragments.py):
+    // все 25 фрагментов, 167 321 объект — около 1,6 с. Заказчик говорит,
+    // что открытие занимает больше двух секунд, значит остаток уходит
+    // сюда, в рисование. Какой именно этап столько стоит, из журнала
+    // было не видно: он молчал целиком.
+    //
+    // Пишем только когда кадр вышел заметно дорогим, иначе журнал
+    // засорится: перерисовка происходит на каждое движение мыши.
+    QElapsedTimer _t_frame, _t_step;
+    _t_frame.start();
+    _t_step.start();
+    qint64 ms_map = 0, ms_dxf = 0, ms_geo1 = 0, ms_cxema = 0, ms_geo2 = 0;
+
     painter->fillRect(0, 0, w, h, m_bk_color);
 
     if (m_parent_id == 0) {
         redrawMap(painter, r, m_internetMap, m_reread);
         m_reread = false;
     }
+    ms_map = _t_step.restart();
 
     if (m_bIsPicture && m_dxf && m_parent_id == 0) {
         drawDxf(m_dxf, painter, m_rect, geom.bx, geom.by, geom.masx, geom.masy);
     }
+    ms_dxf = _t_step.restart();
 
     if (isGeo() && m_parent_id == 0) {
         if (!scaling)
         drawGeo(painter, false);
     }
+    ms_geo1 = _t_step.restart();
 
     draw(painter, &m_cxema);
+    ms_cxema = _t_step.restart();
 
     if (isGeo() && m_parent_id == 0) {
         if (!scaling)
         drawGeo(painter, true);
+    }
+    ms_geo2 = _t_step.restart();
+
+    if (_t_frame.elapsed() >= kSlowFrameMs) {
+        qInfo() << "кадр" << _t_frame.elapsed() << "мс:"
+                << "карта" << ms_map
+                << "подложка" << ms_dxf
+                << "геобаза" << (ms_geo1 + ms_geo2)
+                << "схема" << ms_cxema;
     }
 
 

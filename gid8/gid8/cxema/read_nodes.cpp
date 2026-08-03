@@ -268,7 +268,9 @@ bool CCxema::read_nodes(const QString & par, QProgressDialog* percent, bool firs
         qq = QString("SELECT id FROM net.v_nodes n WHERE n.removed=0 AND %1").arg(par);
     }
 
-    long cnt = sizeOfQ(m_db, qq);
+    // Как и в read_lines: счёт нужен только знаменателем полосы
+    // прогресса, а стоит отдельного прохода по тем же представлениям.
+    long cnt = percent ? sizeOfQ(m_db, qq) : 0;
 
     query.setForwardOnly(true);
     query_exec(m_db, query, q);
