@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <cxema/col_index.h>
 #include <QtSql>
 #include <QRegularExpression>
 
@@ -458,7 +459,7 @@ void create_b5(QSqlDatabase &db, CNode2 *nP, CCxema* cxema, int m_user)
                             n->node.nomO = -1;
                             n->node.fileID = fileID;
 //                            readNode(db, n, n->node.typ, cxema->m_graph, n->getTableMySQL());
-                            readNodeNew(query, n, n->node.typ, cxema->graph(), false);
+                            readNodeNew(query, ColIndex(query), n, n->node.typ, cxema->graph(), false);
                         }
                     }
 
@@ -551,7 +552,7 @@ void create_b5(QSqlDatabase &db, CNode2 *nP, CCxema* cxema, int m_user)
                             if (query_exec(db, query, q)) {
                                 if (query.next()) {
 //                                    readLine(db, l, idid, cxema->m_graph, l->getTableMySQL(), getLineOtkr(l->line.typ));
-                                    readLineNew(query, bline(l), bline(l)->line.typ, cxema->graph());
+                                    readLineNew(query, ColIndex(query), bline(l), bline(l)->line.typ, cxema->graph());
                                 }
                             }
                         }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtSql/QSqlDatabase>
+#include <cxema/col_index.h>
 #include <cxema/graph2.h>
 #include <QProgressDialog>
 #include <ui/PercentDialog.h>
@@ -329,5 +330,5 @@ public:
 };
 
 
-bool readLineNew(QSqlQuery &query, CLine2* line, int typ, CGraph2* m_graph, bool is_out = true);
-bool readNodeNew(QSqlQuery& query, CNode2* node2, int typ, CGraph2* m_graph, bool is_out = true);
+bool readLineNew(QSqlQuery &query, const ColIndex &C, CLine2* line, int typ, CGraph2* m_graph, bool is_out = true);
+bool readNodeNew(QSqlQuery& query, const ColIndex &C, CNode2* node2, int typ, CGraph2* m_graph, bool is_out = true);

@@ -1,4 +1,5 @@
 #include <QtGui>
+#include <cxema/col_index.h>
 #include <QtSql>
 #include <QVariant>
 
@@ -867,7 +868,7 @@ bool rereadLine(QSqlDatabase &db, CGraph2 *graph, CLINE2 *line, const QString & 
         if (query.next()) {
             l->line.nomP = -1;
             l->line.nomO = -1;
-            readLineNew(query, l, l->line.typ, graph);
+            readLineNew(query, ColIndex(query), l, l->line.typ, graph);
         }
     }
     return true;

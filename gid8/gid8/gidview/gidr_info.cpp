@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <cxema/col_index.h>
 #include <QtGui>
 #include <QtWidgets>
 #include <gidview/GidWidget.h>
@@ -39,7 +40,7 @@ bool reread_line(QSqlDatabase &db, CGraph2 *graph, int id, const QString & table
         QSqlQuery query(db);
         if (query_exec(db, query, q)) {
             while (query.next()) {
-                readLineNew(query, bline(l), bline(l)->line.typ, graph);
+                readLineNew(query, ColIndex(query), bline(l), bline(l)->line.typ, graph);
                 ret = true;
             }
         }
@@ -64,7 +65,7 @@ bool reread_node(QSqlDatabase &db, CGraph2 *graph, int id, const QString & table
         QSqlQuery query(db);
         if (query_exec(db, query, q)) {
             if (query.next()) {
-                readNodeNew(query, n, n->node.typ, graph);
+                readNodeNew(query, ColIndex(query), n, n->node.typ, graph);
                 return true;
             }
         }

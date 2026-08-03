@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <cxema/col_index.h>
 #include <QtWidgets>
 #include <QtSql>
 
@@ -29,7 +30,7 @@ bool CCxema::info(CFPoint point, double delta, QWidget *window)
                 QSqlRecord record = query.record();
 //        init_PT(record);
                 if (query.next()) {
-                    readNodeNew(query, node, node->node.typ, m_graph);
+                    readNodeNew(query, ColIndex(query), node, node->node.typ, m_graph);
                     window->repaint();
                 }
             }
@@ -48,7 +49,7 @@ bool CCxema::info(CFPoint point, double delta, QWidget *window)
 
                 QSqlRecord record = query.record();
                 if (query.next()) {
-                    readLineNew(query, l, l->line.typ, m_graph);
+                    readLineNew(query, ColIndex(query), l, l->line.typ, m_graph);
                     window->repaint();
                 }
 

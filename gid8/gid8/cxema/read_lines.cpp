@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include "col_index.h"
 #include <QLocale>
 #include <QTranslator>
 #include <QtSql/QSqlDatabase>
@@ -26,13 +27,13 @@ long sizeOfQ(QSqlDatabase &db, const QString & q);
 const double coef_xy = 1.;
 
 
-bool readLineNew(QSqlQuery &query, CLine2* line, int typ, CGraph2* m_graph, bool is_out)
+bool readLineNew(QSqlQuery &query, const ColIndex &C, CLine2* line, int typ, CGraph2* m_graph, bool is_out)
 {
-    long externalSignLineID = query.value("externalSignLineID").toInt();
-    long id = query.value("id").toInt();
-    long id2 = query.value("ID2").toInt();
-    long podp = query.value("displaySign").toInt();
-    long organizationID = query.value("organizationID").toInt();
+    long externalSignLineID = query.value(C("externalSignLineID")).toInt();
+    long id = query.value(C("id")).toInt();
+    long id2 = query.value(C("ID2")).toInt();
+    long podp = query.value(C("displaySign")).toInt();
+    long organizationID = query.value(C("organizationID")).toInt();
     long magistral = 0;
     long distSite = 0;
     long magistralSite = 0;
@@ -54,36 +55,36 @@ bool readLineNew(QSqlQuery &query, CLine2* line, int typ, CGraph2* m_graph, bool
 */
     UTNapr napr;
 
-    pipeSectStateIDflow = query.value("pipeSectStateIDflow").toInt();
-    pipeSectStateIDret = query.value("pipeSectStateIDret").toInt();
+    pipeSectStateIDflow = query.value(C("pipeSectStateIDflow")).toInt();
+    pipeSectStateIDret = query.value(C("pipeSectStateIDret")).toInt();
 
 
     if (typ == TIP_UT) {
-        magistral = query.value("magistral").toInt();
+        magistral = query.value(C("magistral")).toInt();
 
-        distSite = query.value("distSite").toInt();
-        magistralSite = query.value("magistralSite").toInt();
+        distSite = query.value(C("distSite")).toInt();
+        magistralSite = query.value(C("magistralSite")).toInt();
 
 
-        tubingTypeID = query.value("tubingTypeID").toInt();
-        crimpingQueSite = query.value("crimpingQueSite").toInt();  // опрессовка
-        pipeSectionID = query.value("pipeSectionID").toInt();  // Большой участок
+        tubingTypeID = query.value(C("tubingTypeID")).toInt();
+        crimpingQueSite = query.value(C("crimpingQueSite")).toInt();  // опрессовка
+        pipeSectionID = query.value(C("pipeSectionID")).toInt();  // Большой участок
 
-        double diameterExternal = query.value("diameterExternal").toDouble();
-        double diameterInternal = query.value("diameterInternal").toDouble();
-        double diameterCondit = query.value("diameterCondit").toDouble();
-        double pipeSectLength = query.value("pipeSectLength").toDouble();
+        double diameterExternal = query.value(C("diameterExternal")).toDouble();
+        double diameterInternal = query.value(C("diameterInternal")).toDouble();
+        double diameterCondit = query.value(C("diameterCondit")).toDouble();
+        double pipeSectLength = query.value(C("pipeSectLength")).toDouble();
 
         napr.dl = pipeSectLength;
         napr.diam = diameterInternal;
         napr.diam_usl = diameterCondit;
         napr.diam_vn = diameterExternal;
         napr.v = napr.dl * pow(napr.diam * 0.001, 2) * M_PI;
-        napr.tol = query.value("wallThickness").toDouble();
+        napr.tol = query.value(C("wallThickness")).toDouble();
     }
     else if (typ == TIP_DR) {
-//        napr.dru_home = query.value("diameterInternal").toDouble();
-        napr.dru_home = query.value("dru_home").toDouble();
+//        napr.dru_home = query.value(C("diameterInternal")).toDouble();
+        napr.dru_home = query.value(C("dru_home")).toDouble();
     }
 
     if (pipeSectStateIDflow == 0) pipeSectStateIDflow = 1;
@@ -129,57 +130,57 @@ bool readLineNew(QSqlQuery &query, CLine2* line, int typ, CGraph2* m_graph, bool
     line->line.typ = typ;
 
     if (externalSignLineID == SignLine_ob || externalSignLineID == SignLine_pp || externalSignLineID == SignLine_po) {
-        line->line.pod.q = query.value("pod_q").toDouble();        //  Расход сетевой воды на участке
-        line->line.nomgP = query.value("nomgP").toInt();
+        line->line.pod.q = query.value(C("pod_q")).toDouble();        //  Расход сетевой воды на участке
+        line->line.nomgP = query.value(C("nomgP")).toInt();
     }
     if (externalSignLineID == SignLine_ob || externalSignLineID == SignLine_oo || externalSignLineID == SignLine_op) {
-        line->line.obr.q = query.value("obr_q").toDouble();        //  Расход сетевой воды на участке
-        line->line.nomgO = query.value("nomgO").toInt();
+        line->line.obr.q = query.value(C("obr_q")).toDouble();        //  Расход сетевой воды на участке
+        line->line.nomgO = query.value(C("nomgO")).toInt();
     }
 
     if (typ == TIP_UT) {
         if (externalSignLineID == SignLine_ob || externalSignLineID == SignLine_pp || externalSignLineID == SignLine_po) {
-            line->line.pod.poter = query.value("pod_poter").toDouble();
-            line->line.pod.w = query.value("pod_w").toDouble();        //  Скорость потока сетевой воды
-            line->line.pod.time1 = query.value("pod_time1").toDouble();    //  Время прохождения потока воды
-            line->line.pod.a14 = query.value("pod_a14").toDouble();      //  Удельные линейные потери напора на участке
-            line->line.pod.a15 = query.value("pod_a15").toDouble();      //  Линейные потери напора на участке
-            line->line.pod.a16 = query.value("pod_a16").toDouble();      //  Местные потери напора на участке
-            line->line.pod.a17 = query.value("pod_a17").toDouble();      //  Общие потери напора на участке
-            line->line.pod.tzam = query.value("pod_tzam").toDouble();      //  Время остывания воды при остановке движения
-            line->line.pod.tpot = query.value("pod_tpot").toDouble();    //  Тепловые потери  теплопроводом
+            line->line.pod.poter = query.value(C("pod_poter")).toDouble();
+            line->line.pod.w = query.value(C("pod_w")).toDouble();        //  Скорость потока сетевой воды
+            line->line.pod.time1 = query.value(C("pod_time1")).toDouble();    //  Время прохождения потока воды
+            line->line.pod.a14 = query.value(C("pod_a14")).toDouble();      //  Удельные линейные потери напора на участке
+            line->line.pod.a15 = query.value(C("pod_a15")).toDouble();      //  Линейные потери напора на участке
+            line->line.pod.a16 = query.value(C("pod_a16")).toDouble();      //  Местные потери напора на участке
+            line->line.pod.a17 = query.value(C("pod_a17")).toDouble();      //  Общие потери напора на участке
+            line->line.pod.tzam = query.value(C("pod_tzam")).toDouble();      //  Время остывания воды при остановке движения
+            line->line.pod.tpot = query.value(C("pod_tpot")).toDouble();    //  Тепловые потери  теплопроводом
 
 
-            line->line.pod.ql    = query.value("pod_b101").toDouble();    //
-            line->line.pod.ql_ot = query.value("pod_b102").toDouble();    //
-            line->line.pod.ql_v  = query.value("pod_b103").toDouble();    //
-            line->line.pod.ql_gv = query.value("pod_b104").toDouble();    //
+            line->line.pod.ql    = query.value(C("pod_b101")).toDouble();    //
+            line->line.pod.ql_ot = query.value(C("pod_b102")).toDouble();    //
+            line->line.pod.ql_v  = query.value(C("pod_b103")).toDouble();    //
+            line->line.pod.ql_gv = query.value(C("pod_b104")).toDouble();    //
 
-            line->line.pod.ql_gv_p = query.value("pod_b105").toDouble();    //
-            line->line.pod.ql_gv_o = query.value("pod_b106").toDouble();    //
+            line->line.pod.ql_gv_p = query.value(C("pod_b105")).toDouble();    //
+            line->line.pod.ql_gv_o = query.value(C("pod_b106")).toDouble();    //
 
 
-            line->line.obr.ql    = query.value("obr_b101").toDouble();    //
-            line->line.obr.ql_ot = query.value("obr_b102").toDouble();    //
-            line->line.obr.ql_v  = query.value("obr_b103").toDouble();    //
-            line->line.obr.ql_gv = query.value("obr_b104").toDouble();    //
+            line->line.obr.ql    = query.value(C("obr_b101")).toDouble();    //
+            line->line.obr.ql_ot = query.value(C("obr_b102")).toDouble();    //
+            line->line.obr.ql_v  = query.value(C("obr_b103")).toDouble();    //
+            line->line.obr.ql_gv = query.value(C("obr_b104")).toDouble();    //
 
-            line->line.obr.ql_gv_p = query.value("obr_b105").toDouble();    //
-            line->line.obr.ql_gv_o = query.value("obr_b106").toDouble();    //
+            line->line.obr.ql_gv_p = query.value(C("obr_b105")).toDouble();    //
+            line->line.obr.ql_gv_o = query.value(C("obr_b106")).toDouble();    //
 
 
         }
 
         if (externalSignLineID == SignLine_ob || externalSignLineID == SignLine_oo || externalSignLineID == SignLine_op) {
-            line->line.obr.poter = query.value("obr_poter").toDouble();
-            line->line.obr.w = query.value("obr_w").toDouble();        //  Скорость потока сетевой воды
-            line->line.obr.time1 = query.value("obr_time1").toDouble();    //  Время прохождения потока воды
-            line->line.obr.a14 = query.value("obr_a14").toDouble();      //  Удельные линейные потери напора на участке
-            line->line.obr.a15 = query.value("obr_a15").toDouble();      //  Линейные потери напора на участке
-            line->line.obr.a16 = query.value("obr_a16").toDouble();      //  Местные потери напора на участке
-            line->line.obr.a17 = query.value("obr_a17").toDouble();      //  Общие потери напора на участке
-            line->line.obr.tzam = query.value("obr_tzam").toDouble();      //  Время остывания воды при остановке движения
-            line->line.obr.tpot = query.value("obr_tpot").toDouble();    //  Тепловые потери  теплопроводом
+            line->line.obr.poter = query.value(C("obr_poter")).toDouble();
+            line->line.obr.w = query.value(C("obr_w")).toDouble();        //  Скорость потока сетевой воды
+            line->line.obr.time1 = query.value(C("obr_time1")).toDouble();    //  Время прохождения потока воды
+            line->line.obr.a14 = query.value(C("obr_a14")).toDouble();      //  Удельные линейные потери напора на участке
+            line->line.obr.a15 = query.value(C("obr_a15")).toDouble();      //  Линейные потери напора на участке
+            line->line.obr.a16 = query.value(C("obr_a16")).toDouble();      //  Местные потери напора на участке
+            line->line.obr.a17 = query.value(C("obr_a17")).toDouble();      //  Общие потери напора на участке
+            line->line.obr.tzam = query.value(C("obr_tzam")).toDouble();      //  Время остывания воды при остановке движения
+            line->line.obr.tpot = query.value(C("obr_tpot")).toDouble();    //  Тепловые потери  теплопроводом
         }
     }
 
@@ -245,13 +246,16 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
 //    QInputDialog::getMultiLineText(nullptr, "", "", q);
 
     query_exec(m_db, query, q);
+    // То же, что в read_nodes: 21,3 с на 80 614 участков уходило
+    // на поиск имени колонки при каждом обращении.
+    const ColIndex C(query);
 
     int i = 0;
 
     long id_old = -1;
 
     while (query.next()) {
-        long id = query.value("id").toInt();
+        long id = query.value(C("id")).toInt();
 //          doSomething(country);
 
         if (id == 452 || id == 453) {
@@ -261,9 +265,9 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
 
 
 
-        long fileID = query.value("fileID").toInt();
+        long fileID = query.value(C("fileID")).toInt();
 
-        QString type_txt = query.value("type_txt").toString();
+        QString type_txt = query.value(C("type_txt")).toString();
 
         int typ = getNodeTyp(type_txt);
 
@@ -272,10 +276,10 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
         if (id != id_old) {
             id_old = id;
 
-            long idn1 = query.value("nodeID1").toInt();
-            long idn2 = query.value("nodeID2").toInt();
+            long idn1 = query.value(C("nodeID1")).toInt();
+            long idn2 = query.value(C("nodeID2")).toInt();
 
-            QString type_txt = query.value("type_txt").toString();
+            QString type_txt = query.value(C("type_txt")).toString();
 
             int typ = getLineTyp(type_txt);
 
@@ -298,7 +302,7 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
                     }
 
                     if (!skip) {
-                        QString s_coord = query.value("coords").toString();
+                        QString s_coord = query.value(C("coords")).toString();
                         NP.loadStr(s_coord.toLatin1().data());
 
                         if (coef_xy != 1.) {
@@ -319,7 +323,7 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
                         else {
                             if (line) {
                                 long sign_old = getExternalSignLineId(l);
-                                long sign_new = query.value("externalSignLineID").toInt();
+                                long sign_new = query.value(C("externalSignLineID")).toInt();
 
                                 if (!((sign_old == 2 && sign_new == 3) || (sign_old == 3 && sign_new == 2))) {
 
@@ -338,7 +342,7 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
                         }
 
                         if (line) {
-                            readLineNew(query, line, typ, m_graph);
+                            readLineNew(query, C, line, typ, m_graph);
                         }
                     }
                 }
