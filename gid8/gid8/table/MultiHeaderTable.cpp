@@ -1,4 +1,5 @@
 #include "MultiHeaderTable.h"
+#include "table/DbWindow.h"
 #include "any/MyMain.h"
 #include "init/init_files.h"
 #include "qtoolbar.h"
@@ -83,9 +84,12 @@ void MultiHeaderTable::init(QSqlDatabase &db, const QString & _tn, const QString
 
     header->setDefaultAlignment(Qt::AlignCenter | (Qt::Alignment)Qt::TextWrapAnywhere);
 
-    QTimer::singleShot(150, [=]() {
-        mainTable->resizeColumnsToContents();
+    // То же, что в DbWindow: обмеряем только видимые столбцы без
+    // сохранённой ширины и по выборке строк, а не по всей таблице.
+    // Подробное объяснение — в table/DbWindow.cpp рядом с константами.
+    mainTable->horizontalHeader()->setResizeContentsPrecision(kWidthSampleRows);
 
+    QTimer::singleShot(150, [=]() {
         QSettings settings;
 
         for (int c = 0; c < nc; c++) {
@@ -96,8 +100,17 @@ void MultiHeaderTable::init(QSqlDatabase &db, const QString & _tn, const QString
 
             int width = settings.value(QString("DbWindow/%1/width/%2").arg(_tn, v_col[c]), -1).toInt();
             mainTable->setColumnHidden(c, !y);
+
+            if (!y) continue;
+
             if (width > 0) {
                 mainTable->setColumnWidth(c, width);
+            }
+            else {
+                mainTable->resizeColumnToContents(c);
+                const int w = mainTable->columnWidth(c);
+                if (w < kMinColWidth) mainTable->setColumnWidth(c, kMinColWidth);
+                else if (w > kMaxColWidth) mainTable->setColumnWidth(c, kMaxColWidth);
             }
         }
         this->closed = false;

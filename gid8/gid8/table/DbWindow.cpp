@@ -14,6 +14,7 @@
 #include <mainwindow.h>
 #include <any/MyMain.h>
 
+
 //#include "DbDelegate.h"
 
 //#include "edit/help.h"
@@ -143,9 +144,22 @@ void DbWindow::init(QSqlDatabase &db, const QString & _tn, const QString & q0, c
 
     header->setDefaultAlignment(Qt::AlignCenter | (Qt::Alignment)Qt::TextWrapAnywhere);
     
-    QTimer::singleShot(150, [=]() {
-        this->resizeColumnsToContents();
+    // Подбор ширины столбцов — самое дорогое место при открытии таблицы.
+    //
+    // Было: resizeColumnsToContents() для ВСЕХ столбцов, включая
+    // скрытые и те, у кого ширина уже сохранена и через мгновение будет
+    // назначена заново. У паспортных таблиц столбцов до 151
+    // (heatpipesections), и каждый обмерялся по всем строкам модели —
+    // отсюда и задержка на открытии, и рывок, когда таблица сначала
+    // появляется с одной шириной, а потом перескакивает на другую.
+    //
+    // Стало: обмеряются только столбцы видимые и без сохранённой
+    // ширины, и по выборке строк, а не по всей таблице
+    // (setResizeContentsPrecision). Ширина ограничена сверху, иначе
+    // один столбец с длинным текстом уводит остальные за край экрана.
+    this->horizontalHeader()->setResizeContentsPrecision(kWidthSampleRows);
 
+    QTimer::singleShot(150, [=]() {
         QSettings settings;
 
         for (int c = 0; c < nc; c++) {
@@ -156,9 +170,17 @@ void DbWindow::init(QSqlDatabase &db, const QString & _tn, const QString & q0, c
 
             int width = settings.value(QString("DbWindow/%1/width/%2").arg(_tn, v_col[c]), -1).toInt();
             this->setColumnHidden(c, !y);
+
+            if (!y) continue;                 // скрытый столбец не меряем
+
             if (width > 0) {
                 this->setColumnWidth(c, width);
-//                qDebug() << "c=" << c << " w=" << width << " col=" << v_col[c];
+            }
+            else {
+                this->resizeColumnToContents(c);
+                const int w = this->columnWidth(c);
+                if (w < kMinColWidth) this->setColumnWidth(c, kMinColWidth);
+                else if (w > kMaxColWidth) this->setColumnWidth(c, kMaxColWidth);
             }
         }
         this->closed = false;
@@ -635,7 +657,9 @@ void DbWindow::saveSettings()
         if (width == 0) {
             settings.setValue(QString("DbWindow/%1/%2").arg(this->tn, v_col[c]), false);
         }
-        qDebug() << v_col[c] << " " << width;
+        // Отладочный вывод убран: он писал строку на КАЖДЫЙ столбец при
+        // каждом закрытии таблицы — до 151 строки журнала на паспортных
+        // таблицах, без всякой пользы.
         settings.setValue(QString("DbWindow/%1/width/%2").arg(this->tn, v_col[c]), width);
     }
 }

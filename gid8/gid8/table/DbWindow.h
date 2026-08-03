@@ -280,3 +280,16 @@ private:
 
 DbWindow *getTableView(QSqlDatabase &db, const QString & tn, const QString & q, const QString & title);
 
+// Подбор ширины столбцов таблиц — общий для DbWindow и MultiHeaderTable.
+//
+// kWidthSampleRows: сколько строк обмерять при подборе. По умолчанию Qt
+// меряет ВСЕ строки модели; на паспортных таблицах со 151 столбцом
+// (heatpipesections) это и создавало задержку при открытии.
+//
+// Границы нужны, потому что подбор по содержимому даёт крайности:
+// столбец с одним символом сжимается до нечитаемого, а столбец с
+// длинным примечанием растягивается на пол-экрана и уводит соседние за
+// край окна — на это и жаловались как на «неудобную ширину».
+inline constexpr int kWidthSampleRows = 50;
+inline constexpr int kMinColWidth = 60;
+inline constexpr int kMaxColWidth = 320;
