@@ -233,7 +233,14 @@ bool CCxema::read_lines(const QString & par, QProgressDialog *percent, bool dubl
 
 //    QInputDialog::getMultiLineText(nullptr, "", "", qq);
 
-    long cnt = sizeOfQ(m_db, qq);
+    // Счёт строк нужен ТОЛЬКО как знаменатель полосы прогресса.
+    //
+    // Замер по журналу программы: этот count(*) — самый дорогой запрос
+    // при открытии фрагмента, 1,42 с из 1,7 с всего SQL. Он повторяет
+    // тот же тяжёлый JOIN двух представлений UNION ALL, что и сам
+    // запрос чтения, то есть фрагмент читается фактически дважды.
+    // Когда полосы прогресса нет, платить за неё незачем.
+    long cnt = percent ? sizeOfQ(m_db, qq) : 0;
 
 //    QInputDialog::getMultiLineText(nullptr, "", "", q);
 

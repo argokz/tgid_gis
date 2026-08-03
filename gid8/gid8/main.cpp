@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QLocale>
 #include <QTranslator>
 #include <QFileDialog>
@@ -50,19 +51,27 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 {
     QString msg = msg1;
 
-
-    QString fn = QString("%1/%2").arg(argpath_2(), log_file_name);
-
-    mkdir_for_file(fn);
-
-//    QMessageBox::warning(nullptr, "", fn);
-
-
-    static QFile logFile(fn);
-
-    if (!logFile.isOpen()) {
-        logFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    // Путь, создание каталога и поток — ОДИН раз на весь запуск.
+    //
+    // Раньше на каждое сообщение заново вызывались argpath_2()
+    // (QStandardPaths), mkdir_for_file() и создавался QTextStream, а
+    // Qt::endl сбрасывал буфер на диск. За один запуск программа пишет
+    // около 4000 строк — это столько же системных вызовов mkdir и
+    // столько же сбросов, причём профиль лежит на системном диске.
+    // Сам вывод при этом почти весь служебный: подписи действий вида
+    // "|Текст| |Текст|", по три строки на команду меню.
+    static QFile *logFile = nullptr;
+    static QTextStream *out_ptr = nullptr;
+    if (!logFile) {
+        const QString fn = QString("%1/%2").arg(argpath_2(), log_file_name);
+        mkdir_for_file(fn);
+        logFile = new QFile(fn);
+        logFile->open(QIODevice::WriteOnly | QIODevice::Append);
+        out_ptr = new QTextStream(logFile);
     }
+    if (!logFile->isOpen()) return;
+
+    QTextStream &out = *out_ptr;
 
     QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
 
@@ -76,25 +85,31 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 //    msg = qFormatLogMessage(type, context, msg1);
 
-    QTextStream out(&logFile);
     switch (type) {
     case QtDebugMsg:
-        out << timestamp << " DEBUG: " << msg << Qt::endl;
+        out << timestamp << " DEBUG: " << msg << '\n';
         break;
     case QtInfoMsg:
-        out << timestamp << " INFO: " << msg << Qt::endl;
+        out << timestamp << " INFO: " << msg << '\n';
         break;
     case QtWarningMsg:
-        out << timestamp << " WARNING: " << msg << Qt::endl;
+        out << timestamp << " WARNING: " << msg << '\n';
         break;
     case QtCriticalMsg:
-        out << timestamp << " CRITICAL: " << msg << Qt::endl;
+        out << timestamp << " CRITICAL: " << msg << '\n';
         break;
     case QtFatalMsg:
-        out << timestamp << " FATAL: " << msg << Qt::endl;
+        out << timestamp << " FATAL: " << msg << '\n';
+        out.flush();
         abort();
     }
-    out.flush();
+
+    // Сброс на диск — только для того, что нельзя потерять при падении.
+    // Отладочные и информационные строки уходят пачкой, когда буфер
+    // заполнится или при закрытии файла.
+    if (type == QtWarningMsg || type == QtCriticalMsg) {
+        out.flush();
+    }
 }
 
 
@@ -259,33 +274,55 @@ int main(int argc, char *argv[])
         return runDatabaseSmokeTest();
     }
 
-    init_pics();
-    open_b4();
-    open_b5();
+    // Замер каждого шага запуска.
+    //
+    // По журналу между проверкой активации и подключением к БД уходило
+    // 12 секунд — до единого запроса, то есть это чистая загрузка
+    // справочников с диска. Какой именно шаг столько стоит, из журнала
+    // было не видно: все они молчали. Без этого замера «ускорение
+    // запуска» свелось бы к угадыванию.
+    QElapsedTimer _t_all, _t_step;
+    _t_all.start();
+    _t_step.start();
+#define TGID_INIT_STEP(call)                                            \
+    do {                                                                \
+        _t_step.restart();                                              \
+        call;                                                           \
+        const qint64 _ms = _t_step.elapsed();                           \
+        if (_ms >= 50)                                                  \
+            qInfo() << "запуск:" << #call << _ms << "мс";               \
+    } while (0)
 
-    initInclude();
+    TGID_INIT_STEP(init_pics());
+    TGID_INIT_STEP(open_b4());
+    TGID_INIT_STEP(open_b5());
 
-    initRenamedTables();
-    initRenamedColumns();
-    initLinePoint();
+    TGID_INIT_STEP(initInclude());
 
-    initColumnRusName("sprav");
+    TGID_INIT_STEP(initRenamedTables());
+    TGID_INIT_STEP(initRenamedColumns());
+    TGID_INIT_STEP(initLinePoint());
 
-    initTableRusName("gid");
-    initColumnRusName("gid");
-    initLookup("gid");
-    initLookup("gid8");
-    initLookup2("gid");
+    TGID_INIT_STEP(initColumnRusName("sprav"));
 
-    initTableRusName("OpenStreetMap");
-    initColumnRusName("OpenStreetMap");
-    initLookup("OpenStreetMap");
-    initLookup2("OpenStreetMap");
+    TGID_INIT_STEP(initTableRusName("gid"));
+    TGID_INIT_STEP(initColumnRusName("gid"));
+    TGID_INIT_STEP(initLookup("gid"));
+    TGID_INIT_STEP(initLookup("gid8"));
+    TGID_INIT_STEP(initLookup2("gid"));
 
-    init_onlygeo();
-    init_line_node();
+    TGID_INIT_STEP(initTableRusName("OpenStreetMap"));
+    TGID_INIT_STEP(initColumnRusName("OpenStreetMap"));
+    TGID_INIT_STEP(initLookup("OpenStreetMap"));
+    TGID_INIT_STEP(initLookup2("OpenStreetMap"));
 
-    init_onlyline_list_file();
+    TGID_INIT_STEP(init_onlygeo());
+    TGID_INIT_STEP(init_line_node());
+
+    TGID_INIT_STEP(init_onlyline_list_file());
+
+    qInfo() << "запуск: справочники всего" << _t_all.elapsed() << "мс";
+#undef TGID_INIT_STEP
 
 
 //    std::string pr_almaty = "+proj=tmerc +lat_0=0 +lon_0=76.9166666666667 +k=1 +x_0=-3021 +y_0=-4791536 +ellps=krass +towgs84=24,-121,-76,0,0,0,0 +units=m +no_defs +type=crs";
