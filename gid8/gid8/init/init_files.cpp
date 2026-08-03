@@ -1,4 +1,6 @@
 #include <QApplication>
+#include <QtSql>
+#include <QDebug>
 #include <QFile>
 #include <QRegularExpression>
 #include <map>
@@ -510,6 +512,49 @@ void initTableRusNameFile(const QString & database, const QString & klfn)
             }
         }
     }
+}
+
+void initTableRusNameFromCatalog(QSqlDatabase &db)
+{
+    // Русские подписи слоёв берутся из meta.layer_catalog — таблицы,
+    // которая для этого и заведена (столбец display_name_ru, sql/184).
+    //
+    // Вливаем их в ту же карту, из которой читает findTableRusName,
+    // поэтому ни одно место в интерфейсе править не нужно: экспорт
+    // фрагмента, проводник геобазы, диалоги невидимых объектов
+    // спрашивают подпись уже через неё.
+    //
+    // Каталог перекрывает файловые подписи kls/gid.txt осознанно: он
+    // единственный источник, который можно поправить без пересборки
+    // программы. Пересечений при этом почти нет — в файле лежат имена
+    // дореформенной модели (nodes, linesobj), в каталоге — классы net
+    // (node_plain, consumer_real).
+    if (!db.isOpen()) return;
+
+    QSqlQuery query(db);
+    query.setForwardOnly(true);
+
+    if (!query.exec("SELECT table_name, display_name_ru "
+                    "FROM meta.layer_catalog "
+                    "WHERE display_name_ru IS NOT NULL "
+                    "  AND display_name_ru <> '' "
+                    "  AND display_name_ru <> table_name")) {
+        // Каталога может не быть на старой БД — это не ошибка,
+        // подписи просто останутся файловыми.
+        qWarning() << "meta.layer_catalog не прочитан:"
+                   << query.lastError().text();
+        return;
+    }
+
+    int n = 0;
+    while (query.next()) {
+        const QString name_e = query.value(0).toString().toLower();
+        const QString name_r = query.value(1).toString();
+        if (name_e.isEmpty() || name_r.isEmpty()) continue;
+        map_map_txt["gid"][name_e] = name_r;
+        n++;
+    }
+    qInfo() << "подписи слоёв из meta.layer_catalog:" << n;
 }
 
 void initTableRusName(const QString & database)

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QLocale>
 #include <QTranslator>
@@ -68,6 +69,15 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         logFile = new QFile(fn);
         logFile->open(QIODevice::WriteOnly | QIODevice::Append);
         out_ptr = new QTextStream(logFile);
+
+        // Поток живёт в куче и деструктор у него не вызовется, поэтому
+        // при обычном выходе хвост журнала пропал бы. Проверено: после
+        // перехода на буферизацию самопроверка --db-smoke оставляла в
+        // файле одну строку вместо своего вывода.
+        qAddPostRoutine([]() {
+            if (out_ptr) out_ptr->flush();
+            if (logFile) logFile->close();
+        });
     }
     if (!logFile->isOpen()) return;
 
@@ -104,11 +114,25 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         abort();
     }
 
-    // Сброс на диск — только для того, что нельзя потерять при падении.
-    // Отладочные и информационные строки уходят пачкой, когда буфер
-    // заполнится или при закрытии файла.
-    if (type == QtWarningMsg || type == QtCriticalMsg) {
+    // Сброс на диск.
+    //
+    // Полный отказ от сброса (только по warning/critical) экономит
+    // системные вызовы, но теряет хвост журнала при аварийном
+    // завершении — а программа падала, и в каталоге CrashDumps лежат
+    // дампы gid8.exe. Проверено: после такой правки последние строки
+    // перед снятием процесса из файла пропадали.
+    //
+    // Компромисс: сбрасываем каждые kLogFlushEvery сообщений и всегда
+    // на предупреждениях и ошибках. Экономия остаётся почти полной
+    // (одна запись на 64 строки вместо каждой), а потерять можно не
+    // больше 63 последних строк.
+    static const int kLogFlushEvery = 64;
+    static int since_flush = 0;
+
+    if (type == QtWarningMsg || type == QtCriticalMsg
+            || ++since_flush >= kLogFlushEvery) {
         out.flush();
+        since_flush = 0;
     }
 }
 

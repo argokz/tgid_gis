@@ -2,6 +2,7 @@
 #include <QtSql>
 #include <iostream>
 #include "db.h"
+#include <init/init_files.h>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QRegularExpression>
@@ -230,6 +231,13 @@ bool configureTgidPostgreSqlSession(QSqlDatabase &db)
                    << query.lastError().text();
         return false;
     }
+
+    // Русские подписи слоёв берутся из БД сразу после настройки сессии:
+    // это единственная точка, через которую проходят все подключения,
+    // и здесь search_path уже задан. Раньше подписи были только
+    // файловые (kls/gid.txt), и классы новой модели — node_plain,
+    // consumer_real, pipe_section — показывались латиницей.
+    initTableRusNameFromCatalog(db);
 
     return true;
 }

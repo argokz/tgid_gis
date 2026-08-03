@@ -1,5 +1,7 @@
 #pragma once
 
+class QSqlDatabase;
+
 
 struct CColName
 {
@@ -25,3 +27,8 @@ const CColName *findColumnRusNameFull(const QString & d, const QString & n1, con
 const ForeignTable *findLookup(const QString & d, const QString & n1, const QString & n2);
 const std::map<QString, ForeignTable> *findLookup(const QString & d, const QString & table);
 std::map<int, QString> *findLookup2(const QString & d, const QString & fn);
+
+// Подписи слоёв из meta.layer_catalog. Вызывается после подключения к
+// БД: до него запрос выполнить негде, а файловые подписи уже загружены
+// на старте программы.
+void initTableRusNameFromCatalog(QSqlDatabase &db);
