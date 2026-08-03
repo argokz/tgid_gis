@@ -14,7 +14,7 @@ def read_zn0(conn, fileID):
 select distinct
 ec.id, max(usP.ist)
 
-FROM setPressNodes zn
+FROM {net_mode.tbl(conn, 'setpressnodes')} zn
 
 join {net_mode.tbl(conn, 'nodes')} n on n.id=zn.nodeid
 join externalCodes ec on ec.id=n.externalCodeID

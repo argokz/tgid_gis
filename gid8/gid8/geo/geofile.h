@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QSqlDatabase>
+#include <QString>
+#include <QList>
+#include <QWidget>
 #include <geo/Klassif.h>
 
 class QProgressDialog;
@@ -26,7 +29,20 @@ public:
 
       void clearMark();
 
+    // Поиск по слою геобазы (SQL ILIKE по id и текстовым колонкам).
+    // Возвращает true и заполняет outTn/outId при удачном совпадении.
+    bool find(QWidget *parent, QString *outTn = nullptr, int *outId = nullptr);
+    bool findNext(QWidget *parent, QString *outTn = nullptr, int *outId = nullptr);
+    bool isFindNext() const { return !m_findIds.isEmpty() && m_findIndex >= 0; }
 
+private:
+    bool runFindQuery(Klassif *kls, const QString &pattern, QList<int> *ids);
+    bool emitFindHit(QWidget *parent, QString *outTn, int *outId);
+
+    QString m_findTn;
+    QString m_findPattern;
+    QList<int> m_findIds;
+    int m_findIndex = -1;
 };
 
 

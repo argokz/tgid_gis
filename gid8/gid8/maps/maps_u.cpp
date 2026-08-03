@@ -1,5 +1,7 @@
 #include <QtGui>
 #include <QMessageBox>
+#include <QSettings>
+#include <QCache>
 #include <gidview/GidWidget.h>
 #include <algorithm>
 #include <math.h>
@@ -351,7 +353,8 @@ CFPoint get_WMS_XY()
 bool isJpeg(int typ)
 {
     //  return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT;
-    return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT || typ == ID_GOOGLE_HYBRID;
+    return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT || typ == ID_GOOGLE_HYBRID
+        || typ == ID_MAPTILER_HYBRID || typ == ID_MAPTILER_OSM;
     //    return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT || typ == ID_GOOGLE_HYBRID || typ == ID_WMS_MAP;
 }
 
@@ -368,6 +371,11 @@ bool isMap(int typ_map) {
     if (typ_map == ID_WMS_MAP) return true;
 
     if (typ_map == ID_ESRI_SATELLITE) return true;
+
+    if (typ_map == ID_MAPTILER_STREETS) return true;
+    if (typ_map == ID_MAPTILER_TOPO) return true;
+    if (typ_map == ID_MAPTILER_HYBRID) return true;
+    if (typ_map == ID_MAPTILER_OSM) return true;
 
 
     if (typ_map == ID_MAP_SEMEY) return true;
@@ -426,6 +434,46 @@ void conv(unsigned int xx, unsigned int yy, char* s, int n)
         s[j++] = c;
     }
     s[j] = 0;
+}
+
+QString maptiler_key()
+{
+    // Ключ MapTiler в исходники не попадает. В этом проекте уже был
+    // случай, когда в коммит чуть не уехал токен Google (gid6/dop/
+    // converter_old32), поэтому порядок такой же, как у пароля БД:
+    // сначала настройки программы, затем переменная окружения.
+    // Пустой ключ означает "карта не настроена" — get_url вернёт пустую
+    // строку, и провайдер просто не будет запрашиваться.
+    static QString key;
+    static bool loaded = false;
+
+    if (!loaded) {
+        loaded = true;
+        QSettings settings;
+        key = settings.value("maps/maptiler_key").toString().trimmed();
+        if (key.isEmpty()) {
+            key = qEnvironmentVariable("MAPTILER_KEY").trimmed();
+        }
+        if (key.isEmpty()) {
+            qWarning() << "MapTiler: ключ не задан "
+                          "(настройка maps/maptiler_key или MAPTILER_KEY)";
+        }
+    }
+    return key;
+}
+
+// Растровые тайлы MapTiler. Суффикс @2x даёт картинку 512x512 на ту же
+// клетку схемы 256 — drawPic масштабирует изображение под целевой
+// прямоугольник независимо от исходного размера, поэтому удвоенное
+// разрешение работает без правок отрисовки и даёт более чёткий результат.
+static QString maptiler_url(const QString &style, const QString &ext,
+                            int nn, int xx, int yy)
+{
+    QString key = maptiler_key();
+    if (key.isEmpty()) return QString();
+
+    return QString("https://api.maptiler.com/maps/%1/256/%2/%3/%4@2x.%5?key=%6")
+            .arg(style).arg(nn).arg(xx).arg(yy).arg(ext).arg(key);
 }
 
 QString get_url(int nn, int xx, int yy, int map_typ)
@@ -523,6 +571,22 @@ QString get_url(int nn, int xx, int yy, int map_typ)
 
     case ID_ESRI_SATELLITE:
         str = QString("https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%3/%2/%1").arg(xx).arg(yy).arg(nn);
+        break;
+
+    case ID_MAPTILER_STREETS:
+        str = maptiler_url("streets-v4", "png", nn, xx, yy);
+        break;
+
+    case ID_MAPTILER_TOPO:
+        str = maptiler_url("topo-v4", "png", nn, xx, yy);
+        break;
+
+    case ID_MAPTILER_HYBRID:
+        str = maptiler_url("hybrid-v4", "jpg", nn, xx, yy);
+        break;
+
+    case ID_MAPTILER_OSM:
+        str = maptiler_url("openstreetmap", "jpg", nn, xx, yy);
         break;
 
 
@@ -711,6 +775,19 @@ QString get_path(int map_typ)
     case ID_OPENSTREETMAP:
         path0 = "OPENSTREETMAP";
         break;
+
+    case ID_MAPTILER_STREETS:
+        path0 = "MAPTILER_STREETS";
+        break;
+    case ID_MAPTILER_TOPO:
+        path0 = "MAPTILER_TOPO";
+        break;
+    case ID_MAPTILER_HYBRID:
+        path0 = "MAPTILER_HYBRID";
+        break;
+    case ID_MAPTILER_OSM:
+        path0 = "MAPTILER_OSM";
+        break;
     }
 
     //  char path1[256];
@@ -804,35 +881,64 @@ void drawRamka(QPainter *painter, CFRect& rect, const QString & str)
 }
 
 
-static std::map<QString, QImage> images;
+// Кэш скачанных тайлов.
+//
+// Раньше это был std::map без какого-либо вытеснения: каждая once
+// показанная плитка оставалась в памяти до конца работы программы.
+// Пока тайлы были 256x256, это сходило с рук; с @2x плитка 512x512 в
+// разобранном виде занимает около мегабайта, и прогулка по городу
+// набирает гигабайты. QCache вытесняет давно не использованные записи
+// сам, стоимость записи считаем в килобайтах.
+//
+// Второй кэш — уже отмасштабированные под экран плитки. drawPic делал
+// image.scaled(..., SmoothTransformation) на КАЖДУЮ перерисовку каждой
+// плитки; при сдвиге карты целевой размер не меняется, поэтому
+// пересчёт был чистой потерей времени, вчетверо подорожавшей с @2x.
+static const int kTileCacheKb = 256 * 1024;    // 256 МБ исходных
+static const int kScaledCacheKb = 128 * 1024;  // 128 МБ масштабированных
+
+static QCache<QString, QImage> images(kTileCacheKb);
+static QCache<QString, QImage> scaled_images(kScaledCacheKb);
+
+static int image_cost_kb(const QImage &im)
+{
+    // Не меньше единицы: запись нулевой стоимости QCache не вытесняет.
+    return qMax(1, int(im.sizeInBytes() / 1024));
+}
+
 static std::set<QString> set_downloads;
 
 QImage getImage(const QString & fn, bool &yes)
 {
-    auto it = images.find(fn);
-
     if (reread) {
-        if (it != images.end()) {
-            images.erase(it);
-        }
+        // Перечитывание: плитка устарела. Масштабированные варианты
+        // сбрасываются один раз в начале прохода (см. redrawMap), а не
+        // здесь: getImage вызывается на каждую плитку, и чистка всего
+        // кэша в этом месте повторялась бы десятки раз за кадр.
+        images.remove(fn);
         yes = false;
+        return QImage();
     }
-    else {
-        yes = true;
-        if (it != images.end()) {
-            return it->second;
-        }
 
-        if (QFile::exists(fn)) {
-            QImage image(fn);
-            images[fn] = image;
-    //        qDebug() << "Уже скачал " << fn;
+    if (QImage *cached = images.object(fn)) {
+        yes = true;
+        // QImage неявно разделяемый: копия здесь не копирует пиксели.
+        // Возвращаем именно значение, а не указатель, — вставка в кэш
+        // ниже по коду может вытеснить и удалить объект.
+        return *cached;
+    }
+
+    if (QFile::exists(fn)) {
+        QImage image(fn);
+        if (!image.isNull()) {
+            images.insert(fn, new QImage(image), image_cost_kb(image));
+            yes = true;
             return image;
         }
     }
-    QImage image;
+
     yes = false;
-    return image;
+    return QImage();
 }
 
 
@@ -840,9 +946,7 @@ bool yesImage(const QString & fn)
 {
     if (reread) return false;
 
-    auto it = images.find(fn);
-
-    if (it != images.end()) {
+    if (images.contains(fn)) {
         return true;
     }
 
@@ -871,7 +975,79 @@ QImage adjustBrightness(const QImage &image, int brightnessPercent) {
     return result;
 }
 
-void drawPic(QPainter *painter, CFRect& rect, const QString & fn, int nTransp, int bk_color, int i, int k, int nn)
+// На сколько уровней вверх искать уже загруженную плитку. Каждый шаг
+// растягивает картинку вдвое; после пяти уровней это уже мыло крупнее
+// экрана, от которого пользы меньше, чем от пустого места.
+static const int kParentDepth = 5;
+
+// Пока плитка нужного масштаба качается, на её месте оставался белый
+// прямоугольник. Карты так не делают: они показывают кусок уже
+// загруженной плитки более крупного масштаба, растянутый на это место,
+// и подменяют его, когда придёт настоящая.
+static bool drawParentTile(QPainter *painter, CFRect &rect, int map_typ,
+                           int nn, int xx, int yy)
+{
+    // При перечитывании родительские плитки такие же устаревшие, и
+    // getImage их ещё и вычистит из кэша — показывать нечего.
+    if (reread) return false;
+
+    for (int k = 1; k <= kParentDepth && nn - k >= 0; ++k) {
+        const int pnn = nn - k;
+        const int pxx = xx >> k;
+        const int pyy = yy >> k;
+
+        bool yes = false;
+        QImage parent = getImage(get_path(map_typ)
+                                 + get_name(pnn, pxx, pyy, map_typ), yes);
+        if (!yes || parent.isNull()) continue;
+
+        // Искомая плитка занимает 1/2^k ширины и высоты родительской;
+        // её место внутри родителя — остаток от деления координат.
+        const int div = 1 << k;
+        const double sw = double(parent.width()) / div;
+        const double sh = double(parent.height()) / div;
+        const double sx = (xx - (pxx << k)) * sw;
+        const double sy = (yy - (pyy << k)) * sh;
+
+        painter->drawImage(
+            QRectF(rect.left, rect.top, rect.Width(), rect.Height() + 2),
+            parent, QRectF(sx, sy, sw, sh));
+        return true;
+    }
+    return false;
+}
+
+// Обратный случай: масштаб уменьшили, и плиток более крупного масштаба
+// ещё нет — зато есть четыре дочерние с прошлого вида. Собираем место
+// из них. Глубже одного уровня не идём: там уже 16 плиток на одно
+// место, и собирать дороже, чем дождаться загрузки.
+static bool drawChildTiles(QPainter *painter, CFRect &rect, int map_typ,
+                           int nn, int xx, int yy)
+{
+    if (reread) return false;
+
+    const double w = rect.Width() / 2.;
+    const double h = (rect.Height() + 2) / 2.;
+
+    bool drawn = false;
+
+    for (int dy = 0; dy < 2; ++dy) {
+        for (int dx = 0; dx < 2; ++dx) {
+            bool yes = false;
+            QImage child = getImage(
+                get_path(map_typ)
+                + get_name(nn + 1, xx * 2 + dx, yy * 2 + dy, map_typ), yes);
+            if (!yes || child.isNull()) continue;
+
+            painter->drawImage(
+                QRectF(rect.left + dx * w, rect.top + dy * h, w, h), child);
+            drawn = true;
+        }
+    }
+    return drawn;
+}
+
+void drawPic(QPainter *painter, CFRect& rect, const QString & fn, int nTransp, int bk_color, int i, int k, int nn, int map_typ)
 {
     bool yes;
     QImage image = getImage(fn, yes);
@@ -879,16 +1055,45 @@ void drawPic(QPainter *painter, CFRect& rect, const QString & fn, int nTransp, i
 //        image = adjustBrightness(image, nTransp);
 //    }
 
+    if (!yes) {
+        // Настоящей плитки ещё нет. Сначала пробуем растянуть кусок
+        // плитки более крупного масштаба (так бывает при увеличении),
+        // затем — собрать место из четырёх дочерних (при уменьшении).
+        if (!drawParentTile(painter, rect, map_typ, nn, i, k)) {
+            drawChildTiles(painter, rect, map_typ, nn, i, k);
+        }
+        return;
+    }
 
     if (yes) {
-        QRectF target(rect.left, rect.bottom, rect.Width(), rect.Height());
+        const int w = int(rect.Width());
+        const int h = int(rect.Height()) + 2;
 
-//        painter->setRenderHint(QPainter::SmoothPixmapTransform);
+        if (w > 0 && h > 0) {
+            // Масштабирование с плавным сглаживанием — самая дорогая
+            // операция отрисовки карты, а при сдвиге целевой размер не
+            // меняется, и раньше оно повторялось на каждый кадр для
+            // каждой плитки. Результат кэшируем по имени файла и
+            // размеру: сдвиг теперь попадает в кэш целиком, пересчёт
+            // остаётся только при смене масштаба.
+            const QString key = QString("%1|%2x%3").arg(fn).arg(w).arg(h);
 
-        image = image.scaled(rect.Width(), rect.Height()+2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            QImage ready;
+            if (QImage *cached = scaled_images.object(key)) {
+                ready = *cached;
+            }
+            else {
+                ready = image.scaled(w, h, Qt::IgnoreAspectRatio,
+                                     Qt::SmoothTransformation);
+                // Вставка может не удаться (плитка дороже всего кэша) —
+                // тогда QCache удалит переданный объект, поэтому рисуем
+                // из локальной копии, а не из указателя кэша.
+                scaled_images.insert(key, new QImage(ready),
+                                     image_cost_kb(ready));
+            }
 
-//        painter->drawImage(QPointF(rect.left, rect.bottom), image);
-        painter->drawImage(QPointF(rect.left, rect.top), image);
+            painter->drawImage(QPointF(rect.left, rect.top), ready);
+        }
 
 //        qDebug() << "Рисую " << i << " " << k;
 
@@ -975,7 +1180,11 @@ void remove_file(DownloadManager &download_manager, const QString &fn)
         QFile file(fn);
         file.remove();
     }
-    images.erase(fn);
+    // Файл плитки удалён — вместе с ним должны уйти и разобранная
+    // копия, и все её масштабированные варианты, иначе на экране
+    // останется картинка, которой на диске уже нет.
+    images.remove(fn);
+    scaled_images.clear();
     download_manager.erase(fn);
     qDebug() << "remove " << fn;
 }
@@ -1198,7 +1407,7 @@ int GidWidget::drawMap(QPainter* dc, CFRect& m_rect, int map_typ, int nn)
                     
                     if (get_map(download_manager, map_typ, nn, xx, yy, n_download1, tmpn)) {
                         n_download += n_download1;
-                        drawPic(dc, rect, tmpn, m_nTransp, 255, xx, yy, nn);
+                        drawPic(dc, rect, tmpn, m_nTransp, 255, xx, yy, nn, map_typ);
                     }
                 }
 
@@ -1417,6 +1626,12 @@ int GidWidget::maxNmap(int typ_map)
     else if (typ_map == ID_GOOGLE_MAP) {
         return 21;
     }
+    else if (typ_map == ID_MAPTILER_STREETS || typ_map == ID_MAPTILER_TOPO
+             || typ_map == ID_MAPTILER_HYBRID
+             || typ_map == ID_MAPTILER_OSM) {
+        // Проверено запросами: тайлы отдаются вплоть до z=22.
+        return 21;
+    }
     if (typ_map == ID_YANDEX_MAP || typ_map == ID_YANDEX_SAT) {
         return 17;
     }
@@ -1432,8 +1647,10 @@ bool GidWidget::redrawMap(QPainter* dc, CFRect& m_rect, int typ_map, bool is_rer
 
     if (reread) {
         qDebug() << "Reread";
-        int qq;
-        qq = 1;
+        // Один сброс на весь проход перечитывания: масштабированные
+        // плитки ключуются именем файла и размером на экране, адресно
+        // их не выбрать, а держать устаревшие нельзя.
+        scaled_images.clear();
     }
 
 
@@ -1519,7 +1736,12 @@ void GidWidget::setMaps(int internetMap)
     {gidrAction.aOpenstreetmap       , ID_OPENSTREETMAP},
     {gidrAction.a2gisMap             , ID_2GIS_MAP},
 
-    {gidrAction.aEsriSatMap             , ID_ESRI_SATELLITE}
+    {gidrAction.aEsriSatMap             , ID_ESRI_SATELLITE},
+
+    {gidrAction.aMaptilerStreets        , ID_MAPTILER_STREETS},
+    {gidrAction.aMaptilerTopo           , ID_MAPTILER_TOPO},
+    {gidrAction.aMaptilerHybrid         , ID_MAPTILER_HYBRID},
+    {gidrAction.aMaptilerOsm            , ID_MAPTILER_OSM}
     };
 
     for (auto &it : map_map) {
@@ -1553,7 +1775,12 @@ ID_YANDEX_PMAP,
     {gidrAction.aMapSemeyTs          , ID_MAP_SEMEY_TS},
     {gidrAction.aOpenstreetmap       , ID_OPENSTREETMAP},
     {gidrAction.a2gisMap             , ID_2GIS_MAP},
-    {gidrAction.aEsriSatMap          , ID_ESRI_SATELLITE}
+    {gidrAction.aEsriSatMap          , ID_ESRI_SATELLITE},
+
+    {gidrAction.aMaptilerStreets     , ID_MAPTILER_STREETS},
+    {gidrAction.aMaptilerTopo        , ID_MAPTILER_TOPO},
+    {gidrAction.aMaptilerHybrid      , ID_MAPTILER_HYBRID},
+    {gidrAction.aMaptilerOsm         , ID_MAPTILER_OSM}
 
     };
 

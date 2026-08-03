@@ -29,7 +29,7 @@ void GidWidget::onZap1() // Объем сети
         "hp.pipeSectLength, "
         "IIF(l.externalSignLineID=1, 2, 1) AS db "
         "FROM net.v_linesobj l "
-        "JOIN heatPipeSections hp ON hp.lineID=l.id "
+        "JOIN net.v_heatpipesections hp ON hp.lineID=l.id "
         "JOIN net.v_nodes n1 ON n1.id=l.nodeID1 "
         " @@ "
         "WHERE l.removed = 0 AND n1.internalNodeID IS NULL $$"
@@ -93,7 +93,7 @@ void GidWidget::onZap2() // Длина теплопроводов
 
 
         "FROM net.v_linesobj l  "
-        "JOIN heatPipeSections hp ON hp.lineID=l.id  "
+        "JOIN net.v_heatpipesections hp ON hp.lineID=l.id  "
         "JOIN net.v_nodes n1 ON n1.id=l.nodeID1  "
         "JOIN net.v_nodes n2 ON n2.id=l.nodeID2 "
         " @@ "
@@ -158,7 +158,7 @@ void GidWidget::onZap7() // Длина теплопроводов по диам�
         "IIF(l.externalSignLineID=1, 2, 1) AS db, "
         "n1.fileID "
         "FROM net.v_linesobj l "
-        "JOIN heatPipeSections hp ON hp.lineID=l.id "
+        "JOIN net.v_heatpipesections hp ON hp.lineID=l.id "
         "JOIN net.v_nodes n1 ON n1.id=l.nodeID1 "
         " @@ "
 
@@ -244,7 +244,7 @@ void GidWidget::onZap71() // Длина теплопроводов по диам
         "IIF(l.externalSignLineID=1, 2, 1) AS db,  "
         "n1.fileID  "
         "FROM net.v_linesobj l  "
-        "JOIN heatPipeSections hp ON hp.lineID=l.id  "
+        "JOIN net.v_heatpipesections hp ON hp.lineID=l.id  "
         "JOIN net.v_nodes n1 ON n1.id=l.nodeID1  "
         " @@ "
 

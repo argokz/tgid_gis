@@ -1302,7 +1302,7 @@ bool GidWidget::setCoord1(CLINE2 *line, CCoordList &cl)
 
 /*
 
-    QString q = QString("UPDATE linesobj SET coords='%1' WHERE ID=%2 OR ID=%3").arg(coord).arg(l->line.nomP).arg(l->line.nomO);
+    QString q = QString("UPDATE net.v_linesobj SET coords='%1' WHERE ID=%2 OR ID=%3").arg(coord).arg(l->line.nomP).arg(l->line.nomO);
 
     QSqlQuery query(m_cxema.m_db);
     bool ret = query_exec(m_cxema.m_db, query, q);
@@ -3825,7 +3825,7 @@ bool GidWidget::neotr_node(CNode2* node, CFPoint point)
             "JOIN fragments fr ON fr.id=n.fileID\n"
             "LEFT JOIN net.v_realconsumers rc ON rc.nodeID =n.id\n"
             "JOIN net.v_linesobj l ON(l.nodeID1 = n.id OR l.nodeID2 = n.id) AND(l.nodeID1 = %6 OR l.nodeID2 = %6)\n"
-            "LEFT JOIN heatPipeSections hps ON hps.lineID=l.id\n"
+            "LEFT JOIN net.v_heatpipesections hps ON hps.lineID=l.id\n"
             "WHERE n.fileID in (%7) AND (n.x=0 OR n.x IS NULL) AND (n.y=0 OR n.y IS NULL) AND n.internalNodeID IS NULL\n--AND_NODE")
             .arg(quot_text("Код РС"), quot_text("Имя узла"), quot_text("Описание"), quot_text("Длина"), quot_text("Фрагмент"))
             .arg(node->id).arg(m_cxema.m_par);

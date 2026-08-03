@@ -399,6 +399,21 @@ bool get_table_columns(QSqlDatabase & db, const QString & tn, std::map<QString, 
     return ret;
 }
 
+// Для PG: карточки/экспорт читают net.v_* (tbl_sql), а интроспекция
+// раньше смотрела только relkind='r' — view не находились, filtr из
+// tab/*.txt оставался пустым, поля в PropertyDial без значений.
+static QString resolve_relname_for_columns(const QString & tn)
+{
+    if (!is_POSTGRESQL()) {
+        return tn;
+    }
+    QString resolved = tbl_sql(tn);
+    if (resolved.startsWith(QLatin1Char('"'))) {
+        resolved.remove(QLatin1Char('"'));
+    }
+    return resolved;
+}
+
 bool get_table_columns(QSqlDatabase & db, const QString & tn, std::list<AdoField> & fields)
 {
     std::tuple<QString, QString, QString> key(db.hostName(), db.databaseName(), tn.toLower());
@@ -437,7 +452,7 @@ bool get_table_columns(QSqlDatabase & db, const QString & tn, std::list<AdoField
 
 
     if (is_POSTGRESQL()) {
-
+    const QString rel = resolve_relname_for_columns(tn);
 
     q = QString(
 "SELECT\n"
@@ -457,14 +472,14 @@ bool get_table_columns(QSqlDatabase & db, const QString & tn, std::list<AdoField
 "    INNER JOIN pg_catalog.pg_class c ON n.oid = c.relnamespace\n"
 "    INNER JOIN pg_catalog.pg_attribute a ON c.oid = a.attrelid\n"
 "WHERE\n"
-"    c.relkind = 'r' AND\n"
+"    c.relkind IN ('r', 'v', 'm') AND\n"
 "    a.attnum > 0 AND NOT a.attisdropped and \n"
 "    (LOWER(n.nspname || '.' || c.relname) = LOWER('%1') OR \n"
 "    LOWER(c.relname) = LOWER('%1'))\n"
 "ORDER BY\n"
 "    table_schema,\n"
 "    table_name,\n"
-                    "    ordinal_position;\n").arg(tn);
+                    "    ordinal_position;\n").arg(rel);
                     }
 
     QSqlQuery query(db);

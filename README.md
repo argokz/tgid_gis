@@ -107,6 +107,9 @@ SQL-контракты. При дальнейшем переносе эти ко
 | 83 | Блок «Прочее» (часть): `SqlSave` (PG TEMPLATE), Invert, AvtoOn/Off, AppExit, StatusBar, SetAddr, `a1001` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
 | 84 | Блок «Прочее» (часть 2): поворот/F5/зона/ТП/источники/ТУ/ЭС/флаги вида; тяжёлые отчёты — сообщения | готово — [18](docs/18-gid8-cpp-rewrite.md) |
 | 85 | Отчёты ТУ: `onTuSvod`/`onTuZhurnal` → Excel (QXlsx), `tu/tu_reports.cpp` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 86 | Карточки труб/узлов: `get_table_columns` видит `net.v_*` (relkind v/m + tbl_sql) | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 87 | Создание участка: PG `reset_shape`/`setNodeXY` — алиасы `net.v_*`, rebuild через триггер | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 88 | Пилот карты: HTTPS/User-Agent тайлов; `GeoFile::find`/`findNext` + `onFindGeo`/`onGeoFindNext` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше

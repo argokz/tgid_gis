@@ -468,7 +468,7 @@ bool export_tgid(QSqlDatabase & db, const QString & fn, int fileID, CGraph2 *gra
 
     q = QString(
 "SELECT pss.* FROM pipeSections pss\n"
-"JOIN heatPipeSections hps ON hps.pipeSectionID=pss.id\n"
+"JOIN net.v_heatpipesections hps ON hps.pipeSectionID=pss.id\n"
 "JOIN net.v_linesobj l ON l.id=hps.lineID\n"
 "JOIN net.v_nodes n1 ON n1.id=l.nodeID1\n"
 "WHERE n1.fileID=%1 AND l.removed=0"
@@ -1131,7 +1131,7 @@ int open_table(QSqlDatabase & db, const QString & tn, bool add_id_old = false)
 bool ispr_nodes(QSqlDatabase & db)
 {
     QString q =
-       "update nodes set internalnodeid=n.id\n"
+       "update net.v_nodes set internalnodeid=n.id\n"
        "from net.v_nodes nn\n"
        "join __nodes on __nodes.id=nn.id_old\n"
        "join net.v_nodes n on n.id_old = __nodes.internalnodeid\n"

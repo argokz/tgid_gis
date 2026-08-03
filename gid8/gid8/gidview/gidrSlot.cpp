@@ -1,4 +1,4 @@
-#include <QApplication>
+﻿#include <QApplication>
 #include <QtGui>
 #include <QtWidgets>
 #include <QProgressDialog>
@@ -1442,7 +1442,7 @@ void GidWidget::onTubing5() // Обвязка узлов и насосных с�
 
 void GidWidget::onFindKti() // По коэффициенту тепловых испытаний
 {
-    QString q = "SELECT heattestscoeff FROM heatpipesections"
+    QString q = "SELECT heattestscoeff FROM net.v_heatpipesections"
                 " WHERE heattestscoeff IS NOT NULL"
                 " GROUP BY heattestscoeff ORDER BY heattestscoeff";
 
@@ -1462,9 +1462,9 @@ void GidWidget::onFindKti() // По коэффициенту тепловых и
 
     std::set<int> set_id;
     q = QString(
-        "SELECT l.id FROM heatpipesections hps"
-        " JOIN linesobj l ON l.id=hps.lineid"
-        " JOIN nodes n ON l.nodeid1=n.id"
+        "SELECT l.id FROM net.v_heatpipesections hps"
+        " JOIN net.v_linesobj l ON l.id=hps.lineid"
+        " JOIN net.v_nodes n ON l.nodeid1=n.id"
         " WHERE heattestscoeff=%1 AND n.fileid IN (%2)").arg(s, m_cxema.m_par);
 
     if (query_exec(m_cxema.m_db, query, q)) {
@@ -1830,7 +1830,7 @@ void GidWidget::onSetKorrozia() // Установить Индикаторы к�
     QString q = QString(
         "UPDATE indikator_korrozii AS obj "
         "SET sostoyanie = 1, data_planirovaniya = DATE '%1' "
-        "FROM linesobj l "
+        "FROM net.v_linesobj l "
         "JOIN %2 tmp ON tmp.id = l.id "
         "WHERE ST_DWithin(l.shape, obj.shape, 1)")
         .arg(d.toString("yyyy-MM-dd"), temp_name);
@@ -2062,21 +2062,53 @@ void GidWidget::onGeobaza(bool on) // Показать геобазу
 
 void GidWidget::onFindGeo() // Поиск в геобазе...
 {
-    // полноценный find/findNext геобазы gid6 не перенесён в GeoFile;
-    // открываем проводник карты / геобазы для ручного поиска
-    if (main_window) {
-        main_window->showDocks(Qt::LeftDockWidgetArea, true);
+    QString tn;
+    int id = 0;
+    if (!m_geo.find(this, &tn, &id)) return;
+    moveGeo(tn, id);
+    if (!m_kl_list.findKlN(tn) || !m_kl_list.findKlN(tn)->getGeoObjectById(id)) {
+        // Объект есть в БД, но ещё не в памяти слоя — подтянем центроид.
+        Klassif *kls = m_kl_list.findKlN(tn);
+        if (!kls || !kls->m_db) return;
+        const QString idCol = kls->id.isEmpty() ? QStringLiteral("id") : kls->id;
+        const QString sh = kls->shape.isEmpty() ? QStringLiteral("shape") : kls->shape;
+        QString q = QString(
+            "SELECT ST_X(ST_Centroid(%1)), ST_Y(ST_Centroid(%1)) FROM %2 WHERE %3=%4")
+            .arg(br_text(sh), tbl_sql(kls->nazv), br_text(idCol)).arg(id);
+        QSqlQuery query(*kls->m_db);
+        if (query_exec(*kls->m_db, query, q) && query.next()) {
+            double x = query.value(0).toDouble() * 100.0;
+            double y = -query.value(1).toDouble() * 100.0;
+            CFRect r(x - 50, y - 50, x + 50, y + 50);
+            moveRect(r);
+            if (main_window) main_window->setCurrent(this);
+        }
     }
-    QMessageBox::information(this, "",
-        tr("Выберите слой геобазы в проводнике карты и откройте таблицу объекта "
-           "(или используйте поиск по адресу)."));
 }
 
 
 void GidWidget::onGeoFindNext() // Продолжение поиска
 {
-    QMessageBox::information(this, "",
-        tr("Продолжение поиска по геобазе будет доступно после порта find/findNext."));
+    QString tn;
+    int id = 0;
+    if (!m_geo.findNext(this, &tn, &id)) return;
+    moveGeo(tn, id);
+    Klassif *kls = m_kl_list.findKlN(tn);
+    if (kls && !kls->getGeoObjectById(id) && kls->m_db) {
+        const QString idCol = kls->id.isEmpty() ? QStringLiteral("id") : kls->id;
+        const QString sh = kls->shape.isEmpty() ? QStringLiteral("shape") : kls->shape;
+        QString q = QString(
+            "SELECT ST_X(ST_Centroid(%1)), ST_Y(ST_Centroid(%1)) FROM %2 WHERE %3=%4")
+            .arg(br_text(sh), tbl_sql(kls->nazv), br_text(idCol)).arg(id);
+        QSqlQuery query(*kls->m_db);
+        if (query_exec(*kls->m_db, query, q) && query.next()) {
+            double x = query.value(0).toDouble() * 100.0;
+            double y = -query.value(1).toDouble() * 100.0;
+            CFRect r(x - 50, y - 50, x + 50, y + 50);
+            moveRect(r);
+            if (main_window) main_window->setCurrent(this);
+        }
+    }
 }
 
 
@@ -3984,7 +4016,7 @@ void GidWidget::onIznos() // Износ оборудования
         "hps.lineid AS %7, hps.diametercondit AS %8, "
         "hps.firstpicdatehp AS %9, hps.lasttransdate AS %10 "
         "FROM iznos i "
-        "LEFT JOIN heatpipesections hps ON hps.pipesectionid = i.pipesectionid "
+        "LEFT JOIN net.v_heatpipesections hps ON hps.pipesectionid = i.pipesectionid "
         "WHERE i.calculationid = %11 "
         "ORDER BY i.id")
         .arg(quot_text("Участок (pipeSection)"),
@@ -6088,6 +6120,10 @@ void GidWidget::onGeobaza6 ()   // "Настройка",
         menu2->addAction(gidrAction.aOpenstreetmap); // OpenStreetMap
         menu2->addAction(gidrAction.a2gisMap); // 2ГИС
         menu2->addAction(gidrAction.aEsriSatMap); // 2ГИС
+        menu2->addAction(gidrAction.aMaptilerStreets); // MapTiler Улицы
+        menu2->addAction(gidrAction.aMaptilerTopo); // MapTiler Топография
+        menu2->addAction(gidrAction.aMaptilerHybrid); // MapTiler Гибридная
+        menu2->addAction(gidrAction.aMaptilerOsm); // MapTiler OpenStreetMap
         menu2->addAction(gidrAction.aGoogleElevation); // Высота по Google
         menu2->addAction(gidrAction.aGoogleElevationSet); // Высота по Google
         menu2->addAction(gidrAction.aMapSearch); // Поиск

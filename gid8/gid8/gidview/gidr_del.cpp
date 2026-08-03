@@ -141,7 +141,7 @@ bool GidWidget::delNode2(CNode2 *node)
 
     bool ret = query_exec(m_cxema.m_db, query, q);
 
-    q = QString("UPDATE heatPipeSections SET pipeSectLength=%1 WHERE id IN (%2, %3)").arg(dlina).arg(bline(l1)->line.idP2).arg(bline(l1)->line.idP2);
+    q = QString("UPDATE net.v_heatpipesections SET pipeSectLength=%1 WHERE id IN (%2, %3)").arg(dlina).arg(bline(l1)->line.idP2).arg(bline(l1)->line.idP2);
     ret = query_exec(m_cxema.m_db, query, q);
 
     delLine(l2, false);
@@ -287,11 +287,11 @@ bool setNodeXY(QSqlDatabase &db, int id, double x, double y, int m_user)
 
 "-- Обновляем точку\n"
 "updated_node AS (\n"
-"  UPDATE nodes\n"
+"  UPDATE net.v_nodes AS n\n"
 "  SET x=%2, y=%3, shape = input.new_geom, operatorID=%5, archiveChangeDate=%6, sync_tgid=true\n"
 "  FROM input\n"
-"  WHERE nodes.id = input.id\n"
-"  RETURNING nodes.id, input.new_geom, (SELECT old_point FROM old_geom) AS old_point\n"
+"  WHERE n.id = input.id\n"
+"  RETURNING n.id, input.new_geom, (SELECT old_point FROM old_geom) AS old_point\n"
 "),\n"
 
 "-- Выбираем и обновляем линии\n"
@@ -328,10 +328,10 @@ bool setNodeXY(QSqlDatabase &db, int id, double x, double y, int m_user)
 ")\n"
 
 "-- Применяем обновления\n"
-"UPDATE linesobj\n"
+"UPDATE net.v_linesobj AS lo\n"
 "SET shape = to_update.new_shape, operatorID=%5, archiveChangeDate=%6, sync_tgid=true\n"
 "FROM to_update\n"
-"WHERE linesobj.id = to_update.id;\n"
+"WHERE lo.id = to_update.id;\n"
 
 
 
@@ -448,7 +448,7 @@ bool GidWidget::setXY(CNode2 *n, CFPoint &pt)
 {
   QSqlQuery query(m_cxema.m_db);
 /*
-  query.prepare("UPDATE nodes SET X=:x, Y=:y WHERE ID=:id");
+  query.prepare("UPDATE net.v_nodes SET X=:x, Y=:y WHERE ID=:id");
   query.b1indValue(":x", pt.x);
   query.b1indValue(":y", pt.y);
   query.b1indValue(":id", (int)n->id);
@@ -504,7 +504,7 @@ bool GidWidget::swap(CLINE2 *line)
   
 // externalSignID
 
-  QString q = QString("UPDATE linesobj "
+  QString q = QString("UPDATE net.v_linesobj "
           " SET "
           "    externalSignLineID = case externalSignLineID when 4 then 5 when 5 then 4 else externalSignLineID end, "
           "    nodeID1 = nodeID2, "

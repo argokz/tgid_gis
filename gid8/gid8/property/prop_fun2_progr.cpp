@@ -179,7 +179,7 @@ void fun_pipeSections_remont_history(PropertyDial *prop, QSqlDatabase &db, const
         "From remont2Deployed d\n"
         "LEFT JOIN remont2 o ON o.id=d.directionID\n"
         "JOIN net.v_linesobj l ON l.id=d.lineID\n"
-        "JOIN heatPipeSections hps ON hps.lineID=l.id\n"
+        "JOIN net.v_heatpipesections hps ON hps.lineID=l.id\n"
         "WHERE hps.pipeSectionID=%1\n").arg(quot_text("Наименование")).arg(id);
 
     TableWindow tab(db, "", "Ремонты", q, prop, -1, false, true, true);

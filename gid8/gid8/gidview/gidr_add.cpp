@@ -19,19 +19,19 @@ QString getNodeQ(int typ, const QString & tn, const QString & qq)
     param.replace("!.", "nodes.");
 
     if (tn != "") {
-        q = QString("SELECT nodes.id,n2.id AS id2, %1 FROM net.v_nodes,%2 n2 WHERE nodes.id=n2.nodeID AND %3 AND nodes.removed = 0").arg(param, tn, qq);
+        q = QString("SELECT nodes.id,n2.id AS id2, %1 FROM net.v_nodes AS nodes,%2 n2 WHERE nodes.id=n2.nodeID AND %3 AND nodes.removed = 0").arg(param, tn, qq);
 
         if (typ == TIP_PR) {
             par_pot = ",calcHLdep,calcHLindep,relLoadFacade,calcInternHD,calcHLventil,expendHWpart,avgHLcond,avgHLcloseSys,avgHLopenSysFlow,avgHLopenSysRet,avgHLGVSopenFlow,avgHLGVSopenRet,avgHLGVScloseParall,avgHLGVScloseMix,avgHLGVScloseConseq,avgHLGVSclosePreON,WEmeteringDeviceID";
-            q = QString("SELECT nodes.id,n2.id AS id2, n2.consumerStateID, n2.schemeNum, buildHeight, automDegID, %1 %2 FROM net.v_nodes,%3 n2 WHERE nodes.id=n2.nodeID AND %4 AND nodes.removed = 0")
+            q = QString("SELECT nodes.id,n2.id AS id2, n2.consumerStateID, n2.schemeNum, buildHeight, automDegID, %1 %2 FROM net.v_nodes AS nodes,%3 n2 WHERE nodes.id=n2.nodeID AND %4 AND nodes.removed = 0")
                 .arg(param, par_pot, tn, qq);
         }
         else if (typ == TIP_PO) {
             par_pot = ",calcHLdep,calcHLindep,calcHLventil,calcHLparall,calcHLGVSparall,avgHLcompParall,calcHLmix,calcHLGVSmix,avgHLcompMix,calcHLconseq,calcHLGVSconseq,avgHLcompconseq,calcHLpreON,calcHLGVSpreON,avgHLcompPreON,avgHLGVSopenSysFlow,avgHLGVSopenSysRet,avgHLcompOpen";
-            q = QString("SELECT nodes.id,n2.id AS id2, n2.consumerStateID, maxBuildingHeight, %1 %2 FROM net.v_nodes,%3 n2 WHERE nodes.id=n2.nodeID AND %4 AND nodes.removed = 0").arg(param, par_pot, tn, qq);
+            q = QString("SELECT nodes.id,n2.id AS id2, n2.consumerStateID, maxBuildingHeight, %1 %2 FROM net.v_nodes AS nodes,%3 n2 WHERE nodes.id=n2.nodeID AND %4 AND nodes.removed = 0").arg(param, par_pot, tn, qq);
         }
         else if (typ == TIP_US2) {
-            q = QString("SELECT nodes.id,n2.id, connectID AS id2, %1 FROM net.v_nodes,%2 n2 WHERE nodes.id=n2.nodeID AND %3 AND nodes.removed = 0").arg(param, tn, qq);
+            q = QString("SELECT nodes.id,n2.id, connectID AS id2, %1 FROM net.v_nodes AS nodes,%2 n2 WHERE nodes.id=n2.nodeID AND %3 AND nodes.removed = 0").arg(param, tn, qq);
 
 
             param = param0;
@@ -44,7 +44,7 @@ QString getNodeQ(int typ, const QString & tn, const QString & qq)
 
             q = QString("SELECT nodes.id,n2.id AS id2, n2.connectID, %1 "
                 "FROM %2 n2 "
-                "LEFT JOIN net.v_nodes ON nodes.id=n2.nodeID "
+                "LEFT JOIN net.v_nodes AS nodes ON nodes.id=n2.nodeID "
                 "LEFT JOIN net.v_nodes n3 ON n3.id=n2.connectID "
 
                 "WHERE %3 AND nodes.removed = 0").arg(param, tn, qq);
@@ -53,7 +53,7 @@ QString getNodeQ(int typ, const QString & tn, const QString & qq)
         }
     }
     else {
-        q = QString("SELECT nodes.id,%1 FROM net.v_nodes WHERE %2 AND nodes.removed = 0").arg(param, qq);
+        q = QString("SELECT nodes.id,%1 FROM net.v_nodes AS nodes WHERE %2 AND nodes.removed = 0").arg(param, qq);
     }
 
     //  q += " AND (nodes.internalNodeID IS NULL OR nodes.internalNodeID = 0 OR )";

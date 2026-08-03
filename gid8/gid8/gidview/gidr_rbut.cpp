@@ -461,7 +461,7 @@ void GidWidget::viewNodePodpis()
     if (action) {
         CNode2 *n = (CNode2*)action->data().toLongLong();
         if (n) {
-            QString q = QString("update nodes set displaySign=%1 where id=%2").arg(n->node.isPodp).arg(n->id);
+            QString q = QString("update net.v_nodes set displaySign=%1 where id=%2").arg(n->node.isPodp).arg(n->id);
 
             QSqlQuery query(m_cxema.m_db);
             bool res = query_exec(m_cxema.m_db, query, q);
@@ -518,7 +518,7 @@ void GidWidget::viewLinePodpis()
         CLINE2 *ll = (CLINE2*) action->data().toLongLong();
         if (ll) {
             CLine2 *line = bline(ll);
-            QString q = QString("update linesobj set displaySign=%1 where id=%2 OR id=%3").arg(line->line.isPodp).arg(line->line.nomP).arg(line->line.nomO);
+            QString q = QString("update net.v_linesobj set displaySign=%1 where id=%2 OR id=%3").arg(line->line.isPodp).arg(line->line.nomP).arg(line->line.nomO);
 
             QSqlQuery query(m_cxema.m_db);
             bool res = query_exec(m_cxema.m_db, query, q);

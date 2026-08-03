@@ -21,3 +21,10 @@ docs/schema/calc_log_*.txt
 .idea/
 Thumbs.db
 desktop.ini
+
+# Черновые пробы: файлы вида tools/_*.py и _*.txt создаются при разборе
+# и в репозиторий не входят. Правило появилось после случая, когда
+# массовый git add подхватил чужой каталог и в коммит чуть не уехал
+# токен Google (gid6/dop/converter_old32/mygeo0/credentials.json).
+tools/_*
+*.before_stx

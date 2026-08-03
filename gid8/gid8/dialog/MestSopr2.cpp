@@ -35,7 +35,7 @@ MestSopr2::MestSopr2(QWidget *parent, QSqlDatabase &db, int id)
 
     DbWindow *tb1 = getTableView(db, "08_mestnye_gidravlicheskie_soprotivleniya", q, "Местные гидравлические сопротивления");
 
-    QString q2 = QString("SELECT id, name_mest, s_mest, k_mest, sum_mest FROM localHydroResistances2 WHERE lineID=%1").arg(id);
+    QString q2 = QString("SELECT id, name_mest, s_mest, k_mest, sum_mest FROM net.v_localhydroresistances2 WHERE lineID=%1").arg(id);
 
     if (is_POSTGRESQL()) {
         q = "SELECT * FROM \"08_mestnye_gidravlicheskie_soprotivleniya\"";

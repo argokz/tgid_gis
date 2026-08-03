@@ -132,7 +132,7 @@ void NeOpisanMessage(QSqlDatabase &db, int id_ms, int id_rs)
     if (id_rs == 0) id_rs = -1;
     q = QString(R"SQL(
         SELECT DISTINCT fr.name
-        FROM heatPipeSections hps
+        FROM net.v_heatpipesections hps
         JOIN net.v_linesobj l ON l.id=hps.lineID AND l.removed=0
         JOIN net.v_nodes n1 ON n1.id=l.nodeID1
         JOIN fragments fr ON fr.id=n1.fileID

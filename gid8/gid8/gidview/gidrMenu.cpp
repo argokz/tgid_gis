@@ -676,6 +676,10 @@ void GidWidget::createMenu()
         menu2->addAction(gidrAction.aOpenstreetmap); // OpenStreetMap
         menu2->addAction(gidrAction.a2gisMap); // 2ГИС
         menu2->addAction(gidrAction.aEsriSatMap); // 2ГИС
+        menu2->addAction(gidrAction.aMaptilerStreets); // MapTiler Улицы
+        menu2->addAction(gidrAction.aMaptilerTopo); // MapTiler Топография
+        menu2->addAction(gidrAction.aMaptilerHybrid); // MapTiler Гибридная
+        menu2->addAction(gidrAction.aMaptilerOsm); // MapTiler OpenStreetMap
         menu2->addAction(gidrAction.aGoogleElevation); // Высота по Google
         menu2->addAction(gidrAction.aGoogleElevationSet); // Высота по Google
         menu2->addAction(gidrAction.aMapSearch); // Поиск

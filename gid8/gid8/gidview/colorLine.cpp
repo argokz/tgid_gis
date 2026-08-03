@@ -258,7 +258,7 @@ void GidWidget::onColorLine() // Участки
     }
     else {
         QString q = QString(
-                        "SELECT l.id, l.externalSignLineID, hps.%1 FROM heatPipeSections hps\n"
+                        "SELECT l.id, l.externalSignLineID, hps.%1 FROM net.v_heatpipesections hps\n"
                         "join net.v_linesobj l on l.id = hps.lineID\n"
                         "join net.v_nodes n on n.id = l.nodeID1\n"
                         " WHERE n.fileID IN (%2)").arg(dlg.m_fn.fn, m_cxema.m_par);

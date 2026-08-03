@@ -147,7 +147,7 @@ bool CCxema::openZN()
 
 bool CCxema::openUP()
 {
-    QString q = "SELECT id, nodeID FROM refillNodes";
+    QString q = "SELECT id, nodeID FROM net.v_refillnodes";
 
     QSqlQuery query(m_db);
     query.setForwardOnly(true);

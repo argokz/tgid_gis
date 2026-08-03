@@ -31,7 +31,7 @@ bool setOsmotr(QSqlDatabase &db, const QString & opres, CCxema* m_cxema, int dir
         q = QString(
             "Select d.lineID, faktory_riska_truboprovoda.id AS fakt_id From %1Deployed d\n"
             "LEFT JOIN %1 o ON o.id=d.directionID\n"
-            "JOIN heatPipeSections hps ON hps.lineID=d.lineID\n"
+            "JOIN net.v_heatpipesections hps ON hps.lineID=d.lineID\n"
             "JOIN pipeSections ps1 ON ps1.id=hps.pipeSectionID\n"
             "left join faktory_riska_truboprovoda on faktory_riska_truboprovoda.lineID = ps1.id and faktory_riska_truboprovoda.objID = %2 and faktory_riska_truboprovoda.obj_type_faktory_riskaID = %3\n"
 
@@ -299,7 +299,7 @@ void GidWidget::ListOpres(const QString & opres, const QString & title, const QS
             LEFT JOIN nachalniki_uchastkov nach ON nach.id=r.responsibleID
             JOIN remont2Deployed depl ON depl.directionID=r.id
             JOIN net.v_linesobj l ON l.id=depl.lineID
-            JOIN heatPipeSections hpss ON hpss.lineID=l.id $and_condition2$
+            JOIN net.v_heatpipesections hpss ON hpss.lineID=l.id $and_condition2$
             WHERE
               (
               (r.data_nachala_plan $season_condition$) OR
@@ -319,7 +319,7 @@ void GidWidget::ListOpres(const QString & opres, const QString & title, const QS
             LEFT JOIN nachalniki_uchastkov nach ON nach.id = otvetstvennoe_lico_ID
             JOIN osmotrDeployed depl ON depl.directionID=o.id
             JOIN net.v_linesobj l ON l.id=depl.lineID
-            JOIN heatPipeSections hpss ON hpss.lineID=l.id $and_condition2$
+            JOIN net.v_heatpipesections hpss ON hpss.lineID=l.id $and_condition2$
             WHERE
               (
               (o.data_osmotra $season_condition$) OR
@@ -341,7 +341,7 @@ void GidWidget::ListOpres(const QString & opres, const QString & title, const QS
             LEFT JOIN nachalniki_uchastkov nach ON nach.id=r.responsibleID
             JOIN opresDeployed depl ON depl.directionID=r.id
             JOIN net.v_linesobj l ON l.id=depl.lineID
-            JOIN heatPipeSections hpss ON hpss.lineID=l.id $and_condition2$
+            JOIN net.v_heatpipesections hpss ON hpss.lineID=l.id $and_condition2$
             WHERE
               (
               (r.data_nachala_plan $season_condition$) OR

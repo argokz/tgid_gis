@@ -464,6 +464,10 @@ QAction *aMapSemeyTs = nullptr; // Семей (тепловые сети)
 QAction *aOpenstreetmap = nullptr; // OpenStreetMap
 QAction *a2gisMap = nullptr; // 2ГИС
 QAction *aEsriSatMap = nullptr; // 2ГИС
+QAction *aMaptilerStreets = nullptr; // MapTiler Улицы
+QAction *aMaptilerTopo = nullptr; // MapTiler Топография
+QAction *aMaptilerHybrid = nullptr; // MapTiler Гибридная
+QAction *aMaptilerOsm = nullptr; // MapTiler OpenStreetMap
 
 QAction *aGoogleElevation = nullptr; // Высота по Google
 QAction *aGoogleElevationSet = nullptr; // Высота по Google

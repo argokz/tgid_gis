@@ -163,7 +163,7 @@ def read_zn(G, conn):
     cursor = conn.cursor()
 
     q = f'''
-SELECT n.id, sp.pressFlow, sp.pressRet FROM setPressNodes sp
+SELECT n.id, sp.pressFlow, sp.pressRet FROM {net_mode.tbl(conn, 'setpressnodes')} sp
 JOIN {net_mode.tbl(conn, 'nodes')} n ON n.id=sp.nodeID 
 WHERE n.fileID IN ({s_fileID})  '''
 
@@ -182,7 +182,7 @@ fr.name AS fr_name,
 us2.ist,
 sp.fragment_resultid
 
-FROM setPressNodes sp
+FROM {net_mode.tbl(conn, 'setpressnodes')} sp
 JOIN {net_mode.tbl(conn, 'nodes')} n ON n.id=sp.nodeID 
 JOIN externalCodes ec ON ec.id=n.externalCodeID
 

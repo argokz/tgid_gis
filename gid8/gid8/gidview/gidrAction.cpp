@@ -1674,6 +1674,10 @@ gidrAction.aMapSemeyTs = addToggleGroup(mapGroup, this, tr("Семей (тепл
 gidrAction.aOpenstreetmap = addToggleGroup(mapGroup, this, tr("OpenStreetMap"), "Показать карту OpenStreetMap из интернета", "");
 gidrAction.a2gisMap = addToggleGroup(mapGroup, this, tr("2ГИС"), "Показать спутниковую карту 2ГИС из интернета", "");
 gidrAction.aEsriSatMap = addToggleGroup(mapGroup, this, tr("ESRI Satellite"), "Показать спутниковую карту ESRI Satellite из интернета", "");
+gidrAction.aMaptilerStreets = addToggleGroup(mapGroup, this, tr("MapTiler Улицы"), "Показать карту улиц MapTiler из интернета", "");
+gidrAction.aMaptilerTopo = addToggleGroup(mapGroup, this, tr("MapTiler Топография"), "Показать топографическую карту MapTiler из интернета", "");
+gidrAction.aMaptilerHybrid = addToggleGroup(mapGroup, this, tr("MapTiler Гибридная"), "Показать гибридную спутниковую карту MapTiler из интернета", "");
+gidrAction.aMaptilerOsm = addToggleGroup(mapGroup, this, tr("MapTiler OpenStreetMap"), "Показать карту OpenStreetMap через MapTiler", "");
 
 
 

@@ -3,6 +3,16 @@
 \set ON_ERROR_STOP on
 
 BEGIN;
+    -- Сверка идёт с замороженным снимком дореформенной модели в attic.
+    -- Объекты, заведённые в программе уже ПОСЛЕ переноса, в снимке
+    -- отсутствовать обязаны, поэтому из новой стороны их исключаем:
+    -- признак прямой: узел присутствует в самом снимке. Столбец
+    -- id_old для этого не годится — он нулевой у 91 491 узла из
+    -- 91 532, то есть перенесённые от новых по нему не отличить.
+    -- Без этого тест начинает падать при первой же реальной работе
+    -- пользователя: так и вышло 3 августа, когда через Tgid-07 завели
+    -- потребителя 605612 (журнал meta.object_change_log, 20:44).
+
 
 DO $$
 DECLARE
@@ -52,6 +62,7 @@ BEGIN
                  AND coalesce(item.calchlindep, 0) = 0
           ) consumer ON consumer.nodeid = node.id
          WHERE node.removed = 0
+               AND EXISTS (SELECT 1 FROM attic.nodes_legacy o WHERE o.id = node.id)
     )
     SELECT (SELECT count(*) FROM old_rows),
            (SELECT count(*) FROM new_rows)
@@ -107,6 +118,7 @@ BEGIN
                      AND coalesce(item.calchlindep, 0) = 0
               ) consumer ON consumer.nodeid = node.id
              WHERE node.removed = 0
+               AND EXISTS (SELECT 1 FROM attic.nodes_legacy o WHERE o.id = node.id)
         )
         (SELECT * FROM old_rows EXCEPT SELECT * FROM new_rows)
         UNION ALL
