@@ -702,6 +702,18 @@ void DockPTS::vydMag(int id)
     }
 }
 
+bool DockPTS::currentMsRs(int &typ, int &id) const
+{
+    if (!tree) return false;
+    QTreeWidgetItem *item = tree->currentItem();
+    if (!item) return false;
+    ST1 st = item->data(0, Qt::UserRole).value<ST1>();
+    if (st.id <= 0 || (st.typ != 1 && st.typ != 2)) return false;
+    typ = st.typ;
+    id = st.id;
+    return true;
+}
+
 void DockPTS::vydMS(int id)
 {
     QTreeWidgetItem* it = findItemByData(tree, 0, 1, id);

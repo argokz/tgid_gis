@@ -732,12 +732,16 @@ bool GidWidget::find_point(CFPoint pt)
         }
 
         else if (m_nRegim == gidrAction.aPtsDel) pts_del(point, init_pts_list_file("pts"));
+        else if (m_nRegim == gidrAction.aElectroDel) pts_del(point, init_pts_list_file("electro"));
         else if (m_nRegim == gidrAction.aRemontPovrDefDel) pts_del(point, init_pts_table("defect"));
         else if (m_nRegim == gidrAction.aRemontPovrShurfDel) pts_del(point, init_pts_table("shurfy"));
+        else if (m_nRegim == gidrAction.aKorrozDel) pts_del(point, init_pts_table("indikator_korrozii"));
 
         else if (m_nRegim == gidrAction.aPtsInfo) pts_info(point, init_pts_list_file("pts"));
+        else if (m_nRegim == gidrAction.aElectroInfo) pts_info(point, init_pts_list_file("electro"));
         else if (m_nRegim == gidrAction.aRemontPovrDefInfo) pts_info(point, init_pts_table("defect"));
         else if (m_nRegim == gidrAction.aRemontPovrShurfInfo) pts_info(point, init_pts_table("shurfy"));
+        else if (m_nRegim == gidrAction.aKorrozInfo) pts_info(point, init_pts_table("indikator_korrozii"));
 
 //        else if (m_nRegim == gidrAction.aPtsMove) pts_move(point, init_pts_list_file("pts"));
         else if (m_nRegim == gidrAction.aRemontPovrDefMove) pts_move(point, init_pts_table("defect"));

@@ -254,6 +254,7 @@ CFRect conv(CFRect r);
 CFPoint conv_obr(CFPoint pt);
 CFRect conv_obr(CFRect r);
 void set_coord(double x0, double y0, double alpha);
+double get_alpha();
 
 double LengthPL(double x0, double y0, double x1, double y1, double x2, double y2);  // Расстояние до отрезка
 

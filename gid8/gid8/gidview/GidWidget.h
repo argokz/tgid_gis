@@ -429,6 +429,7 @@ public slots:
     void onSetDate2(); // Установить Дату первичного ввода в эксплуатацию
     void onSetDate1(); // Установить Дату последней перекладки
     void onSetDate3(); // Установить Дату планируемого ремонта
+    void setDate(const QString &tn, const QString &fn, const QString &name_mn);
     void onSetKodRs(); // Установить Код расчетной схемы
     void onGeodz(); // Установить Отметки узлов горизонтали
     void onSetKorrozia(); // Установить Индикаторы коррозии
@@ -466,7 +467,7 @@ public slots:
     void onMasshtab(); // Масштаб...\tCtrl+F3
     void onZoom(); // Масштабировать
     void onPicture(); // Графическая подложка
-//    void onF5(); // Перерисовать схему\tF5
+    void onF5(); // Перерисовать схему\tF5
     void onGeobaza(bool on); // Показать геобазу
     void onFindGeo(); // Поиск в геобазе...
     void onGeoFindNext(); // Продолжение поиска
@@ -722,6 +723,7 @@ public slots:
     void onPassportOnOff(); // Включить/отключить отображение объектов ПТС
     void onKorroziaOnoff(); // Включить/отключить отображение
     void onKorroziaSezon(); // Выбор отопительного сезона
+    void openKorrozTable(const QString &title, const QString &extra_where);
     void onIznos(); // Износ оборудования
 //    void onRemontPlan(); // Планирование ремонтов
     void onElectroAdd(); // Установить объект
@@ -1038,6 +1040,7 @@ private:
 
     void ListOpres(const QString & opres, const QString & title, const QString & name_name, const QString & date_name, int& m_id_opr);
     void LastOpres(const QString & opres, const QString & title, int& m_id_opr, int& m_id_opr_old, bool view_dialog);
+    void openRemont2List(const QString &title, const QString &condition);
 
     void set_geo();
     void set_geo_line();
@@ -1196,10 +1199,12 @@ private: // Всякие флаги
     bool m_bIsGidrInf = false;
     bool m_bIsMapYes = true;
     bool m_bIsNaprGid = true;
+    bool m_bIsPicture = true;
     bool m_bIsPodp = true;
     bool m_bIsPodpAll = false;
     bool m_bIsPodpRes = false;
     bool m_bIsPts = false;
+    bool m_bIsPribor = false;
     bool m_bIsRamka = true;
     bool m_bIsRezhim = false;
 

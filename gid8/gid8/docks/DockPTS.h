@@ -24,6 +24,9 @@ public:
     void vydMS(int id);
     void vydRS(int id);
 
+    /** Текущий выбранный участок МС/РС в дереве: typ=1 МС, typ=2 РС. */
+    bool currentMsRs(int &typ, int &id) const;
+
 signals:
 
 public slots:

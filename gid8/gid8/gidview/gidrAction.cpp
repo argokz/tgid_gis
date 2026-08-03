@@ -625,6 +625,8 @@ gidrAction.aMasshtab = addTrigger(this, tr("Масштаб...\tCtrl+F3"), "", ":
 gidrAction.aMasshtab->setToolTip(html_text("Изменить масштаб отображения схемы"));
 
 gidrAction.aPicture = addTrigger(this, tr("Графическая подложка"), "", ":/images2/Picture.png", SLOT(onPicture()));
+gidrAction.aPicture->setCheckable(true);
+gidrAction.aPicture->setChecked(m_bIsPicture);
 gidrAction.aPicture->setToolTip(html_text("Показать/убрать графическую подложку\nПоказать/убрать графическую подложку"));
 
 gidrAction.aF5 = addTrigger(this, tr("Перерисовать схему\tF5"), "", ":/images/new/2/update 1.svg", SLOT(onF5()));
@@ -1346,7 +1348,9 @@ gidrAction.aSetAddr = addTrigger(this, tr("Адреса потребителей
 // gidrAction.aSetAddr->setToolTip(html_text("????????????"));
 
 gidrAction.aAlma = addTrigger(this, tr("Паспортизация"), "", ":/images2/Alma.png", SLOT(onAlma()));
-// gidrAction.aAlma->setToolTip(html_text("????????????"));
+gidrAction.aAlma->setCheckable(true);
+gidrAction.aAlma->setChecked(m_bIsPts);
+gidrAction.aAlma->setToolTip(html_text("Режим паспортизации (скрывать стрелки потоков)"));
 
 gidrAction.aTuZav = addTrigger(this, tr("Установить статус Завершен для ТУ"), "", ":/images/tu/TuZav.png", SLOT(onTuZav()));
 gidrAction.aTuZav->setToolTip(html_text("Установить статус Завершен для ТУ"));

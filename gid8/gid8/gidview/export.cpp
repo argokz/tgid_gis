@@ -1,6 +1,7 @@
 #include <QtGui>
 #include <QtSql>
 #include <QtWidgets>
+#include <QRegularExpression>
 #include "GidWidget.h"
 #include "mainwindow.h"
 
@@ -83,6 +84,39 @@ void GidWidget::onExportFragmentVyd() // Экспорт выделенного �
     }
 }
 
+
+void GidWidget::onExportFragmentsMulty() // Экспорт всех фрагментов
+{
+    if (m_cxema.map_fragments.empty()) {
+        QMessageBox::information(this, "", tr("Нет открытых фрагментов для экспорта"));
+        return;
+    }
+
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Каталог для экспорта фрагментов"));
+    if (dir.isEmpty()) return;
+
+    int ok = 0, fail = 0;
+    for (auto &it : m_cxema.map_fragments) {
+        int fileID = it.first;
+        QString name = it.second.m_name;
+        name.replace(QRegularExpression("[\\\\/:*?\"<>|]"), "_");
+        if (name.isEmpty()) name = QString("fragment_%1").arg(fileID);
+
+        QString out = QString("%1/%2.tgid").arg(dir, name);
+        QString tmpn = QString("%1/tgid.txt").arg(QDir::tempPath());
+        if (export_tgid(m_cxema.m_db, tmpn, fileID, nullptr)) {
+            QByteArray tmp_ba = tmpn.toLocal8Bit();
+            QByteArray out_ba = out.toLocal8Bit();
+            const char *filenames[1] = { tmp_ba.constData() };
+            if (zip_create(out_ba.constData(), filenames, 1) == 0) ok++;
+            else fail++;
+        } else {
+            fail++;
+        }
+    }
+
+    QMessageBox::information(this, "", tr("Экспорт завершён: успешно %1, ошибок %2").arg(ok).arg(fail));
+}
 
 void GidWidget::onExportFragment() // Экспорт фрагмента
 {

@@ -314,6 +314,7 @@ set(PROJECT_SOURCES
     tu/TuQDialog.cpp
     tu/ReportInputDialog.cpp
     tu/tu_itog.cpp
+    tu/tu_reports.cpp
 
     set_line/set_line.cpp 
 
@@ -801,6 +802,35 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMENT "Deploying legacy gid8 SQL, classifiers and report templates"
     VERBATIM
 )
+
+# Паспорт МС/РС (aPaspNew / aMsPassport) вызывает passport_ps/p.py через
+# str_python(); скрипты лежат в общем дереве gid8/python/docs.
+set(TGID_PASSPORT_PS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../gid8/python/docs/passport_ps")
+if(EXISTS "${TGID_PASSPORT_PS_DIR}/p.py")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/python/docs"
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${TGID_PASSPORT_PS_DIR}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/python/docs/passport_ps"
+        COMMENT "Deploying passport_ps Python package next to gid8.exe"
+        VERBATIM
+    )
+endif()
+
+# Нормативные теплопотери (aTeplopoteri) → poteriNewPg/tp_main.py
+set(TGID_POTERI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../gid8/python/poteriNewPg")
+if(EXISTS "${TGID_POTERI_DIR}/tp_main.py")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E make_directory
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/python"
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${TGID_POTERI_DIR}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/python/poteriNewPg"
+        COMMENT "Deploying poteriNewPg Python package next to gid8.exe"
+        VERBATIM
+    )
+endif()
 
 if(WIN32)
     get_target_property(_qt_qmake_executable Qt6::qmake IMPORTED_LOCATION)

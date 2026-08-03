@@ -2,6 +2,9 @@
 #include <QtGui>
 #include <QtWidgets>
 #include <QtSql>
+#include <QInputDialog>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include "mainwindow.h"
 
@@ -89,16 +92,51 @@ void MainWindow::onProtocol() // Протокол
 
 void MainWindow::onViewStatusBar() // Строка статуса
 {
-}
-    
-
-void MainWindow::onUpdate() // Последнее обновление
-{
+    if (statusBar()) {
+        statusBar()->setVisible(!statusBar()->isVisible());
+    }
 }
     
 
 void MainWindow::onUpdateSetup() // Настройка обновлений
 {
+    QSettings settings;
+    QString code = settings.value("UpdateSetup", "").toString();
+    bool ok = false;
+    QString text = QInputDialog::getText(
+        this,
+        tr("Настройка обновления программы"),
+        tr("Введите код обновления для предприятия"),
+        QLineEdit::Normal,
+        code,
+        &ok);
+    if (!ok) return;
+    settings.setValue("UpdateSetup", text.trimmed());
+}
+
+
+void MainWindow::onUpdate() // Последнее обновление
+{
+    QSettings settings;
+    QString code = settings.value("UpdateSetup", "").toString().trimmed();
+    if (code.isEmpty()) {
+        QMessageBox::information(this, "",
+            tr("Код обновления не задан.\nСначала выполните «Настройка обновлений»."));
+        return;
+    }
+
+    // Старый UpdateProgr тянул zip с lan.avto-glass.kz — в tgid_gis этот
+    // контур не переносим. Показываем код и предлагаем открыть страницу info.
+    QString url = QString("http://lan.avto-glass.kz/?action=updateInfo&db=%1").arg(code);
+    if (QMessageBox::question(
+            this, "",
+            tr("Повторить обновление для «%1»?\n"
+               "Будет открыта страница сведений об обновлении:\n%2")
+                .arg(code, url))
+        != QMessageBox::Yes) {
+        return;
+    }
+    QDesktopServices::openUrl(QUrl(url));
 }
     
 /*

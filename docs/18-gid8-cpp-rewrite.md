@@ -576,3 +576,252 @@ gid6 состоит из команд ремонтов (ID_REMONT_INFO/CONTROL_T
 (action осознанно закомментирован в `gidrMenu.cpp:166`).
 
 Сборка `H:\build\gid8-tgid-gis\gid8.exe` успешна.
+
+## Шаг 77: блок 6 «Ремонты и дефекты» — обязательные команды закрыты
+
+Инвентаризация блока (`maintenance`, 29 команд): 9 инициализированы в
+legacy UI (`IM`), 20 — мёртвые кнопки (`--`, слоты пустые и не
+подключены). Таблицы эксплуатации уже в `ops` (шаги 174–175); контуры
+`opres`/`remont2` пусты и в `almatygid`, и в `tgid_gis` (0≡0).
+
+### БД
+
+* [`sql/181_return_iznos.sql`](../sql/181_return_iznos.sql) — возврат
+  `calculation_iznos` и `iznos` из `attic` в `ops` (нужны для `aIznos`).
+  Тест [`test_iznos_return.sql`](../sql/tests/test_iznos_return.sql) OK.
+
+### Системный фикс SQL
+
+* `ispr_q` / `SelectTop` (`db/db.cpp`): для PostgreSQL корректно срезается
+  `TOP N` из запросов gid6/MSSQL. Без этого `ListOpres` /
+  `aListOpres`/`aListRemont2` падали на синтаксисе
+  `SELECT DISTINCT TOP 1000000 ...`.
+
+### Реализованные слоты
+
+* `setDate` + `onSetDate1/2/3` — массовая установка дат на выделенных
+  участках через `heatPipeSections`
+  (`lastTransDate` / `firstPICdateHP` / `repairDatePlanTP`), порт
+  gid6 `set_obl.cpp::setDate`.
+* `aSetPipeRemontType` — уже работал через `setSomething` (`pipeRemontTypeID`).
+* `openRemont2List` + `onRemontPlan` / `onRemontCurrent` /
+  `onRemontProcess` / `onRemontVypolneno` / `onRemontAll2` — редактируемые
+  списки `remont2` с фильтрами по `remontTypeID`/`stateID` (вместо
+  MSSQL-журнала `remonts_journal.sql` с `STUFF`/`FOR XML`).
+* `aListOpres` / `aListRemont2` — уже были; теперь SQL проходит на PG
+  после фикса `TOP`.
+* `aBottomRemont` — toggle нижнего dock (уже работал).
+* `aEditor2` / `aFilePrintPreview` — чистый UI, к БД не привязаны.
+* `onIznos` — создание/обновление `ops.calculation_iznos` + заготовки
+  строк в `ops.iznos` из `pipesections`, таблица с join на
+  `heatpipesections`. Полный %‑отчёт `remont_sql/tgid_iznos.sql`
+  остаётся на MySQL-диалекте (`IF`/`TIMESTAMPDIFF`) — отдельный порт
+  SQL при появлении реальных данных износа.
+
+### Мёртвые в legacy (не трогаем)
+
+`aNaprOpres/Remont2`, `aSaveOpres*`, `aSaveRemont2*`, `aRemonts*`,
+`aZhurnalDefect/Remont/Diag`, `aViewToolbar*Remont/Opressovka` и т.п. —
+объявлены, но не инициализированы в старом UI (`--` в инвентаризации).
+
+`aViewToolbarControlTu` — по-прежнему закомментирован в меню: отдельной
+панели CONTROL_TU в gid8 нет; рабочие панели ремонтов —
+`m_barRemont` / `aToolbarRemont2*`.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 78: блок 7 «Коррозия» — обязательные команды закрыты
+
+Инвентаризация блока (`corrosion`, 17 команд). Таблицы
+`ops.indikator_korrozii` / `indikator_korrozii_po_godam` и справочник
+сезонов уже в схеме (шаги 174–175); `org.responsibles_korrozia` пуст
+и в `almatygid`, и в `tgid_gis`.
+
+### Реализованные слоты
+
+* `openKorrozTable` — общий PG-native SELECT по `indikator_korrozii`
+  с фильтром отопительного сезона (`Heating_seasons` /
+  `m_sezon_korrozia`) и дополнительным WHERE.
+* Журналы/таблицы: `onKorroziaUpdate`, `onKorrozDoc3`, `onKorrozTable`,
+  `onKorroziaZhurnal1/2/3`, `onKorroziaCurrent`, `onKorrozDoc1/2` —
+  через `openKorrozTable` + фильтры по датам/оценке.
+* Карта: `onKorrozAdd` (`addGeo`), `onKorrozDel` / `onKorrozInfo`
+  (`m_nRegim` + `pts_del`/`pts_info` в `gidr_find.cpp`),
+  `onFragmentPolyKorroziaAr` — подсказка (массовое удаление через
+  таблицу/контекстное меню).
+* `onSetKorrozia` — дата планирования для индикаторов у выделенных
+  участков (`ST_DWithin` + `create_vyd_line_table`).
+* `onKorroziaOnoff` — `geoOnOffFile("remont", ...)`.
+* `onKorroziaSezon` — делегирует в `onRemontPovrOtop()` (общий выбор
+  сезона).
+* `aViewToolbarKorrozia` — toggle через `map_toolbar` /
+  `onToolbarToggleExcl` (панель собирается в `gidrToolBar.cpp`,
+  ribbon — в `mainribbon.cpp`). Пустой stub
+  `onViewToolbarKorrozia` в закомментированном блоке не используется.
+
+### Не переносим как отдельные MSSQL-отчёты
+
+Полные отчёты `sql/korrozia/*` / `indikator_korrozii.sql` (IIF/ISNULL/
+TOP) заменены упрощёнными редактируемыми таблицами. Word-шаблоны
+оценки — отдельный порт при появлении реальной потребности в
+docx-выгрузке.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 79: блок 8 «Паспортизация» — обязательные команды закрыты
+
+Инвентаризация блока (`passport`, 3 команды) + рабочие слоты панели
+ПТС, без которых блок бесполезен.
+
+### Команды блока
+
+* `aViewToolbar2PtsNew` — уже работал через `map_toolbar` /
+  `m_barPts` (`gidrToolBar.cpp`).
+* `onAlma` — checkable toggle режима паспортизации: `m_bIsPts`
+  (скрывает стрелки потоков при отрисовке), сохранение в
+  `flags/isPts` / `flags/isPTS`.
+* `onPaspNew` / `onMsPassport` — формирование паспорта МС/РС:
+  текущий выбор из `DockPTS` (`currentMsRs`) либо диалог выбора
+  `uchastok_ms` / `uchastok_rs`, затем `Passport()` →
+  `passport_ps/p.py` (xlsx).
+
+### Панель ПТС (сопутствующие слоты)
+
+* `onPtsAdd` / `onPtsTable` / `onPassportOnOff` — уже были.
+* `onPtsInfo` / `onPtsDel` — запасной путь в режим клика
+  (`m_nRegim`; основной путь — `regimGroup` / `onRegim`).
+* `onPtsZhurnal` — выбор объекта ПТС и редактируемая таблица через
+  `getGeoSelect` (вместо gid6 `initPassport` только для heatPoint).
+
+### Деплой Python
+
+POST_BUILD в `CMakeLists.txt` копирует
+`gid8/python/docs/passport_ps` рядом с exe
+(`python/docs/passport_ps`), куда смотрит `str_python()`.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 80: блок 9 «Теплопотери» — команды уже на месте
+
+Инвентаризация (`heat_losses`, 3 команды) — слоты не пустые:
+
+* `onPoteri` (`zaprosy.cpp`) — сумма `tpot` по системе / выделенному
+  фрагменту (сообщение).
+* `onSetOpenRez` — `setSomething` для `circHLosOpen` /
+  `avgHLcompOpen` на потребителях.
+* `onTeplopoteri` — диалог сезона → запуск
+  `poteriNewPg/tp_main.py` (таблицы отчётов возвращены в шаге 175).
+
+POST_BUILD копирует `gid8/python/poteriNewPg` рядом с exe
+(`python/poteriNewPg`).
+
+## Шаг 81: блок 10 «GIS-обмен» — основные пустые слоты закрыты
+
+Были уже на месте: `onBmp`, `onExportFragment`/`Vyd`, `onImportFragment`/
+`Mdb`, `onQuery`, `onZapNullGeo`, `onExportDxf`; `aGeobaza` —
+`addToggleValue(&m_bIsGeo)`.
+
+### Заполнены
+
+* `onExportFragmentsMulty` — массовый экспорт открытых фрагментов в
+  каталог (`.tgid` zip).
+* `onBmpFind` / `onPicture` — центр DXF-подложки; toggle
+  `m_bIsPicture` (отрисовка в `gidr_draw.cpp`).
+* `onEditCopyPng` / `onSavePng` — grab схемы в буфер / файл.
+* `onGeodz` — массовая установка `geoMarkTopTube` /
+  `geoMarkNodeArea` на выделенных узлах.
+* `onFindGeoAddr` — показать `DockAddr`; `onFindGeo` — проводник
+  карты (полный `find/findNext` геобазы gid6 не в `GeoFile`).
+* `onGeoInfo` — режим клика `aGeoInfo`.
+* `onImportPts` → `onImportFragment`; `onFileOpenOld` →
+  `onImportFragmentMdb`.
+* `onResetGeo` — перерисовка.
+
+### Отложено (заглушки с сообщением)
+
+* `onExportShape` — нет порта `cxema->exportShape`.
+* `onGeoFindNext` — нужен API поиска в `GeoFile`.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 82: блок 11 «Администрирование» + `aIspravl`
+
+### Уже работало
+
+* `aCatalog` → `MainWindow::onCatalog` (PropertyDial путей документов).
+* `aAddUser` / `aBdDel` / `aPassword*` / `aSetupGid9` /
+  `aGoogleElevationSet` / `aWmsCust`.
+* `aSwap` — режим `regimGroup` + `swap(line)` в `gidr_find.cpp`.
+* `aSetOrg` — `setSomething(organizationID)`.
+
+### Заполнено
+
+* `onUpdateSetup` / `onUpdate` (`mainSlot.cpp`) — код предприятия в
+  `QSettings("UpdateSetup")`; повтор обновления открывает info-URL
+  (полный `UpdateProgr`/zip с lan.avto-glass.kz не переносим).
+* `GidWidget::onCatalog` / `onUpdate*` — делегируют в `MainWindow`
+  (слоты сделаны `public slots`).
+* `onIspravl` — пересоздание внутренних схем реальных потребителей
+  через `create_b5_new` + progress.
+* `onOpc` — явное сообщение: COM OPC DA в Qt-порт не входит.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 83: блок «Прочее» — первая порция пустых слотов
+
+Заполнены (порты gid6 / Qt-аналоги):
+
+* `onSqlSave` — для PostgreSQL: `CREATE DATABASE … WITH TEMPLATE`
+  (служебное подключение к `postgres`, terminate backends, краткое
+  закрытие рабочей сессии); для MSSQL — `BACKUP`/`RESTORE` как раньше.
+* `onInvert` — инверсия `isPjezo` на узлах и участках.
+* `onSetAvtoOn` / `onSetAvtoOff` — `automDegID` + `pr_avtomat` на
+  выделенных потребителях.
+* `onAppExit` — `QApplication::quit()`.
+* `onViewStatusBar` — показать/скрыть status bar главного окна.
+* `onSetAddr` → панель адресов (`onFindGeoAddr`).
+* `on1001` — URL переименования полей (как gid6).
+
+Остаются в «Прочее»: ТУ/электрика/C3, повороты, зона, часть запросов
+и служебных команд — следующий проход. Спорные потребители — в конце.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 84: блок «Прочее» — вторая порция
+
+Рабочие порты / аналоги gid6:
+
+* `onPovorot` / `onPovorot2` — угол через `set_coord` / сброс.
+* `onF5` — перерисовка (`Scroll::onF5`).
+* `onZona` — `WS1`/`WS1_h` + сообщение + переход к узлу.
+* `onSetTp` — `heatPointID` через `setSomething`.
+* `onSetIst` — меню узлов (`mark>1`) + `moveXY`.
+* `onQGvs` — `QSettings("coef24")`.
+* `onPodpPo` / `onPopupPodp*` / `onNaprGid` / `onPribor` /
+  `onPsAstanaName` — флаги отображения.
+* `onTuYear` / `onTuZav` — таблица ТУ по году; статус «Завершён».
+* `onElectroAdd/Info/Del/Table` — слой `electro` (+ клики в
+  `gidr_find`).
+* `onUtNapr` / `onUtNapr2` / `onC3Add` → `onCreateSortNode` /
+  `onIspravl`.
+* `onMapPath` — каталог карт.
+
+С явным сообщением (пока не портятся целиком): `onZhurnalElectro`,
+`onPrPo`, `onSetPsMap`, `onUchList`, `onCheckPo`, `onAsyncCheck`,
+`on1000`/`on1002`, `onTrio`/`onC3Del`.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.
+
+## Шаг 85: отчёты ТУ — свод и журнал (Excel)
+
+Вместо HTML/`print_doc` из gid6 (класса `HTML` в Qt нет) —
+`tu/tu_reports.cpp` на QXlsx (как `tu_itog`; подсказка журнала — Excel):
+
+* `onTuSvod` → `print_tu_svod` — листы по годам, раскраска
+  статусов З/А/М, легенда.
+* `onTuZhurnal` → выбор года → `print_tu_zhurnal` — листы по
+  районам эксплуатации, разбивка нагрузок, итоги, `coef24` для ГВС ср.
+
+Файлы: `%TEMP%/tgid_tu_reports/`, открытие через `QDesktopServices`.
+
+Сборка `H:\build\gid8-tgid-gis-20260802\gid8.exe` успешна.

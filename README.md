@@ -95,38 +95,27 @@ SQL-контракты. При дальнейшем переносе эти ко
 | 71 | Фр. 1: крах `check_GG` (StopIteration) устранён — guard + `min(src)`; входы БД идентичны, 1-й проход 1:1, детерминизм calc 159≈160 | готово — [18](docs/18-gid8-cpp-rewrite.md); эталон дальше — самосогласованность `tgid_gis` |
 | 72 | Блок «Карта и навигация» 16/16: `aFindKti`, `aFindTuIst`, `aColorOnlyPts`, `aHelpFinder` перенесены из gid6 (A/B-проверка), остальные — рабочий чистый UI | готово — [18](docs/18-gid8-cpp-rewrite.md); матрица `function-matrix.canvas.tsx`, все команды утверждены required |
 | 73 | Блок «Гидравлические расчёты» 15/15: `aClearOut`, `aRasList`, `aInfoGid`, `aExport` реализованы; остальные A/B-проверены (24≡24 РС, экспорт 4592/3459 1:1) | готово — [18](docs/18-gid8-cpp-rewrite.md) |
-|| 74 | Рассинхрон деревьев gid8 устранён: шаги 65–73 перенесены из корневой копии в канон `tgid_gis/gid8/gid8`, сборка проверена. Блок 4: `aTableDan`, `aTuTableNeiz`, `aTuIst`, `print_tu_itog` реализованы (A/B 1:1) | готово — [18](docs/18-gid8-cpp-rewrite.md) |
-|| 75 | Блок «Запросы и отчёты» 34/34 закрыт: `onCreateSortNode` — порт gid6 sortNode/sortLine в `ops.sortnodesforuchastok/sortlinesforuchastok` без legacy `pipeSections` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
-|| 76 | Блок «Техусловия (ТУ)» 10/10: редакторы `zhile`/`organizatsii`/`tehnicheskie_usloviya`/`prisoedinennaya_nagruzka_istochnikov`, «неизвестные» списки (A/B 653≡653, 4225≡4225); `aViewToolbarControlTu` — панель ремонтов, переносится с блоком 6 | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 74 | Рассинхрон деревьев gid8 устранён: шаги 65–73 перенесены в канон `tgid_gis/gid8/gid8`. Блок 4: `aTableDan`, `aTuTableNeiz`, `aTuIst`, `print_tu_itog` (A/B 1:1) | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 75 | Блок «Запросы и отчёты» 34/34: `onCreateSortNode` — порт gid6 sortNode/sortLine в `ops.sortnodesforuchastok/sortlinesforuchastok` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 76 | Блок «Техусловия (ТУ)» 10/10: редакторы zhile/organizatsii/ТУ/присоединённая нагрузка; «неизвестные» A/B 653≡653, 4225≡4225 | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 77 | Блок «Ремонты» (IM): `setDate`/`aSetDate1–3`, `aRemontPlan`+фильтры, `aIznos`, фикс `TOP` для PG; `ops.calculation_iznos`/`iznos` из attic ([181](sql/181_return_iznos.sql)); мёртвые `--` не трогаем | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 78 | Блок «Коррозия» 17/17: `openKorrozTable` + журналы/доки, add/del/info на карте, `aSetKorrozia` (ST_DWithin), сезон/`onoff`, toolbar/ribbon; PG-native вместо MSSQL `sql/korrozia/*` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 79 | Блок «Паспортизация»: `aAlma` (`m_bIsPts`), `aPaspNew`/`aMsPassport` → `passport_ps`, toolbar ПТС; деплой `python/docs/passport_ps` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 80 | Блок «Теплопотери» 3/3: `onPoteri`, `onSetOpenRez`, `onTeplopoteri`→`poteriNewPg`; деплой python-пакета | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 81 | Блок «GIS-обмен»: PNG/подложка/геодезия/мульти-экспорт/адреса; Shape и findNext геобазы отложены | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 82 | Блок «Администрирование» + `aIspravl`: Update/UpdateSetup, Ispravl→`create_b5_new`, OPC-заглушка; Catalog/Swap уже были | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 83 | Блок «Прочее» (часть): `SqlSave` (PG TEMPLATE), Invert, AvtoOn/Off, AppExit, StatusBar, SetAddr, `a1001` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 84 | Блок «Прочее» (часть 2): поворот/F5/зона/ТП/источники/ТУ/ЭС/флаги вида; тяжёлые отчёты — сообщения | готово — [18](docs/18-gid8-cpp-rewrite.md) |
+| 85 | Отчёты ТУ: `onTuSvod`/`onTuZhurnal` → Excel (QXlsx), `tu/tu_reports.cpp` | готово — [18](docs/18-gid8-cpp-rewrite.md) |
 | — | 16 PR без концов | не в net (orphan) — [10](docs/10-orphan-pressregulators.md) |
 
 ## Что дальше
 
-1. **Фрагменты-копии** (76–86, 91–97): строки восстановлены, топология
-   полная, sety стартует — но схемы не считаются из-за **исходных данных**:
-   семья 72/ЗЭР — «Не задана нагрузка ГВ [РС1-7 пэу17*]», семья 91 —
-   не назначен источник тепла + ГВ. A/B-прогон на `almatygid` дал ту же
-   ошибку байт-в-байт: схемы никогда не считались, правка — работа
-   оператора в gid8 (внутренние схемы, коды источников), не миграции.
-2. **Спорные потребители** — матрица готова (3 уникальных: `6-5` 0.75/3.0,
-   `2-66/7Б` 0.214/0.063, `1ЦТ-8-1Л` высота 18/27 м); текущий выбор
-   конвертера согласован между копиями. Нужно решение заказчика:
-   [07](docs/07-duplicates-next.md),
+1. **Спорные потребители** — следующий крупный пункт (по решению в
+   конце): [07](docs/07-duplicates-next.md),
    [dubli_generalizedconsumers.sql](sql/queries/dubli_generalizedconsumers.sql).
-3. **Сходимость на фр. 1** — крах `check_GG` устранён (шаг 71), расчёт
-   проходит и детерминирован. Побайтовый паритет с `almatygid` больше не
-   цель: входы идентичны, но результат зависит от истории расчётов самой
-   БД (write-back в карточки потребителей, напоры от последнего расчёта
-   магистрали). Осталось известное Δ температур у виртуальных узлов
-   (нестабильная зона, не structural).
-4. **Функциональная матрица** — заказчик утвердил все 335 команд как
-   `required` (2026-08-02, `docs/12`); перенос идёт по блокам: «Карта и
-   навигация» (шаг 72), «Гидравлические расчёты» (шаг 73), «Запросы и
-   отчёты» (шаги 74–75), «Техусловия (ТУ)» (шаг 76) закрыты, дальше
-   «Ремонты», «Коррозия» и т.д. Рабочая матрица со статусами —
-   `function-matrix.canvas.tsx`.
-   С 2026-08-02 каноническое дерево разработки — `tgid_gis/gid8/gid8`
-   (рассинхрон с корневой копией устранён шагом 74).
+2. Фоном (по желанию): `setPsMap`, `PrPo`/reclass, журнал электросети.
+3. Канон: `tgid_gis/gid8/gid8`. Матрица — `function-matrix.canvas.tsx`.
 
 Инвентаризация старого интерфейса и SQL воспроизводится командой:
 

@@ -64,13 +64,13 @@ QString top100000()
 QString ispr_q(const QString & q)
 {
     if (is_POSTGRESQL()) {
-        static QRegularExpression re("^(.+)\\s+TOP\\s+[0-9]+\\s+(.+)$");
-        QRegularExpressionMatch match = re.match(q);
-        if (match.hasMatch()) {
-            QString q1 = match.captured(1);
-            QString q2 = match.captured(3);
-            return q1 +" " + q2;
-        }
+        // SELECT [DISTINCT] TOP N ... → убрать TOP N (синтаксис MSSQL).
+        static QRegularExpression re(
+            QStringLiteral("\\bTOP\\s+[0-9]+\\s+"),
+            QRegularExpression::CaseInsensitiveOption);
+        QString out = q;
+        out.replace(re, QStringLiteral(""));
+        return out;
     }
     return q;
 }
@@ -197,7 +197,9 @@ QString SelectTop(const QString & q)
     if (RDBMS == MSSQL) {
         return QString("SELECT TOP 2147483647 * FROM (\n %1 \n) __").arg(q);
     }
-    return q;
+    // PostgreSQL: срезать TOP N из запросов, перенесённых из MSSQL/gid6
+    // (ListOpres, журналы ремонтов и т.п. — иначе DbWindow падает на синтаксисе).
+    return ispr_q(q);
 }
 
 

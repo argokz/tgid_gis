@@ -1103,7 +1103,7 @@ void GidWidget::draw(QPainter *painter, double w, double h, const ScrollGeom &ge
         m_reread = false;
     }
 
-    if (m_dxf && m_parent_id == 0) {
+    if (m_bIsPicture && m_dxf && m_parent_id == 0) {
         drawDxf(m_dxf, painter, m_rect, geom.bx, geom.by, geom.masx, geom.masy);
     }
 
@@ -1162,7 +1162,7 @@ void GidWidget::draw(QPainter *painter)
         m_reread = false;
     }
 
-    if (m_dxf && m_parent_id == 0) {
+    if (m_bIsPicture && m_dxf && m_parent_id == 0) {
         drawDxf(m_dxf, painter, m_rect, geom.bx, geom.by, geom.masx, geom.masy);
     }
 

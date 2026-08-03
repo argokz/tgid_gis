@@ -13,6 +13,7 @@
 
 #include <property/PropertyDial.h>
 #include <any/MyMain.h>
+#include <table/DbWindow.h>
 
 #include "std.h"
 
@@ -604,28 +605,88 @@ void GidWidget::onRemontTrub() // Выбор трубопроводов конт
 }
     
 
+void view_db2(DbWindow *view, const QString & title, QWidget *parent);
+
+void GidWidget::openRemont2List(const QString &title, const QString &condition)
+{
+    QString q = QString(
+        "SELECT DISTINCT "
+        "r.id, "
+        "r.otchet_po_defektu AS %1, "
+        "r.data_nachala_plan AS %2, "
+        "r.data_okonchaniya_plan AS %3, "
+        "r.data_nachala_remonta AS %4, "
+        "r.data_zaversheniya_remonta AS %5, "
+        "CASE WHEN COALESCE(r.utverdit, 0) = 0 THEN %6 ELSE %7 END AS %8, "
+        "rt.name AS %9, "
+        "nach.fio AS %10 "
+        "FROM remont2 r "
+        "LEFT JOIN remontTypes rt ON rt.id = r.remontTypeID "
+        "LEFT JOIN nachalniki_uchastkov nach ON nach.id = r.responsibleID "
+        "WHERE %11 "
+        "ORDER BY r.id DESC")
+        .arg(quot_text("Наименование/Адрес"),
+             quot_text("Дата начала ремонта плановая"),
+             quot_text("Дата окончания ремонта плановая"),
+             quot_text("Дата начала ремонтных работ"),
+             quot_text("Дата завершения ремонтных работ"),
+             quot_text("Не утверждено"),
+             quot_text("Утверждено"),
+             quot_text("Утверждение плана"),
+             quot_text("Вид ремонта"),
+             quot_text("Ответственный за ремонт"),
+             condition);
+
+    DbWindow *table = getTableView(m_cxema.m_db, "remont2", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Ошибка открытия списка контуров ремонта"));
+        return;
+    }
+    table->setEdit(true);
+    table->setDelete(true);
+    table->setOpres("remont2");
+    table->setGidWidget(this);
+    view_db2(table, title, this);
+}
+
+
 void GidWidget::onRemontPlan() // Контуры капитального/инвестиционного ремонтов
 {
+    openRemont2List(
+        tr("Контуры капитального/инвестиционного ремонтов. %1").arg(sezon_name(m_sezon_korrozia)),
+        "(r.remontTypeID IN (1, 2))");
 }
     
 
 void GidWidget::onRemontCurrent() // Контуры текущих ремонтов
 {
+    openRemont2List(
+        tr("Контуры текущих ремонтов. %1").arg(sezon_name(m_sezon_korrozia)),
+        "(r.remontTypeID IN (3))");
 }
     
 
 void GidWidget::onRemontProcess() // Ремонт в процессе выполнения
 {
+    openRemont2List(
+        tr("Ремонт в процессе выполнения. %1").arg(sezon_name(m_sezon_korrozia)),
+        "(r.stateID = 2)");
 }
     
 
 void GidWidget::onRemontVypolneno() // Законченные ремонты
 {
+    openRemont2List(
+        tr("Законченные ремонты. %1").arg(sezon_name(m_sezon_korrozia)),
+        "(r.stateID = 3)");
 }
     
 
 void GidWidget::onRemontAll2() // Отобразить все контура
 {
+    openRemont2List(
+        tr("Ремонты. %1").arg(sezon_name(m_sezon_korrozia)),
+        "(1=1)");
 }
     
 

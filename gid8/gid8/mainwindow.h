@@ -267,7 +267,7 @@ private:
 
 //#include "action/mainSlot.h"
 
-private slots:
+public slots:
 //------------------------------------------------------    
 //  Из MFC
 //------------------------------------------------------    
@@ -287,6 +287,7 @@ private slots:
     void onAppAbout(); // О программе
 //------------------------------------------------------    
 
+private slots:
     void onCatalogAccepted();
 
 

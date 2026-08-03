@@ -11,6 +11,7 @@
 #include <any/rights.h>
 
 #include <db/db.h>
+#include <dxf/dxfi.h>
 
 #include "std.h"
 #include <dialog/TableWindow.h>
@@ -24,10 +25,133 @@
 #define INDIKATOR_KORROZII "indikator_korrozii"
 QString transl(const QString & s);
 bool isEditGeo(const QString & tn, bool isMessage);
+bool setMarkLine2Value(QSqlDatabase &db, CGraph2* graph, const QString & tn, const QString & fn, const QVariant & val, bool all);
+bool setMarkNode1Value(QSqlDatabase &db, CGraph2* graph, const QString & tn, const QString & fn, const QVariant & val, bool all);
+bool setMarkNode2Value(QSqlDatabase &db, CGraph2* graph, const QString & tn, const QString & fn, const QVariant & val, bool all);
+bool isBaza(QSqlDatabase &db, const QString & baza);
+bool createBackup(QSqlDatabase &db, const QString & name, const QString & save_dir);
+bool restoreBackup(QSqlDatabase &db, const QString & name_old, const QString & name_new, const QString & save_dir);
+#include <config.h>
+void init_cs(ConnectStr &cs);
+QString change_group_start(QSqlDatabase &db, const QString &comment);
+bool change_group_end(QSqlDatabase &db);
+QString sezon_name(int y);
+bool create_vyd_line_table(QSqlDatabase &db, CGraph2* graph, QString& tn);
+
+
+static bool isSafePgIdent(const QString &s)
+{
+    if (s.isEmpty() || s.size() > 63) return false;
+    const QChar c0 = s[0];
+    if (!(c0.isLetter() || c0 == QLatin1Char('_'))) return false;
+    for (const QChar &c : s) {
+        if (!(c.isLetterOrNumber() || c == QLatin1Char('_'))) return false;
+    }
+    return true;
+}
 
 
 void GidWidget::onSqlSave() // Создание копии Базы данных
 {
+    if (!UserRight::isAdmin()) {
+        QMessageBox::warning(this, "", tr("Для выполнения этой операции у вас должны быть права администратора!"));
+        return;
+    }
+
+    const QString name = getDatabaseName(m_cxema.m_db);
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "", tr("Не удалось определить имя текущей базы данных."));
+        return;
+    }
+
+    bool ok = false;
+    QString new_name = QInputDialog::getText(
+        this, "", tr("Введите название новой базы данных"),
+        QLineEdit::Normal, QString(), &ok).trimmed();
+    if (!ok || new_name.isEmpty()) return;
+
+    if (!isSafePgIdent(new_name) && is_POSTGRESQL()) {
+        QMessageBox::warning(this, "",
+            tr("Имя базы: только латинские буквы, цифры и «_», начинается с буквы или «_»."));
+        return;
+    }
+
+    if (QMessageBox::question(this, "",
+            tr("Копировать базу %1 в %2?").arg(name, new_name)) != QMessageBox::Yes) {
+        return;
+    }
+
+    if (is_POSTGRESQL()) {
+        ConnectStr cs;
+        init_cs(cs);
+        QString host = m_cxema.m_db.hostName();
+        int port = m_cxema.m_db.port();
+        QString user = m_cxema.m_db.userName();
+        QString password = m_cxema.m_db.password();
+        if (host.isEmpty()) host = cs.host;
+        if (port <= 0) port = cs.port;
+        if (user.isEmpty()) user = cs.user;
+        if (password.isEmpty()) password = cs.password;
+
+        QSqlDatabase db0;
+        if (!connectSQL0(1, host, port, QStringLiteral("postgres"), user, password, db0)) {
+            QMessageBox::warning(this, "", tr("Не удалось подключиться к служебной БД postgres."));
+            return;
+        }
+
+        if (isBaza(db0, new_name)) {
+            QMessageBox::warning(this, "", tr("База данных %1 уже существует").arg(new_name));
+            return;
+        }
+
+        // TEMPLATE требует отсутствия других сессий к исходной БД
+        query_exec(db0,
+            QStringLiteral("SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+                           "WHERE datname = '%1' AND pid <> pg_backend_pid()")
+                .arg(name),
+            false);
+        m_cxema.m_db.close();
+
+        QSqlQuery query(db0);
+        const QString q = QStringLiteral("CREATE DATABASE %1 WITH TEMPLATE = %2")
+                              .arg(new_name, name);
+        const bool ret = query_exec(db0, query, q);
+
+        if (!m_cxema.m_db.open()) {
+            QMessageBox::critical(this, "",
+                tr("Копия: %1. Не удалось заново открыть рабочую базу %2:\n%3")
+                    .arg(ret ? tr("создана") : tr("ошибка"),
+                         name,
+                         m_cxema.m_db.lastError().text()));
+            return;
+        }
+        configureTgidPostgreSqlSession(m_cxema.m_db);
+
+        if (ret) {
+            QMessageBox::information(this, "",
+                tr("База %1 создана как копия %2.\nПодключитесь к ней при следующем запуске.")
+                    .arg(new_name, name));
+        } else {
+            ErrorMessage(query);
+        }
+        return;
+    }
+
+    // MSSQL: backup + restore (как gid6)
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Каталог для .bak"));
+    if (dir.isEmpty()) return;
+    const QString bak = QDir(dir).filePath(
+        QStringLiteral("%1_%2.bak")
+            .arg(name, QDateTime::currentDateTime().toString("yyyyMMddHHmmss")));
+    if (!createBackup(m_cxema.m_db, name, bak)) {
+        QMessageBox::warning(this, "", tr("Ошибка BACKUP DATABASE."));
+        return;
+    }
+    if (!restoreBackup(m_cxema.m_db, name, new_name, bak)) {
+        QMessageBox::warning(this, "", tr("Ошибка RESTORE DATABASE."));
+        return;
+    }
+    QMessageBox::information(this, "", tr("Выйдите из программы и зайдите опять."));
 }
 
 
@@ -153,9 +277,7 @@ void GidWidget::onAddFragment() // Добавить Фрагмент схемы
 
 
 
-void GidWidget::onExportFragmentsMulty() // Экспорт всех фрагментов
-{
-}
+// onExportFragmentsMulty — реализация в export.cpp
 
 
 /*
@@ -203,6 +325,30 @@ void GidWidget::onAddDop() // Отобразить дополнительную 
 
 void GidWidget::onBmpFind() // Найти графическую подложку
 {
+    if (!m_bIsPicture || !m_dxf) {
+        QMessageBox::information(this, "", tr("Графическая подложка не загружена"));
+        return;
+    }
+
+    double x1, x2, y1, y2;
+    if (m_dxf->extent_x || m_dxf->extent_y || m_dxf->extent_mx || m_dxf->extent_my) {
+        x1 = qMin(m_dxf->extent_x, m_dxf->extent_mx);
+        x2 = qMax(m_dxf->extent_x, m_dxf->extent_mx);
+        y1 = qMin(m_dxf->extent_y, m_dxf->extent_my);
+        y2 = qMax(m_dxf->extent_y, m_dxf->extent_my);
+        x1 = qMax(x1, m_dxf->l_xmin);
+        x2 = qMin(x2, m_dxf->l_xmax);
+        y1 = qMax(y1, m_dxf->l_ymin);
+        y2 = qMin(y2, m_dxf->l_ymax);
+    } else {
+        x1 = m_dxf->l_xmin;
+        x2 = m_dxf->l_xmax;
+        y1 = m_dxf->l_ymin;
+        y2 = m_dxf->l_ymax;
+    }
+
+    const double k = m_dxf->p25400 != 0 ? m_dxf->p25400 : 1.0;
+    moveXY(CFPoint((x1 + x2) / 2 * k, -(y1 + y2) / 2 * k));
 }
 
 
@@ -212,12 +358,8 @@ QString table_to_q_for_remont(const QString & fn);
 
 void GidWidget::onCatalog() // Каталоги
 {
-/*
-    QString fn = "sql/objects/defect/grafik_group.sql";
-    QString q = table_to_q_for_remont(fn);
-    std::map<QString, QString> map_fn;
-    Remont_docx1(this, m_cxema.m_db, q, 2022);
-*/
+    // рабочий слот — MainWindow::onCatalog (aCatalog подключён к main_window)
+    if (main_window) main_window->onCatalog();
 }
 
 
@@ -334,6 +476,7 @@ void GidWidget::onFilePrintSetup() // Параметры страницы...
 
 void GidWidget::onAppExit() // Выход
 {
+    QApplication::quit();
 }
 
 void resetGid(CCxema * m_cxema, const QString & m_user_gid, int &n_nodes, int n_lines);
@@ -1381,6 +1524,8 @@ void GidWidget::onSetUf() // Установить Коэффициенты см�
 
 void GidWidget::onSetTp() // Установить Тепловые пункты по потребителям
 {
+    QVariant val;
+    setSomething(true, TIP_PR, "heatPointID", QVariant(), val);
 }
 
 
@@ -1534,18 +1679,66 @@ void GidWidget::onSetSher() // Установить Эквивалентную �
 }
 
 
+void GidWidget::setDate(const QString &tn, const QString &fn, const QString &name_mn)
+{
+    if (!isEditGid()) return;
+    if (m_parent_id) return;
+
+    if (!m_cxema.m_graph || !m_cxema.m_graph->isMark()) {
+        QMessageBox::warning(this, "", tr("Для выполнения операции необходимо выделить участки"));
+        return;
+    }
+
+    bool ok = false;
+    QString text = QInputDialog::getText(
+        this,
+        tr("Дата"),
+        tr("Введите дату %1 (дд.мм.гггг)").arg(name_mn),
+        QLineEdit::Normal,
+        QDate::currentDate().toString("dd.MM.yyyy"),
+        &ok);
+    if (!ok) return;
+
+    QDate d = QDate::fromString(text.trimmed(), "dd.MM.yyyy");
+    if (!d.isValid()) {
+        d = QDate::fromString(text.trimmed(), "d.M.yyyy");
+    }
+    if (!d.isValid()) {
+        QMessageBox::warning(this, "", tr("Некорректная дата: %1").arg(text));
+        return;
+    }
+
+    QString ask = tr(
+        "Внимание!\n"
+        "При выполнении этой операции все даты %1 будут установлены в %2\n"
+        "Выполнить операцию?")
+        .arg(name_mn, d.toString("dd.MM.yyyy"));
+    if (QMessageBox::question(this, "", ask) != QMessageBox::Yes) return;
+
+    change_group_start(m_cxema.m_db, tr("Установка даты %1").arg(name_mn));
+    setMarkLine2Value(m_cxema.m_db, m_cxema.graph(), tn, fn, d, false);
+    if (fn == "firstPICdateHP") {
+        setMarkLine2Value(m_cxema.m_db, m_cxema.graph(), tn, "lastTransDate", d, false);
+    }
+    change_group_end(m_cxema.m_db);
+}
+
+
 void GidWidget::onSetDate2() // Установить Дату первичного ввода в эксплуатацию
 {
+    setDate("heatPipeSections", "firstPICdateHP", tr("первичного ввода в эксплуатацию"));
 }
 
 
 void GidWidget::onSetDate1() // Установить Дату последней перекладки
 {
+    setDate("heatPipeSections", "lastTransDate", tr("последней перекладки"));
 }
 
 
 void GidWidget::onSetDate3() // Установить Дату планируемого ремонта
 {
+    setDate("heatPipeSections", "repairDatePlanTP", tr("планируемого ремонта"));
 }
 
 
@@ -1570,11 +1763,84 @@ void GidWidget::onSetKodRs() // Установить Код расчетной �
 
 void GidWidget::onGeodz() // Установить Отметки узлов горизонтали
 {
+    if (!isEditGid()) return;
+    if (m_parent_id) return;
+
+    bool ok = false;
+    QString text = QInputDialog::getText(
+        this,
+        tr("Геодезические отметки"),
+        tr("Введите геодезическую отметку"),
+        QLineEdit::Normal, "0", &ok);
+    if (!ok) return;
+
+    bool ok_num = false;
+    double g = text.trimmed().toDouble(&ok_num);
+    if (!ok_num) {
+        QMessageBox::warning(this, "", tr("Некорректное число: %1").arg(text));
+        return;
+    }
+
+    QString str = tr("Внимание!\nПри выполнении этой операции все геодезические отметки "
+                     "в выбранной области будут установлены в %1\nВыполнить операцию?").arg(g);
+    if (QMessageBox::question(this, "", str) != QMessageBox::Yes) return;
+
+    setMarkNode1Value(m_cxema.m_db, m_cxema.graph(), "nodes", "geoMarkTopTube", text.trimmed(), false);
+    setMarkNode1Value(m_cxema.m_db, m_cxema.graph(), "nodes", "geoMarkNodeArea", text.trimmed(), false);
+
+    for (auto &p : m_cxema.m_graph->map_node) {
+        CNode2 *n = p.second;
+        if (!n) continue;
+        if (n->node.isPjezo) {
+            n->node.geoMarkTopTube = n->node.geoMarkNodeArea = g;
+        }
+    }
+    repaint();
 }
 
 
 void GidWidget::onSetKorrozia() // Установить Индикаторы коррозии
 {
+    if (!isEditGid()) return;
+    if (!m_cxema.m_graph || !m_cxema.m_graph->isMark()) {
+        QMessageBox::warning(this, "", tr("Для выполнения операции необходимо выделить участки"));
+        return;
+    }
+
+    bool ok = false;
+    QString text = QInputDialog::getText(
+        this, tr("Дата планирования"),
+        tr("Введите дату планирования (дд.мм.гггг)"),
+        QLineEdit::Normal, QDate::currentDate().toString("dd.MM.yyyy"), &ok);
+    if (!ok) return;
+
+    QDate d = QDate::fromString(text.trimmed(), "dd.MM.yyyy");
+    if (!d.isValid()) d = QDate::fromString(text.trimmed(), "d.M.yyyy");
+    if (!d.isValid()) {
+        QMessageBox::warning(this, "", tr("Некорректная дата: %1").arg(text));
+        return;
+    }
+
+    QString temp_name = "__temp_korroz__";
+    if (!create_vyd_line_table(m_cxema.m_db, m_cxema.graph(), temp_name)) {
+        QMessageBox::warning(this, "", tr("Не удалось создать временную таблицу выделенных участков"));
+        return;
+    }
+
+    QString q = QString(
+        "UPDATE indikator_korrozii AS obj "
+        "SET sostoyanie = 1, data_planirovaniya = DATE '%1' "
+        "FROM linesobj l "
+        "JOIN %2 tmp ON tmp.id = l.id "
+        "WHERE ST_DWithin(l.shape, obj.shape, 1)")
+        .arg(d.toString("yyyy-MM-dd"), temp_name);
+
+    if (!query_exec(m_cxema.m_db, q)) {
+        QMessageBox::warning(this, "", tr("Не удалось обновить индикаторы коррозии"));
+        return;
+    }
+    QMessageBox::information(this, "", tr("Дата планирования %1 установлена для индикаторов у выделенных участков")
+        .arg(d.toString("dd.MM.yyyy")));
 }
 
 bool setMarkNode1Value(QSqlDatabase &db, CGraph2* graph, const QString & tn, const QString & fn, const QVariant & val, bool all);
@@ -1651,6 +1917,13 @@ void GidWidget::onEditCopy() // Копировать\tCtrl+C
 
 void GidWidget::onEditCopyPng() // Копировать в PNG
 {
+    QPixmap px = grab();
+    if (px.isNull()) {
+        QMessageBox::warning(this, "", tr("Не удалось получить изображение схемы"));
+        return;
+    }
+    QApplication::clipboard()->setPixmap(px);
+    QMessageBox::information(this, "", tr("Изображение схемы скопировано в буфер обмена"));
 }
 
 
@@ -1731,11 +2004,32 @@ void GidWidget::onMovew() // Перемещение\tM
 
 void GidWidget::onPovorot() // Повернуть
 {
+    bool ok = false;
+    double deg = QInputDialog::getDouble(
+        this, tr("Поворот схемы"),
+        tr("Угол поворота, градусы (положительный — против часовой):"),
+        qRadiansToDegrees(get_alpha()), -180.0, 180.0, 1, &ok);
+    if (!ok) return;
+
+    const CFPoint c = ScreenToCoord(CFPoint(width() / 2.0, height() / 2.0));
+    set_coord(c.x, c.y, qDegreesToRadians(deg));
+    repaint();
 }
 
 
 void GidWidget::onPovorot2() // Возврат
 {
+    if (get_alpha() == 0) return;
+    set_coord(0, 0, 0);
+    regim = R_INIT;
+    if (gidrAction.aInfo) m_nRegim = gidrAction.aInfo;
+    repaint();
+}
+
+
+void GidWidget::onF5() // Перерисовать схему\tF5
+{
+    Scroll::onF5();
 }
 
 
@@ -1747,6 +2041,15 @@ void GidWidget::onZoom() // Масштабировать
 
 void GidWidget::onPicture() // Графическая подложка
 {
+    if (!m_dxf) {
+        onBmp();
+        if (!m_dxf) return;
+        m_bIsPicture = true;
+    } else {
+        m_bIsPicture = !m_bIsPicture;
+    }
+    if (gidrAction.aPicture) gidrAction.aPicture->setChecked(m_bIsPicture);
+    repaint();
 }
 
 
@@ -1759,21 +2062,45 @@ void GidWidget::onGeobaza(bool on) // Показать геобазу
 
 void GidWidget::onFindGeo() // Поиск в геобазе...
 {
+    // полноценный find/findNext геобазы gid6 не перенесён в GeoFile;
+    // открываем проводник карты / геобазы для ручного поиска
+    if (main_window) {
+        main_window->showDocks(Qt::LeftDockWidgetArea, true);
+    }
+    QMessageBox::information(this, "",
+        tr("Выберите слой геобазы в проводнике карты и откройте таблицу объекта "
+           "(или используйте поиск по адресу)."));
 }
 
 
 void GidWidget::onGeoFindNext() // Продолжение поиска
 {
+    QMessageBox::information(this, "",
+        tr("Продолжение поиска по геобазе будет доступно после порта find/findNext."));
 }
 
 
 void GidWidget::onFindGeoAddr() // Поиск по адресу
 {
+    if (!main_window) return;
+    main_window->showDocks(Qt::LeftDockWidgetArea, true);
+    if (main_window->m_addr) {
+        QDockWidget *dock = qobject_cast<QDockWidget *>(main_window->m_addr->parentWidget());
+        if (dock) {
+            dock->show();
+            dock->raise();
+        } else {
+            main_window->m_addr->show();
+            main_window->m_addr->raise();
+        }
+    }
 }
 
 
 void GidWidget::onGeoInfo() // Информация из геобазы
 {
+    regim = R_INIT;
+    m_nRegim = gidrAction.aGeoInfo;
 }
 
 
@@ -1845,16 +2172,21 @@ void GidWidget::onSetLength() // Установить длины
 
 void GidWidget::on1000() // Создать файл полей
 {
+    QMessageBox::information(this, "",
+        tr("Экспорт файла подписей полей (.txt2) из gid6 пока не перенесён."));
 }
 
 
 void GidWidget::on1001() // Переименовать поля
 {
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://ivs.lmedia.pro/#/shape")));
 }
 
 
 void GidWidget::on1002() // Сохранить переименованные поля
 {
+    QMessageBox::information(this, "",
+        tr("Импорт файла подписей полей (.txt2) из gid6 пока не перенесён."));
 }
 
 
@@ -2282,6 +2614,14 @@ void GidWidget::onPodp(bool on) // Отображать имена узлов
 
 void GidWidget::onPodpPo() // Отображать схему ПТС
 {
+    // gid6: m_bIsPTS — тот же визуальный режим, что aAlma (m_bIsPts)
+    m_bIsPts = !m_bIsPts;
+    if (gidrAction.aPodpPo) gidrAction.aPodpPo->setChecked(m_bIsPts);
+    if (gidrAction.aAlma) gidrAction.aAlma->setChecked(m_bIsPts);
+    QSettings settings;
+    settings.setValue("flags/isPTS", m_bIsPts);
+    settings.setValue("flags/isPts", m_bIsPts);
+    repaint();
 }
 
 
@@ -2294,6 +2634,9 @@ void GidWidget::onPodpRes(bool on) // Отображать имена узлов
 
 void GidWidget::onPribor() // Отображать Приборы учета
 {
+    m_bIsPribor = !m_bIsPribor;
+    if (gidrAction.aPribor) gidrAction.aPribor->setChecked(m_bIsPribor);
+    repaint();
 }
 
 
@@ -2311,11 +2654,17 @@ void GidWidget::onRezhim(bool on) // Отображать вспомогател
 
 void GidWidget::onPopupPodpOn() // Показать скрытые имена
 {
+    m_bIsPodpAll = true;
+    if (gidrAction.aPodpAll) gidrAction.aPodpAll->setChecked(true);
+    repaint();
 }
 
 
 void GidWidget::onPopupPodpOff() // Не показывать скрытые имена
 {
+    m_bIsPodpAll = false;
+    if (gidrAction.aPodpAll) gidrAction.aPodpAll->setChecked(false);
+    repaint();
 }
 
 
@@ -2326,6 +2675,10 @@ void GidWidget::onPodpYesNo(bool on) // Отображать/Не отображ
 
 void GidWidget::onNaprGid() // Распределение потоков
 {
+    // обычно toggle через addToggleValue; слот — запасной путь из меню
+    m_bIsNaprGid = !m_bIsNaprGid;
+    if (gidrAction.aNaprGid) gidrAction.aNaprGid->setChecked(m_bIsNaprGid);
+    repaint();
 }
 
 //void GidWidget::onAnal() // Анализ...
@@ -2571,6 +2924,51 @@ void GidWidget::onIsprLast() // Изменённые объекты
 
 void GidWidget::onZona() // Гидростатические зоны
 {
+    if (!m_cxema.m_graph || m_cxema.m_graph->map_node.empty()) {
+        QMessageBox::information(this, "", tr("Схема пуста"));
+        return;
+    }
+
+    auto p = m_cxema.m_graph->map_node.begin();
+    double h_min = 1e10, h_max = -1e10;
+    CNode2 *n_min = nullptr;
+
+    m_cxema.m_graph->reset();
+    m_cxema.m_graph->WS1(p->second, nullptr, false);
+
+    for (; p != m_cxema.m_graph->map_node.end(); ++p) {
+        CNode2 *n = p->second;
+        if (n->node.len == -1) continue;
+        if (n->node.geoMarkTopTube + n->node.hz > h_max) {
+            h_max = n->node.geoMarkTopTube + n->node.hz;
+        }
+        if (n->node.geoMarkTopTube < h_min) {
+            h_min = n->node.geoMarkTopTube;
+            n_min = n;
+        }
+    }
+
+    if (!n_min) {
+        QMessageBox::information(this, "", tr("Не удалось определить зону"));
+        return;
+    }
+
+    m_cxema.m_graph->reset();
+    m_cxema.m_graph->WS1_h(n_min, nullptr, 60);
+
+    QMessageBox::information(
+        this, tr("Гидростатические зоны"),
+        tr("Верхняя геодезическая отметка %1 м.\n"
+           "Гидростатический перепад отметок %2 м.\n"
+           "Минимальная геодезическая отметка земли %3 м. в узле %4\n"
+           "Красным цветом показана граница зоны")
+            .arg(h_max + 5)
+            .arg(h_max + 5 - h_min)
+            .arg(h_min)
+            .arg(n_min->getName()));
+
+    moveNode(n_min);
+    repaint();
 }
 
 
@@ -2612,6 +3010,42 @@ void GidWidget::onTuTable() // Технические условия
 
 void GidWidget::onTuYear() // ТУ по годам
 {
+    Klassif *kls = m_kl_list.findKlN("zdaniya_tu");
+    QSqlDatabase *db = kls && kls->m_db ? kls->m_db : &m_cxema.m_db;
+
+    QString q = "SELECT DISTINCT EXTRACT(YEAR FROM data_vydachi_tu)::int AS y"
+                " FROM tehnicheskie_usloviya"
+                " WHERE data_vydachi_tu IS NOT NULL"
+                " ORDER BY y";
+
+    MMenuDial menu(this, tr("Выберите год"));
+    QSqlQuery query(*db);
+    if (query_exec(*db, query, q)) {
+        while (query.next()) {
+            int y = query.value(0).toInt();
+            menu.Add(QString::number(y), y);
+        }
+    }
+    if (menu.exec() != QDialog::Accepted) return;
+
+    int year = menu.value().toInt();
+    q = QString(
+            "SELECT t.*, st.name AS %1 "
+            "FROM tehnicheskie_usloviya t "
+            "LEFT JOIN statetu st ON st.id=t.sostoyanie_dogovora "
+            "WHERE EXTRACT(YEAR FROM t.data_vydachi_tu)=%2 "
+            "ORDER BY t.data_vydachi_tu NULLS LAST, t.nomer_tu")
+            .arg(quot_text("Состояние договора"))
+            .arg(year);
+
+    QString title = tr("Технические условия за %1").arg(year);
+    DbWindow *table = getTableView(*db, "tehnicheskie_usloviya", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, title, this);
 }
 
 
@@ -2621,6 +3055,8 @@ void GidWidget::onTuYear() // ТУ по годам
 #include "tu/ReportInputDialog.h"
 
 void print_tu_itog(QSqlDatabase &db, int y1, int y2, int y, double coef);
+void print_tu_svod(QSqlDatabase &db);
+void print_tu_zhurnal(QSqlDatabase &db, int year);
 
 
 void GidWidget::onTuExcel() // Итоговый тепловой баланс
@@ -2638,11 +3074,41 @@ void GidWidget::onTuExcel() // Итоговый тепловой баланс
 
 void GidWidget::onTuSvod() // Итоговые по годам
 {
+    Klassif *kls = m_kl_list.findKlN("zdaniya_tu");
+    QSqlDatabase *db = kls && kls->m_db ? kls->m_db : &m_cxema.m_db;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    print_tu_svod(*db);
+    QApplication::restoreOverrideCursor();
 }
 
 
 void GidWidget::onTuZhurnal() // Журнал регистрации ТУ
 {
+    Klassif *kls = m_kl_list.findKlN("zdaniya_tu");
+    QSqlDatabase *db = kls && kls->m_db ? kls->m_db : &m_cxema.m_db;
+
+    QString q = "SELECT DISTINCT EXTRACT(YEAR FROM data_vydachi_tu)::int AS y"
+                " FROM tehnicheskie_usloviya"
+                " ORDER BY y NULLS FIRST";
+
+    MMenuDial menu(this, tr("Выберите год"));
+    QSqlQuery query(*db);
+    if (query_exec(*db, query, q)) {
+        while (query.next()) {
+            if (query.value(0).isNull()) {
+                menu.Add(tr("Без даты"), 0);
+            } else {
+                int y = query.value(0).toInt();
+                if (y < 1900) menu.Add(tr("Без даты"), y);
+                else menu.Add(QString::number(y), y);
+            }
+        }
+    }
+    if (menu.exec() != QDialog::Accepted) return;
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    print_tu_zhurnal(*db, menu.value().toInt());
+    QApplication::restoreOverrideCursor();
 }
 
 
@@ -2751,6 +3217,15 @@ void GidWidget::onPrisNagrEdit() // Присоединенная нагрузк�
 
 void GidWidget::onQGvs() // Коэффициент перевода k=Qгвmax/Qгвср
 {
+    QSettings settings;
+    QString s = settings.value("coef24", "2.4").toString();
+    bool ok = false;
+    QString text = QInputDialog::getText(
+        this, tr("Коэффициент перевода"),
+        tr("Коэффициент перевода k=Qгвmax/Qгвср"),
+        QLineEdit::Normal, s, &ok);
+    if (!ok) return;
+    settings.setValue("coef24", text.trimmed());
 }
 
 
@@ -2910,14 +3385,20 @@ void GidWidget::onTuIst() // Отчет по источникам
 }
 
 
-void GidWidget::onPtsInfo() // Информация по объекту
-{
-}
-
-#include <table/DbWindow.h>
-
 const map<QString, Klassif*> *init_pts_list_file(const QString & fn1);
 QString getGeoSelect(Klassif *kls, CGraph2 *graph);
+Klassif *menu_list_file(QWidget *widget, const QString & title, const QString & fn1);
+
+void GidWidget::onPtsInfo() // Информация по объекту
+{
+    // режим задаётся через regimGroup / onRegim; слот — запасной путь из меню
+    if (!init_pts_list_file("pts")) {
+        QMessageBox::warning(this, "", tr("В системе нет объектов ПТС"));
+        return;
+    }
+    regim = R_INIT;
+    m_nRegim = gidrAction.aPtsInfo;
+}
 QString getLineMarkTable(CGraph2 *graph);
 
 QString getQForMarkLine(CGraph2 * graph, bool br);
@@ -3050,6 +3531,12 @@ void GidWidget::onPtsTable() // Таблица
 
 void GidWidget::onPtsDel() // Удалить объект
 {
+    if (!init_pts_list_file("pts")) {
+        QMessageBox::warning(this, "", tr("В системе нет объектов ПТС"));
+        return;
+    }
+    regim = R_INIT;
+    m_nRegim = gidrAction.aPtsDel;
 }
 
 
@@ -3078,8 +3565,59 @@ void GidWidget::onProtKot() // Протяженность котельных
 }
 
 
+static bool pick_ms_rs_for_passport(GidWidget *w, QSqlDatabase &db, int &typ, int &id)
+{
+    // typ: 1=МС, 2=РС — как в DockPTS / Passport()
+    if (main_window) {
+        int t = 0, i = 0;
+        if (main_window->m_ms && main_window->m_ms->currentMsRs(t, i)) {
+            typ = t; id = i; return true;
+        }
+        if (main_window->m_rs && main_window->m_rs->currentMsRs(t, i)) {
+            typ = t; id = i; return true;
+        }
+    }
+
+    MMenuDial kind(w, QObject::tr("Паспорт МС/РС"));
+    kind.Add(QObject::tr("Магистральный участок (МС)"), 1);
+    kind.Add(QObject::tr("Распределительный участок (РС)"), 2);
+    if (kind.exec() != QDialog::Accepted) return false;
+    typ = kind.value().toInt();
+
+    const bool is_ms = (typ == 1);
+    QString q = is_ms
+        ? QString("SELECT id, COALESCE(opisanie_uchastka_ms, '') AS name FROM uchastok_ms ORDER BY name, id")
+        : QString("SELECT id, COALESCE(naimenovanie_uchastka_rs, '') AS name FROM uchastok_rs ORDER BY name, id");
+
+    QSqlQuery query(db);
+    if (!query_exec(db, query, q)) {
+        QMessageBox::warning(w, "", QObject::tr("Не удалось прочитать список участков"));
+        return false;
+    }
+
+    MMenuDial menu(w, is_ms ? QObject::tr("Выберите участок МС") : QObject::tr("Выберите участок РС"));
+    int n = 0;
+    while (query.next()) {
+        int row_id = query.value(0).toInt();
+        QString name = query.value(1).toString().trimmed();
+        if (name.isEmpty()) name = QString("#%1").arg(row_id);
+        menu.Add(QString("%1 — %2").arg(row_id).arg(name), row_id);
+        n++;
+    }
+    if (n == 0) {
+        QMessageBox::information(w, "", QObject::tr("Список участков пуст"));
+        return false;
+    }
+    if (menu.exec() != QDialog::Accepted) return false;
+    id = menu.value().toInt();
+    return id > 0;
+}
+
 void GidWidget::onPaspNew() // Паспорт сети
 {
+    int typ = 0, id = 0;
+    if (!pick_ms_rs_for_passport(this, m_cxema.m_db, typ, id)) return;
+    Passport(nullptr, nullptr, typ, id);
 }
 
 
@@ -3191,63 +3729,163 @@ void GidWidget::onKorrozAdd() // Установить индикатор кор�
 }
 
 
+const map<QString, Klassif*> *init_pts_table(const QString & tab);
+
+void GidWidget::openKorrozTable(const QString &title, const QString &extra_where)
+{
+    QString season_where = "TRUE";
+    if (m_sezon_korrozia > 0) {
+        Heating_seasons h = m_cxema.get_Heating_seasons(m_sezon_korrozia);
+        if (h.y > 0) {
+            QString d1 = h.d0.toString("yyyy-MM-dd");
+            QString d2 = h.d1.toString("yyyy-MM-dd");
+            season_where = QString(
+                "(COALESCE(data_planirovaniya, data_ustanovki, data_izvlecheniya) "
+                "BETWEEN DATE '%1' AND DATE '%2')").arg(d1, d2);
+        }
+    }
+
+    QString where = season_where;
+    if (!extra_where.isEmpty()) {
+        where = QString("(%1) AND (%2)").arg(season_where, extra_where);
+    }
+
+    QString q = QString(
+        "SELECT id, "
+        "nomer_indikatora_korrozii AS %1, "
+        "mesto_ustanovki AS %2, "
+        "data_planirovaniya AS %3, "
+        "data_ustanovki AS %4, "
+        "data_izvlecheniya AS %5, "
+        "lineid AS %6, "
+        "nodeid AS %7, "
+        "srednyaya_skorost_korrozii__mm_god AS %8, "
+        "primechanie AS %9 "
+        "FROM indikator_korrozii "
+        "WHERE %10 "
+        "ORDER BY id DESC")
+        .arg(quot_text("Номер индикатора"),
+             quot_text("Место установки"),
+             quot_text("Дата планирования"),
+             quot_text("Дата установки"),
+             quot_text("Дата извлечения"),
+             quot_text("Линия"),
+             quot_text("Узел"),
+             quot_text("Скорость коррозии, мм/год"),
+             quot_text("Примечание"),
+             where);
+
+    DbWindow *table = getTableView(m_cxema.m_db, "indikator_korrozii", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Ошибка открытия таблицы индикаторов коррозии"));
+        return;
+    }
+    table->setEdit(true);
+    table->setDelete(true);
+    table->setGeo("indikator_korrozii");
+    table->setGidWidget(this);
+    view_db2(table, title, this);
+}
+
+
 void GidWidget::onKorrozDel() // Удалить индикатор коррозии
 {
+    if (!init_pts_table(INDIKATOR_KORROZII)) {
+        QMessageBox::warning(this, "", tr("В системе нет объекта %1").arg(INDIKATOR_KORROZII));
+        return;
+    }
+    regim = R_INIT;
+    m_nRegim = gidrAction.aKorrozDel;
 }
 
 
 void GidWidget::onFragmentPolyKorroziaAr() // Удалить выбранные индикаторы
 {
+    // массовое удаление выделенных гео-индикаторов — через контекстное меню карты
+    QMessageBox::information(this, "",
+        tr("Выделите индикаторы на карте и удалите через контекстное меню объекта "
+           "или через таблицу индикаторов (кнопка удаления строки)."));
 }
 
 
 void GidWidget::onKorrozInfo() // Информация по индикатору
 {
+    if (!init_pts_table(INDIKATOR_KORROZII)) {
+        QMessageBox::warning(this, "", tr("В системе нет объекта %1").arg(INDIKATOR_KORROZII));
+        return;
+    }
+    regim = R_INIT;
+    m_nRegim = gidrAction.aKorrozInfo;
 }
 
 
 void GidWidget::onKorroziaUpdate() // Выбор шаблона плана
 {
+    openKorrozTable(tr("Шаблон/план индикаторов коррозии"), "data_planirovaniya IS NOT NULL");
 }
 
 
 void GidWidget::onKorrozDoc3() // План установки
 {
+    openKorrozTable(
+        tr("План установки индикаторов. %1").arg(sezon_name(m_sezon_korrozia)),
+        "data_planirovaniya IS NOT NULL AND data_ustanovki IS NULL");
 }
 
 
 void GidWidget::onKorrozTable() // Таблица индикаторов коррозии
 {
+    openKorrozTable(tr("Таблица индикаторов коррозии. %1").arg(sezon_name(m_sezon_korrozia)), "");
 }
 
 
 void GidWidget::onKorroziaZhurnal1() // План индикаторов
 {
+    openKorrozTable(
+        tr("План индикаторов. %1").arg(sezon_name(m_sezon_korrozia)),
+        "data_planirovaniya IS NOT NULL AND data_ustanovki IS NULL");
 }
 
 
 void GidWidget::onKorroziaZhurnal2() // Индикаторы установленные
 {
+    openKorrozTable(
+        tr("Индикаторы установленные. %1").arg(sezon_name(m_sezon_korrozia)),
+        "data_ustanovki IS NOT NULL AND data_izvlecheniya IS NULL");
 }
 
 
 void GidWidget::onKorroziaZhurnal3() // Индикаторы извлеченные
 {
+    openKorrozTable(
+        tr("Индикаторы извлеченные. %1").arg(sezon_name(m_sezon_korrozia)),
+        "data_izvlecheniya IS NOT NULL");
 }
 
 
 void GidWidget::onKorroziaCurrent() // Все индикаторы сезона
 {
+    openKorrozTable(tr("Все индикаторы сезона. %1").arg(sezon_name(m_sezon_korrozia)), "");
 }
 
 
 void GidWidget::onKorrozDoc2() // Оценка за отопительный сезон
 {
+    openKorrozTable(
+        tr("Оценка за отопительный сезон. %1").arg(sezon_name(m_sezon_korrozia)),
+        "srednyaya_skorost_korrozii__mm_god IS NOT NULL OR otsenka_korrozionnogo_protsessa IS NOT NULL");
 }
 
 
 void GidWidget::onKorrozDoc1() // Оценка за выбранные сезоны
 {
+    // без фильтра сезона — все оценки
+    int save = m_sezon_korrozia;
+    m_sezon_korrozia = -1;
+    openKorrozTable(
+        tr("Оценка за выбранные сезоны"),
+        "srednyaya_skorost_korrozii__mm_god IS NOT NULL OR otsenka_korrozionnogo_protsessa IS NOT NULL");
+    m_sezon_korrozia = save;
 }
 
 
@@ -3258,42 +3896,183 @@ void GidWidget::onPassportOnOff() // Включить/отключить ото�
 
 void GidWidget::onKorroziaOnoff() // Включить/отключить отображение
 {
-//    geoOnOffFile("remont", tr("Выберите "));
+    geoOnOffFile("remont", tr("Выберите объекты индикаторов коррозии / ремонтов"));
 }
 
 
 void GidWidget::onKorroziaSezon() // Выбор отопительного сезона
 {
+    onRemontPovrOtop();
 }
 
 
+void view_db2(DbWindow *view, const QString & title, QWidget *parent);
+
 void GidWidget::onIznos() // Износ оборудования
 {
+    bool ok = false;
+    QString text = QInputDialog::getText(
+        this,
+        tr("Износ оборудования"),
+        tr("Дата расчёта износа (дд.мм.гггг)"),
+        QLineEdit::Normal,
+        QDate::currentDate().toString("dd.MM.yyyy"),
+        &ok);
+    if (!ok) return;
+
+    QDate d = QDate::fromString(text.trimmed(), "dd.MM.yyyy");
+    if (!d.isValid()) {
+        d = QDate::fromString(text.trimmed(), "d.M.yyyy");
+    }
+    if (!d.isValid()) {
+        QMessageBox::warning(this, "", tr("Некорректная дата: %1").arg(text));
+        return;
+    }
+
+    QDateTime dt(d, QTime(0, 0, 0));
+    QString dt_sql = dt.toString("yyyy-MM-dd HH:mm:ss");
+
+    // Есть ли уже расчёт на эту дату?
+    QSqlQuery qfind(m_cxema.m_db);
+    int existing_id = 0;
+    if (query_exec(m_cxema.m_db, qfind,
+                   QString("SELECT id FROM calculation_iznos WHERE daterascheta::date = '%1'::date")
+                       .arg(d.toString("yyyy-MM-dd")))) {
+        if (qfind.next()) {
+            existing_id = qfind.value(0).toInt();
+        }
+    }
+
+    QString ask = tr("Создать/обновить расчёт износа за %1?").arg(d.toString("dd.MM.yyyy"));
+    int idc = existing_id;
+    if (existing_id > 0) {
+        if (QMessageBox::question(this, "", ask) == QMessageBox::Yes) {
+            query_exec(m_cxema.m_db,
+                       QString("DELETE FROM iznos WHERE calculationid=%1").arg(existing_id));
+            query_exec(m_cxema.m_db,
+                       QString("DELETE FROM calculation_iznos WHERE id=%1").arg(existing_id));
+            idc = 0;
+        }
+    } else if (QMessageBox::question(this, "", ask) != QMessageBox::Yes) {
+        return;
+    }
+
+    if (idc <= 0) {
+        QString name = tr("Износ %1").arg(d.toString("dd.MM.yyyy"));
+        name.replace("'", "''");
+        QSqlQuery qins(m_cxema.m_db);
+        if (!query_exec(m_cxema.m_db, qins,
+                        QString("INSERT INTO calculation_iznos(daterascheta, name) "
+                                "VALUES (TIMESTAMP '%1', '%2') RETURNING id")
+                            .arg(dt_sql, name))
+            || !qins.next()) {
+            QMessageBox::warning(this, "", tr("Не удалось создать расчёт износа"));
+            return;
+        }
+        idc = qins.value(0).toInt();
+        // строки-заготовки по всем участкам (compat.pipesections через search_path)
+        query_exec(m_cxema.m_db,
+                   QString("INSERT INTO iznos(pipesectionid, calculationid) "
+                           "SELECT id, %1 FROM pipesections").arg(idc));
+    }
+
+    QString title = tr("Износ участков тепловой сети — %1").arg(d.toString("dd.MM.yyyy"));
+    QString q = QString(
+        "SELECT i.id, i.pipesectionid AS %1, i.calculationid AS %2, "
+        "i.iznos AS %3, i.dateendperekladki AS %4, i.dateendosvidetel AS %5, "
+        "i.srokekcpluataz AS %6, "
+        "hps.lineid AS %7, hps.diametercondit AS %8, "
+        "hps.firstpicdatehp AS %9, hps.lasttransdate AS %10 "
+        "FROM iznos i "
+        "LEFT JOIN heatpipesections hps ON hps.pipesectionid = i.pipesectionid "
+        "WHERE i.calculationid = %11 "
+        "ORDER BY i.id")
+        .arg(quot_text("Участок (pipeSection)"),
+             quot_text("Расчёт"),
+             quot_text("Износ, %"),
+             quot_text("Дата перекладки"),
+             quot_text("Дата освидетельствования"),
+             quot_text("Срок эксплуатации"),
+             quot_text("Линия"),
+             quot_text("Диаметр усл."),
+             quot_text("Ввод в эксплуатацию"),
+             quot_text("Последняя перекладка"))
+        .arg(idc);
+
+    DbWindow *table = getTableView(m_cxema.m_db, "iznos", q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Ошибка открытия таблицы износа"));
+        return;
+    }
+    table->setEdit(true);
+    table->setGidWidget(this);
+    view_db2(table, title, this);
 }
 
 
 void GidWidget::onElectroAdd() // Установить объект
 {
+    Klassif *kls = menu_list_file(this, tr("Объекты электросети"), "electro");
+    if (kls) addGeo(kls);
 }
 
 
 void GidWidget::onElectroInfo() // Информация по объекту
 {
+    if (!init_pts_list_file("electro")) {
+        QMessageBox::warning(this, "", tr("В системе нет объектов электросети"));
+        return;
+    }
+    regim = R_INIT;
+    m_nRegim = gidrAction.aElectroInfo;
 }
 
 
 void GidWidget::onElectroTable() // Таблица
 {
+    const map<QString, Klassif*> *map_el = init_pts_list_file("electro");
+    if (!map_el || map_el->empty()) {
+        QMessageBox::warning(this, "", tr("В системе нет объектов электросети"));
+        return;
+    }
+
+    MMenuDial menu(this, tr("Таблицы электросети"));
+    for (auto &[tn, kls] : *map_el) {
+        menu.Add(kls->RusName(), QVariant::fromValue(kls));
+    }
+    if (menu.exec() != QDialog::Accepted) return;
+
+    Klassif *kls = menu.value().value<Klassif*>();
+    if (!kls || !kls->m_db) return;
+
+    QString q = getGeoSelect(kls, getCxema()->m_graph);
+    QString title = kls->RusName();
+    DbWindow *table = getTableView(*kls->m_db, kls->nazv, q, title);
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных"));
+        return;
+    }
+    table->setEdit(true);
+    view_db2(table, title, this);
 }
 
 
 void GidWidget::onElectroDel() // Удалить объект
 {
+    if (!init_pts_list_file("electro")) {
+        QMessageBox::warning(this, "", tr("В системе нет объектов электросети"));
+        return;
+    }
+    regim = R_INIT;
+    m_nRegim = gidrAction.aElectroDel;
 }
 
 
 void GidWidget::onZhurnalElectro() // Журнал
 {
+    QMessageBox::information(this, "",
+        tr("Журнал/паспорт электросети (gid6 initPassportElectricalNetwork) "
+           "в Qt-порт не перенесён. Используйте таблицы объектов ЭС."));
 }
 
 #include <ui/Choose_loses_typeDialog.h>
@@ -3691,6 +4470,7 @@ void GidWidget::onMasPodpis() // Масштаб откл.надписей
 
 void GidWidget::onTrio() // Передвинуть
 {
+    QMessageBox::information(this, "", tr("Команда требует доработки (gid6 stub 506)."));
 }
 
 void GidWidget::onIndexes() // Обновление индексов
@@ -3710,6 +4490,7 @@ void GidWidget::onIndexes() // Обновление индексов
 
 void GidWidget::onUpdateSetup() // Настройка обновлений
 {
+    if (main_window) main_window->onUpdateSetup();
 }
 
 #if 0
@@ -3777,16 +4558,52 @@ void GidWidget::onExportPts() // Экспорт фрагмента ПТС
 
 void GidWidget::onImportPts() // Импорт фрагмента ПТС
 {
+    // отдельного импортёра ПТС в gid8 нет — тот же контур, что импорт фрагмента
+    onImportFragment();
 }
 
 
 void GidWidget::onSetAvtoOn() // Сделать потребители автоматическими
 {
+    if (!isEditGid()) return;
+    if (m_parent_id) return;
+
+    const QString msg = tr(
+        "Внимание!\nДля всех выделенных узлов потребителей будет установлен признак %1\nПродолжить операцию?")
+        .arg(tr("автоматический"));
+    if (QMessageBox::question(this, "", msg) != QMessageBox::Yes) return;
+
+    setMarkNode2Value(m_cxema.m_db, m_cxema.graph(), getNodeTableMySQL(TIP_PR),
+                      QStringLiteral("automDegID"), 2, false);
+
+    for (auto p = m_cxema.m_graph->map_node.begin(); p != m_cxema.m_graph->map_node.end(); ++p) {
+        CNode2 *n = p->second;
+        if (n->node.isPjezo) n->node.pr_avtomat = QChar(L'А');
+    }
+    SetModifiedFlag(true);
+    repaint();
 }
 
 
 void GidWidget::onSetAvtoOff() // Сделать потребители неавтоматическими
 {
+    if (!isEditGid()) return;
+    if (m_parent_id) return;
+
+    const QString msg = tr(
+        "Внимание!\nДля всех выделенных узлов потребителей будет установлен признак %1\nПродолжить операцию?")
+        .arg(tr("неавтоматический"));
+    if (QMessageBox::question(this, "", msg) != QMessageBox::Yes) return;
+
+    setMarkNode2Value(m_cxema.m_db, m_cxema.graph(), getNodeTableMySQL(TIP_PR),
+                      QStringLiteral("automDegID"), 1, false);
+
+    for (auto p = m_cxema.m_graph->map_node.begin(); p != m_cxema.m_graph->map_node.end(); ++p) {
+        CNode2 *n = p->second;
+        if (n->node.isPjezo) n->node.pr_avtomat = QChar(L' ');
+    }
+    SetModifiedFlag(true);
+    repaint();
 }
 
 
@@ -3816,36 +4633,96 @@ void GidWidget::onRasList() // Список расчетов
 
 void GidWidget::onSetPsMap() // Установить объекты ПС
 {
+    QMessageBox::information(this, "",
+        tr("Массовая привязка объектов ПС к участкам (gid6 setPsMap) пока не перенесена."));
 }
 
 
 void GidWidget::onSavePng() // Сохранить как PNG
 {
+    QString fn = QFileDialog::getSaveFileName(this, tr("Сохранить как PNG"),
+                                              "schema.png", "PNG (*.png)");
+    if (fn.isEmpty()) return;
+    QPixmap px = grab();
+    if (px.isNull() || !px.save(fn, "PNG")) {
+        QMessageBox::warning(this, "", tr("Не удалось сохранить PNG"));
+        return;
+    }
+    QMessageBox::information(this, "", tr("Сохранено: %1").arg(fn));
 }
 
 
 void GidWidget::onUtNapr2() // Сортировка участков
 {
+    // интерактивное меню gid6 OnUtNapr2; направление потоков — через sortNodes
+    onCreateSortNode();
 }
 
 
 void GidWidget::onInvert() // Инвертировать выделение
 {
+    if (!m_cxema.m_graph) return;
+
+    for (auto p = m_cxema.m_graph->map_node.begin();
+         p != m_cxema.m_graph->map_node.end(); ++p) {
+        CNode2 *n = p->second;
+        n->node.isPjezo = !n->node.isPjezo;
+
+        for (CLINE2 *ll = n->lines; ll; ll = nextl(ll)) {
+            if (IsBegin(ll)) {
+                bline(ll)->line.isPjezo = !bline(ll)->line.isPjezo;
+            }
+        }
+    }
+    repaint();
 }
 
 
 void GidWidget::onSetAddr() // Адреса потребителей
 {
+    // gid6 — только сообщение; в Qt открываем панель адресов (как onFindGeoAddr)
+    onFindGeoAddr();
 }
 
 
 void GidWidget::onAlma() // Паспортизация
 {
+    // режим паспортизации: скрыть стрелки потоков (m_bIsPts), как визуальный
+    // режим ПТС в gid8; в gid6 флаг m_bIsAlma сохранялся, но не влиял на отрисовку
+    m_bIsPts = !m_bIsPts;
+    if (gidrAction.aAlma) gidrAction.aAlma->setChecked(m_bIsPts);
+    QSettings settings;
+    settings.setValue("flags/isPTS", m_bIsPts);
+    settings.setValue("flags/isPts", m_bIsPts);
+    repaint();
 }
 
 
 void GidWidget::onTuZav() // Установить статус Завершен для ТУ
 {
+    Klassif *kls = m_kl_list.findKlN("zdaniya_tu");
+    QSqlDatabase *db = kls && kls->m_db ? kls->m_db : &m_cxema.m_db;
+
+    if (!column_in_table(*db, "tehnicheskie_usloviya", "data_vydachi_akta_dopuska")) {
+        QMessageBox::warning(this, "",
+            tr("В таблице ТУ нет поля data_vydachi_akta_dopuska"));
+        return;
+    }
+
+    if (QMessageBox::question(this, "", tr("Подтвердить операцию?")) != QMessageBox::Yes) {
+        return;
+    }
+
+    QString q =
+        "UPDATE tehnicheskie_usloviya SET sostoyanie_dogovora = ("
+        "  SELECT id FROM statetu"
+        "  WHERE name ILIKE '%заверш%' OR upper(name) IN ('З','Z')"
+        "  ORDER BY id LIMIT 1"
+        ") WHERE data_vydachi_akta_dopuska IS NOT NULL";
+
+    if (query_exec(*db, q)) {
+        QMessageBox::information(this, "", tr("Выполнено!"));
+    }
 }
 
 
@@ -3928,32 +4805,68 @@ void GidWidget::onSetLineid() // !
 
 void GidWidget::onSetIst() // Расстановка источников
 {
+    if (!m_cxema.m_graph) return;
+
+    int mark(CNode2 *n, bool zakr);
+
+    MMenuDial menu(this, tr("Выберите узел"));
+
+    for (auto p = m_cxema.m_graph->map_node.begin();
+         p != m_cxema.m_graph->map_node.end(); ++p) {
+        CNode2 *n = p->second;
+        if (n->node.coord.x == 0 || n->node.internalNodeID != 0) continue;
+        if (n->node.isPjezo) continue;
+        int k = mark(n, false);
+        if (k > 1) {
+            menu.Add(n->getName(), QVariant(static_cast<int>(n->id)));
+        }
+    }
+    repaint();
+
+    if (menu.exec() != QDialog::Accepted) return;
+    CNode2 *n = m_cxema.m_graph->find(menu.value().toInt());
+    if (n) moveXY(n->node.coord);
 }
 
 
 void GidWidget::onUchList() // Список участков ПТС
 {
+    QMessageBox::information(this, "",
+        tr("Список участков ПТС: откройте таблицу участков через меню ПТС "
+           "или команду «Создание таблицы sortNodesForUchastok»."));
 }
-
 
 
 void GidWidget::onAsyncCheck() // Проверка Async Task
 {
+    QMessageBox::information(this, "",
+        tr("Отладочная проверка Async Task из gid6 в Qt-порт не входит."));
 }
 
 
 void GidWidget::onCheckPo() // Проверка
 {
+    QMessageBox::information(this, "",
+        tr("Команда «Проверка» (gid6 OnCheckPo) пока не перенесена."));
 }
 
 
 void GidWidget::onResetGeo() // Обновить надписи
 {
+    // в gid6 здесь был отладочный обход нагрузок; для UI — перерисовка схемы
+    repaint();
 }
 
 
+bool _isDopNameAstana = false;
+
 void GidWidget::onPsAstanaName() // Отображение имен узлов
 {
+    QSettings settings;
+    _isDopNameAstana = !settings.value("DopNameAstana", false).toBool();
+    settings.setValue("DopNameAstana", _isDopNameAstana);
+    if (gidrAction.aPsAstanaName) gidrAction.aPsAstanaName->setChecked(_isDopNameAstana);
+    repaint();
 }
 
 
@@ -3968,36 +4881,86 @@ void GidWidget::onColorOnlyPts() // Цвета только для участк�
 
 void GidWidget::onExportShape() // ESRI shape-файлы
 {
+    QMessageBox::information(this, "",
+        tr("Экспорт ESRI Shape из gid6 (cxema->exportShape) в gid8 ещё не перенесён."));
 }
 
 
 void GidWidget::onPrPo() // Реальные -> обобщенные
 {
+    QMessageBox::information(this, "",
+        tr("Массовая смена класса «реальный → обобщённый» потребитель "
+           "(gid6 renameNode) будет доступна после порта reclass в UI. "
+           "Пока используйте смену типа узла по одному."));
 }
 
 
 void GidWidget::onUtNapr() // Сортировка участков
 {
+    onCreateSortNode();
 }
 
 
 void GidWidget::onC3Del() // Удалить внутренние схемы
 {
+    QMessageBox::information(this, "", tr("Команда требует доработки (gid6 stub 508)."));
 }
 
 
 void GidWidget::onC3Add() // Создать внутренние схемы
 {
+    // gid6 — заглушка 507; ближайший рабочий аналог — onIspravl
+    onIspravl();
 }
 
 
+void create_b5_new(QSqlDatabase &db, CNode2 *nP, CCxema* cxema);
+
 void GidWidget::onIspravl() // Восстановить файл
 {
+    if (!isEditGid()) return;
+
+    if (QMessageBox::question(
+            this, "",
+            tr("Внимание!\nПри выполнении этой операции будут изменены внутренние схемы "
+               "во всех реальных потребителях\nВыполнить операцию?"))
+        != QMessageBox::Yes) {
+        return;
+    }
+
+    QList<CNode2 *> prs;
+    for (auto &p : m_cxema.m_graph->map_node) {
+        CNode2 *nn = p.second;
+        if (nn && nn->node.typ == TIP_PR) prs.append(nn);
+    }
+    if (prs.isEmpty()) {
+        QMessageBox::information(this, "", tr("Реальных потребителей на схеме нет"));
+        return;
+    }
+
+    QProgressDialog progress(tr("Восстановление внутренних схем..."), tr("Отмена"), 0, prs.size(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
+
+    int done = 0;
+    for (CNode2 *nn : prs) {
+        if (progress.wasCanceled()) break;
+        create_b5_new(m_cxema.m_db, nn, &m_cxema);
+        progress.setValue(++done);
+        QApplication::processEvents();
+    }
+    progress.setValue(prs.size());
+    QMessageBox::information(this, "", tr("Обработано потребителей: %1").arg(done));
+    repaint();
 }
 
 
 void GidWidget::onOpc() // Настройка OPC сервера
 {
+    // COM OPC DA из gid6 (opc.cpp) в Qt-сборку не переносился
+    QMessageBox::information(this, "",
+        tr("Настройка OPC сервера SCADA в текущей сборке gid8 недоступна "
+           "(COM OPC DA не входит в Qt-порт)."));
 }
 
 #include <any/json.hpp>
@@ -4261,6 +5224,13 @@ void GidWidget::onMapSearch() // Поиск
 
 void GidWidget::onMapPath() // Каталог
 {
+    extern QString m_pathMap;
+    QString dir = QFileDialog::getExistingDirectory(
+        this, tr("Каталог карт"), m_pathMap.isEmpty() ? QString() : m_pathMap);
+    if (dir.isEmpty()) return;
+    m_pathMap = dir;
+    QSettings settings;
+    settings.setValue("path_map", m_pathMap);
 }
 
 
@@ -4273,6 +5243,8 @@ void GidWidget::onMapYes(bool on) // Восстанавливать подклю
 
 void GidWidget::onFileOpenOld() // Импорт
 {
+    // tooltip: конвертор ТГИД-05/07 — тот же путь, что aImportFragmentMdb
+    onImportFragmentMdb();
 }
 
 
@@ -4551,6 +5523,7 @@ void GidWidget::onPassword2() // Изменить пароль
 
 void GidWidget::onViewStatusBar() // Строка статуса
 {
+    if (main_window) main_window->onViewStatusBar();
 }
 
 void GidWidget::onHelpFinder() // Содержание\tF1
@@ -4575,6 +5548,7 @@ void GidWidget::onHelpFinder() // Содержание\tF1
 
 void GidWidget::onUpdate() // Последнее обновление
 {
+    if (main_window) main_window->onUpdate();
 }
 
 /*
@@ -4757,6 +5731,9 @@ void GidWidget::onSaveRS()
 
 void GidWidget::onMsPassport()
 {
+    int typ = 0, id = 0;
+    if (!pick_ms_rs_for_passport(this, m_cxema.m_db, typ, id)) return;
+    Passport(nullptr, nullptr, typ, id);
 }
 
 
@@ -4789,6 +5766,19 @@ void GidWidget::onAktCreate()
 
 void GidWidget::onPtsZhurnal()
 {
+    Klassif *kls = menu_list_file(this, tr("Объекты ПТС"), "pts");
+    if (!kls) return;
+
+    QString q = getGeoSelect(kls, getCxema()->m_graph);
+    DbWindow *table = getTableView(*kls->m_db, kls->nazv, q, kls->RusName());
+    if (!table) {
+        QMessageBox::warning(this, "", tr("Нет данных в таблице %1").arg(kls->RusName()));
+        return;
+    }
+    table->setGidWidget(this);
+    table->setGeo(kls->nazv);
+    table->setEdit(true);
+    view_db2(table, kls->RusName(), this);
 }
 
 void GidWidget::onSelect6()   // "Выделить",

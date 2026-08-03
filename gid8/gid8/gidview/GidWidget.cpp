@@ -153,6 +153,7 @@ void GidWidget::saveFlags()
     settings.setValue("flags/isPodp",  m_bIsPodp);
     settings.setValue("flags/isPodpRes",  m_bIsPodpRes);
     settings.setValue("flags/isPTS",  m_bIsPts);
+    settings.setValue("flags/isPicture", m_bIsPicture);
     settings.setValue("flags/isRamka",  m_bIsRamka);
     settings.setValue("flags/isRezhim",  m_bIsRezhim);
 
@@ -202,6 +203,7 @@ void GidWidget::restoreFlags()
     m_bIsPodp =    settings.value("flags/isPodp", m_bIsPodp).toBool();
     m_bIsPodpRes = settings.value("flags/isPodpRes", m_bIsPodpRes).toBool();
     m_bIsPts =     settings.value("flags/isPts", m_bIsPts).toBool();
+    m_bIsPicture = settings.value("flags/isPicture", m_bIsPicture).toBool();
     m_bIsRamka =   settings.value("flags/isRamka", m_bIsRamka).toBool();
     m_bIsRezhim =  settings.value("flags/isRezhim", m_bIsRezhim).toBool();
     m_bIsRezhim = true;

@@ -118,7 +118,7 @@ bool execQ(QSqlDatabase & db, const QString & q, bool message = false);
 //int execInsertQ(QSqlDatabase & db, QSqlQuery &query, const QString & q, bool message = false);
 //int execInsertQ(QSqlDatabase & db, const QString & q, bool message = false);
 
-//int execInsertQ(QSqlDatabase & db, const QString & tn, std::map<QString, QVariant> & map_v, bool message = false, bool last = true);
+int execInsertQ(QSqlDatabase & db, const QString & tn, std::map<QString, QVariant> & map_v, bool message = false, bool last = true);
 bool execUpdateQ(QSqlDatabase & db, const QString & tn, int id, std::map<QString, QVariant> & map_v, bool message = false);
 
 QString getTableNameFromSql(const QString & q);
