@@ -106,6 +106,73 @@ void DockGeo::reset()
     }
 }
 
+// Какие слои показывать в проводнике геобазы.
+//
+// В дерево досыпались ВСЕ таблицы классификатора, поэтому там оказались
+// строки, которые на карте включить нельзя: у них попросту нет
+// геометрии, и галочка ничего не меняла. Плюс представления *_wgs84 —
+// это те же объекты в другой системе координат, они существуют для
+// внешних ГИС и в программе не нужны.
+//
+// Признак «есть что рисовать» берётся из самой БД: наличие колонки типа
+// geometry. Список запрашивается один раз за сеанс.
+static const QSet<QString> &geo_tables_with_geometry(QSqlDatabase &db)
+{
+    static QSet<QString> tables;
+    static bool loaded = false;
+
+    if (!loaded) {
+        loaded = true;
+        QSqlQuery query(db);
+        query.setForwardOnly(true);
+        if (query.exec("SELECT lower(table_schema) || '.' || lower(table_name) "
+                       "FROM information_schema.columns "
+                       "WHERE udt_name = 'geometry'")) {
+            while (query.next()) {
+                const QString full = query.value(0).toString();
+                tables.insert(full);
+                // Имя без схемы: в классификаторе слой может быть записан
+                // и так, и так.
+                tables.insert(full.section('.', 1));
+            }
+        }
+        qInfo() << "геобаза: таблиц с геометрией" << tables.size();
+    }
+    return tables;
+}
+
+static bool geo_layer_visible(QSqlDatabase &db, const QString &name)
+{
+    const QString n = name.toLower();
+
+    if (n.endsWith("_wgs84")) return false;
+
+    const QSet<QString> &geo = geo_tables_with_geometry(db);
+    if (geo.isEmpty()) return true;      // не смогли спросить — не прячем
+
+    return geo.contains(n) || geo.contains(n.section('.', 1));
+}
+
+// Русские названия групп. Группа в дереве — это имя схемы БД, и до сих
+// пор она показывалась как есть: net, ref, addr. Понять по такой
+// подписи, что внутри, невозможно.
+static QString geo_group_rus(const QString &schema)
+{
+    static const QMap<QString, QString> names = {
+        {"net",   QStringLiteral("Объекты тепловой сети")},
+        {"ref",   QStringLiteral("Справочники")},
+        {"addr",  QStringLiteral("Адресный план")},
+        {"ops",   QStringLiteral("Эксплуатация: ремонты, дефекты, шурфы")},
+        {"org",   QStringLiteral("Организации и ответственные")},
+        {"doc",   QStringLiteral("Документы и паспорта")},
+        {"el",    QStringLiteral("Электроснабжение")},
+        {"calc",  QStringLiteral("Результаты расчётов")},
+        {"meta",  QStringLiteral("Служебное: каталог слоёв и журналы")},
+        {"attic", QStringLiteral("Архив (изъятое при переносе)")},
+    };
+    return names.value(schema.toLower(), schema);
+}
+
 bool DockGeo::init(GidWidget *view, const QString & baza)
 {
     m_view = view;
@@ -200,6 +267,10 @@ bool DockGeo::init(GidWidget *view, const QString & baza)
 
     for (auto & kl : m_kl_list) {
         if (kl.baza == baza && !set_s.contains(kl.nazv.toLower())) {
+            // Слои без геометрии и представления *_wgs84 в дерево
+            // не попадают: включить их на карте всё равно нельзя.
+            if (!geo_layer_visible(m_view->getCxema()->m_db, kl.nazv)) continue;
+
             QString schema = "";
             QString table = kl.nazv;
             
@@ -212,7 +283,7 @@ bool DockGeo::init(GidWidget *view, const QString & baza)
 
             if (schema != "" && schema != schema_old) {
                 i0 = new QTreeWidgetItem(i00);
-                QString rus_name = findTableRusName(baza, schema);
+                QString rus_name = geo_group_rus(schema);
                 i0->setText(0, rus_name);
                 i0->setCheckState(0, Qt::Checked);
             }
