@@ -354,6 +354,7 @@ bool isJpeg(int typ)
 {
     //  return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT;
     return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT || typ == ID_GOOGLE_HYBRID
+        || typ == ID_MAPTILER_STREETS || typ == ID_MAPTILER_TOPO
         || typ == ID_MAPTILER_HYBRID || typ == ID_MAPTILER_OSM;
     //    return typ == ID_YANDEX_SAT || typ == ID_GOOGLE_SAT || typ == ID_GOOGLE_HYBRID || typ == ID_WMS_MAP;
 }
@@ -462,48 +463,33 @@ QString maptiler_key()
     return key;
 }
 
-// Растровые тайлы MapTiler.
+// Растровые тайлы MapTiler — обычного разрешения, 256x256.
 //
-// Суффикс @2x даёт картинку 512x512 на ту же клетку схемы 256. Она
-// заметно тяжелее: замер по streets-v4 и topo-v4 — 94 и 99 КБ против
-// 36 и 37 КБ, то есть в 2,7 раза. На экран 1920x1080 нужно около 54
-// плиток, значит смена масштаба тянет ~5 МБ вместо ~1,9 МБ, причём
-// MapTiler отдаёт с ОДНОГО хоста (Google и OSM — с трёх поддоменов),
-// а Qt держит не больше шести одновременных соединений на хост.
-// Отсюда и медленное появление карты при зуме.
+// Суффикс @2x убран по требованию заказчика: карта грузилась слишком
+// долго. Замер это подтверждал — плитка @2x весит 94 КБ против 36 КБ
+// обычной (в 2,7 раза больше), на экран 1920x1080 их нужно около 54,
+// то есть смена масштаба тянула ~5 МБ вместо ~1,9 МБ. При этом MapTiler
+// отдаёт с ОДНОГО хоста, тогда как Google и OSM — с трёх поддоменов, а
+// Qt держит не больше шести одновременных соединений на хост: разница
+// в объёме превращалась в разницу во времени почти напрямую.
 //
-// Поэтому удвоенное разрешение запрашивается только когда экран
-// действительно плотный: на обычном мониторе мы бы скачали вчетверо
-// больше пикселей и тут же ужали их обратно. Принудительно включить
-// или выключить — настройка maps/maptiler_retina.
-static bool maptiler_retina()
-{
-    static int mode = -1;      // -1 не выяснено, 0 нет, 1 да
-    if (mode < 0) {
-        QSettings settings;
-        const QVariant v = settings.value("maps/maptiler_retina");
-        if (v.isValid()) {
-            mode = v.toBool() ? 1 : 0;
-        }
-        else {
-            const qreal dpr = qApp ? qApp->devicePixelRatio() : 1.0;
-            mode = (dpr > 1.2) ? 1 : 0;
-        }
-        qInfo() << "MapTiler: плитки" << (mode ? "@2x" : "обычные");
-    }
-    return mode == 1;
-}
-
+// Попытки вернуть @2x «по плотности экрана» здесь быть не должно:
+// решение принято по результату работы, а не по характеристикам
+// монитора.
+//
+// Формат — JPEG для всех четырёх стилей. Замер на одной и той же
+// плитке: streets-v4 36 КБ в PNG против 17 КБ в JPEG, topo-v4 37
+// против 17, openstreetmap 36 против 23, hybrid 43 против 26. Для
+// подложки под сеть потеря качества несущественна, а объём вдвое
+// меньше. Вместе с отказом от @2x это 94 КБ -> 17 КБ на плитку.
 static QString maptiler_url(const QString &style, const QString &ext,
                             int nn, int xx, int yy)
 {
     QString key = maptiler_key();
     if (key.isEmpty()) return QString();
 
-    return QString("https://api.maptiler.com/maps/%1/256/%2/%3/%4%5.%6?key=%7")
-            .arg(style).arg(nn).arg(xx).arg(yy)
-            .arg(maptiler_retina() ? "@2x" : "")
-            .arg(ext).arg(key);
+    return QString("https://api.maptiler.com/maps/%1/256/%2/%3/%4.%5?key=%6")
+            .arg(style).arg(nn).arg(xx).arg(yy).arg(ext).arg(key);
 }
 
 QString get_url(int nn, int xx, int yy, int map_typ)
@@ -604,11 +590,11 @@ QString get_url(int nn, int xx, int yy, int map_typ)
         break;
 
     case ID_MAPTILER_STREETS:
-        str = maptiler_url("streets-v4", "png", nn, xx, yy);
+        str = maptiler_url("streets-v4", "jpg", nn, xx, yy);
         break;
 
     case ID_MAPTILER_TOPO:
-        str = maptiler_url("topo-v4", "png", nn, xx, yy);
+        str = maptiler_url("topo-v4", "jpg", nn, xx, yy);
         break;
 
     case ID_MAPTILER_HYBRID:
