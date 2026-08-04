@@ -462,18 +462,48 @@ QString maptiler_key()
     return key;
 }
 
-// Растровые тайлы MapTiler. Суффикс @2x даёт картинку 512x512 на ту же
-// клетку схемы 256 — drawPic масштабирует изображение под целевой
-// прямоугольник независимо от исходного размера, поэтому удвоенное
-// разрешение работает без правок отрисовки и даёт более чёткий результат.
+// Растровые тайлы MapTiler.
+//
+// Суффикс @2x даёт картинку 512x512 на ту же клетку схемы 256. Она
+// заметно тяжелее: замер по streets-v4 и topo-v4 — 94 и 99 КБ против
+// 36 и 37 КБ, то есть в 2,7 раза. На экран 1920x1080 нужно около 54
+// плиток, значит смена масштаба тянет ~5 МБ вместо ~1,9 МБ, причём
+// MapTiler отдаёт с ОДНОГО хоста (Google и OSM — с трёх поддоменов),
+// а Qt держит не больше шести одновременных соединений на хост.
+// Отсюда и медленное появление карты при зуме.
+//
+// Поэтому удвоенное разрешение запрашивается только когда экран
+// действительно плотный: на обычном мониторе мы бы скачали вчетверо
+// больше пикселей и тут же ужали их обратно. Принудительно включить
+// или выключить — настройка maps/maptiler_retina.
+static bool maptiler_retina()
+{
+    static int mode = -1;      // -1 не выяснено, 0 нет, 1 да
+    if (mode < 0) {
+        QSettings settings;
+        const QVariant v = settings.value("maps/maptiler_retina");
+        if (v.isValid()) {
+            mode = v.toBool() ? 1 : 0;
+        }
+        else {
+            const qreal dpr = qApp ? qApp->devicePixelRatio() : 1.0;
+            mode = (dpr > 1.2) ? 1 : 0;
+        }
+        qInfo() << "MapTiler: плитки" << (mode ? "@2x" : "обычные");
+    }
+    return mode == 1;
+}
+
 static QString maptiler_url(const QString &style, const QString &ext,
                             int nn, int xx, int yy)
 {
     QString key = maptiler_key();
     if (key.isEmpty()) return QString();
 
-    return QString("https://api.maptiler.com/maps/%1/256/%2/%3/%4@2x.%5?key=%6")
-            .arg(style).arg(nn).arg(xx).arg(yy).arg(ext).arg(key);
+    return QString("https://api.maptiler.com/maps/%1/256/%2/%3/%4%5.%6?key=%7")
+            .arg(style).arg(nn).arg(xx).arg(yy)
+            .arg(maptiler_retina() ? "@2x" : "")
+            .arg(ext).arg(key);
 }
 
 QString get_url(int nn, int xx, int yy, int map_typ)

@@ -358,17 +358,40 @@ bool connectSQL0(int rdbms, const QString & host, int port, const QString & baza
     }
     else {
 
-        QString QODBC = "QODBC";
-//        QODBC = "QPSQL";
+        // Драйвер подключения к PostgreSQL.
+        //
+        // Исторически это ODBC, а строка с родным QPSQL была
+        // закомментирована. ODBC добавляет лишний слой на КАЖДУЮ строку:
+        // диспетчер драйверов, psqlODBC, своё преобразование типов.
+        // Родной QPSQL говорит с сервером через libpq напрямую, и
+        // qsqlpsql.dll в сборку уже разворачивается.
+        //
+        // Переключатель вынесен в настройку, потому что смена драйвера
+        // может задеть краевые случаи преобразования типов, и это надо
+        // проверять на живой работе, а не менять молча:
+        //     maps/... нет, тут db/driver = QPSQL | QODBC
+        // По умолчанию оставлен прежний QODBC — поведение не меняется,
+        // пока переключение не проверено.
+        QString drv = "QODBC";
+        if (RDBMS == POSTGRESQL) {
+            QSettings settings;
+            drv = settings.value("db/driver", "QODBC").toString().toUpper();
+            if (drv != "QPSQL" && drv != "QODBC") drv = "QODBC";
+        }
 
-        m_db = QSqlDatabase::addDatabase(QODBC, connectString);
+        m_db = QSqlDatabase::addDatabase(drv, connectString);
         m_db.setHostName(host);
-        m_db.setDatabaseName(connectString);
+        m_db.setDatabaseName(drv == "QPSQL" ? baza : connectString);
 
         if (RDBMS == POSTGRESQL) {
-            qDebug() << "PostgreSQL ODBC:" << host << port << baza << user;
-//            m_db.setConnectOptions("SQL_ATTR_LOGIN_TIMEOUT=5;SQL_ATTR_QUERY_TIMEOUT=5");
-            m_db.setConnectOptions("SQL_ATTR_LOGIN_TIMEOUT=5");
+            qInfo() << "PostgreSQL, драйвер" << drv << ":"
+                    << host << port << baza << user;
+            if (drv == "QODBC") {
+                m_db.setConnectOptions("SQL_ATTR_LOGIN_TIMEOUT=5");
+            }
+            else {
+                m_db.setConnectOptions("connect_timeout=5");
+            }
             m_db.setPort(port);
         }
 
